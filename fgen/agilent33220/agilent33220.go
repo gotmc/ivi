@@ -37,7 +37,7 @@ func (stdFunc *StandardFunction) ConfigureWaveform(w io.Writer) {
 
 }
 
-type FGen struct {
+type Agilent33220 struct {
 	inst     ivi.Instrument
 	Channels *[]Channel
 }
@@ -45,11 +45,11 @@ type FGen struct {
 type Channel struct {
 }
 
-func (fgen *FGen) OutputCount() int {
+func (fgen *Agilent33220) OutputCount() int {
 	return 1
 }
 
-func (fgen *FGen) GetAmplitude(ch int) (float64, error) {
+func (fgen *Agilent33220) GetAmplitude(ch int) (float64, error) {
 	return getAmplitude(fgen.inst, ch)
 }
 
@@ -64,15 +64,12 @@ func getAmplitude(inst ivi.Instrument, ch int) (float64, error) {
 	return strconv.ParseFloat(value, 64)
 }
 
-func (fgen *FGen) Close() error {
+func (fgen *Agilent33220) Close() error {
 	return fgen.inst.Close()
 }
 
-func New(inst ivi.Instrument, err error) (FGen, error) {
-	var fgen FGen
-	if err != nil {
-		return fgen, err
-	}
+func New(inst ivi.Instrument) (Agilent33220, error) {
+	var fgen Agilent33220
 	fgen.inst = inst
 	return fgen, nil
 }
