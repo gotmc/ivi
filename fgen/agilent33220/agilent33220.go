@@ -37,6 +37,8 @@ func (stdFunc *StandardFunction) ConfigureWaveform(w io.Writer) {
 
 }
 
+// Agilent33220 provides the IVI driver for an Agilent 33220A or 33210A
+// function generator.
 type Agilent33220 struct {
 	inst     ivi.Instrument
 	Channels *[]Channel
@@ -45,31 +47,39 @@ type Agilent33220 struct {
 type Channel struct {
 }
 
+// OutputCount returns the number of outputs for the function generator.
 func (fgen *Agilent33220) OutputCount() int {
 	return 1
 }
 
+// GetAmplitude returns the amplitude in volts for the given channel index.
 func (fgen *Agilent33220) GetAmplitude(ch int) (float64, error) {
 	return getAmplitude(fgen.inst, ch)
 }
 
-func getAmplitude(inst ivi.Instrument, ch int) (float64, error) {
+func (fgen *Agilent33220) Amplitude(ch int, a float64) error {
+	return nil
+}
+
+func getAmplitude(q ivi.Querier, ch int) (float64, error) {
 	if ch != 0 {
 		return 0, fmt.Errorf("Channel doesn't exist: %d", ch)
 	}
-	value, err := inst.Query("VOLT?")
+	value, err := q.Query("VOLT?")
 	if err != nil {
 		return 0, err
 	}
 	return strconv.ParseFloat(value, 64)
 }
 
+// Close closes the IVI Instrument.
 func (fgen *Agilent33220) Close() error {
 	return fgen.inst.Close()
 }
 
-func New(inst ivi.Instrument) (Agilent33220, error) {
+// New creates a new Agilent33220 IVI Instrument.
+func New(inst ivi.Instrument) (*Agilent33220, error) {
 	var fgen Agilent33220
 	fgen.inst = inst
-	return fgen, nil
+	return &fgen, nil
 }

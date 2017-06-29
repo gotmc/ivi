@@ -12,5 +12,5 @@ type Agilent34461A struct {
 }
 
 func (dev *Agilent34461A) DCVolts() (v float64, err error) {
-
+	return 0.0, nil
 }

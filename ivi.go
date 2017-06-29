@@ -7,8 +7,17 @@ package ivi
 
 import "io"
 
+// Instrument provides the interface required for all IVI Instruments.
 type Instrument interface {
 	io.ReadWriteCloser
-	WriterString(s string) (n int, err error)
+	StringWriter
+	Querier
+}
+
+type StringWriter interface {
+	WriteString(s string) (n int, err error)
+}
+
+type Querier interface {
 	Query(s string) (value string, err error)
 }
