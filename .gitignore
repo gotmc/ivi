@@ -22,3 +22,6 @@ _testmain.go
 *.exe
 *.test
 *.prof
+
+/examples/visa/usbtmc/agilent33220/agilent33220
+/examples/usbtmc/agilent33220/agilent33220

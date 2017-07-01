@@ -6,7 +6,6 @@
 package main
 
 import (
-	"fmt"
 	"log"
 
 	"github.com/gotmc/ivi/fgen/agilent33220"
@@ -28,18 +27,6 @@ func main() {
 		log.Fatalf("IVI instrument error: %s", err)
 	}
 	defer fgen.Close()
-	amp, err := fgen.GetAmplitude(0)
-	if err != nil {
-		log.Fatalf("Problem reading amplitude: %s", err)
-	}
-	fmt.Printf("Amplitude = %.2f", amp)
-	err = fgen.Amplitude(0, 0.24)
-	if err != nil {
-		log.Fatalf("Problem setting the amplitude: %s", err)
-	}
-	amp, err = fgen.GetAmplitude(0)
-	if err != nil {
-		log.Fatalf("Problem reading amplitude: %s", err)
-	}
-	fmt.Printf("Amplitude = %.2f", amp)
+	ch := fgen.Ch[0]
+	ch.SetAmplitude(0.24)
 }
