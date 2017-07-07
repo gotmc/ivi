@@ -37,7 +37,20 @@ func main() {
 	ch.EnableOutput()
 	wave, err := ch.StandardWaveform()
 	if err != nil {
-		log.Fatalf("Error determining standard waveform: %s", err)
+		log.Printf("Error determining standard waveform: %s", err)
+	} else {
+		log.Printf("Waveform = %s", wave)
 	}
-	log.Printf("Waveform = %s", wave)
+	amp, err := ch.Amplitude()
+	if err != nil {
+		log.Printf("Error determining the amplitude: %s", err)
+	} else {
+		log.Printf("Amplitude = %.2f Vpp", amp)
+	}
+	freq, err := ch.Frequency()
+	if err != nil {
+		log.Printf("Error determining the frequency: %s", err)
+	} else {
+		log.Printf("Frequency = %.2f Hz", freq)
+	}
 }
