@@ -29,7 +29,7 @@ func (stdFunc *StandardFunction) ConfigureWaveform(w io.Writer) {
 type Agilent33220 struct {
 	inst        ivi.Instrument
 	outputCount int
-	Ch          []Channel
+	Channels    []Channel
 }
 
 // OutputCount returns the number of outputs for the function generator.
@@ -54,7 +54,7 @@ func New(inst ivi.Instrument) (*Agilent33220, error) {
 	fgen := Agilent33220{
 		inst:        inst,
 		outputCount: outputCount,
-		Ch:          channels,
+		Channels:    channels,
 	}
 	return &fgen, nil
 }

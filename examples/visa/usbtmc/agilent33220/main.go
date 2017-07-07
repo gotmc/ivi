@@ -28,7 +28,7 @@ func main() {
 		log.Fatalf("IVI instrument error: %s", err)
 	}
 	defer fgen.Close()
-	ch := fgen.Ch[0]
+	ch := fgen.Channels[0]
 	ch.SetStandardWaveform(ivi.Triangle)
 	ch.SetFrequency(1000)
 	ch.SetAmplitude(0.24)
