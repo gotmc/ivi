@@ -29,9 +29,12 @@ func main() {
 	}
 	defer fgen.Close()
 	ch := fgen.Channels[0]
+	ch.DisableOutput()
 	ch.SetStandardWaveform(ivi.Triangle)
 	ch.SetFrequency(1000)
-	ch.SetAmplitude(0.24)
+	ch.SetAmplitude(0.25)
+	ch.SetDCOffset(0.1)
+	ch.EnableOutput()
 	wave, err := ch.StandardWaveform()
 	if err != nil {
 		log.Fatalf("Error determining standard waveform: %s", err)
