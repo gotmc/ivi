@@ -10,3 +10,8 @@ instance, instead of sending SCPI commands to an Agilent 33220A function
 generator, which would be different than the SCPI commands for an SRS
 DS345 function generator, the [ivi][] package provides a common API for
 function generators.
+
+Currently, [ivi][] doesn't cache state. Every time an attribute is read
+directly from the instrument.
+
+[ivi]: https://github.com/gotmc/ivi

@@ -8,10 +8,11 @@ package main
 import (
 	"log"
 
+	"github.com/gotmc/ivi"
 	"github.com/gotmc/ivi/fgen/agilent33220"
 	_ "github.com/gotmc/usbtmc/driver/truveris"
 	"github.com/gotmc/visa"
-	_ "github.com/gotmc/visa/drivers/usbtmc"
+	_ "github.com/gotmc/visa/driver/usbtmc"
 )
 
 func main() {
@@ -28,5 +29,12 @@ func main() {
 	}
 	defer fgen.Close()
 	ch := fgen.Ch[0]
+	ch.SetStandardWaveform(ivi.Triangle)
+	ch.SetFrequency(1000)
 	ch.SetAmplitude(0.24)
+	wave, err := ch.StandardWaveform()
+	if err != nil {
+		log.Fatalf("Error determining standard waveform: %s", err)
+	}
+	log.Printf("Waveform = %s", wave)
 }

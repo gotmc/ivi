@@ -17,7 +17,7 @@ type StandardFunction struct {
 	dutyCycleHigh float64
 	frequency     float64
 	startPhase    float64
-	waveform      StandardWaveform
+	waveform      ivi.StandardWaveform
 }
 
 func (stdFunc *StandardFunction) ConfigureWaveform(w io.Writer) {
