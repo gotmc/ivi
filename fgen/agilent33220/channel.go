@@ -35,12 +35,12 @@ type Channel struct {
 }
 
 func (ch *Channel) DisableOutput() error {
-	_, err := ch.inst.WriteString("OUTP OFF")
+	_, err := ch.inst.WriteString("OUTP OFF\n")
 	return err
 }
 
 func (ch *Channel) EnableOutput() error {
-	_, err := ch.inst.WriteString("OUTP ON")
+	_, err := ch.inst.WriteString("OUTP ON\n")
 	return err
 }
 

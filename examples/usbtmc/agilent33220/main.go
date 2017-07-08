@@ -8,6 +8,7 @@ package main
 import (
 	"log"
 
+	"github.com/gotmc/ivi"
 	"github.com/gotmc/ivi/fgen/agilent33220"
 	"github.com/gotmc/usbtmc"
 	_ "github.com/gotmc/usbtmc/driver/truveris"
@@ -32,11 +33,11 @@ func main() {
 	}
 	defer fgen.Close()
 	// You can access the channel from the fgen instrument.
-	fgen.Ch[0].DisableOutput()
-	fgen.Ch[0].SetAmplitude(0.4)
+	fgen.Channels[0].DisableOutput()
+	fgen.Channels[0].SetAmplitude(0.4)
 	// Or you can assign the channel to a variabl.
-	ch := fgen.Ch[0]
-	ch.SetStandardWaveform(agilent33220.Sine)
+	ch := fgen.Channels[0]
+	ch.SetStandardWaveform(ivi.Sine)
 	ch.SetDCOffset(0.1)
 	ch.SetFrequency(2340)
 	f, err := ch.Frequency()

@@ -10,7 +10,7 @@ import (
 
 	"github.com/gotmc/ivi"
 	"github.com/gotmc/ivi/fgen/agilent33220"
-	_ "github.com/gotmc/usbtmc/driver/truveris"
+	_ "github.com/gotmc/usbtmc/driver/google"
 	"github.com/gotmc/visa"
 	_ "github.com/gotmc/visa/driver/usbtmc"
 )
@@ -22,12 +22,10 @@ func main() {
 	if err != nil {
 		log.Fatalf("VISA resource %s: %s", address, err)
 	}
-	defer res.Close()
 	fgen, err := agilent33220.New(res)
 	if err != nil {
 		log.Fatalf("IVI instrument error: %s", err)
 	}
-	defer fgen.Close()
 	ch := fgen.Channels[0]
 	ch.DisableOutput()
 	ch.SetStandardWaveform(ivi.Triangle)
@@ -53,4 +51,20 @@ func main() {
 	} else {
 		log.Printf("Frequency = %.2f Hz", freq)
 	}
+	// FIXME(mdr): I need to fix the ivi/visa/usbtmc APIs, so that I don't get a
+	// double close. Am I going to require that a separate USB context be created
+	// separately, or will that be part of opening the device?
+	// log.Printf("About to close fgen")
+	// err = fgen.Close()
+	// if err != nil {
+	// log.Printf("Error closing fgen: %s", err)
+	// }
+	// log.Printf("Closed fgen.")
+	err = res.Close()
+	if err != nil {
+		log.Printf("Error closing VISA resource: %s", err)
+	}
+	log.Printf("Here")
+	// FIXME(mdr): By changing from the truveris USBTMC driver to the google
+	// driver, there's no a hang in closing the USB context.
 }
