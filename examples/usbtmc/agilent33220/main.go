@@ -16,31 +16,57 @@ import (
 
 func main() {
 
+	// Create a USBTMC context and set the debug level
 	ctx, err := usbtmc.NewContext()
 	if err != nil {
 		log.Fatalf("Error creating new USB context: %s", err)
 	}
 	defer ctx.Close()
+	ctx.SetDebugLevel(1)
 
-	res, err := ctx.NewDevice("USB0::2391::1031::MY44035849::INSTR")
+	// Create a new USBTMC device
+	dev, err := ctx.NewDevice("USB0::2391::1031::MY44035849::INSTR")
 	if err != nil {
 		log.Fatalf("NewDevice error: %s", err)
 	}
-	defer res.Close()
-	fgen, err := agilent33220.New(res)
+	defer dev.Close()
+
+	// Create a new IVI instance of the Agilent 33220 function generator
+	fgen, err := agilent33220.New(dev)
 	if err != nil {
 		log.Fatalf("IVI instrument error: %s", err)
 	}
-	defer fgen.Close()
-	// You can access the channel from the fgen instrument.
+
+	// Channel specific methods can be accessed directly from the instrument
+	// using 0-based index to select the desirec channel.
 	fgen.Channels[0].DisableOutput()
 	fgen.Channels[0].SetAmplitude(0.4)
-	// Or you can assign the channel to a variabl.
+
+	// Alternatively, the channel can be assigned to a variable.
 	ch := fgen.Channels[0]
 	ch.SetStandardWaveform(ivi.Sine)
 	ch.SetDCOffset(0.1)
 	ch.SetFrequency(2340)
-	f, err := ch.Frequency()
-	log.Printf("Frequency is %.0f Hz", f)
+
+	// Instead of configuring attributes of a standard waveform individually, the
+	// standard waveform can be configured using a single method.
+	ch.ConfigureStandardWaveform(ivi.Sine, 0.4, 0.1, 2340, 0)
 	ch.EnableOutput()
+
+	// Query the FGen
+	freq, err := ch.Frequency()
+	if err != nil {
+		log.Printf("error querying frequency: %s", err)
+	}
+	log.Printf("Frequency = %.0f Hz", freq)
+	amp, err := ch.Amplitude()
+	if err != nil {
+		log.Printf("error querying amplitude: %s", err)
+	}
+	log.Printf("Amplitude = %.3f Vpp", amp)
+	wave, err := ch.StandardWaveform()
+	if err != nil {
+		log.Printf("error querying standard waveform: %s", err)
+	}
+	log.Printf("Standard waveform = %s", wave)
 }

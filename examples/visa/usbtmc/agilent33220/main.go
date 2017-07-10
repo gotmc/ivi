@@ -28,11 +28,14 @@ func main() {
 	}
 	ch := fgen.Channels[0]
 	ch.DisableOutput()
-	ch.SetStandardWaveform(ivi.Triangle)
-	ch.SetFrequency(1000)
-	ch.SetAmplitude(0.25)
-	ch.SetDCOffset(0.1)
+	// ch.SetStandardWaveform(ivi.Triangle)
+	// ch.SetFrequency(1000)
+	// ch.SetAmplitude(0.25)
+	// ch.SetDCOffset(0.1)
+	// Shortcut to configure standard waveform in one command.
+	ch.ConfigureStandardWaveform(ivi.Sine, 0.25, 0.1, 2340, 0)
 	ch.EnableOutput()
+	// Query the FGen
 	wave, err := ch.StandardWaveform()
 	if err != nil {
 		log.Printf("Error determining standard waveform: %s", err)
@@ -64,7 +67,6 @@ func main() {
 	if err != nil {
 		log.Printf("Error closing VISA resource: %s", err)
 	}
-	log.Printf("Here")
 	// FIXME(mdr): By changing from the truveris USBTMC driver to the google
 	// driver, there's no a hang in closing the USB context.
 }
