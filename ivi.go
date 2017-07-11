@@ -5,11 +5,10 @@
 
 package ivi
 
-import "io"
-
 // Instrument provides the interface required for all IVI Instruments.
 type Instrument interface {
-	io.ReadWriteCloser
+	Read(p []byte) (n int, err error)
+	Write(p []byte) (n int, err error)
 	StringWriter
 	Querier
 }

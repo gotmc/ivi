@@ -199,6 +199,8 @@ func (ch *Channel) StandardWaveform() (ivi.StandardWaveform, error) {
 		return ivi.Sine, nil
 	case "SQU":
 		return ivi.Square, nil
+	case "DC":
+		return ivi.DC, nil
 	case "RAMP":
 		symm, err := ch.queryFloat64("FUNC:RAMP:SYMM?\n")
 		if err != nil {
@@ -232,9 +234,9 @@ func (ch *Channel) SetStandardWaveform(wave ivi.StandardWaveform) error {
 var waveformCommand = map[ivi.StandardWaveform]string{
 	ivi.Sine:     "FUNC SIN",
 	ivi.Square:   "FUNC SQU",
-	ivi.Triangle: "FUNC RAMP; FUNC:RAMP:SYMM 50",
-	ivi.RampUp:   "FUNC RAMP; FUNC:RAMP:SYMM 100",
-	ivi.RampDown: "FUNC RAMP; FUNC:RAMP:SYMM 0",
+	ivi.Triangle: "FUNC RAMP; RAMP:SYMM 50",
+	ivi.RampUp:   "FUNC RAMP; RAMP:SYMM 100",
+	ivi.RampDown: "FUNC RAMP; RAMP:SYMM 0",
 	ivi.DC:       "FUNC DC",
 }
 

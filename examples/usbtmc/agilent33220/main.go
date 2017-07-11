@@ -50,7 +50,7 @@ func main() {
 
 	// Instead of configuring attributes of a standard waveform individually, the
 	// standard waveform can be configured using a single method.
-	ch.ConfigureStandardWaveform(ivi.Sine, 0.4, 0.1, 2340, 0)
+	ch.ConfigureStandardWaveform(ivi.RampUp, 0.4, 0.1, 2340, 0)
 	ch.EnableOutput()
 
 	// Query the FGen

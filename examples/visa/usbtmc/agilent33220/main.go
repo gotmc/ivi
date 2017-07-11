@@ -54,19 +54,8 @@ func main() {
 	} else {
 		log.Printf("Frequency = %.2f Hz", freq)
 	}
-	// FIXME(mdr): I need to fix the ivi/visa/usbtmc APIs, so that I don't get a
-	// double close. Am I going to require that a separate USB context be created
-	// separately, or will that be part of opening the device?
-	// log.Printf("About to close fgen")
-	// err = fgen.Close()
-	// if err != nil {
-	// log.Printf("Error closing fgen: %s", err)
-	// }
-	// log.Printf("Closed fgen.")
 	err = res.Close()
 	if err != nil {
 		log.Printf("Error closing VISA resource: %s", err)
 	}
-	// FIXME(mdr): By changing from the truveris USBTMC driver to the google
-	// driver, there's no a hang in closing the USB context.
 }

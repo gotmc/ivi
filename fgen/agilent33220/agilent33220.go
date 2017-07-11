@@ -66,11 +66,6 @@ func (fgen *Agilent33220) OutputCount() int {
 	return fgen.outputCount
 }
 
-// Close closes the IVI Instrument.
-func (fgen *Agilent33220) Close() error {
-	return fgen.inst.Close()
-}
-
 // New creates a new Agilent33220 IVI Instrument.
 func New(inst ivi.Instrument) (*Agilent33220, error) {
 	outputCount := 1
