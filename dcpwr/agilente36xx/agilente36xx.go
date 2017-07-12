@@ -8,9 +8,6 @@ Package agilente36xx implements the IVI driver for the Agilent/Keysight E3600
 series of power supplies.
 
 IVI Instrument Class: IviDCPwr
-IVI Class Specification: IVI-4.4
-IVI Specification Revision: 3.0
-IVI Specification Edition: September 24, 2015
 Capability Groups Supported (specification section):
    4. IviDCPwrBase
 	 5. IviDCPwrTrigger
@@ -27,12 +24,26 @@ package agilente36xx
 
 import "github.com/gotmc/ivi"
 
+const (
+	classSpecMajorVersion = 4
+	classSpecMinorVersion = 4
+	classSpecRevision     = "3.0"
+)
+
+var supportedInstrumentModels = []string{
+	"E3631A",
+}
+
 // AgilentE36xx provides the IVI driver for the Agilent/Keysight E3600 series
 // of power supplies.
 type AgilentE36xx struct {
-	inst        ivi.Instrument
-	outputCount int
-	Channels    []Channel
+	inst                       ivi.Instrument
+	outputCount                int
+	Channels                   []Channel
+	ClassSpecMajorVersion      int
+	ClassSpecMinorVersion      int
+	ClassSpecRevision          string
+	SupportedInstrumentsModels []string
 }
 
 // OutputCount returns the number of available output channels. OutputCount is
@@ -65,9 +76,13 @@ func New(inst ivi.Instrument) (*AgilentE36xx, error) {
 	channels[1] = p25v
 	channels[2] = n25v
 	dcpwr := AgilentE36xx{
-		inst:        inst,
-		outputCount: outputCount,
-		Channels:    channels,
+		inst:                       inst,
+		outputCount:                outputCount,
+		Channels:                   channels,
+		ClassSpecMajorVersion:      classSpecMajorVersion,
+		ClassSpecMinorVersion:      classSpecMinorVersion,
+		ClassSpecRevision:          classSpecRevision,
+		SupportedInstrumentsModels: supportedInstrumentModels,
 	}
 	return &dcpwr, nil
 }

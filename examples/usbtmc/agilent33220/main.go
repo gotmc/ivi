@@ -69,4 +69,19 @@ func main() {
 		log.Printf("error querying standard waveform: %s", err)
 	}
 	log.Printf("Standard waveform = %s", wave)
+	mfr, err := fgen.InstrumentManufacturer()
+	if err != nil {
+		log.Printf("error querying instrument manufacturer: %s", err)
+	}
+	log.Printf("Instrument manufacturer = %s", mfr)
+	model, err := fgen.InstrumentModel()
+	if err != nil {
+		log.Printf("error querying instrument model: %s", err)
+	}
+	log.Printf("Instrument model = %s", model)
+	fw, err := fgen.FirmwareRevision()
+	if err != nil {
+		log.Printf("error querying firmware revision: %s", err)
+	}
+	log.Printf("Firmware revision = %s", fw)
 }
