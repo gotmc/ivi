@@ -55,6 +55,12 @@ func (inherent *Inherent) InstrumentModel() (string, error) {
 	return inherent.parseIdentification("model")
 }
 
+// InstrumentSerialNumber queries the instrument and returns the S/N of the
+// instrument.
+func (inherent *Inherent) InstrumentSerialNumber() (string, error) {
+	return inherent.parseIdentification("sn")
+}
+
 func (inherent *Inherent) Reset() error {
 	_, err := inherent.inst.WriteString("*RST\n")
 	return err
