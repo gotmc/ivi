@@ -24,10 +24,16 @@ package agilente36xx
 
 import "github.com/gotmc/ivi"
 
+// Required to implement the Inherent Capabilities & Attributes
 const (
 	classSpecMajorVersion = 4
 	classSpecMinorVersion = 4
 	classSpecRevision     = "3.0"
+	idnString             = `^(?P<mfr>[^,]+),` +
+		`(?P<model>[^,]+),0,` +
+		`(?P<fwr>\d{1}.\d{1})-` +
+		`(?P<boot>\d{1}.\d{1})-` +
+		`(?P<asic>\d{1})$`
 )
 
 var supportedInstrumentModels = []string{
@@ -37,20 +43,10 @@ var supportedInstrumentModels = []string{
 // AgilentE36xx provides the IVI driver for the Agilent/Keysight E3600 series
 // of power supplies.
 type AgilentE36xx struct {
-	inst                       ivi.Instrument
-	outputCount                int
-	Channels                   []Channel
-	ClassSpecMajorVersion      int
-	ClassSpecMinorVersion      int
-	ClassSpecRevision          string
-	SupportedInstrumentsModels []string
-}
-
-// OutputCount returns the number of available output channels. OutputCount is
-// the getter for the read-only IviDCPwrBase Attribute Output Channel Count
-// described in Section 4.2.7 of IVI-4.4: IviDCPwr Class Specification.
-func (dcpwr *AgilentE36xx) OutputCount() int {
-	return dcpwr.outputCount
+	inst        ivi.Instrument
+	outputCount int
+	Channels    []Channel
+	ivi.Inherent
 }
 
 // New creates a new AgilentE36xx IVI Instrument.
@@ -75,14 +71,25 @@ func New(inst ivi.Instrument) (*AgilentE36xx, error) {
 	channels[0] = p6v
 	channels[1] = p25v
 	channels[2] = n25v
+	inherentBase := ivi.InherentBase{
+		ClassSpecMajorVersion:     classSpecMajorVersion,
+		ClassSpecMinorVersion:     classSpecMinorVersion,
+		ClassSpecRevision:         classSpecRevision,
+		SupportedInstrumentModels: supportedInstrumentModels,
+	}
+	inherent := ivi.NewInherent(inst, inherentBase)
 	dcpwr := AgilentE36xx{
-		inst:                       inst,
-		outputCount:                outputCount,
-		Channels:                   channels,
-		ClassSpecMajorVersion:      classSpecMajorVersion,
-		ClassSpecMinorVersion:      classSpecMinorVersion,
-		ClassSpecRevision:          classSpecRevision,
-		SupportedInstrumentsModels: supportedInstrumentModels,
+		inst:        inst,
+		outputCount: outputCount,
+		Channels:    channels,
+		Inherent:    inherent,
 	}
 	return &dcpwr, nil
+}
+
+// OutputCount returns the number of available output channels. OutputCount is
+// the getter for the read-only IviDCPwrBase Attribute Output Channel Count
+// described in Section 4.2.7 of IVI-4.4: IviDCPwr Class Specification.
+func (dcpwr *AgilentE36xx) OutputCount() int {
+	return dcpwr.outputCount
 }

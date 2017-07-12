@@ -27,17 +27,19 @@ State Caching: Not implemented
 */
 package agilent33220
 
-import (
-	"errors"
-	"strings"
+import "github.com/gotmc/ivi"
 
-	"github.com/gotmc/ivi"
-)
-
+// Required to implement the Inherent Capabilities & Attributes
 const (
 	classSpecMajorVersion = 4
 	classSpecMinorVersion = 3
 	classSpecRevision     = "5.2"
+	idnString             = `^(?P<mfr>[^,]+),` +
+		`(?P<model>[^,]+),0,` +
+		`(?P<fwr>\d{1}.\d{2})-` +
+		`(?P<boot>\d{1}.\d{2})-` +
+		`(?P<asic>\d{2})-` +
+		`(?P<pcb>\d{1}$`
 )
 
 var supportedInstrumentModels = []string{
@@ -48,13 +50,10 @@ var supportedInstrumentModels = []string{
 // Agilent33220 provides the IVI driver for an Agilent 33220A or 33210A
 // function generator.
 type Agilent33220 struct {
-	inst                       ivi.Instrument
-	outputCount                int
-	Channels                   []Channel
-	ClassSpecMajorVersion      int
-	ClassSpecMinorVersion      int
-	ClassSpecRevision          string
-	SupportedInstrumentsModels []string
+	inst        ivi.Instrument
+	outputCount int
+	Channels    []Channel
+	ivi.Inherent
 }
 
 // New creates a new Agilent33220 IVI Instrument.
@@ -66,14 +65,19 @@ func New(inst ivi.Instrument) (*Agilent33220, error) {
 	}
 	channels := make([]Channel, outputCount)
 	channels[0] = ch
+	inherentBase := ivi.InherentBase{
+		ClassSpecMajorVersion:     classSpecMajorVersion,
+		ClassSpecMinorVersion:     classSpecMinorVersion,
+		ClassSpecRevision:         classSpecRevision,
+		SupportedInstrumentModels: supportedInstrumentModels,
+		IDNString:                 idnString,
+	}
+	inherent := ivi.NewInherent(inst, inherentBase)
 	fgen := Agilent33220{
-		inst:                       inst,
-		outputCount:                outputCount,
-		Channels:                   channels,
-		ClassSpecMajorVersion:      classSpecMajorVersion,
-		ClassSpecMinorVersion:      classSpecMinorVersion,
-		ClassSpecRevision:          classSpecRevision,
-		SupportedInstrumentsModels: supportedInstrumentModels,
+		inst:        inst,
+		outputCount: outputCount,
+		Channels:    channels,
+		Inherent:    inherent,
 	}
 	return &fgen, nil
 }
@@ -83,62 +87,4 @@ func New(inst ivi.Instrument) (*Agilent33220, error) {
 // Section 4.2.1 of IVI-4.3: IviFgen Class Specification.
 func (fgen *Agilent33220) OutputCount() int {
 	return fgen.outputCount
-}
-
-// FirmwardRevision queries the instrument and returns the firmware revision of
-// the instrument. FirmwareRevision is the getter for the read-only inherent
-// attribute Instrument Firmware Revision described in Section 5.18 of IVI-3.2:
-// Inherent Capabilities Specification.
-func (fgen *Agilent33220) FirmwareRevision() (string, error) {
-	s, err := fgen.inst.Query("*IDN?\n")
-	if err != nil {
-		return "", err
-	}
-	ret := strings.Split(s, ",")
-	ret = strings.Split(ret[3], "-")
-	return ret[0], nil
-}
-
-// InstrumentManufacturer queries the instrument and returns the manufacturer
-// of the instrument. InstrumentManufacturer is the getter for the read-only
-// inherent attribute Instrument Manufacturer described in Section 5.19 of
-// IVI-3.2: Inherent Capabilities Specification.
-func (fgen *Agilent33220) InstrumentManufacturer() (string, error) {
-	s, err := fgen.inst.Query("*IDN?\n")
-	if err != nil {
-		return "", err
-	}
-	ret := strings.Split(s, ",")
-	return ret[0], nil
-}
-
-// InstrumentModel queries the instrument and returns the model of the
-// instrument.  InstrumentModel is the getter for the read-only inherent
-// attribute Instrument Model described in Section 5.20 of IVI-3.2: Inherent
-// Capabilities Specification.
-func (fgen *Agilent33220) InstrumentModel() (string, error) {
-	s, err := fgen.inst.Query("*IDN?\n")
-	if err != nil {
-		return "", err
-	}
-	ret := strings.Split(s, ",")
-	return ret[1], nil
-}
-
-// Disable places the instrument in a quiescent state as quickly as possible.
-// Disable provides the method described in Section 6.4 of IVI-3.2: Inherent
-// Capabilities Specification.
-func (fgen *Agilent33220) Disable() error {
-	// FIXME(mdr): Implement!!!!
-	return errors.New("disable is not yet implemented.")
-}
-
-func (fgen *Agilent33220) Reset() error {
-	_, err := fgen.inst.WriteString("*RST\n")
-	return err
-}
-
-func (fgen *Agilent33220) Clear() error {
-	_, err := fgen.inst.WriteString("*CLS\n")
-	return err
 }
