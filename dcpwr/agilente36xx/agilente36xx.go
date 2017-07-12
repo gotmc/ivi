@@ -30,6 +30,10 @@ var supportedInstrumentModels = []string{
 	"E3631A",
 }
 
+const (
+	outputCount = 3
+)
+
 // AgilentE36xx provides the IVI driver for the Agilent/Keysight E3600 series
 // of power supplies.
 type AgilentE36xx struct {
@@ -41,7 +45,6 @@ type AgilentE36xx struct {
 
 // New creates a new AgilentE36xx IVI Instrument.
 func New(inst ivi.Instrument) (*AgilentE36xx, error) {
-	outputCount := 3
 	p6v := Channel{
 		id:   0,
 		name: "P6V",

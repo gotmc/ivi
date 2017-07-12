@@ -32,6 +32,11 @@ var supportedInstrumentModels = []string{
 	"33210A",
 }
 
+// Constants used for FGen
+const (
+	outputCount = 1
+)
+
 // Agilent33220 provides the IVI driver for an Agilent 33220A or 33210A
 // function generator.
 type Agilent33220 struct {
@@ -43,7 +48,6 @@ type Agilent33220 struct {
 
 // New creates a new Agilent33220 IVI Instrument.
 func New(inst ivi.Instrument) (*Agilent33220, error) {
-	outputCount := 1
 	ch := Channel{
 		id:   0,
 		inst: inst,
