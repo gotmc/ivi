@@ -7,22 +7,6 @@
 Package agilent33220 implements the IVI driver for the Agilent 33220A function
 generator.
 
-IVI Instrument Class: IviFgen
-Capability Groups Supported (specification section):
-   4. IviFgenBase               Partially (missing 4.2.5, 4.2.7)
-   5. IviFgenStdFunc            Yes
-   6. IviFgenArbWfm             Not Yet
-   7. IviFgenArbFrequency       Not Yet
-   8. IviFgenArbSeq             No
-   9. IviFgenTrigger            Not Yet
-  10. IviFgenStartTrigger       Not Yet
-  11. IviFgenStopTrigger        Not Yet
-  12. IviFgenHoldTrigger        Not Yet
-  16. IviFgenSoftwareTrigger    Not Yet
-  17. IviFgenBurst              Not Yet (next to work on)
-
-Hardware Information:
-
 State Caching: Not implemented
 */
 package agilent33220
@@ -34,6 +18,7 @@ const (
 	classSpecMajorVersion = 4
 	classSpecMinorVersion = 3
 	classSpecRevision     = "5.2"
+	groupCapabilities     = "FgenBase,FgenStdfunc"
 	idnString             = `^(?P<mfr>[^,]+),` +
 		`(?P<model>[^,]+),0,` +
 		`(?P<fwr>\d{1}.\d{2})-` +
@@ -69,6 +54,7 @@ func New(inst ivi.Instrument) (*Agilent33220, error) {
 		ClassSpecMajorVersion:     classSpecMajorVersion,
 		ClassSpecMinorVersion:     classSpecMinorVersion,
 		ClassSpecRevision:         classSpecRevision,
+		GroupCapabilities:         groupCapabilities,
 		SupportedInstrumentModels: supportedInstrumentModels,
 		IDNString:                 idnString,
 	}

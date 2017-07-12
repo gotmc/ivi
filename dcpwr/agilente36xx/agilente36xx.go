@@ -7,17 +7,6 @@
 Package agilente36xx implements the IVI driver for the Agilent/Keysight E3600
 series of power supplies.
 
-IVI Instrument Class: IviDCPwr
-Capability Groups Supported (specification section):
-   4. IviDCPwrBase
-	 5. IviDCPwrTrigger
-	 6. IviDCPwrSoftwareTrigger
-	 7. IviDCPwrMeasurement
-
-Hardware Information:
-  Instrument Manufacturer:          Keysight Technologies
-	Supported Instrument Models:      E3631A
-
 State Caching: Not implemented
 */
 package agilente36xx
@@ -29,6 +18,7 @@ const (
 	classSpecMajorVersion = 4
 	classSpecMinorVersion = 4
 	classSpecRevision     = "3.0"
+	groupCapabilities     = "DCPwrBase,DCPwrMeasurement"
 	idnString             = `^(?P<mfr>[^,]+),` +
 		`(?P<model>[^,]+),0,` +
 		`(?P<fwr>\d{1}.\d{1})-` +
@@ -75,6 +65,7 @@ func New(inst ivi.Instrument) (*AgilentE36xx, error) {
 		ClassSpecMajorVersion:     classSpecMajorVersion,
 		ClassSpecMinorVersion:     classSpecMinorVersion,
 		ClassSpecRevision:         classSpecRevision,
+		GroupCapabilities:         groupCapabilities,
 		SupportedInstrumentModels: supportedInstrumentModels,
 	}
 	inherent := ivi.NewInherent(inst, inherentBase)
