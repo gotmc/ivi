@@ -15,7 +15,6 @@ import "github.com/gotmc/ivi"
 
 // Required to implement the Inherent and DCPwr attributes and capabilities
 const (
-	outputCount           = 3
 	classSpecMajorVersion = 4
 	classSpecMinorVersion = 4
 	classSpecRevision     = "3.0"
@@ -26,39 +25,31 @@ var supportedInstrumentModels = []string{
 	"E3631A",
 }
 
+var channelNames = []string{
+	"P6V",
+	"P25V",
+	"N25V",
+}
+
 // AgilentE36xx provides the IVI driver for the Agilent/Keysight E3600 series
 // of power supplies.
 type AgilentE36xx struct {
-	inst        ivi.Instrument
-	outputCount int
-	Channels    []Channel
+	inst     ivi.Instrument
+	Channels []Channel
 	ivi.Inherent
 }
 
 // New creates a new AgilentE36xx IVI Instrument.
-func New(inst ivi.Instrument, queryID, reset bool) (*AgilentE36xx, error) {
-	if queryID {
-		ivi.QueryID(inst)
-	}
-	p6v := Channel{
-		id:   0,
-		name: "P6V",
-		inst: inst,
-	}
-	p25v := Channel{
-		id:   1,
-		name: "P25V",
-		inst: inst,
-	}
-	n25v := Channel{
-		id:   2,
-		name: "N25V",
-		inst: inst,
-	}
+func New(inst ivi.Instrument) (*AgilentE36xx, error) {
+	outputCount := len(channelNames)
 	channels := make([]Channel, outputCount)
-	channels[0] = p6v
-	channels[1] = p25v
-	channels[2] = n25v
+	for i, ch := range channelNames {
+		channels[i] = Channel{
+			id:   i,
+			name: ch,
+			inst: inst,
+		}
+	}
 	inherentBase := ivi.InherentBase{
 		ClassSpecMajorVersion:     classSpecMajorVersion,
 		ClassSpecMinorVersion:     classSpecMinorVersion,
@@ -68,10 +59,9 @@ func New(inst ivi.Instrument, queryID, reset bool) (*AgilentE36xx, error) {
 	}
 	inherent := ivi.NewInherent(inst, inherentBase)
 	dcpwr := AgilentE36xx{
-		inst:        inst,
-		outputCount: outputCount,
-		Channels:    channels,
-		Inherent:    inherent,
+		inst:     inst,
+		Channels: channels,
+		Inherent: inherent,
 	}
 	return &dcpwr, nil
 }
@@ -80,5 +70,5 @@ func New(inst ivi.Instrument, queryID, reset bool) (*AgilentE36xx, error) {
 // the getter for the read-only IviDCPwrBase Attribute Output Channel Count
 // described in Section 4.2.7 of IVI-4.4: IviDCPwr Class Specification.
 func (dcpwr *AgilentE36xx) OutputCount() int {
-	return dcpwr.outputCount
+	return len(dcpwr.Channels)
 }
