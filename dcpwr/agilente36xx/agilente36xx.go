@@ -18,7 +18,7 @@ const (
 	classSpecMajorVersion = 4
 	classSpecMinorVersion = 4
 	classSpecRevision     = "3.0"
-	groupCapabilities     = "DCPwrBase,DCPwrMeasurement"
+	groupCapabilities     = "IviDCPwrBase,IviDCPwrMeasurement"
 )
 
 var supportedInstrumentModels = []string{
@@ -39,7 +39,7 @@ type AgilentE36xx struct {
 	ivi.Inherent
 }
 
-// New creates a new AgilentE36xx IVI Instrument.
+// New creates a new AgilentE37xx IVI Instrument.
 func New(inst ivi.Instrument) (*AgilentE36xx, error) {
 	outputCount := len(channelNames)
 	channels := make([]Channel, outputCount)

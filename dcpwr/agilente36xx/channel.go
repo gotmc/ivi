@@ -23,6 +23,13 @@ const (
 	CurrentRegulate
 )
 
+type voltageCurrent int
+
+const (
+	voltageQuery voltageCurrent = iota
+	currentQuery
+)
+
 type Channel struct {
 	id   int
 	name string
@@ -34,22 +41,46 @@ func (ch *Channel) String() string {
 	return ch.name
 }
 
-// CurrentLimit specifies the output current limit. The units are Amp.s
+// CurrentLimit determines the output current limit. The units are Amps.
 // CurrentLimit implements the getter for the read-write IviDCPwrBase Attribute
 // Current Limit described in Section 4.2.1 of IVI-4.4: IviDCPwr Class
 // Specification.
 func (ch *Channel) CurrentLimit() (float64, error) {
-	return ch.queryFloat64(fmt.Sprintf("INST %s;:SOUR:CURR?\n", ch.name))
+	return ch.queryLimit(currentQuery)
 }
 
-// CurrentLimitBehavior specifies the behavior of the power supply when the
+// SetCurrentLimit specifies the output current limit. The units are Amp.s
+// SetCurrentLimit implements the setter for the read-write IviDCPwrBase
+// Attribute Current Limit described in Section 4.2.1 of IVI-4.4: IviDCPwr
+// Class Specification.
+func (ch *Channel) SetCurrentLimit(limit float64) error {
+	cmd := fmt.Sprintf("INST %s;:CURR %f\n", ch.name, limit)
+	_, err := ch.inst.WriteString(cmd)
+	return err
+}
+
+// CurrentLimitBehavior determines the behavior of the power supply when the
 // output current is equal to or greater than the value of the Current Limit
-// attribute.  CurrentLimitBehavior implements the getter for the read-write
-// IviDCPwrBase Attribute Current Limit Behavior described in Section 4.2.2 of
-// IVI-4.4: IviDCPwr Class Specification.
+// attribute. The E3631A only supports the CurrentRegulate behavior.
+// CurrentLimitBehavior implements the getter for the read-write IviDCPwrBase
+// Attribute Current Limit Behavior described in Section 4.2.2 of IVI-4.4:
+// IviDCPwr Class Specification.
 func (ch *Channel) CurrentLimitBehavior() (CurrentLimitBehavior, error) {
-	// FIXME(mdr): Need to implement!
 	return CurrentRegulate, nil
+}
+
+// SetCurrentLimitBehavior specifies the behavior of the power supply when the
+// output current is equal to or greater than the value of the Current Limit
+// attribute. The E3631A only supports the CurrentRegulate behavior, so
+// attempting to set CurrentTrip will result in an error.  CurrentLimitBehavior
+// implements the getter for the read-write IviDCPwrBase Attribute Current
+// Limit Behavior described in Section 4.2.2 of IVI-4.4: IviDCPwr Class
+// Specification.
+func (ch *Channel) SetCurrentLimitBehavior(behavior CurrentLimitBehavior) error {
+	if behavior == CurrentTrip {
+		return errors.New("current trip is not supported")
+	}
+	return nil
 }
 
 // OutputEnabled determines if all three output channels are enabled or
@@ -121,13 +152,7 @@ func (ch *Channel) SetOVPLimit(limit float64) error {
 // read-write IviDCPwrBase Attribute Voltage Level described in Section 4.2.6
 // of IVI-4.4: IviDCPwr Class Specification.
 func (ch *Channel) VoltageLevel() (float64, error) {
-	cmd := fmt.Sprintf("APPL? %s", ch.name)
-	s, err := ch.inst.Query(cmd)
-	if err != nil {
-		return 0.0, err
-	}
-	ret := strings.Split(s, ",")
-	return strconv.ParseFloat(ret[0], 64)
+	return ch.queryLimit(voltageQuery)
 }
 
 // SetVoltageLevel specifies the voltage level the DC power supply attempts
@@ -138,6 +163,31 @@ func (ch *Channel) SetVoltageLevel(amp float64) error {
 	cmd := fmt.Sprintf("APPL %s, %f\n", ch.name, amp)
 	_, err := ch.inst.WriteString(cmd)
 	return err
+}
+
+// Name returns the name of the output channel. Name is the getter for the
+// read-only IviDCPwrBase Attribute Output Channel Name described in Section
+// 4.2.9 of IVI-4.4: IviDCPwr Class Specification.
+func (ch *Channel) Name() string {
+	return ch.name
+}
+
+// MeasureVoltage takes a measurement on the output signal and returns the
+// measured voltage.  MeasureVoltage implements the IviDCPwrMeasurement
+// function Measure for the Voltage MeasurementType parameter described in
+// Section 7.2.1 of IVI-4.4: IviDCPwr Class Specification.
+func (ch *Channel) MeasureVoltage() (float64, error) {
+	cmd := fmt.Sprintf("MEAS:CURR? %s", ch.name)
+	return ch.queryFloat64(cmd)
+}
+
+// MeasureCurrent takes a measurement on the output signal and returns the
+// measured current. MeasureCurrent implements the IviDCPwrMeasurement
+// function Measure for the Current MeasurementType parameter described in
+// Section 7.2.1 of IVI-4.4: IviDCPwr Class Specification.
+func (ch *Channel) MeasureCurrent() (float64, error) {
+	cmd := fmt.Sprintf("MEAS? %s", ch.name)
+	return ch.queryFloat64(cmd)
 }
 
 func (ch *Channel) setFloat64(cmd string, value float64) error {
@@ -154,4 +204,14 @@ func (ch *Channel) queryFloat64(query string) (float64, error) {
 
 func (ch *Channel) queryString(query string) (string, error) {
 	return ivi.QueryString(ch.inst, query)
+}
+
+func (ch *Channel) queryLimit(query voltageCurrent) (float64, error) {
+	cmd := fmt.Sprintf("APPL? %s", ch.name)
+	s, err := ch.inst.Query(cmd)
+	if err != nil {
+		return 0.0, err
+	}
+	ret := strings.Split(s, ",")
+	return strconv.ParseFloat(ret[query], 64)
 }

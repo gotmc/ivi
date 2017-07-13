@@ -41,7 +41,7 @@ const (
 	Arbitrary
 )
 
-// Channel represents a repated capability of an output channel for the
+// Channel represents a repeated capability of an output channel for the
 // function generator.
 type Channel struct {
 	id            int
