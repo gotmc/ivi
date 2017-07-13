@@ -39,8 +39,13 @@ type AgilentE36xx struct {
 	ivi.Inherent
 }
 
-// New creates a new AgilentE37xx IVI Instrument.
-func New(inst ivi.Instrument) (*AgilentE36xx, error) {
+// New creates a new AgilentE36xx IVI Instrument. Currently, only the E3631A
+// model is supported, but in the future as other models are added, the New
+// function will query the instrument to determine the model and ensure it is
+// one of the supported models. If reset is true, then the instrument is reset.
+func New(inst ivi.Instrument, reset bool) (*AgilentE36xx, error) {
+	// FIXME(mdr): Need to query the instrument to determine the model and then
+	// set any model specific attributes, such as quantity and names of channels.
 	outputCount := len(channelNames)
 	channels := make([]Channel, outputCount)
 	for i, ch := range channelNames {
@@ -62,6 +67,10 @@ func New(inst ivi.Instrument) (*AgilentE36xx, error) {
 		inst:     inst,
 		Channels: channels,
 		Inherent: inherent,
+	}
+	if reset {
+		err := dcpwr.Reset()
+		return &dcpwr, err
 	}
 	return &dcpwr, nil
 }

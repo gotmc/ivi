@@ -32,7 +32,7 @@ func main() {
 	defer dev.Close()
 
 	// Create a new IVI instance of the Agilent 33220 function generator
-	fgen, err := agilent33220.New(dev)
+	fgen, err := agilent33220.New(dev, true)
 	if err != nil {
 		log.Fatalf("IVI instrument error: %s", err)
 	}

@@ -41,7 +41,7 @@ type Agilent3446x struct {
 }
 
 // New creates a new Agilent3446x IVI Instrument.
-func New(inst ivi.Instrument) (*Agilent3446x, error) {
+func New(inst ivi.Instrument, reset bool) (*Agilent3446x, error) {
 	inherentBase := ivi.InherentBase{
 		ClassSpecMajorVersion:     classSpecMajorVersion,
 		ClassSpecMinorVersion:     classSpecMinorVersion,
@@ -54,6 +54,10 @@ func New(inst ivi.Instrument) (*Agilent3446x, error) {
 		inst:        inst,
 		outputCount: outputCount,
 		Inherent:    inherent,
+	}
+	if reset {
+		err := dmm.Reset()
+		return &dmm, err
 	}
 	return &dmm, nil
 }

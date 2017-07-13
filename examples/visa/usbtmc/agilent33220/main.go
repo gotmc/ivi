@@ -22,7 +22,7 @@ func main() {
 	if err != nil {
 		log.Fatalf("VISA resource %s: %s", address, err)
 	}
-	fgen, err := agilent33220.New(res)
+	fgen, err := agilent33220.New(res, true)
 	if err != nil {
 		log.Fatalf("IVI instrument error: %s", err)
 	}

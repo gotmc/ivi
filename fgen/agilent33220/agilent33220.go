@@ -41,7 +41,7 @@ type Agilent33220 struct {
 }
 
 // New creates a new Agilent33220 IVI Instrument.
-func New(inst ivi.Instrument) (*Agilent33220, error) {
+func New(inst ivi.Instrument, reset bool) (*Agilent33220, error) {
 	ch := Channel{
 		id:   0,
 		inst: inst,
@@ -61,6 +61,10 @@ func New(inst ivi.Instrument) (*Agilent33220, error) {
 		outputCount: outputCount,
 		Channels:    channels,
 		Inherent:    inherent,
+	}
+	if reset {
+		err := fgen.Reset()
+		return &fgen, err
 	}
 	return &fgen, nil
 }
