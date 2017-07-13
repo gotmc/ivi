@@ -10,22 +10,13 @@ import (
 
 	"github.com/gotmc/ivi"
 	"github.com/gotmc/ivi/fgen/agilent33220"
-	"github.com/gotmc/usbtmc"
-	_ "github.com/gotmc/usbtmc/driver/truveris"
+	"github.com/gotmc/lxi"
 )
 
 func main() {
 
-	// Create a USBTMC context and set the debug level
-	ctx, err := usbtmc.NewContext()
-	if err != nil {
-		log.Fatalf("Error creating new USB context: %s", err)
-	}
-	defer ctx.Close()
-	ctx.SetDebugLevel(1)
-
-	// Create a new USBTMC device
-	dev, err := ctx.NewDevice("USB0::2391::1031::MY44035849::INSTR")
+	// Create a new LXI device
+	dev, err := lxi.NewDevice("TCPIP0::10.12.100.150::5025::SOCKET")
 	if err != nil {
 		log.Fatalf("NewDevice error: %s", err)
 	}

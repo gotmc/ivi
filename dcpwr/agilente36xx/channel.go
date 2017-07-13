@@ -141,17 +141,17 @@ func (ch *Channel) SetVoltageLevel(amp float64) error {
 }
 
 func (ch *Channel) setFloat64(cmd string, value float64) error {
-	return setFloat64(ch.inst, cmd, value)
+	return ivi.SetFloat64(ch.inst, cmd, value)
 }
 
 func (ch *Channel) queryBool(query string) (bool, error) {
-	return queryBool(ch.inst, query)
+	return ivi.QueryBool(ch.inst, query)
 }
 
 func (ch *Channel) queryFloat64(query string) (float64, error) {
-	return queryFloat64(ch.inst, query)
+	return ivi.QueryFloat64(ch.inst, query)
 }
 
 func (ch *Channel) queryString(query string) (string, error) {
-	return queryString(ch.inst, query)
+	return ivi.QueryString(ch.inst, query)
 }

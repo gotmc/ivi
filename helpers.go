@@ -3,17 +3,15 @@
 // Use of this source code is governed by a MIT-style license that
 // can be found in the LICENSE.txt file for the project.
 
-package agilente36xx
+package ivi
 
 import (
 	"fmt"
 	"strconv"
 	"strings"
-
-	"github.com/gotmc/ivi"
 )
 
-func queryBool(q ivi.Querier, query string) (bool, error) {
+func QueryBool(q Querier, query string) (bool, error) {
 	s, err := q.Query(query)
 	if err != nil {
 		return false, err
@@ -28,7 +26,7 @@ func queryBool(q ivi.Querier, query string) (bool, error) {
 	}
 }
 
-func queryFloat64(q ivi.Querier, query string) (float64, error) {
+func QueryFloat64(q Querier, query string) (float64, error) {
 	s, err := q.Query(query)
 	if err != nil {
 		return 0.0, err
@@ -36,12 +34,16 @@ func queryFloat64(q ivi.Querier, query string) (float64, error) {
 	return strconv.ParseFloat(strings.TrimSpace(s), 64)
 }
 
-func queryString(q ivi.Querier, query string) (string, error) {
+func QueryString(q Querier, query string) (string, error) {
 	return q.Query(query)
 }
 
-func setFloat64(sw ivi.StringWriter, cmd string, value float64) error {
+func SetFloat64(sw StringWriter, cmd string, value float64) error {
 	send := fmt.Sprintf(cmd, value)
 	_, err := sw.WriteString(send)
 	return err
+}
+
+func QueryID(q Querier) (string, error) {
+	return q.Query("*IDN?\n")
 }

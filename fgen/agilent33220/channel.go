@@ -26,13 +26,23 @@ const (
 	Burst
 )
 
+// OutputMode determines how the function generator produces waveforms. This
+// attribute determines which extension group's functions and attributes are
+// used to configure the waveform the function generator produces. OutputMode
+// implements the defined values for the Output Mode read-write attribute
+// defined in Section 4.2.5 of IVI-4.3: IviFgen Class Specification.
 type OutputMode int
 
+// Function indicates the IVI driver uses the attributes and functions of the
+// IviFgenStdFunc extension group. Arbitrary indicates the IVI driver uses the
+// attributes and functions of the IviFgenArbWfm extension group.
 const (
 	Function OutputMode = iota
 	Arbitrary
 )
 
+// Channel represents a repated capability of an output channel for the
+// function generator.
 type Channel struct {
 	id            int
 	inst          ivi.Instrument
@@ -214,13 +224,13 @@ func (ch *Channel) StandardWaveform() (ivi.StandardWaveform, error) {
 		case 50.0:
 			return ivi.Triangle, nil
 		default:
-			return wave, fmt.Errorf("unable to determine waveform type RAMP with SYMM %s", symm)
+			return wave, fmt.Errorf("unable to determine waveform type RAMP with SYMM %f", symm)
 		}
 	}
 	return wave, fmt.Errorf("unable to determine standard waveform type: %s", s)
 }
 
-// SetStandardWaveform specifices which standard waveform teh function
+// SetStandardWaveform specifices which standard waveform the function
 // generator produces.  SetStandwardWaveform is the setter for the read-write
 // IviFgenStdFunc Attribute Waveform described in Section 5.2.6 of IVI-4.3:
 // IviFgen Class Specification.
@@ -249,6 +259,11 @@ var waveformApplyCommand = map[ivi.StandardWaveform]string{
 	ivi.DC:       "APPL:DC %.4f, %.4f, %.4f\n",
 }
 
+// ConfigureStandardWaveform configures the attributes of the function
+// generator that affect standard waveform generation.
+// ConfigureStandardWaveform is the method that implements the Configure
+// Standard Waveform function described in Section 5.3.1 of IVI-4.3: IviFgen
+// Class Specification.
 func (ch *Channel) ConfigureStandardWaveform(wave ivi.StandardWaveform, amp float64,
 	offset float64, freq float64, phase float64) error {
 	cmd := fmt.Sprintf(waveformApplyCommand[wave], freq, amp, offset)
@@ -257,17 +272,17 @@ func (ch *Channel) ConfigureStandardWaveform(wave ivi.StandardWaveform, amp floa
 }
 
 func (ch *Channel) setFloat64(cmd string, value float64) error {
-	return setFloat64(ch.inst, cmd, value)
+	return ivi.SetFloat64(ch.inst, cmd, value)
 }
 
 func (ch *Channel) queryBool(query string) (bool, error) {
-	return queryBool(ch.inst, query)
+	return ivi.QueryBool(ch.inst, query)
 }
 
 func (ch *Channel) queryFloat64(query string) (float64, error) {
-	return queryFloat64(ch.inst, query)
+	return ivi.QueryFloat64(ch.inst, query)
 }
 
 func (ch *Channel) queryString(query string) (string, error) {
-	return queryString(ch.inst, query)
+	return ivi.QueryString(ch.inst, query)
 }
