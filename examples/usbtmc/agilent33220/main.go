@@ -79,6 +79,11 @@ func main() {
 		log.Printf("error querying instrument model: %s", err)
 	}
 	log.Printf("Instrument model = %s", model)
+	sn, err := fgen.InstrumentSerialNumber()
+	if err != nil {
+		log.Printf("error querying instrument sn: %s", err)
+	}
+	log.Printf("Instrument S/N = %s", sn)
 	fw, err := fgen.FirmwareRevision()
 	if err != nil {
 		log.Printf("error querying firmware revision: %s", err)

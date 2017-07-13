@@ -43,3 +43,7 @@ func SetFloat64(sw StringWriter, cmd string, value float64) error {
 	_, err := sw.WriteString(send)
 	return err
 }
+
+func QueryID(q Querier) (string, error) {
+	return q.Query("*IDN?\n")
+}

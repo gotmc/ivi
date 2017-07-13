@@ -7,7 +7,16 @@ package ivi
 
 import (
 	"errors"
-	"regexp"
+	"strings"
+)
+
+type idPart int
+
+const (
+	mfrID idPart = iota
+	modelID
+	snID
+	fwrID
 )
 
 type Inherent struct {
@@ -36,7 +45,7 @@ func NewInherent(inst Instrument, base InherentBase) Inherent {
 // attribute Instrument Firmware Revision described in Section 5.18 of IVI-3.2:
 // Inherent Capabilities Specification.
 func (inherent *Inherent) FirmwareRevision() (string, error) {
-	return inherent.parseIdentification("fwr")
+	return inherent.parseIdentification(fwrID)
 }
 
 // InstrumentManufacturer queries the instrument and returns the manufacturer
@@ -44,7 +53,7 @@ func (inherent *Inherent) FirmwareRevision() (string, error) {
 // inherent attribute Instrument Manufacturer described in Section 5.19 of
 // IVI-3.2: Inherent Capabilities Specification.
 func (inherent *Inherent) InstrumentManufacturer() (string, error) {
-	return inherent.parseIdentification("mfr")
+	return inherent.parseIdentification(mfrID)
 }
 
 // InstrumentModel queries the instrument and returns the model of the
@@ -52,13 +61,13 @@ func (inherent *Inherent) InstrumentManufacturer() (string, error) {
 // attribute Instrument Model described in Section 5.20 of IVI-3.2: Inherent
 // Capabilities Specification.
 func (inherent *Inherent) InstrumentModel() (string, error) {
-	return inherent.parseIdentification("model")
+	return inherent.parseIdentification(modelID)
 }
 
 // InstrumentSerialNumber queries the instrument and returns the S/N of the
 // instrument.
 func (inherent *Inherent) InstrumentSerialNumber() (string, error) {
-	return inherent.parseIdentification("sn")
+	return inherent.parseIdentification(snID)
 }
 
 func (inherent *Inherent) Reset() error {
@@ -79,17 +88,11 @@ func (inherent *Inherent) Disable() error {
 	return errors.New("disable is not yet implemented.")
 }
 
-func (inherent *Inherent) parseIdentification(part string) (string, error) {
+func (inherent *Inherent) parseIdentification(part idPart) (string, error) {
 	s, err := inherent.inst.Query("*IDN?\n")
 	if err != nil {
 		return "", err
 	}
-	re := regexp.MustCompile(inherent.IDNString)
-	res := re.FindStringSubmatch(s)
-	subexpNames := re.SubexpNames()
-	matchMap := map[string]string{}
-	for i, n := range res {
-		matchMap[subexpNames[i]] = string(n)
-	}
-	return matchMap[part], nil
+	parts := strings.Split(s, ",")
+	return parts[part], nil
 }

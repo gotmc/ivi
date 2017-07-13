@@ -19,12 +19,6 @@ const (
 	classSpecMinorVersion = 3
 	classSpecRevision     = "5.2"
 	groupCapabilities     = "FgenBase,FgenStdfunc"
-	idnString             = `^(?P<mfr>[^,]+),` +
-		`(?P<model>[^,]+),0,` +
-		`(?P<fwr>\d{1}.\d{2})-` +
-		`(?P<boot>\d{1}.\d{2})-` +
-		`(?P<asic>\d{2})-` +
-		`(?P<pcb>\d{1}$`
 )
 
 var supportedInstrumentModels = []string{
@@ -60,7 +54,6 @@ func New(inst ivi.Instrument) (*Agilent33220, error) {
 		ClassSpecRevision:         classSpecRevision,
 		GroupCapabilities:         groupCapabilities,
 		SupportedInstrumentModels: supportedInstrumentModels,
-		IDNString:                 idnString,
 	}
 	inherent := ivi.NewInherent(inst, inherentBase)
 	fgen := Agilent33220{

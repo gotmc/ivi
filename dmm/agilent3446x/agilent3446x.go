@@ -19,16 +19,6 @@ const (
 	classSpecMinorVersion = 2
 	classSpecRevision     = "4.1"
 	groupCapabilities     = "DmmBase,DmmACMeasurement,DmmFrequencyMeasurement,DmmDeviceInfo"
-	idnString             = `^(?P<mfr>[^,]+),` +
-		`(?P<model>[^,]+),` +
-		`(?P<sn>[^,]+),` +
-		`(?P<hw>\d{1})-` +
-		`(?P<fwr>\d{2}.\d{2})-` +
-		`(?P<pp>\d{2}.\d{2})-` +
-		`(?P<mm>\d{2}.\d{2})-` +
-		`(?P<fpga>\d{2}.\d{2})-` +
-		`(?P<bb>\d{2})-` +
-		`(?P<fp>\d{1}$`
 )
 
 var supportedInstrumentModels = []string{
@@ -58,7 +48,6 @@ func New(inst ivi.Instrument) (*Agilent3446x, error) {
 		ClassSpecRevision:         classSpecRevision,
 		GroupCapabilities:         groupCapabilities,
 		SupportedInstrumentModels: supportedInstrumentModels,
-		IDNString:                 idnString,
 	}
 	inherent := ivi.NewInherent(inst, inherentBase)
 	dmm := Agilent3446x{

@@ -13,26 +13,18 @@ package agilente36xx
 
 import "github.com/gotmc/ivi"
 
-// Required to implement the Inherent Capabilities & Attributes
+// Required to implement the Inherent and DCPwr attributes and capabilities
 const (
+	outputCount           = 3
 	classSpecMajorVersion = 4
 	classSpecMinorVersion = 4
 	classSpecRevision     = "3.0"
 	groupCapabilities     = "DCPwrBase,DCPwrMeasurement"
-	idnString             = `^(?P<mfr>[^,]+),` +
-		`(?P<model>[^,]+),0,` +
-		`(?P<fwr>\d{1}.\d{1})-` +
-		`(?P<boot>\d{1}.\d{1})-` +
-		`(?P<asic>\d{1})$`
 )
 
 var supportedInstrumentModels = []string{
 	"E3631A",
 }
-
-const (
-	outputCount = 3
-)
 
 // AgilentE36xx provides the IVI driver for the Agilent/Keysight E3600 series
 // of power supplies.
@@ -44,7 +36,10 @@ type AgilentE36xx struct {
 }
 
 // New creates a new AgilentE36xx IVI Instrument.
-func New(inst ivi.Instrument) (*AgilentE36xx, error) {
+func New(inst ivi.Instrument, queryID, reset bool) (*AgilentE36xx, error) {
+	if queryID {
+		ivi.QueryID(inst)
+	}
 	p6v := Channel{
 		id:   0,
 		name: "P6V",
