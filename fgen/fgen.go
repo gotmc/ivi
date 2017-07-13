@@ -3,6 +3,12 @@
 // Use of this source code is governed by a MIT-style license that
 // can be found in the LICENSE.txt file for the project.
 
+/* Package fgen provides the Defined Values and other structs, methods, etc.
+that are common among all intstruments meeting the IVI-4.3: IviFgen Class
+Specification.
+
+Files are split based on the class capaiblity groups.
+*/
 package fgen
 
 // OperationMode provides the defined values for the Operation Mode defined in
@@ -32,6 +38,7 @@ type OutputMode int
 const (
 	Function OutputMode = iota
 	Arbitrary
+	Sequence
 )
 
 type TriggerSource int

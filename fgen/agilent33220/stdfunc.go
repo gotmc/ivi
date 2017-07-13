@@ -9,7 +9,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/gotmc/ivi"
+	"github.com/gotmc/ivi/fgen"
 )
 
 // Amplitude reads the difference between the maximum and minimum waveform
@@ -80,8 +80,8 @@ func (ch *Channel) SetFrequency(freq float64) error {
 // output by the function generator. If not, an error is returned.
 // StandwardWaveform is the getter for the read-write IviFgenStdFunc Attribute
 // Waveform described in Section 5.2.6 of IVI-4.3: IviFgen Class Specification.
-func (ch *Channel) StandardWaveform() (ivi.StandardWaveform, error) {
-	var wave ivi.StandardWaveform
+func (ch *Channel) StandardWaveform() (fgen.StandardWaveform, error) {
+	var wave fgen.StandardWaveform
 	s, err := ch.queryString("FUNC?\n")
 	if err != nil {
 		return wave, err
@@ -89,11 +89,11 @@ func (ch *Channel) StandardWaveform() (ivi.StandardWaveform, error) {
 	s = strings.TrimSpace(s)
 	switch s {
 	case "SIN":
-		return ivi.Sine, nil
+		return fgen.Sine, nil
 	case "SQU":
-		return ivi.Square, nil
+		return fgen.Square, nil
 	case "DC":
-		return ivi.DC, nil
+		return fgen.DC, nil
 	case "RAMP":
 		symm, err := ch.queryFloat64("FUNC:RAMP:SYMM?\n")
 		if err != nil {
@@ -101,11 +101,11 @@ func (ch *Channel) StandardWaveform() (ivi.StandardWaveform, error) {
 		}
 		switch symm {
 		case 0.0:
-			return ivi.RampDown, nil
+			return fgen.RampDown, nil
 		case 100.0:
-			return ivi.RampUp, nil
+			return fgen.RampUp, nil
 		case 50.0:
-			return ivi.Triangle, nil
+			return fgen.Triangle, nil
 		default:
 			return wave, fmt.Errorf("unable to determine waveform type RAMP with SYMM %f", symm)
 		}
@@ -117,29 +117,29 @@ func (ch *Channel) StandardWaveform() (ivi.StandardWaveform, error) {
 // generator produces.  SetStandwardWaveform is the setter for the read-write
 // IviFgenStdFunc Attribute Waveform described in Section 5.2.6 of IVI-4.3:
 // IviFgen Class Specification.
-func (ch *Channel) SetStandardWaveform(wave ivi.StandardWaveform) error {
+func (ch *Channel) SetStandardWaveform(wave fgen.StandardWaveform) error {
 	// FIXME(mdr): May need to change the phase offset in order to match the
 	// waveforms shown in Figure 5-1 of IVI-4.3: IviFgen Class Specification.
 	_, err := ch.inst.WriteString(waveformCommand[wave])
 	return err
 }
 
-var waveformCommand = map[ivi.StandardWaveform]string{
-	ivi.Sine:     "FUNC SIN",
-	ivi.Square:   "FUNC SQU",
-	ivi.Triangle: "FUNC RAMP; RAMP:SYMM 50",
-	ivi.RampUp:   "FUNC RAMP; RAMP:SYMM 100",
-	ivi.RampDown: "FUNC RAMP; RAMP:SYMM 0",
-	ivi.DC:       "FUNC DC",
+var waveformCommand = map[fgen.StandardWaveform]string{
+	fgen.Sine:     "FUNC SIN",
+	fgen.Square:   "FUNC SQU",
+	fgen.Triangle: "FUNC RAMP; RAMP:SYMM 50",
+	fgen.RampUp:   "FUNC RAMP; RAMP:SYMM 100",
+	fgen.RampDown: "FUNC RAMP; RAMP:SYMM 0",
+	fgen.DC:       "FUNC DC",
 }
 
-var waveformApplyCommand = map[ivi.StandardWaveform]string{
-	ivi.Sine:     "APPL:SIN %.4f, %.4f, %.4f\n",
-	ivi.Square:   "APPL:SQU %.4f, %.4f, %.4f\n",
-	ivi.Triangle: "APPL:RAMP %.4f, %.4f, %.4f;:FUNC:RAMP:SYMM 50\n",
-	ivi.RampUp:   "APPL:RAMP %.4f, %.4f, %.4f;:FUNC:RAMP:SYMM 100\n",
-	ivi.RampDown: "APPL:RAMP %.4f, %.4f, %.4f;:FUNC:RAMP:SYMM 0\n",
-	ivi.DC:       "APPL:DC %.4f, %.4f, %.4f\n",
+var waveformApplyCommand = map[fgen.StandardWaveform]string{
+	fgen.Sine:     "APPL:SIN %.4f, %.4f, %.4f\n",
+	fgen.Square:   "APPL:SQU %.4f, %.4f, %.4f\n",
+	fgen.Triangle: "APPL:RAMP %.4f, %.4f, %.4f;:FUNC:RAMP:SYMM 50\n",
+	fgen.RampUp:   "APPL:RAMP %.4f, %.4f, %.4f;:FUNC:RAMP:SYMM 100\n",
+	fgen.RampDown: "APPL:RAMP %.4f, %.4f, %.4f;:FUNC:RAMP:SYMM 0\n",
+	fgen.DC:       "APPL:DC %.4f, %.4f, %.4f\n",
 }
 
 // ConfigureStandardWaveform configures the attributes of the function
@@ -147,7 +147,7 @@ var waveformApplyCommand = map[ivi.StandardWaveform]string{
 // ConfigureStandardWaveform is the method that implements the Configure
 // Standard Waveform function described in Section 5.3.1 of IVI-4.3: IviFgen
 // Class Specification.
-func (ch *Channel) ConfigureStandardWaveform(wave ivi.StandardWaveform, amp float64,
+func (ch *Channel) ConfigureStandardWaveform(wave fgen.StandardWaveform, amp float64,
 	offset float64, freq float64, phase float64) error {
 	cmd := fmt.Sprintf(waveformApplyCommand[wave], freq, amp, offset)
 	_, err := ch.inst.WriteString(cmd)

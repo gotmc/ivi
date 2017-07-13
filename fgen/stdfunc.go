@@ -3,14 +3,10 @@
 // Use of this source code is governed by a MIT-style license that
 // can be found in the LICENSE.txt file for the project.
 
-package stdfunc
+package fgen
 
-// StandardWaveform is the type of standard waveforms available per IVI-4.3:
-// IviFgen Class Specification,	Section 5 IvIFgenStdFunc Extension Group.
 type StandardWaveform int
 
-// Available standard waveforms per IVI-4.3: IviFgen Class Specification,
-// Section 5 IvIFgenStdFunc Extension Group.
 const (
 	Sine StandardWaveform = iota
 	Square

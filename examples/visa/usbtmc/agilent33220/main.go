@@ -8,7 +8,6 @@ package main
 import (
 	"log"
 
-	"github.com/gotmc/ivi"
 	"github.com/gotmc/ivi/fgen"
 	"github.com/gotmc/ivi/fgen/agilent33220"
 	_ "github.com/gotmc/usbtmc/driver/truveris"
@@ -23,15 +22,14 @@ func main() {
 	if err != nil {
 		log.Fatalf("VISA resource %s: %s", address, err)
 	}
-	a, err := agilent33220.New(res, true)
+	fg, err := agilent33220.New(res, true)
 	if err != nil {
 		log.Fatalf("IVI instrument error: %s", err)
 	}
-	ch := a.Channels[0]
+	ch := fg.Channels[0]
 	ch.DisableOutput()
 	// Shortcut to configure standard waveform in one command.
-	ch.SetOperationMode(fgen.Continuous)
-	ch.ConfigureStandardWaveform(ivi.Sine, 0.25, 0.1, 2340, 0)
+	ch.ConfigureStandardWaveform(fgen.Sine, 0.25, 0.1, 2340, 0)
 	ch.SetBurstCount(131)
 	ch.SetInternalTriggerPeriod(0.112) // code period = 112 ms
 	ch.SetTriggerSource(fgen.InternalTrigger)

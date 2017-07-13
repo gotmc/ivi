@@ -20,27 +20,3 @@ type StringWriter interface {
 type Querier interface {
 	Query(s string) (value string, err error)
 }
-
-type StandardWaveform int
-
-const (
-	Sine StandardWaveform = iota
-	Square
-	Triangle
-	RampUp
-	RampDown
-	DC
-)
-
-var standardWaveforms = map[StandardWaveform]string{
-	Sine:     "Sine",
-	Square:   "Square",
-	Triangle: "Triangle",
-	RampUp:   "Ramp Up",
-	RampDown: "Ramp Down",
-	DC:       "DC",
-}
-
-func (wave StandardWaveform) String() string {
-	return standardWaveforms[wave]
-}
