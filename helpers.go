@@ -34,11 +34,26 @@ func QueryFloat64(q Querier, query string) (float64, error) {
 	return strconv.ParseFloat(strings.TrimSpace(s), 64)
 }
 
+func QueryInt(q Querier, query string) (int, error) {
+	s, err := q.Query(query)
+	if err != nil {
+		return 0, err
+	}
+	i, err := strconv.ParseInt(strings.TrimSpace(s), 10, 32)
+	return int(i), err
+}
+
 func QueryString(q Querier, query string) (string, error) {
 	return q.Query(query)
 }
 
 func SetFloat64(sw StringWriter, cmd string, value float64) error {
+	send := fmt.Sprintf(cmd, value)
+	_, err := sw.WriteString(send)
+	return err
+}
+
+func SetInt(sw StringWriter, cmd string, value int) error {
 	send := fmt.Sprintf(cmd, value)
 	_, err := sw.WriteString(send)
 	return err

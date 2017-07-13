@@ -18,8 +18,11 @@ const (
 	classSpecMajorVersion = 4
 	classSpecMinorVersion = 3
 	classSpecRevision     = "5.2"
-	groupCapabilities     = "FgenBase,FgenStdfunc"
+	groupCapabilities     = "IviFgenBase,IviFgenStdfunc,IviFgenTrigger,IviFgenInternalTrigger,IviFgenBurst"
 )
+
+// TODO(mdr): Seems like groupCapabilities should be a []string instead of
+// string
 
 var supportedInstrumentModels = []string{
 	"33220A",
@@ -69,9 +72,9 @@ func New(inst ivi.Instrument, reset bool) (*Agilent33220, error) {
 	return &fgen, nil
 }
 
-// OutputCount returns the number of available output channels. OutputCount is
-// the getter for the read-only IviFgenBase Attribute Output Count described in
-// Section 4.2.1 of IVI-4.3: IviFgen Class Specification.
-func (fgen *Agilent33220) OutputCount() int {
-	return fgen.outputCount
+// Channel represents a repeated capability of an output channel for the
+// function generator.
+type Channel struct {
+	id   int
+	inst ivi.Instrument
 }
