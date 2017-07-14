@@ -74,10 +74,3 @@ func New(inst ivi.Instrument, reset bool) (*AgilentE36xx, error) {
 	}
 	return &dcpwr, nil
 }
-
-// OutputCount returns the number of available output channels. OutputCount is
-// the getter for the read-only IviDCPwrBase Attribute Output Channel Count
-// described in Section 4.2.7 of IVI-4.4: IviDCPwr Class Specification.
-func (dcpwr *AgilentE36xx) OutputCount() int {
-	return len(dcpwr.Channels)
-}
