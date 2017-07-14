@@ -1,17 +1,84 @@
 # ivi
-Go-based implementation of the Interchangeable Virtual Instrument (IVI) standard
+Go-based implementation of the Interchangeable Virtual Instrument (IVI)
+standard.
+
+[![GoDoc][godoc image]][godoc link]
+[![License Badge][license image]][LICENSE.txt]
 
 ## Overview
 
-The IVI standard wasn't written for Go, so the [ivi][] package doesn't
-fully implement the IVI standard. However, the value of the [ivi][]
-package is in providing a standardized API for test equipment. For
-instance, instead of sending SCPI commands to an Agilent 33220A function
-generator, which would be different than the SCPI commands for an SRS
-DS345 function generator, the [ivi][] package provides a common API for
-function generators.
+The [IVI Specifications][] developed by the IVI Foundation provide
+standardized APIs for programming test instruments. This package is a
+partial, Go-based implementation of the IVI Specifications, which are
+specified for C, COM, and .NET.
+
+The main advantage of the ivi package is not having to learn the
+[SCPI][] commands for each individual peice of test equipment. For
+instance, both the Agilent 33220A and the Stanford Research Systems
+DS345 function generators can be programmed using one standard API. The
+only requirement for this is having an IVI driver for the desired test
+equipment.
 
 Currently, [ivi][] doesn't cache state. Every time an attribute is read
-directly from the instrument.
+directly from the instrument. Development focus is currently on fleshing
+out the APIs and creating a few IVI drivers for each instrument type.
+
+## Installation
+
+```bash
+$ go get github.com/gotmc/ivi
+```
+
+## Usage
+
+The [ivi][ivi] package requires receiving an Instrument interface. The
+[visa][], [lxi][], and [usbtmc][] packages meet the Instrument
+interface. You can either use [visa][], which will call [lxi][] and/or
+[usbtmc][] as nescessary, or you can directly call [usbtmc][] or [lxi][]
+as desired.
+
+## Documentation
+
+Documentation can be found at either:
+
+- <https://godoc.org/github.com/gotmc/ivi>
+- <http://localhost:6060/pkg/github.com/gotmc/ivi/> after running `$
+  godoc -http=:6060`
+
+## Contributing
+
+Contributions are welcome! To contribute please:
+
+1. Fork the repository
+2. Create a feature branch
+3. Code
+4. Submit a [pull request][]
+
+### Testing
+
+Prior to submitting a [pull request][], please run:
+
+```bash
+$ make check
+```
+
+To update and view the test coverage report:
+
+```bash
+$ make cover
+```
+
+## License
+
+[ivi][] is released under the MIT license. Please see the
+[LICENSE.txt][] file for more information.
 
 [ivi]: https://github.com/gotmc/ivi
+[ivi specification]: http://www.ivifoundation.org/
+[godoc image]: https://godoc.org/github.com/gotmc/ivi?status.svg
+[godoc link]: https://godoc.org/github.com/gotmc/ivi
+[LICENSE.txt]: https://github.com/gotmc/ivi/blob/master/LICENSE.txt
+[license image]: https://img.shields.io/badge/license-MIT-blue.svg
+[lxi]: https://github.com/gotmc/lxi
+[pull request]: https://help.github.com/articles/using-pull-requests
+[visa]: https://github.com/gotmc/visa
