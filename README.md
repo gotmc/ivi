@@ -7,10 +7,10 @@ standard.
 
 ## Overview
 
-The [IVI Specifications][] developed by the IVI Foundation provide
-standardized APIs for programming test instruments. This package is a
-partial, Go-based implementation of the IVI Specifications, which are
-specified for C, COM, and .NET.
+The [IVI Specifications][ivi-specs] developed by the IVI Foundation
+provide standardized APIs for programming test instruments. This package
+is a partial, Go-based implementation of the IVI Specifications, which
+are specified for C, COM, and .NET.
 
 The main advantage of the ivi package is not having to learn the
 [SCPI][] commands for each individual peice of test equipment. For
@@ -74,11 +74,13 @@ $ make cover
 [LICENSE.txt][] file for more information.
 
 [ivi]: https://github.com/gotmc/ivi
-[ivi specification]: http://www.ivifoundation.org/
+[ivi-specs]: http://www.ivifoundation.org/
 [godoc image]: https://godoc.org/github.com/gotmc/ivi?status.svg
 [godoc link]: https://godoc.org/github.com/gotmc/ivi
 [LICENSE.txt]: https://github.com/gotmc/ivi/blob/master/LICENSE.txt
 [license image]: https://img.shields.io/badge/license-MIT-blue.svg
 [lxi]: https://github.com/gotmc/lxi
 [pull request]: https://help.github.com/articles/using-pull-requests
+[scpi]: http://www.ivifoundation.org/scpi/
+[usbtmc]: https://github.com/gotmc/usbtmc
 [visa]: https://github.com/gotmc/visa
