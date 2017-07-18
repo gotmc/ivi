@@ -102,14 +102,30 @@ func (ch *Channel) EnableOutput() error {
 // OVPEnabled is the getter for the read-write IviFgenBase Attribute OVP
 // Enabled described in Section 4.2.4 of IVI-4.4: IviDCPwr Class Specification.
 func (ch *Channel) OVPEnabled() (bool, error) {
+	max, err := ch.queryFloat64("VOLT:PROT? MAX\n")
+	if err != nil {
+		return false, err
+	}
+	ovp, err := ch.queryFloat64("VOLT:PROT?\n")
+	if err != nil {
+		return false, err
+	}
+	if ovp == max {
+		return false, nil
+	}
 	return true, nil
 }
 
-// SetOVPEnabled always returns nil, since the PMX series always has the
-// voltage protection set.  SetOVPEnabled is the setter for the read-write
-// IviFgenBase Attribute OVP Enabled described in Section 4.2.4 of IVI-4.4:
-// IviDCPwr Class Specification.
+// SetOVPEnabled enables or disables the over-votlage protection. Since the OVP
+// is always enabled on the PMX power supply, if false, the PMX's OVP is set to
+// its maximum value, which is 110% of the maximum output voltage.  voltage
+// protection set.  SetOVPEnabled is the setter for the read-write IviFgenBase
+// Attribute OVP Enabled described in Section 4.2.4 of IVI-4.4: IviDCPwr Class
+// Specification.
 func (ch *Channel) SetOVPEnabled(v bool) error {
+	if v == false {
+		return ch.Set("VOLT:PROT MAX\n")
+	}
 	return nil
 }
 
@@ -156,4 +172,32 @@ func (dcpwr *KikusuiPMX) OutputCount() int {
 // 4.2.9 of IVI-4.4: IviDCPwr Class Specification.
 func (ch *Channel) Name() string {
 	return ch.name
+}
+
+// ConfigureCurrentLimit specifies the output current limit value and the
+// behavior of the power supply when the output current is greater than or
+// equal to that value.  ConfigureCurrentLimit implements the IviDCPwrBase
+// Configure Current Limit function described in Section 4.3.1 of IVI-4.4:
+// IviDCPwr Class Specification.
+func (ch *Channel) ConfigureCurrentLimit(behavior dcpwr.CurrentLimitBehavior, limit float64) error {
+	if behavior == dcpwr.Regulate {
+		ch.currentLimitBehavior = dcpwr.Regulate
+		return ch.Set("CURR %f;:CURR:PROT MAX\n", limit)
+	} else if behavior == dcpwr.Trip {
+		ch.currentLimitBehavior = dcpwr.Trip
+		return ch.Set("CURR %f;:CURR:PROT %f\n", limit, limit)
+	}
+	return errors.New("unknown current limit behavior")
+
+}
+
+// ConfigureOVP specifies the over-voltage limit and the behavior of the power
+// supply when the output voltage is greater than or equal to that value.
+// ConfigureOVP implements the IviDCPwrBase Configure OVP function described in
+// Section 4.3.4 of IVI-4.4: IviDCPwr Class Specification.
+func (ch *Channel) ConfigureOVP(enabled bool, limit float64) error {
+	if enabled == false {
+		return ch.Set("VOLT:PROT MAX\n")
+	}
+	return ch.Set("VOLT:PROT %f\n", limit)
 }

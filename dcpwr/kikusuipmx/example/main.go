@@ -7,6 +7,7 @@ package main
 
 import (
 	"log"
+	"time"
 
 	"github.com/gotmc/ivi/dcpwr"
 	"github.com/gotmc/ivi/dcpwr/kikusuipmx"
@@ -33,12 +34,18 @@ func main() {
 	ch := dcp.Channels[0]
 	ch.DisableOutput()
 	ch.SetVoltageLevel(50)
-	ch.SetCurrentLimitBehavior(dcpwr.Trip)
-	ch.SetCurrentLimit(0.25)
-	ch.SetOVPLimit(60)
+	ch.ConfigureCurrentLimit(dcpwr.Trip, 0.25)
+	// The above command is the same as the following two:
+	// ch.SetCurrentLimitBehavior(dcpwr.Trip)
+	// ch.SetCurrentLimit(0.25)
+	ch.ConfigureOVP(true, 60)
+	// The aove command is the same as the following two:
+	// ch.SetOVPEnabled(true)
+	// ch.SetOVPLimit(60)
 	ch.EnableOutput()
 
-	// Query the power supply
+	// Let the power supply settle before we query it.
+	time.Sleep(500 * time.Millisecond)
 	v, err := ch.VoltageLevel()
 	if err != nil {
 		log.Printf("error querying voltage level: %s", err)
