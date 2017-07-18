@@ -8,8 +8,8 @@ package main
 import (
 	"log"
 
-	"github.com/gotmc/ivi"
-	"github.com/gotmc/ivi/fgen/agilent33220"
+	"github.com/gotmc/ivi/fgen"
+	"github.com/gotmc/ivi/fgen/agilent/ag33220"
 	"github.com/gotmc/lxi"
 )
 
@@ -24,25 +24,25 @@ func main() {
 
 	// Create a new IVI instance of the Agilent 33220 function generator and
 	// reset.
-	fgen, err := agilent33220.New(dev, true)
+	fg, err := ag33220.New(dev, true)
 	if err != nil {
 		log.Fatalf("IVI instrument error: %s", err)
 	}
 
 	// Channel specific methods can be accessed directly from the instrument
 	// using 0-based index to select the desirec channel.
-	fgen.Channels[0].DisableOutput()
-	fgen.Channels[0].SetAmplitude(0.4)
+	fg.Channels[0].DisableOutput()
+	fg.Channels[0].SetAmplitude(0.4)
 
 	// Alternatively, the channel can be assigned to a variable.
-	ch := fgen.Channels[0]
-	ch.SetStandardWaveform(ivi.Sine)
+	ch := fg.Channels[0]
+	ch.SetStandardWaveform(fgen.Sine)
 	ch.SetDCOffset(0.1)
 	ch.SetFrequency(2340)
 
 	// Instead of configuring attributes of a standard waveform individually, the
 	// standard waveform can be configured using a single method.
-	ch.ConfigureStandardWaveform(ivi.RampUp, 0.4, 0.1, 2340, 0)
+	ch.ConfigureStandardWaveform(fgen.RampUp, 0.4, 0.1, 2340, 0)
 	ch.EnableOutput()
 
 	// Query the FGen
@@ -61,22 +61,22 @@ func main() {
 		log.Printf("error querying standard waveform: %s", err)
 	}
 	log.Printf("Standard waveform = %s", wave)
-	mfr, err := fgen.InstrumentManufacturer()
+	mfr, err := fg.InstrumentManufacturer()
 	if err != nil {
 		log.Printf("error querying instrument manufacturer: %s", err)
 	}
 	log.Printf("Instrument manufacturer = %s", mfr)
-	model, err := fgen.InstrumentModel()
+	model, err := fg.InstrumentModel()
 	if err != nil {
 		log.Printf("error querying instrument model: %s", err)
 	}
 	log.Printf("Instrument model = %s", model)
-	sn, err := fgen.InstrumentSerialNumber()
+	sn, err := fg.InstrumentSerialNumber()
 	if err != nil {
 		log.Printf("error querying instrument sn: %s", err)
 	}
 	log.Printf("Instrument S/N = %s", sn)
-	fw, err := fgen.FirmwareRevision()
+	fw, err := fg.FirmwareRevision()
 	if err != nil {
 		log.Printf("error querying firmware revision: %s", err)
 	}

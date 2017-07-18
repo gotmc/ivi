@@ -9,7 +9,7 @@ import (
 	"log"
 
 	"github.com/gotmc/ivi/fgen"
-	"github.com/gotmc/ivi/fgen/agilent33220"
+	"github.com/gotmc/ivi/fgen/agilent/ag33220"
 	_ "github.com/gotmc/usbtmc/driver/truveris"
 	"github.com/gotmc/visa"
 	_ "github.com/gotmc/visa/driver/usbtmc"
@@ -22,7 +22,7 @@ func main() {
 	if err != nil {
 		log.Fatalf("VISA resource %s: %s", address, err)
 	}
-	fg, err := agilent33220.New(res, true)
+	fg, err := ag33220.New(res, true)
 	if err != nil {
 		log.Fatalf("IVI instrument error: %s", err)
 	}
