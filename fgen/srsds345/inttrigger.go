@@ -20,5 +20,5 @@ func (ch *Channel) InternalTriggerRate() (float64, error) {
 // IviFgenInternalTrigger Attribute Internal Trigger Rate described in Section
 // 15.2.1 of IVI-4.3: IviFgen Class Specification.
 func (ch *Channel) SetInternalTriggerRate(rate float64) error {
-	return ch.setFloat64("TRAT %.3f\n", rate)
+	return ch.Set("TRAT %.3f\n", rate)
 }

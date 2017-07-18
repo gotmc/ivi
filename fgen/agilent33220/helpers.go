@@ -7,7 +7,7 @@ package agilent33220
 
 import "github.com/gotmc/ivi"
 
-func (ch *Channel) setFloat64(cmd string, value float64) error {
+func (ch *Channel) Set(cmd string, value float64) error {
 	return ivi.SetFloat64(ch.inst, cmd, value)
 }
 

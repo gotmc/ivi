@@ -102,5 +102,5 @@ func (ch *Channel) OutputImpedance() (float64, error) {
 // Output Impedance described in Section 4.2.3 of IVI-4.3: IviFgen Class
 // Specification.
 func (ch *Channel) SetOutputImpedance(impedance float64) error {
-	return ch.setFloat64("OUTP:LOAD %f\n", impedance)
+	return ch.Set("OUTP:LOAD %f\n", impedance)
 }

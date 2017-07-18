@@ -26,7 +26,7 @@ func (ch *Channel) Amplitude() (float64, error) {
 // setter for the read-write IviFgenStdFunc Attribute Amplitude described in
 // Section 5.2.1 of IVI-4.3: IviFgen Class Specification.
 func (ch *Channel) SetAmplitude(amp float64) error {
-	return ch.setFloat64("AMPL %f VP\n", amp)
+	return ch.Set("AMPL %f VP\n", amp)
 }
 
 // DCOffset reads the difference between the average of the maximum and minimum
@@ -42,7 +42,7 @@ func (ch *Channel) DCOffset() (float64, error) {
 // for the read-write IviFgenStdFunc Attribute DC Offset described in Section
 // 5.2.2 of IVI-4.3: IviFgen Class Specification.
 func (ch *Channel) SetDCOffset(amp float64) error {
-	return ch.setFloat64("OFFS %f\n", amp)
+	return ch.Set("OFFS %f\n", amp)
 }
 
 // DutyCycle reads the percentage of time, specified as 0-100, during one cycle
@@ -74,7 +74,7 @@ func (ch *Channel) Frequency() (float64, error) {
 // the setter for the read-write IviFgenStdFunc Attribute Frequency described
 // in Section 5.2.4 of IVI-4.3: IviFgen Class Specification.
 func (ch *Channel) SetFrequency(freq float64) error {
-	return ch.setFloat64("FREQ %f\n", freq)
+	return ch.Set("FREQ %f\n", freq)
 }
 
 // StandardWaveform determines if one of the IVI Standard Waveforms is being

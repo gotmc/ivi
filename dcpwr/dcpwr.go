@@ -10,8 +10,8 @@ package dcpwr
 type CurrentLimitBehavior int
 
 const (
-	CurrentTrip CurrentLimitBehavior = iota
-	CurrentRegulate
+	Trip CurrentLimitBehavior = iota
+	Regulate
 )
 
 type VoltageCurrent int

@@ -7,12 +7,8 @@ package srsds345
 
 import "github.com/gotmc/ivi"
 
-func (ch *Channel) setFloat64(cmd string, value float64) error {
-	return ivi.SetFloat64(ch.inst, cmd, value)
-}
-
-func (ch *Channel) setInt(cmd string, value int) error {
-	return ivi.SetInt(ch.inst, cmd, value)
+func (ch *Channel) Set(format string, a ...interface{}) error {
+	return ivi.Set(ch.inst, format, a)
 }
 
 func (ch *Channel) queryBool(query string) (bool, error) {

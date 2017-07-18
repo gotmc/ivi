@@ -7,6 +7,7 @@ package ivi
 
 import (
 	"fmt"
+	"log"
 	"strconv"
 	"strings"
 )
@@ -17,9 +18,9 @@ func QueryBool(q Querier, query string) (bool, error) {
 		return false, err
 	}
 	switch s {
-	case "OFF":
+	case "OFF", "0":
 		return false, nil
-	case "ON":
+	case "ON", "1":
 		return true, nil
 	default:
 		return false, fmt.Errorf("could not determine boolean status from %s", s)
@@ -47,15 +48,13 @@ func QueryString(q Querier, query string) (string, error) {
 	return q.Query(query)
 }
 
-func SetFloat64(sw StringWriter, cmd string, value float64) error {
-	send := fmt.Sprintf(cmd, value)
-	_, err := sw.WriteString(send)
-	return err
-}
-
-func SetInt(sw StringWriter, cmd string, value int) error {
-	send := fmt.Sprintf(cmd, value)
-	_, err := sw.WriteString(send)
+func Set(sw StringWriter, format string, a ...interface{}) error {
+	cmd := format
+	if a != nil {
+		cmd = fmt.Sprintf(format, a...)
+	}
+	log.Printf("writing cmd: %s", cmd)
+	_, err := sw.WriteString(cmd)
 	return err
 }
 

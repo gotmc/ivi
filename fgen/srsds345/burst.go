@@ -18,5 +18,5 @@ func (ch *Channel) BurstCount() (int, error) {
 // read-write IviFgenBurst Attribute Burst Count described in Section 17.2.1 of
 // IVI-4.3: IviFgen Class Specification.
 func (ch *Channel) SetBurstCount(count int) error {
-	return ch.setInt("BCNT %d\n", count)
+	return ch.Set("BCNT %d\n", count)
 }
