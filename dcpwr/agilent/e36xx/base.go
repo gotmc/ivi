@@ -7,7 +7,6 @@ package e36xx
 
 import (
 	"errors"
-	"fmt"
 
 	"github.com/gotmc/ivi/dcpwr"
 )
@@ -17,7 +16,7 @@ import (
 // Current Limit described in Section 4.2.1 of IVI-4.4: IviDCPwr Class
 // Specification.
 func (ch *Channel) CurrentLimit() (float64, error) {
-	return ch.queryLimit(dcpwr.CurrentQuery)
+	return ch.queryLimit(currentQuery)
 }
 
 // SetCurrentLimit specifies the output current limit. The units are Amp.s
@@ -25,9 +24,7 @@ func (ch *Channel) CurrentLimit() (float64, error) {
 // Attribute Current Limit described in Section 4.2.1 of IVI-4.4: IviDCPwr
 // Class Specification.
 func (ch *Channel) SetCurrentLimit(limit float64) error {
-	cmd := fmt.Sprintf("INST %s;:CURR %f\n", ch.name, limit)
-	_, err := ch.inst.WriteString(cmd)
-	return err
+	return ch.Set("INST %s;:CURR %f\n", ch.Name(), limit)
 }
 
 // CurrentLimitBehavior determines the behavior of the power supply when the
@@ -59,7 +56,7 @@ func (ch *Channel) SetCurrentLimitBehavior(behavior dcpwr.CurrentLimitBehavior) 
 // Attribute Output Enabled described in Section 4.2.3 of IVI-4.4: IviDCPwr
 // Class Specification.
 func (ch *Channel) OutputEnabled() (bool, error) {
-	return ch.queryBool("OUTP?\n")
+	return ch.QueryBool("OUTP?\n")
 }
 
 // SetOutputEnabled sets all three output channels to enabled or disabled.
@@ -73,8 +70,7 @@ func (ch *Channel) SetOutputEnabled(v bool) error {
 	} else {
 		send = "OUTP OFF\n"
 	}
-	_, err := ch.inst.WriteString(send)
-	return err
+	return ch.Set(send)
 }
 
 // DisableOutput is a convenience function for setting the Output Enabled
@@ -123,7 +119,7 @@ func (ch *Channel) SetOVPLimit(limit float64) error {
 // read-write IviDCPwrBase Attribute Voltage Level described in Section 4.2.6
 // of IVI-4.4: IviDCPwr Class Specification.
 func (ch *Channel) VoltageLevel() (float64, error) {
-	return ch.queryLimit(dcpwr.VoltageQuery)
+	return ch.queryLimit(voltageQuery)
 }
 
 // SetVoltageLevel specifies the voltage level the DC power supply attempts
@@ -131,9 +127,7 @@ func (ch *Channel) VoltageLevel() (float64, error) {
 // read-write IviDCPwrBase Attribute Voltage Level described in Section 4.2.6
 // of IVI-4.4: IviDCPwr Class Specification.
 func (ch *Channel) SetVoltageLevel(amp float64) error {
-	cmd := fmt.Sprintf("APPL %s, %f\n", ch.name, amp)
-	_, err := ch.inst.WriteString(cmd)
-	return err
+	return ch.Set("APPL %s, %f\n", ch.Name(), amp)
 }
 
 // OutputCount returns the number of available output channels. OutputCount is
@@ -141,11 +135,4 @@ func (ch *Channel) SetVoltageLevel(amp float64) error {
 // described in Section 4.2.7 of IVI-4.4: IviDCPwr Class Specification.
 func (dcpwr *E36xx) OutputCount() int {
 	return len(dcpwr.Channels)
-}
-
-// Name returns the name of the output channel. Name is the getter for the
-// read-only IviDCPwrBase Attribute Output Channel Name described in Section
-// 4.2.9 of IVI-4.4: IviDCPwr Class Specification.
-func (ch *Channel) Name() string {
-	return ch.name
 }

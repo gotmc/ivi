@@ -9,14 +9,8 @@ package dcpwr
 // Behavior defined in Section 4.2.2 of IVI-4.4: IviDCPwr Class Specification.
 type CurrentLimitBehavior int
 
+// These are the defined values for the Current Limit Behavior.
 const (
 	Trip CurrentLimitBehavior = iota
 	Regulate
-)
-
-type VoltageCurrent int
-
-const (
-	VoltageQuery VoltageCurrent = iota
-	CurrentQuery
 )

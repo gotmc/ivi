@@ -16,7 +16,7 @@ import (
 // Current Limit described in Section 4.2.1 of IVI-4.4: IviDCPwr Class
 // Specification.
 func (ch *Channel) CurrentLimit() (float64, error) {
-	return ch.queryFloat64("CURR?\n")
+	return ch.QueryFloat64("CURR?\n")
 }
 
 // SetCurrentLimit specifies the output current limit. The units are Amps.
@@ -57,7 +57,7 @@ func (ch *Channel) SetCurrentLimitBehavior(behavior dcpwr.CurrentLimitBehavior) 
 		return ch.Set("CURR:PROT MAX\n")
 	} else if behavior == dcpwr.Trip {
 		ch.currentLimitBehavior = dcpwr.Trip
-		limit, err := ch.queryFloat64("CURR?\n")
+		limit, err := ch.QueryFloat64("CURR?\n")
 		if err != nil {
 			return err
 		}
@@ -71,7 +71,7 @@ func (ch *Channel) SetCurrentLimitBehavior(behavior dcpwr.CurrentLimitBehavior) 
 // Attribute Output Enabled described in Section 4.2.3 of IVI-4.4: IviDCPwr
 // Class Specification.
 func (ch *Channel) OutputEnabled() (bool, error) {
-	return ch.queryBool("OUTP?\n")
+	return ch.QueryBool("OUTP?\n")
 }
 
 // SetOutputEnabled sets all the output channel to enabled or disabled.
@@ -101,11 +101,11 @@ func (ch *Channel) EnableOutput() error {
 // OVPEnabled is the getter for the read-write IviFgenBase Attribute OVP
 // Enabled described in Section 4.2.4 of IVI-4.4: IviDCPwr Class Specification.
 func (ch *Channel) OVPEnabled() (bool, error) {
-	max, err := ch.queryFloat64("VOLT:PROT? MAX\n")
+	max, err := ch.QueryFloat64("VOLT:PROT? MAX\n")
 	if err != nil {
 		return false, err
 	}
-	ovp, err := ch.queryFloat64("VOLT:PROT?\n")
+	ovp, err := ch.QueryFloat64("VOLT:PROT?\n")
 	if err != nil {
 		return false, err
 	}
@@ -132,7 +132,7 @@ func (ch *Channel) SetOVPEnabled(v bool) error {
 // is the getter for the read-write IviDWPwrBase Attribute OVP Limit described
 // in Section 4.2.5 of IVI-4.4: IviDCPwr Class Specification.
 func (ch *Channel) OVPLimit() (float64, error) {
-	return ch.queryFloat64("VOLT:PROT?\n")
+	return ch.QueryFloat64("VOLT:PROT?\n")
 }
 
 // SetOVPLimit returns an error since the E3631A doesn't support OVP.
@@ -147,7 +147,7 @@ func (ch *Channel) SetOVPLimit(limit float64) error {
 // read-write IviDCPwrBase Attribute Voltage Level described in Section 4.2.6
 // of IVI-4.4: IviDCPwr Class Specification.
 func (ch *Channel) VoltageLevel() (float64, error) {
-	return ch.queryFloat64("VOLT?\n")
+	return ch.QueryFloat64("VOLT?\n")
 }
 
 // SetVoltageLevel specifies the voltage level the DC power supply attempts
@@ -163,13 +163,6 @@ func (ch *Channel) SetVoltageLevel(level float64) error {
 // described in Section 4.2.7 of IVI-4.4: IviDCPwr Class Specification.
 func (dcpwr *PMX) OutputCount() int {
 	return len(dcpwr.Channels)
-}
-
-// Name returns the name of the output channel. Name is the getter for the
-// read-only IviDCPwrBase Attribute Output Channel Name described in Section
-// 4.2.9 of IVI-4.4: IviDCPwr Class Specification.
-func (ch *Channel) Name() string {
-	return ch.name
 }
 
 // ConfigureCurrentLimit specifies the output current limit value and the

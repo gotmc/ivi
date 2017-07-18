@@ -12,8 +12,8 @@ import "fmt"
 // function Measure for the Voltage MeasurementType parameter described in
 // Section 7.2.1 of IVI-4.4: IviDCPwr Class Specification.
 func (ch *Channel) MeasureVoltage() (float64, error) {
-	cmd := fmt.Sprintf("MEAS:CURR? %s", ch.name)
-	return ch.queryFloat64(cmd)
+	cmd := fmt.Sprintf("MEAS:CURR? %s", ch.Name())
+	return ch.QueryFloat64(cmd)
 }
 
 // MeasureCurrent takes a measurement on the output signal and returns the
@@ -21,6 +21,6 @@ func (ch *Channel) MeasureVoltage() (float64, error) {
 // function Measure for the Current MeasurementType parameter described in
 // Section 7.2.1 of IVI-4.4: IviDCPwr Class Specification.
 func (ch *Channel) MeasureCurrent() (float64, error) {
-	cmd := fmt.Sprintf("MEAS? %s", ch.name)
-	return ch.queryFloat64(cmd)
+	cmd := fmt.Sprintf("MEAS? %s", ch.Name())
+	return ch.QueryFloat64(cmd)
 }
