@@ -4,14 +4,17 @@
 // can be found in the LICENSE.txt file for the project.
 
 /*
-Package agilente36xx implements the IVI driver for the Agilent/Keysight E3600
-series of power supplies.
+Package e36xx implements the IVI driver for the Agilent/Keysight E3600 series
+of power supplies.
 
 State Caching: Not implemented
 */
 package e36xx
 
-import "github.com/gotmc/ivi"
+import (
+	"github.com/gotmc/ivi"
+	"github.com/gotmc/ivi/dcpwr"
+)
 
 // Required to implement the Inherent and DCPwr attributes and capabilities
 const (
@@ -49,11 +52,8 @@ func New(inst ivi.Instrument, reset bool) (*E36xx, error) {
 	outputCount := len(channelNames)
 	channels := make([]Channel, outputCount)
 	for i, ch := range channelNames {
-		channels[i] = Channel{
-			id:   i,
-			name: ch,
-			inst: inst,
-		}
+		baseChannel := dcpwr.NewChannel(i, ch, inst)
+		channels[i] = Channel{baseChannel}
 	}
 	inherentBase := ivi.InherentBase{
 		ClassSpecMajorVersion:     classSpecMajorVersion,

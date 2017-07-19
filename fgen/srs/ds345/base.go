@@ -16,7 +16,7 @@ import (
 // the getter for the read-only IviFgenBase Attribute Output Count described in
 // Section 4.2.1 of IVI-4.3: IviFgen Class Specification.
 func (a *DS345) OutputCount() int {
-	return a.outputCount
+	return len(a.Channels)
 }
 
 // OperationMode determines whether the function generator should produce a
@@ -25,7 +25,7 @@ func (a *DS345) OutputCount() int {
 // Section 4.2.2 of IVI-4.3: IviFgen Class Specification.
 func (ch *Channel) OperationMode() (fgen.OperationMode, error) {
 	var mode fgen.OperationMode
-	s, err := ch.queryString("MENA?\n")
+	s, err := ch.QueryString("MENA?\n")
 	if err != nil {
 		return mode, fmt.Errorf("error getting operation mode: %s", err)
 	}
@@ -33,7 +33,7 @@ func (ch *Channel) OperationMode() (fgen.OperationMode, error) {
 	case "0":
 		return fgen.Continuous, nil
 	case "1":
-		mod, err := ch.queryString("MTYP?\n")
+		mod, err := ch.QueryString("MTYP?\n")
 		if err != nil {
 			return mode, fmt.Errorf("error determining modulation type: %s", err)
 		}

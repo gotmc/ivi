@@ -11,7 +11,7 @@ package ds345
 // Attribute Internal Trigger Rate described in Section 15.2.1 of IVI-4.3:
 // IviFgen Class Specification.
 func (ch *Channel) InternalTriggerRate() (float64, error) {
-	return ch.queryFloat64("TRAT?\n")
+	return ch.QueryFloat64("TRAT?\n")
 }
 
 // SetInternalTriggerRate specifies the rate at which the function generator's

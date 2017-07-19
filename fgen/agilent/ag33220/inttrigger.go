@@ -14,7 +14,7 @@ func (ch *Channel) InternalTriggerRate() (float64, error) {
 	// The Agilent 33220A needs to know the burst period in seconds; however, the
 	// IVI API expects the number of triggers per second. Therefore, we need the
 	// inverse.
-	per, err := ch.queryFloat64("BURS:INT:PER?\n")
+	per, err := ch.QueryFloat64("BURS:INT:PER?\n")
 	if err != nil {
 		return 0.0, err
 	}
@@ -37,7 +37,7 @@ func (ch *Channel) SetInternalTriggerRate(rate float64) error {
 // InternalTriggerPeriod is not part of the IVI API, which only provides
 // InternalTriggerRate, but this is a convenience function.
 func (ch *Channel) InternalTriggerPeriod() (float64, error) {
-	return ch.queryFloat64("BURS:INT:PER?\n")
+	return ch.QueryFloat64("BURS:INT:PER?\n")
 }
 
 // SetInternalTriggerPeriod specifies the internal trigger period in seconds.

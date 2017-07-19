@@ -17,7 +17,7 @@ import (
 // the read-write IviFgenStdFunc Attribute Amplitude described in Section 5.2.1
 // of IVI-4.3: IviFgen Class Specification.
 func (ch *Channel) Amplitude() (float64, error) {
-	return ch.queryFloat64("VOLT?\n")
+	return ch.QueryFloat64("VOLT?\n")
 }
 
 // SetAmplitude specifies the difference between the maximum and minimum
@@ -33,7 +33,7 @@ func (ch *Channel) SetAmplitude(amp float64) error {
 // the read-write IviFgenStdFunc Attribute DC Offset described in Section 5.2.2
 // of IVI-4.3: IviFgen Class Specification.
 func (ch *Channel) DCOffset() (float64, error) {
-	return ch.queryFloat64("VOLT:OFFS?\n")
+	return ch.QueryFloat64("VOLT:OFFS?\n")
 }
 
 // SetDCOffset sets the difference between the average of the maximum and
@@ -49,7 +49,7 @@ func (ch *Channel) SetDCOffset(amp float64) error {
 // the read-write IviFgenStdFunc Attribute Duty Cycle High described in Section
 // 5.2.3 of IVI-4.3: IviFgen Class Specification.
 func (ch *Channel) DutyCycle() (float64, error) {
-	return ch.queryFloat64("FUNC:SQU:DCYC?\n")
+	return ch.QueryFloat64("FUNC:SQU:DCYC?\n")
 }
 
 // SetDutyCycle sets the percentage of time, specified as 0-100, during one
@@ -65,7 +65,7 @@ func (ch *Channel) SetDutyCycle(duty float64) error {
 // for the read-write IviFgenStdFunc Attribute Frequency described in Section
 // 5.2.4 of IVI-4.3: IviFgen Class Specification.
 func (ch *Channel) Frequency() (float64, error) {
-	return ch.queryFloat64("FREQ?\n")
+	return ch.QueryFloat64("FREQ?\n")
 }
 
 // SetFrequency sets the number of waveform cycles generated in one second
@@ -82,7 +82,7 @@ func (ch *Channel) SetFrequency(freq float64) error {
 // Waveform described in Section 5.2.6 of IVI-4.3: IviFgen Class Specification.
 func (ch *Channel) StandardWaveform() (fgen.StandardWaveform, error) {
 	var wave fgen.StandardWaveform
-	s, err := ch.queryString("FUNC?\n")
+	s, err := ch.QueryString("FUNC?\n")
 	if err != nil {
 		return wave, err
 	}
@@ -95,7 +95,7 @@ func (ch *Channel) StandardWaveform() (fgen.StandardWaveform, error) {
 	case "DC":
 		return fgen.DC, nil
 	case "RAMP":
-		symm, err := ch.queryFloat64("FUNC:RAMP:SYMM?\n")
+		symm, err := ch.QueryFloat64("FUNC:RAMP:SYMM?\n")
 		if err != nil {
 			return wave, fmt.Errorf("unable to get symmetry to determine standard waveform: %s", err)
 		}
@@ -148,7 +148,5 @@ var waveformApplyCommand = map[fgen.StandardWaveform]string{
 // Class Specification.
 func (ch *Channel) ConfigureStandardWaveform(wave fgen.StandardWaveform, amp float64,
 	offset float64, freq float64, phase float64) error {
-	cmd := fmt.Sprintf(waveformApplyCommand[wave], freq, amp, offset)
-	_, err := ch.inst.WriteString(cmd)
-	return err
+	return ch.Set(waveformApplyCommand[wave], freq, amp, offset)
 }

@@ -10,7 +10,7 @@ package ag33220
 // read-write IviFgenBurst Attribute Burst Count described in Section 17.2.1 of
 // IVI-4.3: IviFgen Class Specification.
 func (ch *Channel) BurstCount() (int, error) {
-	return ch.queryInt("BURS:NCYC?\n")
+	return ch.QueryInt("BURS:NCYC?\n")
 }
 
 // SetBurstCount sets the number of waveform cycles that the function generator

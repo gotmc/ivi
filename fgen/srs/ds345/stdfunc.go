@@ -18,7 +18,7 @@ import (
 // the read-write IviFgenStdFunc Attribute Amplitude described in Section 5.2.1
 // of IVI-4.3: IviFgen Class Specification.
 func (ch *Channel) Amplitude() (float64, error) {
-	return ch.queryFloat64("AMPL?\n")
+	return ch.QueryFloat64("AMPL?\n")
 }
 
 // SetAmplitude specifies the difference between the maximum and minimum
@@ -34,7 +34,7 @@ func (ch *Channel) SetAmplitude(amp float64) error {
 // the read-write IviFgenStdFunc Attribute DC Offset described in Section 5.2.2
 // of IVI-4.3: IviFgen Class Specification.
 func (ch *Channel) DCOffset() (float64, error) {
-	return ch.queryFloat64("OFFS?\n")
+	return ch.QueryFloat64("OFFS?\n")
 }
 
 // SetDCOffset sets the difference between the average of the maximum and
@@ -66,7 +66,7 @@ func (ch *Channel) SetDutyCycle(duty float64) error {
 // for the read-write IviFgenStdFunc Attribute Frequency described in Section
 // 5.2.4 of IVI-4.3: IviFgen Class Specification.
 func (ch *Channel) Frequency() (float64, error) {
-	return ch.queryFloat64("FREQ?\n")
+	return ch.QueryFloat64("FREQ?\n")
 }
 
 // SetFrequency sets the number of waveform cycles generated in one second
@@ -83,7 +83,7 @@ func (ch *Channel) SetFrequency(freq float64) error {
 // Waveform described in Section 5.2.6 of IVI-4.3: IviFgen Class Specification.
 func (ch *Channel) StandardWaveform() (fgen.StandardWaveform, error) {
 	var wave fgen.StandardWaveform
-	s, err := ch.queryString("FUNC?\n")
+	s, err := ch.QueryString("FUNC?\n")
 	if err != nil {
 		return wave, err
 	}
@@ -96,7 +96,7 @@ func (ch *Channel) StandardWaveform() (fgen.StandardWaveform, error) {
 	case "2":
 		return fgen.Triangle, nil
 	case "3":
-		invrt, err := ch.queryString("INVT?\n")
+		invrt, err := ch.QueryString("INVT?\n")
 		if err != nil {
 			return wave, fmt.Errorf("unable to determine ramp up vs ramp down: %s", err)
 		}
