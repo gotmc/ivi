@@ -19,11 +19,14 @@ const (
 	fwrID
 )
 
+// Inherent provides the inherent capabilities for all IVI instruments.
 type Inherent struct {
 	inst Instrument
 	InherentBase
 }
 
+// InherentBase provides the exported properties for the inherent capabilities
+// of all IVI instruments.
 type InherentBase struct {
 	ClassSpecMajorVersion     int
 	ClassSpecMinorVersion     int
@@ -33,6 +36,8 @@ type InherentBase struct {
 	IDNString                 string
 }
 
+// NewInherent creates a new Inherent struct using the given Instrument
+// interface and the InherentBase struct.
 func NewInherent(inst Instrument, base InherentBase) Inherent {
 	return Inherent{
 		inst:         inst,
@@ -40,7 +45,7 @@ func NewInherent(inst Instrument, base InherentBase) Inherent {
 	}
 }
 
-// FirmwardRevision queries the instrument and returns the firmware revision of
+// FirmwareRevision queries the instrument and returns the firmware revision of
 // the instrument. FirmwareRevision is the getter for the read-only inherent
 // attribute Instrument Firmware Revision described in Section 5.18 of IVI-3.2:
 // Inherent Capabilities Specification.
@@ -70,11 +75,13 @@ func (inherent *Inherent) InstrumentSerialNumber() (string, error) {
 	return inherent.parseIdentification(snID)
 }
 
+// Reset resets the instrument.
 func (inherent *Inherent) Reset() error {
 	_, err := inherent.inst.WriteString("*RST\n")
 	return err
 }
 
+// Clear clears the instrument.
 func (inherent *Inherent) Clear() error {
 	_, err := inherent.inst.WriteString("*CLS\n")
 	return err
@@ -85,7 +92,7 @@ func (inherent *Inherent) Clear() error {
 // Capabilities Specification.
 func (inherent *Inherent) Disable() error {
 	// FIXME(mdr): Implement!!!!
-	return errors.New("disable is not yet implemented.")
+	return errors.New("disable not implemented")
 }
 
 func (inherent *Inherent) parseIdentification(part idPart) (string, error) {

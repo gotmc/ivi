@@ -20,6 +20,7 @@ const (
 	currentQuery
 )
 
+// Channel models an E36xx DC power supply output channel.
 type Channel struct {
 	dcpwr.Channel
 }

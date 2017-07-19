@@ -12,6 +12,7 @@ import (
 	"strings"
 )
 
+// QueryBool is used to query a Querier interface and return a bool.
 func QueryBool(q Querier, query string) (bool, error) {
 	s, err := q.Query(query)
 	if err != nil {
@@ -27,6 +28,7 @@ func QueryBool(q Querier, query string) (bool, error) {
 	}
 }
 
+// QueryFloat64 is used to query a Querier interface and return a float64.
 func QueryFloat64(q Querier, query string) (float64, error) {
 	s, err := q.Query(query)
 	if err != nil {
@@ -35,6 +37,7 @@ func QueryFloat64(q Querier, query string) (float64, error) {
 	return strconv.ParseFloat(strings.TrimSpace(s), 64)
 }
 
+// QueryInt is used to query a Querier interface and return an int.
 func QueryInt(q Querier, query string) (int, error) {
 	s, err := q.Query(query)
 	if err != nil {
@@ -44,10 +47,13 @@ func QueryInt(q Querier, query string) (int, error) {
 	return int(i), err
 }
 
+// QueryString is used to query a Querier interface and return a string.
 func QueryString(q Querier, query string) (string, error) {
 	return q.Query(query)
 }
 
+// Set formats according to a format specifier and then writes the resulting
+// string to the given StringWriter interface.
 func Set(sw StringWriter, format string, a ...interface{}) error {
 	cmd := format
 	if a != nil {
@@ -58,6 +64,7 @@ func Set(sw StringWriter, format string, a ...interface{}) error {
 	return err
 }
 
+// QueryID queries the identity of the instrument.
 func QueryID(q Querier) (string, error) {
 	return q.Query("*IDN?\n")
 }

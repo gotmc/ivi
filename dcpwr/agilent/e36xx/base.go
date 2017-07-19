@@ -64,13 +64,10 @@ func (ch *Channel) OutputEnabled() (bool, error) {
 // Output Enabled described in Section 4.2.3 of IVI-4.4: IviDCPwr Class
 // Specification.
 func (ch *Channel) SetOutputEnabled(v bool) error {
-	var send string
 	if v {
-		send = "OUTP ON\n"
-	} else {
-		send = "OUTP OFF\n"
+		return ch.Set("OUTP ON\n")
 	}
-	return ch.Set(send)
+	return ch.Set("OUTP OFF\n")
 }
 
 // DisableOutput is a convenience function for setting the Output Enabled
@@ -133,6 +130,6 @@ func (ch *Channel) SetVoltageLevel(amp float64) error {
 // OutputCount returns the number of available output channels. OutputCount is
 // the getter for the read-only IviDCPwrBase Attribute Output Channel Count
 // described in Section 4.2.7 of IVI-4.4: IviDCPwr Class Specification.
-func (dcpwr *E36xx) OutputCount() int {
-	return len(dcpwr.Channels)
+func (dev *E36xx) OutputCount() int {
+	return len(dev.Channels)
 }

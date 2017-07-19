@@ -161,8 +161,8 @@ func (ch *Channel) SetVoltageLevel(level float64) error {
 // OutputCount returns the number of available output channels. OutputCount is
 // the getter for the read-only IviDCPwrBase Attribute Output Channel Count
 // described in Section 4.2.7 of IVI-4.4: IviDCPwr Class Specification.
-func (dcpwr *PMX) OutputCount() int {
-	return len(dcpwr.Channels)
+func (dev *PMX) OutputCount() int {
+	return len(dev.Channels)
 }
 
 // ConfigureCurrentLimit specifies the output current limit value and the

@@ -13,10 +13,13 @@ type Instrument interface {
 	Querier
 }
 
+// StringWriter provides the interface to write a string.
 type StringWriter interface {
 	WriteString(s string) (n int, err error)
 }
 
+// Querier provides the interface to query using a given string and provide the
+// resultant string.
 type Querier interface {
 	Query(s string) (value string, err error)
 }

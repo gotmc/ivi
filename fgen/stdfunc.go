@@ -5,8 +5,11 @@
 
 package fgen
 
+// StandardWaveform models the defined values for the Standard Waveform defined
+// in Section 5.2.6 of IVI-4.3: IviFgen Class Specification.
 type StandardWaveform int
 
+// These are the available standard waveforms.
 const (
 	Sine StandardWaveform = iota
 	Square

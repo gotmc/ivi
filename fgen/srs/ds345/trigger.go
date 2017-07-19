@@ -17,7 +17,7 @@ import (
 // 9.2.1 of IVI-4.3: IviFgen Class Specification.
 func (ch *Channel) TriggerSource() (fgen.TriggerSource, error) {
 	var src fgen.TriggerSource
-	s, err := ch.queryString("TSRC?\n")
+	s, err := ch.QueryString("TSRC?\n")
 	if err != nil {
 		return src, err
 	}

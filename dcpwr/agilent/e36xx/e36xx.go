@@ -4,8 +4,8 @@
 // can be found in the LICENSE.txt file for the project.
 
 /*
-Package agilente36xx implements the IVI driver for the Agilent/Keysight E3600
-series of power supplies.
+Package e36xx implements the IVI driver for the Agilent/Keysight E3600 series
+of power supplies.
 
 State Caching: Not implemented
 */

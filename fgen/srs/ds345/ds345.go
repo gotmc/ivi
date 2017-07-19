@@ -11,7 +11,10 @@ State Caching: Not implemented
 */
 package ds345
 
-import "github.com/gotmc/ivi"
+import (
+	"github.com/gotmc/ivi"
+	"github.com/gotmc/ivi/fgen"
+)
 
 // Required to implement the Inherent Capabilities & Attributes
 const (
@@ -28,28 +31,25 @@ var supportedInstrumentModels = []string{
 	"DS345",
 }
 
-// Constants used for FGen
-const (
-	outputCount = 1
-)
+var channelNames = []string{
+	"Output",
+}
 
-// SRSDS345 provides the IVI driver for an Agilent 33220A or 33210A
-// function generator.
+// DS345 provides the IVI driver for a SRS DS345 function generator.
 type DS345 struct {
-	inst        ivi.Instrument
-	outputCount int
-	Channels    []Channel
+	inst     ivi.Instrument
+	Channels []Channel
 	ivi.Inherent
 }
 
-// New creates a new SRSDS345 IVI Instrument.
+// New creates a new DS345 IVI Instrument.
 func New(inst ivi.Instrument, reset bool) (*DS345, error) {
-	ch := Channel{
-		id:   0,
-		inst: inst,
-	}
+	outputCount := len(channelNames)
 	channels := make([]Channel, outputCount)
-	channels[0] = ch
+	for i, ch := range channelNames {
+		baseChannel := fgen.NewChannel(i, ch, inst)
+		channels[i] = Channel{baseChannel}
+	}
 	inherentBase := ivi.InherentBase{
 		ClassSpecMajorVersion:     classSpecMajorVersion,
 		ClassSpecMinorVersion:     classSpecMinorVersion,
@@ -59,10 +59,9 @@ func New(inst ivi.Instrument, reset bool) (*DS345, error) {
 	}
 	inherent := ivi.NewInherent(inst, inherentBase)
 	fgen := DS345{
-		inst:        inst,
-		outputCount: outputCount,
-		Channels:    channels,
-		Inherent:    inherent,
+		inst:     inst,
+		Channels: channels,
+		Inherent: inherent,
 	}
 	if reset {
 		err := fgen.Reset()
@@ -74,6 +73,5 @@ func New(inst ivi.Instrument, reset bool) (*DS345, error) {
 // Channel represents a repeated capability of an output channel for the
 // function generator.
 type Channel struct {
-	id   int
-	inst ivi.Instrument
+	fgen.Channel
 }

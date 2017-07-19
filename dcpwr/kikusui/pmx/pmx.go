@@ -40,8 +40,8 @@ var channelNames = []string{
 	"DCOutput",
 }
 
-// KikusuiPMX provides the IVI driver for the Agilent/Keysight E3600 series
-// of power supplies.
+// PMX provides the IVI driver for the Agilent/Keysight E3600 series of power
+// supplies.
 type PMX struct {
 	inst     ivi.Instrument
 	Channels []Channel

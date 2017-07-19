@@ -16,7 +16,7 @@ import (
 // the getter for the read-only IviFgenBase Attribute Output Count described in
 // Section 4.2.1 of IVI-4.3: IviFgen Class Specification.
 func (a *Ag33220) OutputCount() int {
-	return a.outputCount
+	return len(a.Channels)
 }
 
 // OperationMode determines whether the function generator should produce a
@@ -25,7 +25,7 @@ func (a *Ag33220) OutputCount() int {
 // Section 4.2.2 of IVI-4.3: IviFgen Class Specification.
 func (ch *Channel) OperationMode() (fgen.OperationMode, error) {
 	var mode fgen.OperationMode
-	s, err := ch.queryString("BURS:STAT?\n")
+	s, err := ch.QueryString("BURS:STAT?\n")
 	if err != nil {
 		return mode, fmt.Errorf("error getting operation mode: %s", err)
 	}
@@ -58,7 +58,7 @@ func (ch *Channel) SetOperationMode(mode fgen.OperationMode) error {
 // Output Enabled described in Section 4.2.3 of IVI-4.3: IviFgen Class
 // Specification.
 func (ch *Channel) OutputEnabled() (bool, error) {
-	return ch.queryBool("OUTP?\n")
+	return ch.QueryBool("OUTP?\n")
 }
 
 // SetOutputEnabled sets the output channel to enabled or disabled.
@@ -68,9 +68,8 @@ func (ch *Channel) OutputEnabled() (bool, error) {
 func (ch *Channel) SetOutputEnabled(v bool) error {
 	if v {
 		return ch.Set("OUPT ON\n")
-	} else {
-		return ch.Set("OUTP OFF\n")
 	}
+	return ch.Set("OUTP OFF\n")
 }
 
 // DisableOutput is a convenience function for setting the Output Enabled
@@ -90,7 +89,7 @@ func (ch *Channel) EnableOutput() error {
 // Output Impedance described in Section 4.2.4 of IVI-4.3: IviFgen Class
 // Specification.
 func (ch *Channel) OutputImpedance() (float64, error) {
-	return ch.queryFloat64("OUTP:LOAD?\n")
+	return ch.QueryFloat64("OUTP:LOAD?\n")
 }
 
 // SetOutputImpedance sets the output channel's impedance in ohms.

@@ -7,6 +7,8 @@ package pmx
 
 import "github.com/gotmc/ivi/dcpwr"
 
+// Channel represents the repeated capability of an output channel for the PMX
+// DC power supply.
 type Channel struct {
 	dcpwr.Channel
 	currentLimitBehavior dcpwr.CurrentLimitBehavior

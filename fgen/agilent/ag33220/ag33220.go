@@ -11,7 +11,10 @@ State Caching: Not implemented
 */
 package ag33220
 
-import "github.com/gotmc/ivi"
+import (
+	"github.com/gotmc/ivi"
+	"github.com/gotmc/ivi/fgen"
+)
 
 // Required to implement the Inherent Capabilities & Attributes
 const (
@@ -29,28 +32,26 @@ var supportedInstrumentModels = []string{
 	"33210A",
 }
 
-// Constants used for FGen
-const (
-	outputCount = 1
-)
+var channelNames = []string{
+	"Output",
+}
 
 // Ag33220 provides the IVI driver for an Agilent 33220A or 33210A
 // function generator.
 type Ag33220 struct {
-	inst        ivi.Instrument
-	outputCount int
-	Channels    []Channel
+	inst     ivi.Instrument
+	Channels []Channel
 	ivi.Inherent
 }
 
 // New creates a new Ag33220 IVI Instrument.
 func New(inst ivi.Instrument, reset bool) (*Ag33220, error) {
-	ch := Channel{
-		id:   0,
-		inst: inst,
-	}
+	outputCount := len(channelNames)
 	channels := make([]Channel, outputCount)
-	channels[0] = ch
+	for i, ch := range channelNames {
+		baseChannel := fgen.NewChannel(i, ch, inst)
+		channels[i] = Channel{baseChannel}
+	}
 	inherentBase := ivi.InherentBase{
 		ClassSpecMajorVersion:     classSpecMajorVersion,
 		ClassSpecMinorVersion:     classSpecMinorVersion,
@@ -60,10 +61,9 @@ func New(inst ivi.Instrument, reset bool) (*Ag33220, error) {
 	}
 	inherent := ivi.NewInherent(inst, inherentBase)
 	fgen := Ag33220{
-		inst:        inst,
-		outputCount: outputCount,
-		Channels:    channels,
-		Inherent:    inherent,
+		inst:     inst,
+		Channels: channels,
+		Inherent: inherent,
 	}
 	if reset {
 		err := fgen.Reset()
@@ -75,6 +75,5 @@ func New(inst ivi.Instrument, reset bool) (*Ag33220, error) {
 // Channel represents a repeated capability of an output channel for the
 // function generator.
 type Channel struct {
-	id   int
-	inst ivi.Instrument
+	fgen.Channel
 }
