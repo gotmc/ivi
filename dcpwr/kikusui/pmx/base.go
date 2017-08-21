@@ -115,7 +115,7 @@ func (ch *Channel) OVPEnabled() (bool, error) {
 	return true, nil
 }
 
-// SetOVPEnabled enables or disables the over-votlage protection. Since the OVP
+// SetOVPEnabled enables or disables the over-voltage protection. Since the OVP
 // is always enabled on the PMX power supply, if false, the PMX's OVP is set to
 // its maximum value, which is 110% of the maximum output voltage.  voltage
 // protection set.  SetOVPEnabled is the setter for the read-write IviFgenBase

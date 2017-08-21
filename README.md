@@ -2,8 +2,9 @@
 Go-based implementation of the Interchangeable Virtual Instrument (IVI)
 standard.
 
-[![GoDoc][godoc image]][godoc link]
-[![License Badge][license image]][LICENSE.txt]
+[![GoDoc][godoc badge]][godoc link]
+[![Go Report Card][report badge]][report card]
+[![License Badge][license badge]][LICENSE.txt]
 
 ## Overview
 
@@ -75,12 +76,14 @@ $ make cover
 
 [ivi]: https://github.com/gotmc/ivi
 [ivi-specs]: http://www.ivifoundation.org/
-[godoc image]: https://godoc.org/github.com/gotmc/ivi?status.svg
+[godoc badge]: https://godoc.org/github.com/gotmc/ivi?status.svg
 [godoc link]: https://godoc.org/github.com/gotmc/ivi
 [LICENSE.txt]: https://github.com/gotmc/ivi/blob/master/LICENSE.txt
-[license image]: https://img.shields.io/badge/license-MIT-blue.svg
+[license badge]: https://img.shields.io/badge/license-MIT-blue.svg
 [lxi]: https://github.com/gotmc/lxi
 [pull request]: https://help.github.com/articles/using-pull-requests
+[report badge]: https://goreportcard.com/badge/github.com/gotmc/ivi
+[report card]: https://goreportcard.com/report/github.com/gotmc/ivi
 [scpi]: http://www.ivifoundation.org/scpi/
 [usbtmc]: https://github.com/gotmc/usbtmc
 [visa]: https://github.com/gotmc/visa

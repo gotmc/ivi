@@ -113,8 +113,8 @@ func (ch *Channel) StandardWaveform() (fgen.StandardWaveform, error) {
 	return wave, fmt.Errorf("unable to determine standard waveform type: %s", s)
 }
 
-// SetStandardWaveform specifices which standard waveform the function
-// generator produces.  SetStandwardWaveform is the setter for the read-write
+// SetStandardWaveform specifies which standard waveform the function generator
+// produces.  SetStandwardWaveform is the setter for the read-write
 // IviFgenStdFunc Attribute Waveform described in Section 5.2.6 of IVI-4.3:
 // IviFgen Class Specification.
 func (ch *Channel) SetStandardWaveform(wave fgen.StandardWaveform) error {
