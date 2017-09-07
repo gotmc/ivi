@@ -50,7 +50,7 @@ func (ch *Channel) SetOperationMode(mode fgen.OperationMode) error {
 	case fgen.Continuous:
 		return ch.Set("BURS:STAT OFF\n")
 	}
-	return errors.New("bad fgen operatino mode")
+	return errors.New("bad fgen operation mode")
 }
 
 // OutputEnabled determines if the output channel is enabled or disabled.
@@ -67,7 +67,7 @@ func (ch *Channel) OutputEnabled() (bool, error) {
 // Specification.
 func (ch *Channel) SetOutputEnabled(v bool) error {
 	if v {
-		return ch.Set("OUPT ON\n")
+		return ch.Set("OUTP ON\n")
 	}
 	return ch.Set("OUTP OFF\n")
 }

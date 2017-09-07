@@ -7,7 +7,6 @@ package ivi
 
 import (
 	"fmt"
-	"log"
 	"strconv"
 	"strings"
 )
@@ -59,7 +58,6 @@ func Set(sw StringWriter, format string, a ...interface{}) error {
 	if a != nil {
 		cmd = fmt.Sprintf(format, a...)
 	}
-	log.Printf("writing cmd: %s", cmd)
 	_, err := sw.WriteString(cmd)
 	return err
 }
