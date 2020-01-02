@@ -1,10 +1,8 @@
+github.com/google/gousb v0.0.0-20190812193832-18f4c1d8a750 h1:DVKHLo3yE4psTjD9aM2pY7EHoicaQbgmaxxvvHC6ZSM=
+github.com/google/gousb v0.0.0-20190812193832-18f4c1d8a750/go.mod h1:Tl4HdAs1ThE3gECkNwz+1MWicX6FXddhJEw7L8jRDiI=
 github.com/gotmc/lxi v0.0.0-20180516161445-c11aa5dac569 h1:WQr0B10YW8ER2EaOrgk7lsO8B3kjbmIdEGPOJ7UYtwk=
 github.com/gotmc/lxi v0.0.0-20180516161445-c11aa5dac569/go.mod h1:wK2gbDWVUKXJ4unQAnlDbra35KgMFwRd39Vjrosw3A0=
 github.com/gotmc/usbtmc v0.0.0-20180705190535-91334b87f971 h1:zrdCzvH/Kr6bpGJ7KS1MHzg8iEZCmIkvzWFWC2s8DYw=
 github.com/gotmc/usbtmc v0.0.0-20180705190535-91334b87f971/go.mod h1:gZKCRkVyooVOMTHFiO6yvAtBwHbkzeNUFEOA1UDxo24=
 github.com/gotmc/visa v0.0.0-20180516160158-02029f1d5b54 h1:mrl/xsqtCIUdIFttqSfwmIv3zjucXECn5tUemYl7Tvk=
 github.com/gotmc/visa v0.0.0-20180516160158-02029f1d5b54/go.mod h1:srcZolUATCAXcSxdS3aX9UWyHpX8LZTqrBJGsRamWhk=
-github.com/kylelemons/gousb v0.0.0-20170613091925-99e7ca4f0173 h1:1lNpWOG92HHuSb7GKJj9+NX85zufHtMJ2tw+PZPzleo=
-github.com/kylelemons/gousb v0.0.0-20170613091925-99e7ca4f0173/go.mod h1:5UsKSFw2EsQiNUwJoMuiSzUnh3sY7teV66+U230sgvk=
-github.com/truveris/gousb v0.0.0-20160420111257-a0cc1ba42182 h1:44M+Pr498yMOSA29vipqGtB+nNNnFAyPbt0QICDzEJk=
-github.com/truveris/gousb v0.0.0-20160420111257-a0cc1ba42182/go.mod h1:gc2Wm/Rg29CItw/rIDIdqyoTbz1cqAkAWgYFNrgWuu0=

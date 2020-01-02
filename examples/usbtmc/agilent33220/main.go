@@ -11,7 +11,7 @@ import (
 	"github.com/gotmc/ivi/fgen"
 	"github.com/gotmc/ivi/fgen/agilent/ag33220"
 	"github.com/gotmc/usbtmc"
-	_ "github.com/gotmc/usbtmc/driver/truveris"
+	_ "github.com/gotmc/usbtmc/driver/google"
 )
 
 func main() {
