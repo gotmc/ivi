@@ -38,6 +38,12 @@ var measurementFunctions = map[MeasurementFunction]string{
 	Temperature:        "Temperature",
 }
 
+// MeasurementFunctionMap maps the string name of a measurement function to the
+// MeasurementFunction.
+var MeasurementFunctionMap = map[string]MeasurementFunction{
+	"VOLT": DCVolts,
+}
+
 func (f MeasurementFunction) String() string {
 	return measurementFunctions[f]
 }

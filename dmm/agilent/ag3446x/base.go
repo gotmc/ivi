@@ -5,10 +5,24 @@
 
 package ag3446x
 
-import "github.com/gotmc/ivi/dmm"
+import (
+	"fmt"
+	"strings"
+
+	"github.com/gotmc/ivi/dmm"
+)
 
 // MeasurementFunction needs a better comment.
 func (d *Ag3446x) MeasurementFunction() (dmm.MeasurementFunction, error) {
-	f, err := d.QueryString("CONF?\n")
-	return dmm.DCVolts, nil
+	conf, err := d.QueryString("CONF?\n")
+	if err != nil {
+		return 0, err
+	}
+	conf = strings.TrimSpace(conf)
+	fcnString := strings.Split(conf, " ")[0]
+	fcn, ok := dmm.MeasurementFunctionMap[fcnString]
+	if !ok {
+		return 0, fmt.Errorf("%s is not a valid measurement function", fcnString)
+	}
+	return fcn, nil
 }

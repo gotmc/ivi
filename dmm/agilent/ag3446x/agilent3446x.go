@@ -60,3 +60,8 @@ func New(inst ivi.Instrument, reset bool) (*Ag3446x, error) {
 	}
 	return &dmm, nil
 }
+
+// QueryString queries the DMM and returns a string.
+func (d *Ag3446x) QueryString(query string) (string, error) {
+	return ivi.QueryString(d.inst, query)
+}
