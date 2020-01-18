@@ -5,7 +5,10 @@
 
 package dcpwr
 
-import "github.com/gotmc/ivi"
+import (
+	"github.com/gotmc/ivi"
+	"github.com/gotmc/query"
+)
 
 // Channel represents the repeated capability of an output channel for a DC
 // power supply.
@@ -41,17 +44,17 @@ func (ch *Channel) Set(format string, a ...interface{}) error {
 }
 
 // QueryBool queries the channel and returns a bool.
-func (ch *Channel) QueryBool(query string) (bool, error) {
-	return ivi.QueryBool(ch.inst, query)
+func (ch *Channel) QueryBool(cmd string) (bool, error) {
+	return query.Bool(ch.inst, cmd)
 }
 
 // QueryFloat64 queries the channel and returns a float64.
-func (ch *Channel) QueryFloat64(query string) (float64, error) {
-	return ivi.QueryFloat64(ch.inst, query)
+func (ch *Channel) QueryFloat64(cmd string) (float64, error) {
+	return query.Float64(ch.inst, cmd)
 }
 
 // QueryString queries the channel and returns a string.
 // FIXME(mdr): Change to take a format string and ...interface{}
-func (ch *Channel) QueryString(query string) (string, error) {
-	return ivi.QueryString(ch.inst, query)
+func (ch *Channel) QueryString(cmd string) (string, error) {
+	return query.String(ch.inst, cmd)
 }

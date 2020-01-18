@@ -7,49 +7,7 @@ package ivi
 
 import (
 	"fmt"
-	"strconv"
-	"strings"
 )
-
-// QueryBool is used to query a Querier interface and return a bool.
-func QueryBool(q Querier, query string) (bool, error) {
-	s, err := q.Query(query)
-	if err != nil {
-		return false, err
-	}
-	switch s {
-	case "OFF", "0":
-		return false, nil
-	case "ON", "1":
-		return true, nil
-	default:
-		return false, fmt.Errorf("could not determine boolean status from %s", s)
-	}
-}
-
-// QueryFloat64 is used to query a Querier interface and return a float64.
-func QueryFloat64(q Querier, query string) (float64, error) {
-	s, err := q.Query(query)
-	if err != nil {
-		return 0.0, err
-	}
-	return strconv.ParseFloat(strings.TrimSpace(s), 64)
-}
-
-// QueryInt is used to query a Querier interface and return an int.
-func QueryInt(q Querier, query string) (int, error) {
-	s, err := q.Query(query)
-	if err != nil {
-		return 0, err
-	}
-	i, err := strconv.ParseInt(strings.TrimSpace(s), 10, 32)
-	return int(i), err
-}
-
-// QueryString is used to query a Querier interface and return a string.
-func QueryString(q Querier, query string) (string, error) {
-	return q.Query(query)
-}
 
 // Set formats according to a format specifier and then writes the resulting
 // string to the given StringWriter interface.

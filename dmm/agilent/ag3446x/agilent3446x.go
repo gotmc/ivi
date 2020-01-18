@@ -10,7 +10,10 @@ State Caching: Not implemented
 */
 package ag3446x
 
-import "github.com/gotmc/ivi"
+import (
+	"github.com/gotmc/ivi"
+	"github.com/gotmc/query"
+)
 
 // Required to implement the Inherent Capabilities & Attributes
 const (
@@ -62,6 +65,6 @@ func New(inst ivi.Instrument, reset bool) (*Ag3446x, error) {
 }
 
 // QueryString queries the DMM and returns a string.
-func (d *Ag3446x) QueryString(query string) (string, error) {
-	return ivi.QueryString(d.inst, query)
+func (d *Ag3446x) QueryString(cmd string) (string, error) {
+	return query.String(d.inst, cmd)
 }

@@ -3,21 +3,21 @@
 // Use of this source code is governed by a MIT-style license that
 // can be found in the LICENSE.txt file for the project.
 
-package fgen
+package dsa
 
 import (
 	"github.com/gotmc/ivi"
 	"github.com/gotmc/query"
 )
 
-// Channel models a generic FGen channel
+// Channel models a generic DSA channel
 type Channel struct {
 	id   int
 	name string
 	inst ivi.Instrument
 }
 
-// NewChannel returns a Channel for a function generator.
+// NewChannel returns a Channel for a DSA.
 func NewChannel(id int, name string, inst ivi.Instrument) Channel {
 	return Channel{id, name, inst}
 }

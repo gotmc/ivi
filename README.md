@@ -1,4 +1,5 @@
 # ivi
+
 Go-based implementation of the Interchangeable Virtual Instrument (IVI)
 standard.
 
@@ -13,16 +14,15 @@ provide standardized APIs for programming test instruments. This package
 is a partial, Go-based implementation of the IVI Specifications, which
 are specified for C, COM, and .NET.
 
-The main advantage of the ivi package is not having to learn the
-[SCPI][] commands for each individual peice of test equipment. For
-instance, both the Agilent 33220A and the Stanford Research Systems
-DS345 function generators can be programmed using one standard API. The
-only requirement for this is having an IVI driver for the desired test
-equipment.
+The main advantage of the [ivi][] package is not having to learn the [SCPI][]
+commands for each individual piece of test equipment. For instance, both the
+Agilent 33220A and the Stanford Research Systems DS345 function generators can
+be programmed using one standard API. The only requirement for this is having
+an IVI driver for the desired test equipment.
 
 Currently, [ivi][] doesn't cache state. Every time an attribute is read
-directly from the instrument. Development focus is currently on fleshing
-out the APIs and creating a few IVI drivers for each instrument type.
+directly from the instrument. Development focus is currently on fleshing out
+the APIs and creating a few IVI drivers for each instrument type.
 
 ## Installation
 
@@ -32,11 +32,15 @@ $ go get github.com/gotmc/ivi
 
 ## Usage
 
-The [ivi][ivi] package requires receiving an Instrument interface. The
-[visa][], [lxi][], and [usbtmc][] packages meet the Instrument
-interface. You can either use [visa][], which will call [lxi][] and/or
-[usbtmc][] as nescessary, or you can directly call [usbtmc][] or [lxi][]
-as desired.
+The [ivi][] package requires receiving an Instrument interface. The following
+gotmc packages meet the Instrument interface:
+
+- [visa][] — Calls [lxi][] or [usbtmc][] as needed, so that you can identify
+  instruments using a VISA resource address string.
+- [lxi][] — Used to control LXI enabled instruments via Ethernet.
+- [usbtmc][] — Used to control USBTMC compliant instruments via USB.
+- [prologix][] —  Used to communicate with instruments using a Prologix GPIB
+- controller.
 
 ## Examples
 
@@ -85,6 +89,7 @@ $ make cover
 [LICENSE.txt]: https://github.com/gotmc/ivi/blob/master/LICENSE.txt
 [license badge]: https://img.shields.io/badge/license-MIT-blue.svg
 [lxi]: https://github.com/gotmc/lxi
+[prologix]: https://github.com/gotmc/prologix
 [pull request]: https://help.github.com/articles/using-pull-requests
 [report badge]: https://goreportcard.com/badge/github.com/gotmc/ivi
 [report card]: https://goreportcard.com/report/github.com/gotmc/ivi
