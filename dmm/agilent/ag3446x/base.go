@@ -20,9 +20,24 @@ func (d *Ag3446x) MeasurementFunction() (dmm.MeasurementFunction, error) {
 	}
 	conf = strings.TrimSpace(conf)
 	fcnString := strings.Split(conf, " ")[0]
-	fcn, ok := dmm.MeasurementFunctionMap[fcnString]
+	fcn, ok := fcnMap[fcnString]
 	if !ok {
 		return 0, fmt.Errorf("%s is not a valid measurement function", fcnString)
 	}
 	return fcn, nil
+}
+
+// MeasurementFunctionMap maps the string name of a measurement function to the
+// MeasurementFunction.
+var fcnMap = map[string]dmm.MeasurementFunction{
+	"VOLT":    dmm.DCVolts,
+	"VOLT:DC": dmm.DCVolts,
+	"VOLT:AC": dmm.ACVolts,
+	"CURR":    dmm.DCCurrent,
+	"CURR:DC": dmm.DCCurrent,
+	"CURR:AC": dmm.ACCurrent,
+	"RES":     dmm.TwoWireResistance,
+	"FRES":    dmm.FourWireResistance,
+	"FREQ":    dmm.Frequency,
+	"TEMP":    dmm.Temperature,
 }
