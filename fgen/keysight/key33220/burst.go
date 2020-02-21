@@ -3,7 +3,7 @@
 // Use of this source code is governed by a MIT-style license that
 // can be found in the LICENSE.txt file for the project.
 
-package ag33220
+package key33220
 
 // BurstCount returns the number of waveform cycles that the function generator
 // produces after it receives a trigger.  BurstCount is the getter for the

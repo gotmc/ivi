@@ -4,12 +4,12 @@
 // can be found in the LICENSE.txt file for the project.
 
 /*
-Package ag33220 implements the IVI driver for the Agilent 33220A function
+Package key33220 implements the IVI driver for the Agilent 33220A function
 generator.
 
 State Caching: Not implemented
 */
-package ag33220
+package key33220
 
 import (
 	"github.com/gotmc/ivi"

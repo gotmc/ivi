@@ -4,11 +4,11 @@
 // can be found in the LICENSE.txt file for the project.
 
 /*
-Package ag3446x implements the IVI driver for the Keysight 3446x family of DMM.
+Package key3446x implements the IVI driver for the Keysight 3446x family of DMM.
 
 State Caching: Not implemented
 */
-package ag3446x
+package key3446x
 
 import (
 	"github.com/gotmc/ivi"
