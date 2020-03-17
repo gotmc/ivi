@@ -16,30 +16,6 @@ import (
 	"github.com/gotmc/ivi/dcpwr"
 )
 
-// Required to implement the Inherent and DCPwr attributes and capabilities
-const (
-	classSpecMajorVersion = 4
-	classSpecMinorVersion = 4
-	classSpecRevision     = "3.0"
-	groupCapabilities     = "IviDCPwrBase,IviDCPwrMeasurement,IviDCPwrTrigger"
-)
-
-var supportedInstrumentModels = []string{
-	"PMX18-2A",
-	"PMX18-5A",
-	"PMX35-1A",
-	"PMX35-3A",
-	"PMX70-1A",
-	"PMX110-0.6A",
-	"PMX250-0.25A",
-	"PMX350-0.2A",
-	"PMX500-0.2A",
-}
-
-var channelNames = []string{
-	"DCOutput",
-}
-
 // PMX provides the IVI driver for the Agilent/Keysight E3600 series of power
 // supplies.
 type PMX struct {
@@ -55,6 +31,9 @@ type PMX struct {
 func New(inst ivi.Instrument, reset bool) (*PMX, error) {
 	// FIXME(mdr): Need to query the instrument to determine the model and then
 	// set any model specific attributes, such as quantity and names of channels.
+	channelNames := []string{
+		"DCOutput",
+	}
 	outputCount := len(channelNames)
 	channels := make([]Channel, outputCount)
 	for i, ch := range channelNames {
@@ -65,21 +44,35 @@ func New(inst ivi.Instrument, reset bool) (*PMX, error) {
 		}
 	}
 	inherentBase := ivi.InherentBase{
-		ClassSpecMajorVersion:     classSpecMajorVersion,
-		ClassSpecMinorVersion:     classSpecMinorVersion,
-		ClassSpecRevision:         classSpecRevision,
-		GroupCapabilities:         groupCapabilities,
-		SupportedInstrumentModels: supportedInstrumentModels,
+		ClassSpecMajorVersion: 4,
+		ClassSpecMinorVersion: 4,
+		ClassSpecRevision:     "3.0",
+		GroupCapabilities: []string{
+			"IviDCPwrBase",
+			"IviDCPwrMeasurement",
+			"IviDCPwrTrigger",
+		},
+		SupportedInstrumentModels: []string{
+			"PMX18-2A",
+			"PMX18-5A",
+			"PMX35-1A",
+			"PMX35-3A",
+			"PMX70-1A",
+			"PMX110-0.6A",
+			"PMX250-0.25A",
+			"PMX350-0.2A",
+			"PMX500-0.2A",
+		},
 	}
 	inherent := ivi.NewInherent(inst, inherentBase)
-	dcpwr := PMX{
+	driver := PMX{
 		inst:     inst,
 		Channels: channels,
 		Inherent: inherent,
 	}
 	if reset {
-		err := dcpwr.Reset()
-		return &dcpwr, err
+		err := driver.Reset()
+		return &driver, err
 	}
-	return &dcpwr, nil
+	return &driver, nil
 }

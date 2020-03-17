@@ -16,25 +16,6 @@ import (
 	"github.com/gotmc/ivi/fgen"
 )
 
-// Required to implement the Inherent Capabilities & Attributes
-const (
-	classSpecMajorVersion = 4
-	classSpecMinorVersion = 3
-	classSpecRevision     = "5.2"
-	groupCapabilities     = "IviFgenBase,IviFgenStdfunc,IviFgenTrigger,IviFgenInternalTrigger,IviFgenBurst"
-)
-
-// TODO(mdr): Seems like groupCapabilities should be a []string instead of
-// string
-
-var supportedInstrumentModels = []string{
-	"DS345",
-}
-
-var channelNames = []string{
-	"Output",
-}
-
 // DS345 provides the IVI driver for a SRS DS345 function generator.
 type DS345 struct {
 	inst     ivi.Instrument
@@ -44,6 +25,9 @@ type DS345 struct {
 
 // New creates a new DS345 IVI Instrument.
 func New(inst ivi.Instrument, reset bool) (*DS345, error) {
+	channelNames := []string{
+		"Output",
+	}
 	outputCount := len(channelNames)
 	channels := make([]Channel, outputCount)
 	for i, ch := range channelNames {
@@ -51,23 +35,31 @@ func New(inst ivi.Instrument, reset bool) (*DS345, error) {
 		channels[i] = Channel{baseChannel}
 	}
 	inherentBase := ivi.InherentBase{
-		ClassSpecMajorVersion:     classSpecMajorVersion,
-		ClassSpecMinorVersion:     classSpecMinorVersion,
-		ClassSpecRevision:         classSpecRevision,
-		GroupCapabilities:         groupCapabilities,
-		SupportedInstrumentModels: supportedInstrumentModels,
+		ClassSpecMajorVersion: 4,
+		ClassSpecMinorVersion: 3,
+		ClassSpecRevision:     "5.2",
+		GroupCapabilities: []string{
+			"IviFgenBase",
+			"IviFgenStdfunc",
+			"IviFgenTrigger",
+			"IviFgenInternalTrigger",
+			"IviFgenBurst",
+		},
+		SupportedInstrumentModels: []string{
+			"DS345",
+		},
 	}
 	inherent := ivi.NewInherent(inst, inherentBase)
-	fgen := DS345{
+	driver := DS345{
 		inst:     inst,
 		Channels: channels,
 		Inherent: inherent,
 	}
 	if reset {
-		err := fgen.Reset()
-		return &fgen, err
+		err := driver.Reset()
+		return &driver, err
 	}
-	return &fgen, nil
+	return &driver, nil
 }
 
 // Channel represents a repeated capability of an output channel for the

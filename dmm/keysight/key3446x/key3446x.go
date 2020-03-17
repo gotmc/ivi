@@ -4,7 +4,8 @@
 // can be found in the LICENSE.txt file for the project.
 
 /*
-Package key3446x implements the IVI driver for the Keysight 3446x family of DMM.
+Package key3446x implements the IVI Instrument driver for the Keysight 3446x
+family of DMM.
 
 State Caching: Not implemented
 */
@@ -15,27 +16,8 @@ import (
 	"github.com/gotmc/query"
 )
 
-// Required to implement the Inherent Capabilities & Attributes
-const (
-	classSpecMajorVersion = 4
-	classSpecMinorVersion = 2
-	classSpecRevision     = "4.1"
-	groupCapabilities     = "DmmBase,DmmACMeasurement,DmmFrequencyMeasurement,DmmDeviceInfo"
-)
-
-var supportedInstrumentModels = []string{
-	"34460A",
-	"34461A",
-	"34465A",
-	"34470A",
-}
-
-// Required for base DMM
-const (
-	outputCount = 1
-)
-
-// Ag3446x provides the IVI driver for the Keysight 3446x family of DMM.
+// Ag3446x provides the IVI Instrument driver for the Keysight 3446x family of
+// DMM.
 type Ag3446x struct {
 	inst        ivi.Instrument
 	outputCount int
@@ -45,23 +27,33 @@ type Ag3446x struct {
 // New creates a new Agilent3446x IVI Instrument.
 func New(inst ivi.Instrument, reset bool) (*Ag3446x, error) {
 	inherentBase := ivi.InherentBase{
-		ClassSpecMajorVersion:     classSpecMajorVersion,
-		ClassSpecMinorVersion:     classSpecMinorVersion,
-		ClassSpecRevision:         classSpecRevision,
-		GroupCapabilities:         groupCapabilities,
-		SupportedInstrumentModels: supportedInstrumentModels,
+		ClassSpecMajorVersion: 4,
+		ClassSpecMinorVersion: 2,
+		ClassSpecRevision:     "4.1",
+		GroupCapabilities: []string{
+			"DmmBase",
+			"DmmACMeasurement",
+			"DmmFrequencyMeasurement",
+			"DmmDeviceInfo",
+		},
+		SupportedInstrumentModels: []string{
+			"34460A",
+			"34461A",
+			"34465A",
+			"34470A",
+		},
 	}
 	inherent := ivi.NewInherent(inst, inherentBase)
-	dmm := Ag3446x{
+	driver := Ag3446x{
 		inst:        inst,
-		outputCount: outputCount,
+		outputCount: 1,
 		Inherent:    inherent,
 	}
 	if reset {
-		err := dmm.Reset()
-		return &dmm, err
+		err := driver.Reset()
+		return &driver, err
 	}
-	return &dmm, nil
+	return &driver, nil
 }
 
 // QueryString queries the DMM and returns a string.

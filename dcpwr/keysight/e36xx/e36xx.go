@@ -16,24 +16,6 @@ import (
 	"github.com/gotmc/ivi/dcpwr"
 )
 
-// Required to implement the Inherent and DCPwr attributes and capabilities
-const (
-	classSpecMajorVersion = 4
-	classSpecMinorVersion = 4
-	classSpecRevision     = "3.0"
-	groupCapabilities     = "IviDCPwrBase,IviDCPwrMeasurement"
-)
-
-var supportedInstrumentModels = []string{
-	"E3631A",
-}
-
-var channelNames = []string{
-	"P6V",
-	"P25V",
-	"N25V",
-}
-
 // E36xx provides the IVI driver for the Agilent/Keysight E3600 series
 // of power supplies.
 type E36xx struct {
@@ -42,13 +24,19 @@ type E36xx struct {
 	ivi.Inherent
 }
 
-// New creates a new AgilentE36xx IVI Instrument. Currently, only the E3631A
-// model is supported, but in the future as other models are added, the New
-// function will query the instrument to determine the model and ensure it is
-// one of the supported models. If reset is true, then the instrument is reset.
+// New creates a new AgilentE36xx IVI Instrument driver. Currently, only the
+// E3631A model is supported, but in the future as other models are added, the
+// New function will query the instrument to determine the model and ensure it
+// is one of the supported models. If reset is true, then the instrument is
+// reset.
 func New(inst ivi.Instrument, reset bool) (*E36xx, error) {
 	// FIXME(mdr): Need to query the instrument to determine the model and then
 	// set any model specific attributes, such as quantity and names of channels.
+	channelNames := []string{
+		"P6V",
+		"P25V",
+		"N25V",
+	}
 	outputCount := len(channelNames)
 	channels := make([]Channel, outputCount)
 	for i, ch := range channelNames {
@@ -56,21 +44,26 @@ func New(inst ivi.Instrument, reset bool) (*E36xx, error) {
 		channels[i] = Channel{baseChannel}
 	}
 	inherentBase := ivi.InherentBase{
-		ClassSpecMajorVersion:     classSpecMajorVersion,
-		ClassSpecMinorVersion:     classSpecMinorVersion,
-		ClassSpecRevision:         classSpecRevision,
-		GroupCapabilities:         groupCapabilities,
-		SupportedInstrumentModels: supportedInstrumentModels,
+		ClassSpecMajorVersion: 4,
+		ClassSpecMinorVersion: 4,
+		ClassSpecRevision:     "3.0",
+		GroupCapabilities: []string{
+			"IviDCPwrBase",
+			"IviDCPwrMeasurement",
+		},
+		SupportedInstrumentModels: []string{
+			"E3631A",
+		},
 	}
 	inherent := ivi.NewInherent(inst, inherentBase)
-	dcpwr := E36xx{
+	driver := E36xx{
 		inst:     inst,
 		Channels: channels,
 		Inherent: inherent,
 	}
 	if reset {
-		err := dcpwr.Reset()
-		return &dcpwr, err
+		err := driver.Reset()
+		return &driver, err
 	}
-	return &dcpwr, nil
+	return &driver, nil
 }

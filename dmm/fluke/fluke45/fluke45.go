@@ -15,18 +15,6 @@ import (
 	"github.com/gotmc/query"
 )
 
-// Required to implement the Inherent Capabilities & Attributes
-const (
-	classSpecMajorVersion = 4
-	classSpecMinorVersion = 2
-	classSpecRevision     = "4.1"
-	groupCapabilities     = "DmmBase,DmmACMeasurement,DmmFrequencyMeasurement,DmmDeviceInfo"
-)
-
-var supportedInstrumentModels = []string{
-	"45",
-}
-
 // DMM provides the IVI driver for the Fluke 45 DMM.
 type DMM struct {
 	inst ivi.Instrument
@@ -36,22 +24,29 @@ type DMM struct {
 // New creates a new Agilent3446x IVI Instrument.
 func New(inst ivi.Instrument, reset bool) (*DMM, error) {
 	inherentBase := ivi.InherentBase{
-		ClassSpecMajorVersion:     classSpecMajorVersion,
-		ClassSpecMinorVersion:     classSpecMinorVersion,
-		ClassSpecRevision:         classSpecRevision,
-		GroupCapabilities:         groupCapabilities,
-		SupportedInstrumentModels: supportedInstrumentModels,
+		ClassSpecMajorVersion: 4,
+		ClassSpecMinorVersion: 2,
+		ClassSpecRevision:     "4.1",
+		GroupCapabilities: []string{
+			"DmmBase",
+			"DmmACMeasurement",
+			"DmmFrequencyMeasurement",
+			"DmmDeviceInfo",
+		},
+		SupportedInstrumentModels: []string{
+			"45",
+		},
 	}
 	inherent := ivi.NewInherent(inst, inherentBase)
-	dmm := DMM{
+	driver := DMM{
 		inst:     inst,
 		Inherent: inherent,
 	}
 	if reset {
-		err := dmm.Reset()
-		return &dmm, err
+		err := driver.Reset()
+		return &driver, err
 	}
-	return &dmm, nil
+	return &driver, nil
 }
 
 // QueryString queries the DMM and returns a string.

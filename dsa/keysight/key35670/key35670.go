@@ -11,28 +11,9 @@ import (
 )
 
 /*
-Package key35670 implements the IVI driver for the Keysight 35670 Dynamic
-Signal Analyzer (DSA).
+Package key35670 implements the IVI Instrument driver for the Keysight 35670
+Dynamic Signal Analyzer (DSA).
 */
-
-// Required to implement the Inherent Capabilities & Attributes
-const (
-	classSpecMajorVersion = 100
-	classSpecMinorVersion = 0
-	classSpecRevision     = "100.0"
-	groupCapabilities     = "IviDSABase"
-)
-
-var supportedInstrumentModels = []string{
-	"35670A",
-}
-
-var channelNames = []string{
-	"CH1",
-	"CH2",
-	"CH3",
-	"CH4",
-}
 
 // Key35670 provides the IVI driver for a Keysight 35670A Dynamic Signal
 // Analyzer.
@@ -42,8 +23,14 @@ type Key35670 struct {
 	ivi.Inherent
 }
 
-// New creates a new Key35670 IVI Instrument.
+// New creates a new Key35670 IVI Instrument driver.
 func New(inst ivi.Instrument, reset bool) (*Key35670, error) {
+	channelNames := []string{
+		"CH1",
+		"CH2",
+		"CH3",
+		"CH4",
+	}
 	inputCount := len(channelNames)
 	channels := make([]Channel, inputCount)
 	for i, ch := range channelNames {
@@ -51,23 +38,27 @@ func New(inst ivi.Instrument, reset bool) (*Key35670, error) {
 		channels[i] = Channel{baseChannel}
 	}
 	inherentBase := ivi.InherentBase{
-		ClassSpecMajorVersion:     classSpecMajorVersion,
-		ClassSpecMinorVersion:     classSpecMinorVersion,
-		ClassSpecRevision:         classSpecRevision,
-		GroupCapabilities:         groupCapabilities,
-		SupportedInstrumentModels: supportedInstrumentModels,
+		ClassSpecMajorVersion: 100,
+		ClassSpecMinorVersion: 0,
+		ClassSpecRevision:     "1.0",
+		GroupCapabilities: []string{
+			"IviDSABase",
+		},
+		SupportedInstrumentModels: []string{
+			"35670A",
+		},
 	}
 	inherent := ivi.NewInherent(inst, inherentBase)
-	dev := Key35670{
+	driver := Key35670{
 		inst:     inst,
 		Channels: channels,
 		Inherent: inherent,
 	}
 	if reset {
-		err := dev.Reset()
-		return &dev, err
+		err := driver.Reset()
+		return &driver, err
 	}
-	return &dev, nil
+	return &driver, nil
 }
 
 // Channel represents a repeated capability of an input channel for the Dynamic

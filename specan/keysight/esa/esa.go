@@ -13,18 +13,6 @@ package esa
 
 import "github.com/gotmc/ivi"
 
-// Required to implement the Inherent Capabilities & Attributes
-const (
-	classSpecMajorVersion = 4
-	classSpecMinorVersion = 8
-	classSpecRevision     = "2.0"
-	groupCapabilities     = "IviSpecAnBase"
-)
-
-var supportedInstrumentModels = []string{
-	"E4411B",
-}
-
 // E4411B provides the IVI driver for an Agilent E4411B ESA spectrum
 // analyzer.
 type E4411B struct {
@@ -35,20 +23,24 @@ type E4411B struct {
 // New creates a new E4411B IVI Instrument.
 func New(inst ivi.Instrument, reset bool) (*E4411B, error) {
 	inherentBase := ivi.InherentBase{
-		ClassSpecMajorVersion:     classSpecMajorVersion,
-		ClassSpecMinorVersion:     classSpecMinorVersion,
-		ClassSpecRevision:         classSpecRevision,
-		GroupCapabilities:         groupCapabilities,
-		SupportedInstrumentModels: supportedInstrumentModels,
+		ClassSpecMajorVersion: 4,
+		ClassSpecMinorVersion: 8,
+		ClassSpecRevision:     "2.0",
+		GroupCapabilities: []string{
+			"IviSpecAnBase",
+		},
+		SupportedInstrumentModels: []string{
+			"E4411B",
+		},
 	}
 	inherent := ivi.NewInherent(inst, inherentBase)
-	sa := E4411B{
+	driver := E4411B{
 		inst:     inst,
 		Inherent: inherent,
 	}
 	if reset {
-		err := sa.Reset()
-		return &sa, err
+		err := driver.Reset()
+		return &driver, err
 	}
-	return &sa, nil
+	return &driver, nil
 }

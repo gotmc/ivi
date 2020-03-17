@@ -31,7 +31,7 @@ type InherentBase struct {
 	ClassSpecMajorVersion     int
 	ClassSpecMinorVersion     int
 	ClassSpecRevision         string
-	GroupCapabilities         string
+	GroupCapabilities         []string
 	SupportedInstrumentModels []string
 	IDNString                 string
 }
