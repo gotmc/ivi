@@ -25,7 +25,7 @@ type Ag33220 struct {
 }
 
 // New creates a new Ag33220 IVI Instrument.
-func New(inst ivi.Instrument, reset bool) (*Ag33220, error) {
+func New(inst ivi.Instrument, reset bool) (Ag33220, error) {
 	channelNames := []string{
 		"Output",
 	}
@@ -59,9 +59,9 @@ func New(inst ivi.Instrument, reset bool) (*Ag33220, error) {
 	}
 	if reset {
 		err := driver.Reset()
-		return &driver, err
+		return driver, err
 	}
-	return &driver, nil
+	return driver, nil
 }
 
 // Channel represents a repeated capability of an output channel for the

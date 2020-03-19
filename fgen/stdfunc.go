@@ -5,6 +5,33 @@
 
 package fgen
 
+// StdFunc provides the interface required for the IviFgenStdFunc capability
+// group.
+type StdFunc interface {
+	Channels() ([]*StdFuncChannel, error)
+	Channel(name string) (*StdFuncChannel, error)
+	ChannelByID(id int) (*StdFuncChannel, error)
+	ChannelCount() int
+}
+
+// StdFuncChannel provides the interface for the channel repeated capability for
+// the IviFgenStdFunc capability group.
+type StdFuncChannel interface {
+	Amplitude() (float64, error)
+	SetAmplitude(amp float64) error
+	DCOffset() (float64, error)
+	SetDCOffset(offset float64) error
+	DutyCycleHigh() (float64, error)
+	SetDutyCycleHigh(duty float64) error
+	Frequency() (float64, error)
+	SetFrequency(freq float64) error
+	StartPhase() (float64, error)
+	SetStartPhase(start float64) error
+	StandardWaveform() (StandardWaveform, error)
+	SetStandardWaveform(StandardWaveform) error
+	ConfigureStandardWaveform(wave StandardWaveform, amp, offset, freq, phase float64) error
+}
+
 // StandardWaveform models the defined values for the Standard Waveform defined
 // in Section 5.2.6 of IVI-4.3: IviFgen Class Specification.
 type StandardWaveform int

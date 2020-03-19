@@ -31,9 +31,9 @@ func (ch *Channel) OperationMode() (fgen.OperationMode, error) {
 	}
 	switch s {
 	case "OFF":
-		return fgen.Continuous, nil
+		return fgen.ContinuousMode, nil
 	case "ON":
-		return fgen.Burst, nil
+		return fgen.BurstMode, nil
 	default:
 		return mode, fmt.Errorf("error determining operation mode from fgen: %s", s)
 	}
@@ -45,9 +45,9 @@ func (ch *Channel) OperationMode() (fgen.OperationMode, error) {
 // Section 4.2.2 of IVI-4.3: IviFgen Class Specification.
 func (ch *Channel) SetOperationMode(mode fgen.OperationMode) error {
 	switch mode {
-	case fgen.Burst:
+	case fgen.BurstMode:
 		return ch.Set("BURS:MODE TRIG;STAT ON\n")
-	case fgen.Continuous:
+	case fgen.ContinuousMode:
 		return ch.Set("BURS:STAT OFF\n")
 	}
 	return errors.New("bad fgen operation mode")
@@ -65,8 +65,8 @@ func (ch *Channel) OutputEnabled() (bool, error) {
 // SetOutputEnabled is the setter for the read-write IviFgenBase Attribute
 // Output Enabled described in Section 4.2.3 of IVI-4.3: IviFgen Class
 // Specification.
-func (ch *Channel) SetOutputEnabled(v bool) error {
-	if v {
+func (ch *Channel) SetOutputEnabled(b bool) error {
+	if b {
 		return ch.Set("OUTP ON\n")
 	}
 	return ch.Set("OUTP OFF\n")

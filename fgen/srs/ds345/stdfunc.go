@@ -79,7 +79,7 @@ func (ch *Channel) SetFrequency(freq float64) error {
 
 // StandardWaveform determines if one of the IVI Standard Waveforms is being
 // output by the function generator. If not, an error is returned.
-// StandwardWaveform is the getter for the read-write IviFgenStdFunc Attribute
+// StandardWaveform is the getter for the read-write IviFgenStdFunc Attribute
 // Waveform described in Section 5.2.6 of IVI-4.3: IviFgen Class Specification.
 func (ch *Channel) StandardWaveform() (fgen.StandardWaveform, error) {
 	var wave fgen.StandardWaveform
@@ -111,7 +111,7 @@ func (ch *Channel) StandardWaveform() (fgen.StandardWaveform, error) {
 }
 
 // SetStandardWaveform specifies which standard waveform the function
-// generator produces.  SetStandwardWaveform is the setter for the read-write
+// generator produces.  SetStandardWaveform is the setter for the read-write
 // IviFgenStdFunc Attribute Waveform described in Section 5.2.6 of IVI-4.3:
 // IviFgen Class Specification.
 func (ch *Channel) SetStandardWaveform(wave fgen.StandardWaveform) error {

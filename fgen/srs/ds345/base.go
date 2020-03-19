@@ -31,7 +31,7 @@ func (ch *Channel) OperationMode() (fgen.OperationMode, error) {
 	}
 	switch s {
 	case "0":
-		return fgen.Continuous, nil
+		return fgen.ContinuousMode, nil
 	case "1":
 		mod, err := ch.QueryString("MTYP?\n")
 		if err != nil {
@@ -39,7 +39,7 @@ func (ch *Channel) OperationMode() (fgen.OperationMode, error) {
 		}
 		switch mod {
 		case "5":
-			return fgen.Burst, nil
+			return fgen.BurstMode, nil
 		default:
 			return mode, fmt.Errorf("error determining operation mode, mtyp = %s", mod)
 		}
@@ -54,9 +54,9 @@ func (ch *Channel) OperationMode() (fgen.OperationMode, error) {
 // Section 4.2.2 of IVI-4.3: IviFgen Class Specification.
 func (ch *Channel) SetOperationMode(mode fgen.OperationMode) error {
 	switch mode {
-	case fgen.Burst:
+	case fgen.BurstMode:
 		return ch.Set("MENA1;MTYP5\n")
-	case fgen.Continuous:
+	case fgen.ContinuousMode:
 		return ch.Set("MENA0\n")
 	}
 	return errors.New("bad fgen operation mode")

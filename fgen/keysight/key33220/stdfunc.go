@@ -44,19 +44,19 @@ func (ch *Channel) SetDCOffset(amp float64) error {
 	return ch.Set("VOLT:OFFS %f\n", amp)
 }
 
-// DutyCycle reads the percentage of time, specified as 0-100, during one cycle
-// for which the square wave is at its high value.  DutyCycle is the getter for
-// the read-write IviFgenStdFunc Attribute Duty Cycle High described in Section
-// 5.2.3 of IVI-4.3: IviFgen Class Specification.
-func (ch *Channel) DutyCycle() (float64, error) {
+// DutyCycleHigh reads the percentage of time, specified as 0-100, during one
+// cycle for which the square wave is at its high value.  DutyCycle is the
+// getter for the read-write IviFgenStdFunc Attribute Duty Cycle High described
+// in Section 5.2.3 of IVI-4.3: IviFgen Class Specification.
+func (ch *Channel) DutyCycleHigh() (float64, error) {
 	return ch.QueryFloat64("FUNC:SQU:DCYC?\n")
 }
 
-// SetDutyCycle sets the percentage of time, specified as 0-100, during one
+// SetDutyCycleHigh sets the percentage of time, specified as 0-100, during one
 // cycle for which the square wave is at its high value. SetDutyCycle is the
 // setter for the read-write IviFgenStdFunc Attribute Duty Cycle High described
 // in Section 5.2.3 of IVI-4.3: IviFgen Class Specification.
-func (ch *Channel) SetDutyCycle(duty float64) error {
+func (ch *Channel) SetDutyCycleHigh(duty float64) error {
 	return ch.Set("FUNC:SQU:DCYC %f\n", duty)
 }
 
@@ -78,7 +78,7 @@ func (ch *Channel) SetFrequency(freq float64) error {
 
 // StandardWaveform determines if one of the IVI Standard Waveforms is being
 // output by the function generator. If not, an error is returned.
-// StandwardWaveform is the getter for the read-write IviFgenStdFunc Attribute
+// StandardWaveform is the getter for the read-write IviFgenStdFunc Attribute
 // Waveform described in Section 5.2.6 of IVI-4.3: IviFgen Class Specification.
 func (ch *Channel) StandardWaveform() (fgen.StandardWaveform, error) {
 	var wave fgen.StandardWaveform
@@ -114,7 +114,7 @@ func (ch *Channel) StandardWaveform() (fgen.StandardWaveform, error) {
 }
 
 // SetStandardWaveform specifies which standard waveform the function generator
-// produces.  SetStandwardWaveform is the setter for the read-write
+// produces.  SetStandardWaveform is the setter for the read-write
 // IviFgenStdFunc Attribute Waveform described in Section 5.2.6 of IVI-4.3:
 // IviFgen Class Specification.
 func (ch *Channel) SetStandardWaveform(wave fgen.StandardWaveform) error {
