@@ -13,7 +13,6 @@ package u2751a
 
 import (
 	"fmt"
-	"log"
 	"time"
 
 	"github.com/gotmc/ivi"
@@ -137,14 +136,12 @@ func (d *U2751A) Channel(name string) (*Channel, error) {
 	// See if the given name matches one of the virtual channel names.
 	for _, ch := range d.channels {
 		if name == ch.virtualName {
-			log.Printf("Found virtual name: %s", name)
 			return &d.channels[ch.id], nil
 		}
 	}
 	// See if the given name matches one of the physical channel names.
 	for _, ch := range d.channels {
 		if name == ch.name {
-			log.Printf("Found physical name: %s", name)
 			return &d.channels[ch.id], nil
 		}
 	}

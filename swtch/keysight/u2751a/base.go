@@ -7,7 +7,6 @@ package u2751a
 
 import (
 	"fmt"
-	"log"
 	"time"
 
 	"github.com/gotmc/ivi"
@@ -259,10 +258,6 @@ func (d *U2751A) Connect(ch1name, ch2name string) error {
 		largeID = ch1.id
 	}
 
-	log.Printf("small ID = %d / large ID = %d", smallID, largeID)
-	log.Printf("Address of ch1 = %v", &ch1)
-	log.Printf("Address of ch2 = %v", &ch2)
-
 	// Check to see if we're trying to connect a channel to itself.
 	if smallID == largeID {
 		return swtch.ErrCannotConnectToSelf
@@ -284,7 +279,6 @@ func (d *U2751A) Connect(ch1name, ch2name string) error {
 
 	// Make sure that we aren't trying to connect two source channels.
 	if ch1.isSourceChannel && ch2.isSourceChannel {
-		log.Fatalf("I'm here")
 		return swtch.ErrAttemptToConnectSources
 	}
 	// See if the path already exists.
@@ -301,9 +295,7 @@ func (d *U2751A) Connect(ch1name, ch2name string) error {
 	if ch1.chType != Row || ch2.chType != Col {
 		return fmt.Errorf("expected a row and a col got: %s and %s", ch1.chType, ch2.chType)
 	}
-	cmd := fmt.Sprintf("ROUT:CLOS (@%1d%02d)\n", row, col)
-	log.Printf("Command to send to switch: %s", cmd)
-	err = ivi.Set(d.inst, cmd)
+	err = ivi.Set(d.inst, "ROUT:CLOS (@%1d%02d)\n", row, col)
 	if err != nil {
 		return err
 	}
