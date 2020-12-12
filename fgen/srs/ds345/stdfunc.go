@@ -132,11 +132,11 @@ var waveformCommand = map[fgen.StandardWaveform]string{
 }
 
 var waveformApplyCommand = map[fgen.StandardWaveform]string{
-	fgen.Sine:     "FUNC 0; FREQ %.4f; AMPL %.4f; OFFS %.4f; PHSE %.3f\n",
-	fgen.Square:   "FUNC 1; FREQ %.4f; AMPL %.4f; OFFS %.4f; PHSE %.3f\n",
-	fgen.Triangle: "FUNC 2; FREQ %.4f; AMPL %.4f; OFFS %.4f; PHSE %.3f\n",
-	fgen.RampUp:   "FUNC 3; INVT 0; FREQ %.4f; AMPL %.4f; OFFS %.4f; PHSE %.3f\n",
-	fgen.RampDown: "FUNC 3; INVT 1; FREQ %.4f; AMPL %.4f; OFFS %.4f; PHSE %.3f\n",
+	fgen.Sine:     "FUNC 0; FREQ %.4f; AMPL %.4fVP; OFFS %.4f; PHSE %.3f\n",
+	fgen.Square:   "FUNC 1; FREQ %.4f; AMPL %.4fVP; OFFS %.4f; PHSE %.3f\n",
+	fgen.Triangle: "FUNC 2; FREQ %.4f; AMPL %.4fVP; OFFS %.4f; PHSE %.3f\n",
+	fgen.RampUp:   "FUNC 3; INVT 0; FREQ %.4f; AMPL %.4fVP; OFFS %.4f; PHSE %.3f\n",
+	fgen.RampDown: "FUNC 3; INVT 1; FREQ %.4f; AMPL %.4fVP; OFFS %.4f; PHSE %.3f\n",
 }
 
 // ConfigureStandardWaveform configures the attributes of the function
