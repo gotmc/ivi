@@ -7,6 +7,7 @@ package ds345
 
 import (
 	"errors"
+	"log"
 	"strings"
 
 	"github.com/gotmc/ivi/fgen"
@@ -44,5 +45,6 @@ func (ch *Channel) SetTriggerSource(src fgen.TriggerSource) error {
 		fgen.InternalTrigger: "1",
 		fgen.ExternalTrigger: "2",
 	}
-	return ch.Set("TSRC %s\n", triggers[src])
+	log.Printf("Sending command TSRC%s\n", triggers[src])
+	return ch.Set("TSRC%s\n", triggers[src])
 }
