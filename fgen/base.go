@@ -7,10 +7,10 @@ package fgen
 
 // Base provides the interface required for the IviFgenBase capability group.
 type Base interface {
-	Channels() ([]*BaseChannel, error)
-	Channel(name string) (*BaseChannel, error)
-	ChannelByID(id int) (*BaseChannel, error)
-	ChannelCount() int
+	// Channels() ([]*BaseChannel, error)
+	// Channel(name string) (*BaseChannel, error)
+	// ChannelByID(id int) (*BaseChannel, error)
+	// ChannelCount() int
 	OutputCount() int
 }
 

@@ -14,6 +14,7 @@ import (
 
 // Make sure that the ds345 driver implements the IviFgenBase capability
 // group.
+var _ fgen.Base = (*DS345)(nil)
 var _ fgen.BaseChannel = (*Channel)(nil)
 
 // OutputCount returns the number of available output channels. OutputCount is

@@ -11,6 +11,7 @@ import (
 
 // Make sure that the ds345 driver implements the IviFgenBurst capability
 // group.
+var _ fgen.Burst = (*DS345)(nil)
 var _ fgen.BurstChannel = (*Channel)(nil)
 
 // BurstCount returns the number of waveform cycles that the function generator
