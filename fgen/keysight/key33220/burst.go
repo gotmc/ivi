@@ -5,6 +5,14 @@
 
 package key33220
 
+import (
+	"github.com/gotmc/ivi/fgen"
+)
+
+// Make sure that the key33220 driver implements the IviFgenBurst capability
+// group.
+var _ fgen.BurstChannel = (*Channel)(nil)
+
 // BurstCount returns the number of waveform cycles that the function generator
 // produces after it receives a trigger.  BurstCount is the getter for the
 // read-write IviFgenBurst Attribute Burst Count described in Section 17.2.1 of

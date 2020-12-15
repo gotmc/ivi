@@ -12,6 +12,10 @@ import (
 	"github.com/gotmc/ivi/fgen"
 )
 
+// Make sure that the key33220 driver implements the IviFgenTrigger capability
+// group.
+var _ fgen.TriggerChannel = (*Channel)(nil)
+
 // TriggerSource determines the trigger srouce. TriggerSource is the getter for
 // the read-write IviFgenTrigger Attribute Trigger Source described in Section
 // 9.2.1 of IVI-4.3: IviFgen Class Specification.

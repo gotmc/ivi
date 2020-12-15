@@ -17,8 +17,8 @@ type Base interface {
 // BaseChannel provides the interface for the channel repeated capability for
 // the IviFgenBase capability group.
 type BaseChannel interface {
-	Name() string
-	VirtualName() string
+	// Name() string
+	// VirtualName() string
 	OperationMode() (OperationMode, error)
 	SetOperationMode(mode OperationMode) error
 	OutputEnabled() (bool, error)
@@ -27,12 +27,12 @@ type BaseChannel interface {
 	EnableOutput() error
 	OutputImpedance() (float64, error)
 	SetOutputImpedance(impedance float64) error
-	OutputMode() (OutputMode, error)
-	SetOutputMode(mode OutputMode) error
-	ReferenceClockSource() (ClockSource, error)
-	SetReferenceClockSource(src ClockSource) error
-	AbortGeneration() error
-	InitiateGeneration() error
+	// OutputMode() (OutputMode, error)
+	// SetOutputMode(mode OutputMode) error
+	// ReferenceClockSource() (ClockSource, error)
+	// SetReferenceClockSource(src ClockSource) error
+	// AbortGeneration() error
+	// InitiateGeneration() error
 }
 
 // OperationMode provides the defined values for the Operation Mode defined in

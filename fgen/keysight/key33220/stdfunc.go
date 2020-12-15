@@ -12,6 +12,10 @@ import (
 	"github.com/gotmc/ivi/fgen"
 )
 
+// Make sure that the key33220 driver implements the IviFgenStdFunc capability
+// group.
+var _ fgen.StdFuncChannel = (*Channel)(nil)
+
 // Amplitude reads the difference between the maximum and minimum waveform
 // values, i.e., the peak-to-peak voltage value. Amplitude is the getter for
 // the read-write IviFgenStdFunc Attribute Amplitude described in Section 5.2.1
@@ -74,6 +78,24 @@ func (ch *Channel) Frequency() (float64, error) {
 // in Section 5.2.4 of IVI-4.3: IviFgen Class Specification.
 func (ch *Channel) SetFrequency(freq float64) error {
 	return ch.Set("FREQ %f\n", freq)
+}
+
+// StartPhase reads the start phase of the standard waveform the function
+// generator produces. When the Waveform attribute is set to Waveform DC, this
+// attribute does not affect signal output. The units are degrees. StartPhase
+// is the getter for the read-write IviFgenStdFunc Attribute Start Phase described
+// in Section 5.2.5 of IVI-4.3: IviFgen Class Specification.
+func (ch *Channel) StartPhase() (float64, error) {
+	return ch.QueryFloat64("PHAS?\n")
+}
+
+// SetStartPhase writes the start phase of the standard waveform the function
+// generator produces. When the Waveform attribute is set to Waveform DC, this
+// attribute does not affect signal output. The units are degrees. StartPhase
+// is the getter for the read-write IviFgenStdFunc Attribute Start Phase described
+// in Section 5.2.5 of IVI-4.3: IviFgen Class Specification.
+func (ch *Channel) SetStartPhase(freq float64) error {
+	return ch.Set("PHAS %f\n", freq)
 }
 
 // StandardWaveform determines if one of the IVI Standard Waveforms is being

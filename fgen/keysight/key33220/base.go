@@ -12,21 +12,15 @@ import (
 	"github.com/gotmc/ivi/fgen"
 )
 
+// Make sure that the key33220 driver implements the IviFgenBase capability
+// group.
+var _ fgen.BaseChannel = (*Channel)(nil)
+
 // OutputCount returns the number of available output channels. OutputCount is
 // the getter for the read-only IviFgenBase Attribute Output Count described in
 // Section 4.2.1 of IVI-4.3: IviFgen Class Specification.
-func (a *Ag33220) OutputCount() int {
+func (a *Key33220) OutputCount() int {
 	return len(a.Channels)
-}
-
-// AbortGeneration Aborts a previously initiated signal generation. If the
-// function generator is in the Output Generation State, this function moves
-// the function generator to the Configuration State. If the function generator
-// is already in the Configuration State, the function does nothing and returns
-// Success. AbortGeneration implements the IviFgenBase function described in
-// Section 4.3 of IVI-4.3: IviFgen Class Specification.
-func (ch *Channel) AbortGeneration() error {
-	return ch.DisableOutput()
 }
 
 // OperationMode determines whether the function generator should produce a
@@ -108,4 +102,14 @@ func (ch *Channel) OutputImpedance() (float64, error) {
 // Specification.
 func (ch *Channel) SetOutputImpedance(impedance float64) error {
 	return ch.Set("OUTP:LOAD %f\n", impedance)
+}
+
+// AbortGeneration Aborts a previously initiated signal generation. If the
+// function generator is in the Output Generation State, this function moves
+// the function generator to the Configuration State. If the function generator
+// is already in the Configuration State, the function does nothing and returns
+// Success. AbortGeneration implements the IviFgenBase function described in
+// Section 4.3 of IVI-4.3: IviFgen Class Specification.
+func (ch *Channel) AbortGeneration() error {
+	return ch.DisableOutput()
 }

@@ -16,16 +16,16 @@ import (
 	"github.com/gotmc/ivi/fgen"
 )
 
-// Ag33220 provides the IVI driver for an Agilent 33220A or 33210A
+// Key33220 provides the IVI driver for an Agilent 33220A or 33210A
 // function generator.
-type Ag33220 struct {
+type Key33220 struct {
 	inst     ivi.Instrument
 	Channels []Channel
 	ivi.Inherent
 }
 
-// New creates a new Ag33220 IVI Instrument.
-func New(inst ivi.Instrument, reset bool) (Ag33220, error) {
+// New creates a new Key33220 IVI Instrument.
+func New(inst ivi.Instrument, reset bool) (Key33220, error) {
 	channelNames := []string{
 		"Output",
 	}
@@ -52,7 +52,7 @@ func New(inst ivi.Instrument, reset bool) (Ag33220, error) {
 		},
 	}
 	inherent := ivi.NewInherent(inst, inherentBase)
-	driver := Ag33220{
+	driver := Key33220{
 		inst:     inst,
 		Channels: channels,
 		Inherent: inherent,

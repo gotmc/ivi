@@ -5,6 +5,14 @@
 
 package ds345
 
+import (
+	"github.com/gotmc/ivi/fgen"
+)
+
+// Make sure that the ds345 driver implements the IviFgenInternalTrigger
+// capability group.
+var _ fgen.IntTriggerChannel = (*Channel)(nil)
+
 // InternalTriggerRate determines the rate at which the function generator's
 // internal trigger source produces a trigger in triggers per second.
 // InternalTriggerRate is the getter for the read-write IviFgenInternalTrigger

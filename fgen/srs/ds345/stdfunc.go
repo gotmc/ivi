@@ -13,6 +13,10 @@ import (
 	"github.com/gotmc/ivi/fgen"
 )
 
+// Make sure that the ds345 driver implements the IviFgenStdFunc capability
+// group.
+var _ fgen.StdFuncChannel = (*Channel)(nil)
+
 // Amplitude reads the difference between the maximum and minimum waveform
 // values, i.e., the peak-to-peak voltage value. Amplitude is the getter for
 // the read-write IviFgenStdFunc Attribute Amplitude described in Section 5.2.1
@@ -45,19 +49,19 @@ func (ch *Channel) SetDCOffset(amp float64) error {
 	return ch.Set("OFFS %f\n", amp)
 }
 
-// DutyCycle reads the percentage of time, specified as 0-100, during one cycle
-// for which the square wave is at its high value.  DutyCycle is the getter for
-// the read-write IviFgenStdFunc Attribute Duty Cycle High described in Section
-// 5.2.3 of IVI-4.3: IviFgen Class Specification.
-func (ch *Channel) DutyCycle() (float64, error) {
+// DutyCycleHigh reads the percentage of time, specified as 0-100, during one
+// cycle for which the square wave is at its high value.  DutyCycle is the
+// getter for the read-write IviFgenStdFunc Attribute Duty Cycle High described
+// in Section 5.2.3 of IVI-4.3: IviFgen Class Specification.
+func (ch *Channel) DutyCycleHigh() (float64, error) {
 	return 0.0, errors.New("duty cycle not yet implemented")
 }
 
-// SetDutyCycle sets the percentage of time, specified as 0-100, during one
+// SetDutyCycleHigh sets the percentage of time, specified as 0-100, during one
 // cycle for which the square wave is at its high value. SetDutyCycle is the
 // setter for the read-write IviFgenStdFunc Attribute Duty Cycle High described
 // in Section 5.2.3 of IVI-4.3: IviFgen Class Specification.
-func (ch *Channel) SetDutyCycle(duty float64) error {
+func (ch *Channel) SetDutyCycleHigh(duty float64) error {
 	return errors.New("not yet implemented; difficult in ds345")
 }
 
@@ -75,6 +79,24 @@ func (ch *Channel) Frequency() (float64, error) {
 // in Section 5.2.4 of IVI-4.3: IviFgen Class Specification.
 func (ch *Channel) SetFrequency(freq float64) error {
 	return ch.Set("FREQ %f\n", freq)
+}
+
+// StartPhase reads the start phase of the standard waveform the function
+// generator produces. When the Waveform attribute is set to Waveform DC, this
+// attribute does not affect signal output. The units are degrees. StartPhase
+// is the getter for the read-write IviFgenStdFunc Attribute Start Phase described
+// in Section 5.2.5 of IVI-4.3: IviFgen Class Specification.
+func (ch *Channel) StartPhase() (float64, error) {
+	return ch.QueryFloat64("PHSE?\n")
+}
+
+// SetStartPhase writes the start phase of the standard waveform the function
+// generator produces. When the Waveform attribute is set to Waveform DC, this
+// attribute does not affect signal output. The units are degrees. StartPhase
+// is the getter for the read-write IviFgenStdFunc Attribute Start Phase described
+// in Section 5.2.5 of IVI-4.3: IviFgen Class Specification.
+func (ch *Channel) SetStartPhase(freq float64) error {
+	return ch.Set("PHSE %f\n", freq)
 }
 
 // StandardWaveform determines if one of the IVI Standard Waveforms is being
