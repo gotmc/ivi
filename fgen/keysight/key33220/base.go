@@ -19,6 +19,16 @@ func (a *Ag33220) OutputCount() int {
 	return len(a.Channels)
 }
 
+// AbortGeneration Aborts a previously initiated signal generation. If the
+// function generator is in the Output Generation State, this function moves
+// the function generator to the Configuration State. If the function generator
+// is already in the Configuration State, the function does nothing and returns
+// Success. AbortGeneration implements the IviFgenBase function described in
+// Section 4.3 of IVI-4.3: IviFgen Class Specification.
+func (ch *Channel) AbortGeneration() error {
+	return ch.DisableOutput()
+}
+
 // OperationMode determines whether the function generator should produce a
 // continuous or burst output on the channel. OperationMode implements the
 // getter for the read-write IviFgenBase Attribute Operation Mode described in
