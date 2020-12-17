@@ -12,8 +12,8 @@ import (
 )
 
 // Make sure the IviDCPwrMeasurement capability group has been implemented.
-var _ dcpwr.Base = (*E36xx)(nil)
-var _ dcpwr.BaseChannel = (*Channel)(nil)
+var _ dcpwr.Measurement = (*E36xx)(nil)
+var _ dcpwr.MeasurementChannel = (*Channel)(nil)
 
 // MeasureVoltage takes a measurement on the output signal and returns the
 // measured voltage.

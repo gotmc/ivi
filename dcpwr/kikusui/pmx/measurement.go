@@ -5,6 +5,12 @@
 
 package pmx
 
+import "github.com/gotmc/ivi/dcpwr"
+
+// Make sure the IviDCPwrMeasurement capability group has been implemented.
+var _ dcpwr.Measurement = (*PMX)(nil)
+var _ dcpwr.MeasurementChannel = (*Channel)(nil)
+
 // MeasureVoltage takes a measurement on the output signal and returns the
 // measured voltage.  MeasureVoltage implements the IviDCPwrMeasurement
 // function Measure for the Voltage MeasurementType parameter described in
