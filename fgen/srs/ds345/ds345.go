@@ -5,7 +5,7 @@
 
 /*
 Package ds345 implements the IVI driver for the Stanford Research System
-DS345 function generator. The serial port mode is 8N2.
+DS345 function generator.
 
 State Caching: Not implemented
 */
@@ -13,7 +13,6 @@ package ds345
 
 import (
 	"github.com/gotmc/ivi"
-	"github.com/gotmc/ivi/com"
 	"github.com/gotmc/ivi/fgen"
 )
 
@@ -75,13 +74,42 @@ type Channel struct {
 	fgen.Channel
 }
 
-// SerialConfig returns the allowed configuration for the DS345's serial port.
-// Baud rates are listed in order from fastest to slowest.
-func SerialConfig() com.SerialModes {
-	return com.SerialModes{
-		BaudRates: []int{19200, 9600, 4800, 2400, 1200, 600, 300},
-		DataBits:  8,
-		Parity:    com.NoParity,
-		StopBits:  2,
-	}
+// AvailableCOMPorts lists the avaialble COM ports, including optional ports.
+func AvailableCOMPorts() []string {
+	return []string{"GPIB", "RS232"}
+}
+
+// DefaultGPIBAddress lists the default GPIB interface address.
+func DefaultGPIBAddress() int {
+	return 19
+}
+
+// SerialConfig lists whether the RS-232 serial port is configured as a DCE
+// (Data Circuit-Terminating Equipment) or a DTE (Data Terminal Equipment). Computers
+// running the IVI program are DTEs; therefore, use a straight through serial
+// cable when connecting to DCEs and a null modem cable when connecting to DTEs.
+func SerialConfig() string {
+	return "DCE"
+}
+
+// SerialBaudRates lists the available baud rates for the RS-232 serial port
+// from the fastest to the slowest.
+func SerialBaudRates() []int {
+	return []int{19200, 9600, 4800, 2400, 1200, 600, 300}
+}
+
+// DefaultSerialBaudRate returns the default baud rate for the RS-232 serial
+// port.
+func DefaultSerialBaudRate() int {
+	return 9600
+}
+
+// SerialDataFrames lists the available RS-232 data frame formats.
+func SerialDataFrames() []string {
+	return []string{"8N2"}
+}
+
+// DefaultSerialDataFrame returns the default RS-232 data frame format.
+func DefaultSerialDataFrame() string {
+	return "8N2"
 }

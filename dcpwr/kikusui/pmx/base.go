@@ -24,9 +24,9 @@ func (ch *Channel) CurrentLimit() (float64, error) {
 // Attribute Current Limit described in Section 4.2.1 of IVI-4.4: IviDCPwr
 // Class Specification.
 func (ch *Channel) SetCurrentLimit(limit float64) error {
-	if ch.currentLimitBehavior == dcpwr.Regulate {
+	if ch.currentLimitBehavior == dcpwr.CurrentRegulate {
 		return ch.Set("CURR %f;:CURR:PROT MAX\n", limit)
-	} else if ch.currentLimitBehavior == dcpwr.Trip {
+	} else if ch.currentLimitBehavior == dcpwr.CurrentTrip {
 		return ch.Set("CURR %f;:CURR:PROT %f\n", limit, limit)
 	}
 	return errors.New("current limit behavior not set")
@@ -52,11 +52,11 @@ func (ch *Channel) CurrentLimitBehavior() (dcpwr.CurrentLimitBehavior, error) {
 // Limit Behavior described in Section 4.2.2 of IVI-4.4: IviDCPwr Class
 // Specification.
 func (ch *Channel) SetCurrentLimitBehavior(behavior dcpwr.CurrentLimitBehavior) error {
-	if behavior == dcpwr.Regulate {
-		ch.currentLimitBehavior = dcpwr.Regulate
+	if behavior == dcpwr.CurrentRegulate {
+		ch.currentLimitBehavior = dcpwr.CurrentRegulate
 		return ch.Set("CURR:PROT MAX\n")
-	} else if behavior == dcpwr.Trip {
-		ch.currentLimitBehavior = dcpwr.Trip
+	} else if behavior == dcpwr.CurrentTrip {
+		ch.currentLimitBehavior = dcpwr.CurrentTrip
 		limit, err := ch.QueryFloat64("CURR?\n")
 		if err != nil {
 			return err
@@ -171,11 +171,11 @@ func (dev *PMX) OutputCount() int {
 // Configure Current Limit function described in Section 4.3.1 of IVI-4.4:
 // IviDCPwr Class Specification.
 func (ch *Channel) ConfigureCurrentLimit(behavior dcpwr.CurrentLimitBehavior, limit float64) error {
-	if behavior == dcpwr.Regulate {
-		ch.currentLimitBehavior = dcpwr.Regulate
+	if behavior == dcpwr.CurrentRegulate {
+		ch.currentLimitBehavior = dcpwr.CurrentRegulate
 		return ch.Set("CURR %f;:CURR:PROT MAX\n", limit)
-	} else if behavior == dcpwr.Trip {
-		ch.currentLimitBehavior = dcpwr.Trip
+	} else if behavior == dcpwr.CurrentTrip {
+		ch.currentLimitBehavior = dcpwr.CurrentTrip
 		return ch.Set("CURR %f;:CURR:PROT %f\n", limit, limit)
 	}
 	return errors.New("unknown current limit behavior")

@@ -11,10 +11,16 @@ package com
 
 // SerialModes returns the allowed serial communication modes for a device.
 type SerialModes struct {
-	BaudRates []int
-	DataBits  int
-	Parity    Parity
-	StopBits  int
+	Equipment  EquipClass
+	BaudRates  []int
+	DataFrames []DataFrame
+}
+
+// DataFrame models an RS-232 data frame format.
+type DataFrame struct {
+	DataBits int
+	Parity   Parity
+	StopBits int
 }
 
 // Parity defines the serial port parity setting.
@@ -25,4 +31,16 @@ const (
 	NoParity Parity = iota
 	OddParity
 	EvenParity
+)
+
+// EquipClass defines whether the device is a DCE (Data Circuit-Terminating
+// Equipment) or a DTE (Data Terminal Equipment). Note, the computer running
+// the IVI software is a DTE. DTE-DTE and DCE-DCE connections require a null
+// modem cable.
+type EquipClass int
+
+// Enum of available equipment classes.
+const (
+	DCE EquipClass = iota
+	DTE
 )

@@ -69,3 +69,22 @@ func New(inst ivi.Instrument, reset bool) (Key33220, error) {
 type Channel struct {
 	fgen.Channel
 }
+
+// AvailableCOMPorts lists the avaialble COM ports, including optional ports.
+func AvailableCOMPorts() []string {
+	return []string{"GPIB", "LAN", "USB"}
+}
+
+// DefaultGPIBAddress lists the default GPIB interface address.
+func DefaultGPIBAddress() int {
+	return 10
+}
+
+// LANPorts returns a map of the different ports with the key being the type of
+// port.
+func LANPorts() map[string]int {
+	return map[string]int{
+		"telnet": 5024,
+		"socket": 5025,
+	}
+}

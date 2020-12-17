@@ -19,3 +19,14 @@ type TriggerChannel interface {
 	TriggerSource() (TriggerSource, error)
 	SetTriggerSource(TriggerSource) error
 }
+
+// TriggerSource models the defined values for the Trigger Source defined in
+// Section 9.2.1 of IVI-4.3: IviFgenClass Specification.
+type TriggerSource int
+
+// These are the available trigger sources.
+const (
+	InternalTrigger TriggerSource = iota
+	ExternalTrigger
+	SoftwareTrigger
+)

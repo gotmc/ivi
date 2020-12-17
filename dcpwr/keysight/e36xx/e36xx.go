@@ -67,3 +67,43 @@ func New(inst ivi.Instrument, reset bool) (*E36xx, error) {
 	}
 	return &driver, nil
 }
+
+// AvailableCOMPorts lists the avaialble COM ports, including optional ports.
+func AvailableCOMPorts() []string {
+	return []string{"GPIB", "RS232"}
+}
+
+// DefaultGPIBAddress lists the default GPIB interface address.
+func DefaultGPIBAddress() int {
+	return 5
+}
+
+// SerialConfig lists whether the RS-232 serial port is configured as a DCE
+// (Data Circuit-Terminating Equipment) or a DTE (Data Terminal Equipment). Computers
+// running the IVI program are DTEs; therefore, use a straight through serial
+// cable when connecting to DCEs and a null modem cable when connecting to DTEs.
+func SerialConfig() string {
+	return "DTE"
+}
+
+// SerialBaudRates lists the available baud rates for the RS-232 serial port
+// from the fastest to the slowest.
+func SerialBaudRates() []int {
+	return []int{9600, 4800, 2400, 1200, 600, 300}
+}
+
+// DefaultSerialBaudRate returns the default baud rate for the RS-232 serial
+// port.
+func DefaultSerialBaudRate() int {
+	return 9600
+}
+
+// SerialDataFrames lists the available RS-232 data frame formats.
+func SerialDataFrames() []string {
+	return []string{"8N2", "7E2", "7O2"}
+}
+
+// DefaultSerialDataFrame returns the default RS-232 data frame format.
+func DefaultSerialDataFrame() string {
+	return "8N2"
+}

@@ -5,21 +5,33 @@
 
 package e36xx
 
-import "fmt"
+import (
+	"fmt"
+
+	"github.com/gotmc/ivi/dcpwr"
+)
+
+// Make sure the IviDCPwrMeasurement capability group has been implemented.
+var _ dcpwr.Base = (*E36xx)(nil)
+var _ dcpwr.BaseChannel = (*Channel)(nil)
 
 // MeasureVoltage takes a measurement on the output signal and returns the
-// measured voltage.  MeasureVoltage implements the IviDCPwrMeasurement
-// function Measure for the Voltage MeasurementType parameter described in
-// Section 7.2.1 of IVI-4.4: IviDCPwr Class Specification.
+// measured voltage.
+//
+// MeasureVoltage implements the IviDCPwrMeasurement function Measure for the
+// Voltage MeasurementType parameter described in Section 7.2.1 of IVI-4.4:
+// IviDCPwr Class Specification.
 func (ch *Channel) MeasureVoltage() (float64, error) {
 	cmd := fmt.Sprintf("MEAS:CURR? %s", ch.Name())
 	return ch.QueryFloat64(cmd)
 }
 
 // MeasureCurrent takes a measurement on the output signal and returns the
-// measured current. MeasureCurrent implements the IviDCPwrMeasurement
-// function Measure for the Current MeasurementType parameter described in
-// Section 7.2.1 of IVI-4.4: IviDCPwr Class Specification.
+// measured current.
+//
+// MeasureCurrent implements the IviDCPwrMeasurement function Measure for the
+// Current MeasurementType parameter described in Section 7.2.1 of IVI-4.4:
+// IviDCPwr Class Specification.
 func (ch *Channel) MeasureCurrent() (float64, error) {
 	cmd := fmt.Sprintf("MEAS? %s", ch.Name())
 	return ch.QueryFloat64(cmd)

@@ -40,7 +40,7 @@ func New(inst ivi.Instrument, reset bool) (*PMX, error) {
 		baseChannel := dcpwr.NewChannel(i, ch, inst)
 		channels[i] = Channel{
 			Channel:              baseChannel,
-			currentLimitBehavior: dcpwr.Regulate,
+			currentLimitBehavior: dcpwr.CurrentRegulate,
 		}
 	}
 	inherentBase := ivi.InherentBase{
