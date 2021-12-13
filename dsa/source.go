@@ -11,11 +11,11 @@ type SourceShape string
 // These are the available source waveforms.
 const (
 	Sine          SourceShape = "SIN"  // Sinusoidal Waveform
-	Random                    = "RAND" // Random Noise
-	BurstRandom               = "BRAN" // Burst Random Noise
-	PeriodicChirp             = "PCH"  // Periodic Chirp
-	BurstChirp                = "BCH"  // Burst Chirp
-	Pink                      = "PINK" // Pink Noise
+	Random        SourceShape = "RAND" // Random Noise
+	BurstRandom   SourceShape = "BRAN" // Burst Random Noise
+	PeriodicChirp SourceShape = "PCH"  // Periodic Chirp
+	BurstChirp    SourceShape = "BCH"  // Burst Chirp
+	Pink          SourceShape = "PINK" // Pink Noise
 )
 
 func (shape SourceShape) String() string {

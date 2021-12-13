@@ -135,7 +135,7 @@ func (ch *Channel) OVPEnabled() (bool, error) {
 // SetOVPEnabled is the setter for the read-write IviFgenBase Attribute OVP
 // Enabled described in Section 4.2.4 of IVI-4.4: IviDCPwr Class Specification.
 func (ch *Channel) SetOVPEnabled(v bool) error {
-	if v == false {
+	if !v {
 		return ch.Set("VOLT:PROT MAX\n")
 	}
 	return nil
@@ -237,7 +237,7 @@ func (ch *Channel) ConfigureOutputRange(rt dcpwr.RangeType, rng float64) error {
 // ConfigureOVP implements the IviDCPwrBase Configure OVP function described in
 // Section 4.3.4 of IVI-4.4: IviDCPwr Class Specification.
 func (ch *Channel) ConfigureOVP(enabled bool, limit float64) error {
-	if enabled == false {
+	if !enabled {
 		return ch.Set("VOLT:PROT MAX\n")
 	}
 	return ch.Set("VOLT:PROT %f\n", limit)
