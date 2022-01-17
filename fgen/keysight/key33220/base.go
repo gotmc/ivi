@@ -14,6 +14,7 @@ import (
 
 // Make sure that the key33220 driver implements the IviFgenBase capability
 // group.
+var _ fgen.Base = (*Key33220)(nil)
 var _ fgen.BaseChannel = (*Channel)(nil)
 
 // OutputCount returns the number of available output channels. OutputCount is
