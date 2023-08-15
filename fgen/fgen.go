@@ -3,7 +3,8 @@
 // Use of this source code is governed by a MIT-style license that
 // can be found in the LICENSE.txt file for the project.
 
-/*Package fgen provides the Defined Values and other structs, methods, etc.
+/*
+Package fgen provides the Defined Values and other structs, methods, etc.
 that are common among all intstruments meeting the IVI-4.3: IviFgen Class
 Specification.
 

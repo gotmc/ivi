@@ -3,7 +3,8 @@
 // Use of this source code is governed by a MIT-style license that
 // can be found in the LICENSE.txt file for the project.
 
-/*Package dsa provides the Defined Values and other structs, methods, etc.
+/*
+Package dsa provides the Defined Values and other structs, methods, etc.
 that are common among all Dynamic Signal Analyzers (DSA). Note, DSAs are not
 included in one of the IVI specifications.
 */

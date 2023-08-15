@@ -3,7 +3,8 @@
 // Use of this source code is governed by a MIT-style license that
 // can be found in the LICENSE.txt file for the project.
 
-/*Package swtch provides the Defined Values and other structs, interfaces,
+/*
+Package swtch provides the Defined Values and other structs, interfaces,
 methods, etc. that are common among all instruments meeting the IVI-4.6:
 IviSwtch Class Specification.
 
