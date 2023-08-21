@@ -22,7 +22,7 @@ var _ dcpwr.MeasurementChannel = (*Channel)(nil)
 // Voltage MeasurementType parameter described in Section 7.2.1 of IVI-4.4:
 // IviDCPwr Class Specification.
 func (ch *Channel) MeasureVoltage() (float64, error) {
-	cmd := fmt.Sprintf("MEAS:CURR? %s", ch.Name())
+	cmd := fmt.Sprintf("MEAS:VOLT? %s", ch.Name())
 	return ch.QueryFloat64(cmd)
 }
 
@@ -33,6 +33,6 @@ func (ch *Channel) MeasureVoltage() (float64, error) {
 // Current MeasurementType parameter described in Section 7.2.1 of IVI-4.4:
 // IviDCPwr Class Specification.
 func (ch *Channel) MeasureCurrent() (float64, error) {
-	cmd := fmt.Sprintf("MEAS? %s", ch.Name())
+	cmd := fmt.Sprintf("MEAS:CURR? %s", ch.Name())
 	return ch.QueryFloat64(cmd)
 }
