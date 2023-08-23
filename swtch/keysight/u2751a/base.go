@@ -13,6 +13,16 @@ import (
 	"github.com/gotmc/ivi/swtch"
 )
 
+// Name returns the physical name of the channel.
+func (ch *Channel) Name() string {
+	return ch.name
+}
+
+// VirtualName returns the virtual name of the channel.
+func (ch *Channel) VirtualName() string {
+	return ch.name
+}
+
 // ACCurrentCarryMax returns the maximum AC current the channel can carry in
 // amperes RMS. ACCurrentCarryMax is the getter for the read-only IviSwtchBase
 // attribute Characteristics.ACCurrentCarryMax described in Section 4.2.1 of
@@ -135,8 +145,19 @@ func (ch *Channel) IsConfigChannel() bool {
 // connected to another channel. IsConfigChannel is the setter for the
 // read-write IviSwtchBase Attribute IsConfigurationChannel described in
 // Section 4.2.16 of IVI-4.6:IviSwtch Class Specification.
-func (ch *Channel) SetConfigChannel(b bool) {
+func (ch *Channel) SetConfigChannel(b bool) error {
 	ch.isConfigChannel = b
+	return nil
+}
+
+// EnableConfigChannel is a convenience function to SetConfigChannel to true.
+func (ch *Channel) EnableConfigChannel() error {
+	return ch.SetConfigChannel(true)
+}
+
+// DisableConfigChannel is a convenience function to SetConfigChannel to false.
+func (ch *Channel) DisableConfigChannel() error {
+	return ch.SetConfigChannel(false)
 }
 
 // IsDebounced indicates whether the switch module has settled from the
@@ -166,8 +187,19 @@ func (ch *Channel) IsSourceChannel() bool {
 // is the setter for the read-write IviSwtchBase Attribute
 // IsConfigurationChannel described in Section 4.2.18 of IVI-4.6:IviSwtch Class
 // Specification.
-func (ch *Channel) SetSourceChannel(b bool) {
+func (ch *Channel) SetSourceChannel(b bool) error {
 	ch.isSourceChannel = b
+	return nil
+}
+
+// EnableSourceChannel is a convenience function to SetSourceChannel to true.
+func (ch *Channel) EnableSourceChannel() error {
+	return ch.SetSourceChannel(true)
+}
+
+// DisableSourceChannel is a convenience function to SetSourceChannel to false.
+func (ch *Channel) DisableSourceChannel() error {
+	return ch.SetSourceChannel(false)
 }
 
 // SettlingTime returns the maximum total settling time for the channel before

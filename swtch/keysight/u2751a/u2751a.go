@@ -194,3 +194,21 @@ func newChannel(id int, name string, chType ChannelType, switchID int, inst ivi.
 		settlingTime:          4 * time.Millisecond,
 	}
 }
+
+// TODO(mdr): Instead of having a SetVirtualNames method, should the virtual
+// names be set at creation and not allowed to be changed?
+
+// SetVirtualNames sets the virtual name for the channels given as a map with
+// the physical name provided as the key. Each virtual name must be unique and
+// the number of virtual names provided must match the numder of channels
+// otherwise an error is returned.
+func (d *U2751A) SetVirtualNames(names map[string]string) error {
+	for physicalName, virtualName := range names {
+		for i, ch := range d.channels {
+			if physicalName == ch.name {
+				d.channels[i].virtualName = virtualName
+			}
+		}
+	}
+	return nil
+}

@@ -23,35 +23,36 @@ type Base interface {
 	GetPath(ch1, ch2 string) ([]string, error)
 	SetPath(chs []string) error
 	WaitForDebounce(maxTime time.Duration) error
+	SetVirtualNames(names []string) error
 }
 
-// BaseChannel prives the interface for the channel repeated capability for the
-// IviSwtchBase capability group.
+// BaseChannel provides the interface for the channel repeated capability for
+// the IviSwtchBase capability group.
 type BaseChannel interface {
-	Name() string
-	VirtualName() string
 	ACCurrentCarryMax() float64
 	ACCurrentSwitchingMax() float64
 	ACPowerCarryMax() float64
 	ACPowerSwitchingMax() float64
 	ACVoltageMax() float64
 	Bandwidth() float64
-	Impedance() float64
 	DCCurrentCarryMax() float64
 	DCCurrentSwitchingMax() float64
 	DCPowerCarryMax() float64
 	DCPowerSwitchingMax() float64
 	DCVoltageMax() float64
-	IsConfigChannel() bool
-	SetConfigChannel(b bool) error
-	EnableConfigChannel() error
 	DisableConfigChannel() error
+	DisableSourceChannel() error
+	EnableConfigChannel() error
+	EnableSourceChannel() error
+	Impedance() float64
+	IsConfigChannel() bool
 	IsDebounced() bool
 	IsSourceChannel() bool
+	Name() string
+	SetConfigChannel(b bool) error
 	SetSourceChannel(b bool) error
-	EnableSourceChannel() error
-	DisableSourceChannel() error
 	SettlingTime() time.Duration
+	VirtualName() string
 	WireMode() int
 }
 
