@@ -7,9 +7,8 @@ package e36xx
 
 import (
 	"fmt"
-	"strconv"
-	"strings"
 
+	"github.com/gotmc/convert"
 	"github.com/gotmc/ivi/dcpwr"
 )
 
@@ -31,6 +30,9 @@ func (ch *Channel) queryLimit(query voltageCurrent) (float64, error) {
 	if err != nil {
 		return 0.0, err
 	}
-	ret := strings.Split(s, ",")
-	return strconv.ParseFloat(ret[query], 64)
+	floats, err := convert.StringToNFloats(s, ",", 2)
+	if err != nil {
+		return 0.0, err
+	}
+	return floats[query], nil
 }

@@ -69,6 +69,7 @@ Prior to submitting a [pull request][], please run:
 
 ```bash
 $ make check
+$ make lint
 ```
 
 To update and view the test coverage report:
