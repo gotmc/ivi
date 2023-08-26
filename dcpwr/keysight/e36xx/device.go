@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022 The ivi developers. All rights reserved.
+// Copyright (c) 2017-2023 The ivi developers. All rights reserved.
 // Project site: https://github.com/gotmc/ivi
 // Use of this source code is governed by a MIT-style license that
 // can be found in the LICENSE.txt file for the project.
@@ -16,9 +16,12 @@ import (
 	"github.com/gotmc/ivi/dcpwr"
 )
 
-// E36xx provides the IVI driver for the Agilent/Keysight E3600 series
-// of power supplies.
-type E36xx struct {
+// Confirm that the device driver implements the IviDCPwrBase interface.
+var _ dcpwr.Base = (*Device)(nil)
+
+// Device provides the IVI driver for the Agilent/Keysight E3600 series of DC
+// power supplies.
+type Device struct {
 	inst     ivi.Instrument
 	Channels []Channel
 	ivi.Inherent
@@ -29,9 +32,7 @@ type E36xx struct {
 // New function will query the instrument to determine the model and ensure it
 // is one of the supported models. If reset is true, then the instrument is
 // reset.
-func New(inst ivi.Instrument, reset bool) (*E36xx, error) {
-	// FIXME(mdr): Need to query the instrument to determine the model and then
-	// set any model specific attributes, such as quantity and names of channels.
+func New(inst ivi.Instrument, reset bool) (*Device, error) {
 	channelNames := []string{
 		"P6V",
 		"P25V",
@@ -39,9 +40,12 @@ func New(inst ivi.Instrument, reset bool) (*E36xx, error) {
 	}
 	outputCount := len(channelNames)
 	channels := make([]Channel, outputCount)
-	for i, ch := range channelNames {
-		baseChannel := dcpwr.NewChannel(i, ch, inst)
-		channels[i] = Channel{baseChannel}
+	for i, channelName := range channelNames {
+		ch := Channel{
+			name: channelName,
+			inst: inst,
+		}
+		channels[i] = ch
 	}
 	inherentBase := ivi.InherentBase{
 		ClassSpecMajorVersion: 4,
@@ -56,16 +60,16 @@ func New(inst ivi.Instrument, reset bool) (*E36xx, error) {
 		},
 	}
 	inherent := ivi.NewInherent(inst, inherentBase)
-	driver := E36xx{
+	device := Device{
 		inst:     inst,
 		Channels: channels,
 		Inherent: inherent,
 	}
 	if reset {
-		err := driver.Reset()
-		return &driver, err
+		err := device.Reset()
+		return &device, err
 	}
-	return &driver, nil
+	return &device, nil
 }
 
 // AvailableCOMPorts lists the avaialble COM ports, including optional ports.
@@ -106,4 +110,13 @@ func SerialDataFrames() []string {
 // DefaultSerialDataFrame returns the default RS-232 data frame format.
 func DefaultSerialDataFrame() string {
 	return "8N2"
+}
+
+// ChannelCount returns the number of available output channels.
+//
+// ChannelCount is the getter for the read-only IviDCPwrBase Attribute Output
+// Channel Count described in Section 4.2.7 of IVI-4.4: IviDCPwr Class
+// Specification.
+func (d Device) ChannelCount() int {
+	return len(d.Channels)
 }

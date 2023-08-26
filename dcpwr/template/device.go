@@ -4,42 +4,45 @@
 // can be found in the LICENSE.txt file for the project.
 
 /*
-Package dp800 implements the IVI driver for the Rigol DP800 series
-of programmable linear DC power supplies.
+Package template provides a template to create additional IVI drivers for DC
+power supplies.
 
 State Caching: Not implemented
 */
-package dp800
+package template
 
 import (
 	"github.com/gotmc/ivi"
 	"github.com/gotmc/ivi/dcpwr"
 )
 
-// DP800 provides the IVI driver for the Rigol DP800 series
-// of power supplies.
-type DP800 struct {
+// Confirm that the device driver implements the IviDCPwrBase interface.
+var _ dcpwr.Base = (*Device)(nil)
+
+// Device provides the IVI driver for the Rigol DP800 series of DC power
+// supplies.
+type Device struct {
 	inst     ivi.Instrument
 	Channels []Channel
 	ivi.Inherent
 }
 
-// New creates a new Rigol DP800 IVI Instrument driver. The New function will
+// New creates a new DC Power Supply IVI Instrument driver. The New function will
 // query the instrument to determine the model and ensure it is one of the
 // supported models. If reset is true, then the instrument is reset.
-func New(inst ivi.Instrument, reset bool) (*DP800, error) {
-	// FIXME(mdr): Need to query the instrument to determine the model and then
-	// set any model specific attributes, such as quantity and names of channels.
+func New(inst ivi.Instrument, reset bool) (*Device, error) {
 	channelNames := []string{
-		"P6V",
-		"P25V",
-		"N25V",
+		"CH1",
+		"CH2",
 	}
 	outputCount := len(channelNames)
 	channels := make([]Channel, outputCount)
-	for i, ch := range channelNames {
-		baseChannel := dcpwr.NewChannel(i, ch, inst)
-		channels[i] = Channel{baseChannel}
+	for i, channelName := range channelNames {
+		ch := Channel{
+			name: channelName,
+			inst: inst,
+		}
+		channels[i] = ch
 	}
 	inherentBase := ivi.InherentBase{
 		ClassSpecMajorVersion: 4,
@@ -48,13 +51,14 @@ func New(inst ivi.Instrument, reset bool) (*DP800, error) {
 		GroupCapabilities: []string{
 			"IviDCPwrBase",
 			"IviDCPwrMeasurement",
+			"IviDCPwrTrigger",
 		},
 		SupportedInstrumentModels: []string{
-			"E3631A",
+			"TBD",
 		},
 	}
 	inherent := ivi.NewInherent(inst, inherentBase)
-	driver := DP800{
+	driver := Device{
 		inst:     inst,
 		Channels: channels,
 		Inherent: inherent,
@@ -68,7 +72,7 @@ func New(inst ivi.Instrument, reset bool) (*DP800, error) {
 
 // AvailableCOMPorts lists the avaialble COM ports, including optional ports.
 func AvailableCOMPorts() []string {
-	return []string{"GPIB", "RS232"}
+	return []string{"GPIB", "RS232", "Ethernet", "USB"}
 }
 
 // DefaultGPIBAddress lists the default GPIB interface address.
@@ -104,4 +108,13 @@ func SerialDataFrames() []string {
 // DefaultSerialDataFrame returns the default RS-232 data frame format.
 func DefaultSerialDataFrame() string {
 	return "8N2"
+}
+
+// ChannelCount returns the number of available output channels.
+//
+// ChannelCount is the getter for the read-only IviDCPwrBase Attribute Output
+// Channel Count described in Section 4.2.7 of IVI-4.4: IviDCPwr Class
+// Specification.
+func (dev *Device) ChannelCount() int {
+	return len(dev.Channels)
 }

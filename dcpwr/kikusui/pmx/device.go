@@ -16,9 +16,12 @@ import (
 	"github.com/gotmc/ivi/dcpwr"
 )
 
-// PMX provides the IVI driver for the Agilent/Keysight E3600 series of power
+// Confirm that the device driver implements the IviDCPwrBase interface.
+var _ dcpwr.Base = (*Device)(nil)
+
+// Device provides the IVI driver for the Kikusui PMX series of DC power
 // supplies.
-type PMX struct {
+type Device struct {
 	inst     ivi.Instrument
 	Channels []Channel
 	ivi.Inherent
@@ -28,20 +31,18 @@ type PMX struct {
 // model is supported, but in the future as other models are added, the New
 // function will query the instrument to determine the model and ensure it is
 // one of the supported models. If reset is true, then the instrument is reset.
-func New(inst ivi.Instrument, reset bool) (*PMX, error) {
-	// FIXME(mdr): Need to query the instrument to determine the model and then
-	// set any model specific attributes, such as quantity and names of channels.
+func New(inst ivi.Instrument, reset bool) (*Device, error) {
 	channelNames := []string{
 		"DCOutput",
 	}
 	outputCount := len(channelNames)
 	channels := make([]Channel, outputCount)
-	for i, ch := range channelNames {
-		baseChannel := dcpwr.NewChannel(i, ch, inst)
-		channels[i] = Channel{
-			Channel:              baseChannel,
-			currentLimitBehavior: dcpwr.CurrentRegulate,
+	for i, channelName := range channelNames {
+		ch := Channel{
+			name: channelName,
+			inst: inst,
 		}
+		channels[i] = ch
 	}
 	inherentBase := ivi.InherentBase{
 		ClassSpecMajorVersion: 4,
@@ -65,7 +66,7 @@ func New(inst ivi.Instrument, reset bool) (*PMX, error) {
 		},
 	}
 	inherent := ivi.NewInherent(inst, inherentBase)
-	driver := PMX{
+	driver := Device{
 		inst:     inst,
 		Channels: channels,
 		Inherent: inherent,
@@ -75,4 +76,13 @@ func New(inst ivi.Instrument, reset bool) (*PMX, error) {
 		return &driver, err
 	}
 	return &driver, nil
+}
+
+// ChannelCount returns the number of available output channels.
+//
+// ChannelCount is the getter for the read-only IviDCPwrBase Attribute Output
+// Channel Count described in Section 4.2.7 of IVI-4.4: IviDCPwr Class
+// Specification.
+func (dev *Device) ChannelCount() int {
+	return len(dev.Channels)
 }

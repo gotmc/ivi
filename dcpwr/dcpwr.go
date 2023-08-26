@@ -11,3 +11,29 @@ Specification.
 Files are split based on the class capability groups.
 */
 package dcpwr
+
+import "errors"
+
+// Base provides the interface required for the IviDCPwrBase capability group.
+type Base interface {
+	ChannelCount() int
+}
+
+// Error codes related to the IviDCPwr Class Specification.
+var (
+	ErrNotImplemented     error = errors.New("not implemented in ivi driver")
+	ErrOVPUnsupported     error = errors.New("ovp not supported")
+	ErrTriggerNotSoftware error = errors.New("trigger source is not set to software trigger.")
+)
+
+// CommType defines the available types of communication for a DC power supply.
+type CommType int
+
+// Available communiction interfaces for remote communction of a DC power
+// supply.
+const (
+	GPIB CommType = iota
+	RS232
+	USB
+	LAN
+)

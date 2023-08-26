@@ -5,56 +5,91 @@
 
 package dcpwr
 
-import (
-	"github.com/gotmc/ivi"
-	"github.com/gotmc/query"
+// BaseChannel provides the interface for the channel repeated capability for
+// the IviDCPwrBase capability group.
+type BaseChannel interface {
+	CurrentLimit() (float64, error)
+	SetCurrentLimit(limit float64) error
+	CurrentLimitBehavior() (CurrentLimitBehavior, error)
+	SetCurrentLimitBehavior(behavior CurrentLimitBehavior) error
+	OutputEnabled() (bool, error)
+	SetOutputEnabled(b bool) error
+	DisableOutput() error
+	EnableOutput() error
+	OVPEnabled() (bool, error)
+	SetOVPEnabled(b bool) error
+	DisableOVP() error
+	EnableOVP() error
+	VoltageLevel() (float64, error)
+	SetVoltageLevel(level float64) error
+	ConfigureCurrentLimit(behavior CurrentLimitBehavior, limit float64) error
+	ConfigureOutputRange(rt RangeType, rng float64) error
+	ConfigureOVP(b bool, limit float64) error
+	QueryCurrentLimitMax(voltage float64) (float64, error)
+	QueryVoltageLevelMax(currentLimit float64) (float64, error)
+	QueryOutputState(os OutputState) (bool, error)
+	ResetOutputProtection() error
+}
+
+// MeasurementChannel provides the interface for the channel repeated
+// capability for the IviDCPwrMeasurement capability group.
+type MeasurementChannel interface {
+	MeasureVoltage() (float64, error)
+	MeasureCurrent() (float64, error)
+}
+
+// CurrentLimitBehavior provides the defined values for the Current Limit
+// Behavior defined in Section 4.2.2 of IVI-4.4: IviDCPwr Class Specification.
+type CurrentLimitBehavior int
+
+// CurrentTrip and CurrentRegulate are the available Current Limit Behaviors.
+// In CurrentTrip behavior, the power supply disables the output when the
+// output current is equal to or greater than the value of the Current Limit
+// attribute. In CurrentRegulate behavior, the power supply restricts the
+// output voltage such that the output current is not greater than the value of
+// the Current Limit attribute.
+const (
+	CurrentTrip CurrentLimitBehavior = iota
+	CurrentRegulate
 )
 
-// Channel represents the repeated capability of an output channel for a DC
-// power supply.
-type Channel struct {
-	id   int
-	name string
-	inst ivi.Instrument
-}
+// RangeType provides the defined values for the Output Range Type defined in
+// Section 4.3.3 of IVI-4.4: IviDCPwr Class Specification.
+type RangeType int
 
-// NewChannel returns a Channel for a DC power supply.
-func NewChannel(id int, name string, inst ivi.Instrument) Channel {
-	return Channel{id, name, inst}
-}
+// Available range types. In VoltageRange, the voltage range is set by the
+// Range parameter. In CurrentRange, the current range is set by the Range
+// parameter. The actual values of the range types are the same as those shown
+// in Section 10 IviDCPwr Function Parameter Value Definitions of IVI-4.4:
+// IviDCPwr Class Specification.
+const (
+	CurrentRange RangeType = iota
+	VoltageRange
+)
 
-// Name returns the name of the output channel. Name is the getter for the
-// read-only IviDCPwrBase Attribute Output Channel Name described in Section
-// 4.2.9 of IVI-4.4: IviDCPwr Class Specification.
-func (ch *Channel) Name() string {
-	// TODO(mdr): Should I get rid of the Name getter and instead use the more Go
-	// idiomatic Stringer interface?
-	return ch.name
-}
+// OutputState provides the defined values for the state of the output defined
+// in Section 4.3.9 of IVI-4.4: IviDCPwr Class Specification.
+type OutputState int
 
-// String implements the stringer interface for channel.
-func (ch *Channel) String() string {
-	return ch.name
-}
+// Available output states that can be queried. The actual values of the output
+// states are the same as those shown in Section 10 IviDCPwr Function Parameter
+// Value Definitions of IVI-4.4: IviDCPwr Class Specification.
+const (
+	ConstantVoltage OutputState = iota
+	ConstantCurrent
+	OverVoltage
+	OverCurrent
+	Unregulated
+)
 
-// Set takes the same inputs as fmt.Sprintf() and writes the resultant command
-// to the IVI device.
-func (ch *Channel) Set(format string, a ...interface{}) error {
-	return ivi.Set(ch.inst, format, a...)
-}
+// MeasurementType provides the defined values for the type of measurement
+// defined in Section 7.2.1 of IVI-4.4: IviDCPwr Class Specification.
+type MeasurementType int
 
-// QueryBool queries the channel and returns a bool.
-func (ch *Channel) QueryBool(cmd string) (bool, error) {
-	return query.Bool(ch.inst, cmd)
-}
-
-// QueryFloat64 queries the channel and returns a float64.
-func (ch *Channel) QueryFloat64(cmd string) (float64, error) {
-	return query.Float64(ch.inst, cmd)
-}
-
-// QueryString queries the channel and returns a string.
-// FIXME(mdr): Change to take a format string and ...interface{}
-func (ch *Channel) QueryString(cmd string) (string, error) {
-	return query.String(ch.inst, cmd)
-}
+// Available output states that can be queried. The actual values of the output
+// states are the same as those shown in Section 10 IviDCPwr Function Parameter
+// Value Definitions of IVI-4.4: IviDCPwr Class Specification.
+const (
+	CurrentMeasurement MeasurementType = iota
+	VoltageMeasurement
+)
