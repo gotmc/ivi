@@ -9,20 +9,26 @@ standard.
 
 ## Overview
 
-The [IVI Specifications][ivi-specs] developed by the IVI Foundation
-provide standardized APIs for programming test instruments. This package
-is a partial, Go-based implementation of the IVI Specifications, which
-are specified for C, COM, and .NET.
+The [IVI Specifications][ivi-specs] developed by the [IVI
+Foundation][ivi-foundation] provide standardized APIs for programming test
+instruments. This package is a partial, Go-based implementation of the IVI
+Specifications, which are specified for C, COM, and .NET.
 
 The main advantage of the [ivi][] package is not having to learn the [SCPI][]
-commands for each individual piece of test equipment. For instance, both the
-Agilent 33220A and the Stanford Research Systems DS345 function generators can
-be programmed using one standard API. The only requirement for this is having
-an IVI driver for the desired test equipment.
+commands for each individual piece of test equipment. For instance, by using the
+[ivi][] package both the Agilent 33220A and the Stanford Research Systems DS345
+function generators can be programmed using one standard API. The only
+requirement for this is having an IVI driver for the desired test equipment.
 
-Currently, [ivi][] doesn't cache state. Every time an attribute is read
-directly from the instrument. Development focus is currently on fleshing out
-the APIs and creating a few IVI drivers for each instrument type.
+If an [ivi][] driver doesn't exist for a peice of test equipment that you want
+to use, please open an issue and/or submit a pull request. The [IVI
+Specifications][] don't provide APIs for every type of test equipment (e.g.,
+they don't specify an API for electronic loads) in which case a set of APIs will
+be developed as needed for new types of test equipment.
+
+Development focus is currently on solidifying the APIs and creating a few IVI
+drivers for each instrument type.
+
 
 ## Installation
 
@@ -36,11 +42,11 @@ The [ivi][] package requires receiving an Instrument interface. The following
 gotmc packages meet the Instrument interface:
 
 - [visa][] — Calls [lxi][] or [usbtmc][] as needed, so that you can identify
-  instruments using a VISA resource address string.
+    instruments using a VISA resource address string.
 - [lxi][] — Used to control LXI enabled instruments via Ethernet.
 - [usbtmc][] — Used to control USBTMC compliant instruments via USB.
 - [prologix][] —  Used to communicate with instruments using a Prologix GPIB
-- controller.
+    controller.
 
 ## Examples
 
@@ -84,7 +90,8 @@ $ make cover
 [LICENSE.txt][] file for more information.
 
 [ivi]: https://github.com/gotmc/ivi
-[ivi-specs]: http://www.ivifoundation.org/
+[ivi-foundation]: http://www.ivifoundation.org/
+[ivi-specs]: http://www.ivifoundation.org/specifications/
 [godoc badge]: https://godoc.org/github.com/gotmc/ivi?status.svg
 [godoc link]: https://godoc.org/github.com/gotmc/ivi
 [LICENSE.txt]: https://github.com/gotmc/ivi/blob/master/LICENSE.txt
