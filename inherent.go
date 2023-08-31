@@ -7,6 +7,7 @@ package ivi
 
 import (
 	"errors"
+	"fmt"
 	"strings"
 )
 
@@ -50,7 +51,7 @@ func NewInherent(inst Instrument, base InherentBase) Inherent {
 // attribute Instrument Firmware Revision described in Section 5.18 of IVI-3.2:
 // Inherent Capabilities Specification.
 func (inherent *Inherent) FirmwareRevision() (string, error) {
-	return inherent.parseIdentification(fwrID)
+	return inherent.queryIdentification(fwrID)
 }
 
 // InstrumentManufacturer queries the instrument and returns the manufacturer
@@ -58,7 +59,7 @@ func (inherent *Inherent) FirmwareRevision() (string, error) {
 // inherent attribute Instrument Manufacturer described in Section 5.19 of
 // IVI-3.2: Inherent Capabilities Specification.
 func (inherent *Inherent) InstrumentManufacturer() (string, error) {
-	return inherent.parseIdentification(mfrID)
+	return inherent.queryIdentification(mfrID)
 }
 
 // InstrumentModel queries the instrument and returns the model of the
@@ -66,13 +67,13 @@ func (inherent *Inherent) InstrumentManufacturer() (string, error) {
 // attribute Instrument Model described in Section 5.20 of IVI-3.2: Inherent
 // Capabilities Specification.
 func (inherent *Inherent) InstrumentModel() (string, error) {
-	return inherent.parseIdentification(modelID)
+	return inherent.queryIdentification(modelID)
 }
 
 // InstrumentSerialNumber queries the instrument and returns the S/N of the
 // instrument.
 func (inherent *Inherent) InstrumentSerialNumber() (string, error) {
-	return inherent.parseIdentification(snID)
+	return inherent.queryIdentification(snID)
 }
 
 // Reset resets the instrument.
@@ -95,11 +96,18 @@ func (inherent *Inherent) Disable() error {
 	return errors.New("disable not implemented")
 }
 
-func (inherent *Inherent) parseIdentification(part idPart) (string, error) {
+func (inherent *Inherent) queryIdentification(part idPart) (string, error) {
 	s, err := inherent.inst.Query("*IDN?\n")
 	if err != nil {
 		return "", err
 	}
-	parts := strings.Split(s, ",")
+	return parseIdentification(s, part)
+}
+
+func parseIdentification(idn string, part idPart) (string, error) {
+	parts := strings.Split(idn, ",")
+	if len(parts) != 4 {
+		return "", fmt.Errorf("idn string (`%s`) could not be split in four", idn)
+	}
 	return parts[part], nil
 }
