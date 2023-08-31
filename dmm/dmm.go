@@ -5,6 +5,25 @@
 
 package dmm
 
+// Base provides the interface required for the IviDMMBase capability group.
+type Base interface {
+	MeaurementFunction() (MeasurementFunction, error)
+	SetMeasurementFunction(MeasurementFunction) error
+	Range() (float64, error)
+	SetRange(float64) error
+	AutoRange() (AutoRange, error)
+	SetAutoRange(AutoRange) error
+	ResolutionAbsolute() (float64, error)
+	SetResolutionAbsoluate(float64) error
+	TriggerDelay() (float64, error)
+	SetTriggerDelay(float64) error
+}
+
+// ACMeasurement provides the interface required for the IviDMMACMeasurement
+// capability group.
+type ACMeasurement interface {
+}
+
 // MeasurementFunction provides the defined values for the Measurement Function defined in
 // Section 4.2.1 of IVI-4.2: IviDmm Class Specification.
 type MeasurementFunction int
@@ -41,3 +60,14 @@ var measurementFunctions = map[MeasurementFunction]string{
 func (f MeasurementFunction) String() string {
 	return measurementFunctions[f]
 }
+
+// AutoRange provides the defined values for the AutoRange function defined in
+// Section 4.2.3 of IVI-4.2: IviDmm Class Specification.
+type AutoRange int
+
+// The AutoRange defined values are the available auto range settings.
+const (
+	AutoOn AutoRange = iota
+	AutoOff
+	AutoOnce
+)
