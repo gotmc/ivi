@@ -49,6 +49,16 @@ const (
 	BurstMode
 )
 
+func (om OperationMode) String() string {
+	switch om {
+	case ContinuousMode:
+		return "continuous mode"
+	case BurstMode:
+		return "burst mode"
+	}
+	return ""
+}
+
 // OutputMode determines how the function generator produces waveforms. This
 // attribute determines which extension group's functions and attributes are
 // used to configure the waveform the function generator produces. OutputMode

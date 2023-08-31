@@ -30,3 +30,15 @@ const (
 	ExternalTrigger
 	SoftwareTrigger
 )
+
+func (ts TriggerSource) String() string {
+	switch ts {
+	case InternalTrigger:
+		return "internal trigger"
+	case ExternalTrigger:
+		return "external trigger"
+	case SoftwareTrigger:
+		return "software trigger"
+	}
+	return ""
+}
