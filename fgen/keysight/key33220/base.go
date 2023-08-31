@@ -8,6 +8,7 @@ package key33220
 import (
 	"errors"
 	"fmt"
+	"strings"
 
 	"github.com/gotmc/ivi/fgen"
 )
@@ -30,17 +31,19 @@ func (a *Key33220) OutputCount() int {
 // Section 4.2.2 of IVI-4.3: IviFgen Class Specification.
 func (ch *Channel) OperationMode() (fgen.OperationMode, error) {
 	var mode fgen.OperationMode
+	// TODO(mdr): Should I replace the `ch.QueryString(cmd)` with
+	// `query.String(ch.ivi, cmd)`?
 	s, err := ch.QueryString("BURS:STAT?\n")
 	if err != nil {
 		return mode, fmt.Errorf("error getting operation mode: %s", err)
 	}
-	switch s {
-	case "OFF":
+	switch strings.TrimSpace(s) {
+	case "0":
 		return fgen.ContinuousMode, nil
-	case "ON":
+	case "1":
 		return fgen.BurstMode, nil
 	default:
-		return mode, fmt.Errorf("error determining operation mode from fgen: %s", s)
+		return mode, fmt.Errorf("error determining operation mode; received: %s", s)
 	}
 }
 
