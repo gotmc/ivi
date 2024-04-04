@@ -17,5 +17,5 @@ lint:
 
 cover:
 	@echo 'Test coverage in html'
-	go test -coverprofile=coverage.out
+	go test ./... -coverprofile=coverage.out
 	go tool cover -html=coverage.out
