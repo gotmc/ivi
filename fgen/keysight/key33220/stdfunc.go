@@ -119,7 +119,10 @@ func (ch *Channel) StandardWaveform() (fgen.StandardWaveform, error) {
 	case "RAMP":
 		symm, err := ch.QueryFloat64("FUNC:RAMP:SYMM?\n")
 		if err != nil {
-			return wave, fmt.Errorf("unable to get symmetry to determine standard waveform: %s", err)
+			return wave, fmt.Errorf(
+				"unable to get symmetry to determine standard waveform: %s",
+				err,
+			)
 		}
 		switch symm {
 		case 0.0:

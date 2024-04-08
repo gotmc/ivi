@@ -167,7 +167,14 @@ func (d *U2751A) Channels() ([]Channel, error) {
 	return d.channels, nil
 }
 
-func newChannel(id int, name string, chType ChannelType, switchID int, inst ivi.Instrument, standalone bool) Channel {
+func newChannel(
+	id int,
+	name string,
+	chType ChannelType,
+	switchID int,
+	inst ivi.Instrument,
+	standalone bool,
+) Channel {
 	dcVoltageMax := 42.0
 	acVoltageMax := 35.0
 	if !standalone {

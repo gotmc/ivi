@@ -78,7 +78,7 @@ func (inherent *Inherent) InstrumentSerialNumber() (string, error) {
 
 // Reset resets the instrument.
 func (inherent *Inherent) Reset() error {
-	_, err := inherent.inst.WriteString("*RST\n")
+	_, err := inherent.inst.WriteString("*rst\n")
 	return err
 }
 
@@ -97,7 +97,7 @@ func (inherent *Inherent) Disable() error {
 }
 
 func (inherent *Inherent) queryIdentification(part idPart) (string, error) {
-	s, err := inherent.inst.Query("*IDN?\n")
+	s, err := inherent.inst.Query("*idn?\n")
 	if err != nil {
 		return "", err
 	}

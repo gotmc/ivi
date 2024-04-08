@@ -21,9 +21,9 @@ type Base interface {
 
 // Error codes related to the IviDCPwr Class Specification.
 var (
-	ErrNotImplemented     error = errors.New("not implemented in ivi driver")
-	ErrOVPUnsupported     error = errors.New("ovp not supported")
-	ErrTriggerNotSoftware error = errors.New("trigger source is not set to software trigger.")
+	ErrNotImplemented     = errors.New("not implemented in ivi driver")
+	ErrOVPUnsupported     = errors.New("ovp not supported")
+	ErrTriggerNotSoftware = errors.New("trigger source is not set to software trigger")
 )
 
 // CommType defines the available types of communication for a DC power supply.
