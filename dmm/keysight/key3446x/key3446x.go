@@ -16,6 +16,12 @@ import (
 	"github.com/gotmc/query"
 )
 
+const (
+	specMajorVersion = 4
+	specMinorVersion = 2
+	specRevision     = "4.1"
+)
+
 // Ag3446x provides the IVI Instrument driver for the Keysight 3446x family of
 // DMM.
 type Ag3446x struct {
@@ -27,9 +33,9 @@ type Ag3446x struct {
 // New creates a new Agilent3446x IVI Instrument.
 func New(inst ivi.Instrument, reset bool) (*Ag3446x, error) {
 	inherentBase := ivi.InherentBase{
-		ClassSpecMajorVersion: 4,
-		ClassSpecMinorVersion: 2,
-		ClassSpecRevision:     "4.1",
+		ClassSpecMajorVersion: specMajorVersion,
+		ClassSpecMinorVersion: specMinorVersion,
+		ClassSpecRevision:     specRevision,
 		GroupCapabilities: []string{
 			"DmmBase",
 			"DmmACMeasurement",

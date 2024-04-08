@@ -15,6 +15,12 @@ import (
 	"github.com/gotmc/query"
 )
 
+const (
+	specMajorVersion = 4
+	specMinorVersion = 2
+	specRevision     = "4.1"
+)
+
 // DMM provides the IVI driver for the Fluke 45 DMM.
 type DMM struct {
 	inst ivi.Instrument
@@ -24,9 +30,9 @@ type DMM struct {
 // New creates a new Agilent3446x IVI Instrument.
 func New(inst ivi.Instrument, reset bool) (*DMM, error) {
 	inherentBase := ivi.InherentBase{
-		ClassSpecMajorVersion: 4,
-		ClassSpecMinorVersion: 2,
-		ClassSpecRevision:     "4.1",
+		ClassSpecMajorVersion: specMajorVersion,
+		ClassSpecMinorVersion: specMinorVersion,
+		ClassSpecRevision:     specRevision,
 		GroupCapabilities: []string{
 			"DmmBase",
 			"DmmACMeasurement",

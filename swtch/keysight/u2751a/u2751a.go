@@ -18,6 +18,12 @@ import (
 	"github.com/gotmc/ivi"
 )
 
+const (
+	specMajorVersion = 4
+	specMinorVersion = 6
+	specRevision     = "4.0"
+)
+
 // ChannelType is used to determine if the channel is a row or a column.
 type ChannelType int
 
@@ -72,9 +78,9 @@ func New(inst ivi.Instrument, reset, standalone bool) (U2751A, error) {
 		channels[i] = newChannel(i, ch.name, ch.chType, ch.switchID, inst, standalone)
 	}
 	inherentBase := ivi.InherentBase{
-		ClassSpecMajorVersion: 4,
-		ClassSpecMinorVersion: 6,
-		ClassSpecRevision:     "4.0",
+		ClassSpecMajorVersion: specMajorVersion,
+		ClassSpecMinorVersion: specMinorVersion,
+		ClassSpecRevision:     specRevision,
 		GroupCapabilities: []string{
 			"IviSwtchBase",
 			"IviSwtchScanner",

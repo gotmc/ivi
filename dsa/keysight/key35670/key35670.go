@@ -15,6 +15,12 @@ Package key35670 implements the IVI Instrument driver for the Keysight 35670
 Dynamic Signal Analyzer (DSA).
 */
 
+const (
+	specMajorVersion = 0
+	specMinorVersion = 0
+	specRevision     = "N/A"
+)
+
 // Key35670 provides the IVI driver for a Keysight 35670A Dynamic Signal
 // Analyzer.
 type Key35670 struct {
@@ -38,9 +44,9 @@ func New(inst ivi.Instrument, reset bool) (*Key35670, error) {
 		channels[i] = Channel{baseChannel}
 	}
 	inherentBase := ivi.InherentBase{
-		ClassSpecMajorVersion: 100,
-		ClassSpecMinorVersion: 0,
-		ClassSpecRevision:     "1.0",
+		ClassSpecMajorVersion: specMajorVersion,
+		ClassSpecMinorVersion: specMinorVersion,
+		ClassSpecRevision:     specRevision,
 		GroupCapabilities: []string{
 			"IviDSABase",
 		},

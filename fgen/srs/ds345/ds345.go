@@ -16,6 +16,12 @@ import (
 	"github.com/gotmc/ivi/fgen"
 )
 
+const (
+	specMajorVersion = 4
+	specMinorVersion = 3
+	specRevision     = "5.2"
+)
+
 // DS345 provides the IVI driver for a SRS DS345 function generator.
 type DS345 struct {
 	inst     ivi.Instrument
@@ -35,9 +41,9 @@ func New(inst ivi.Instrument, reset bool) (*DS345, error) {
 		channels[i] = Channel{baseChannel}
 	}
 	inherentBase := ivi.InherentBase{
-		ClassSpecMajorVersion: 4,
-		ClassSpecMinorVersion: 3,
-		ClassSpecRevision:     "5.2",
+		ClassSpecMajorVersion: specMajorVersion,
+		ClassSpecMinorVersion: specMinorVersion,
+		ClassSpecRevision:     specRevision,
 		GroupCapabilities: []string{
 			"IviFgenBase",
 			"IviFgenStdfunc",

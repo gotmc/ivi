@@ -19,6 +19,12 @@ import (
 // Confirm that the device driver implements the IviDCPwrBase interface.
 var _ dcpwr.Base = (*Device)(nil)
 
+const (
+	specMajorVersion = 4
+	specMinorVersion = 4
+	specRevision     = "3.0"
+)
+
 // Device provides the IVI driver for the Rigol DP800 series of DC power
 // supplies.
 type Device struct {
@@ -45,9 +51,9 @@ func New(inst ivi.Instrument, reset bool) (*Device, error) {
 		channels[i] = ch
 	}
 	inherentBase := ivi.InherentBase{
-		ClassSpecMajorVersion: 4,
-		ClassSpecMinorVersion: 4,
-		ClassSpecRevision:     "3.0",
+		ClassSpecMajorVersion: specMajorVersion,
+		ClassSpecMinorVersion: specMinorVersion,
+		ClassSpecRevision:     specRevision,
 		GroupCapabilities: []string{
 			"IviDCPwrBase",
 			"IviDCPwrMeasurement",

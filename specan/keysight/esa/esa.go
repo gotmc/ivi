@@ -13,6 +13,12 @@ package esa
 
 import "github.com/gotmc/ivi"
 
+const (
+	specMajorVersion = 4
+	specMinorVersion = 8
+	specRevision     = "2.0"
+)
+
 // E4411B provides the IVI driver for an Agilent E4411B ESA spectrum
 // analyzer.
 type E4411B struct {
@@ -23,9 +29,9 @@ type E4411B struct {
 // New creates a new E4411B IVI Instrument.
 func New(inst ivi.Instrument, reset bool) (*E4411B, error) {
 	inherentBase := ivi.InherentBase{
-		ClassSpecMajorVersion: 4,
-		ClassSpecMinorVersion: 8,
-		ClassSpecRevision:     "2.0",
+		ClassSpecMajorVersion: specMajorVersion,
+		ClassSpecMinorVersion: specMinorVersion,
+		ClassSpecRevision:     specRevision,
 		GroupCapabilities: []string{
 			"IviSpecAnBase",
 		},

@@ -16,6 +16,12 @@ import (
 	"github.com/gotmc/ivi/load"
 )
 
+const (
+	specMajorVersion = 0
+	specMinorVersion = 0
+	specRevision     = "N/A"
+)
+
 // SDL10xx provides the IVI driver for the Siglent SDL1000X and SDL1030X DC
 // Electronic Loads.
 type SDL10xx struct {
@@ -38,9 +44,9 @@ func New(inst ivi.Instrument, reset bool) (*SDL10xx, error) {
 		channels[i] = Channel{baseChannel}
 	}
 	inherentBase := ivi.InherentBase{
-		ClassSpecMajorVersion: 0,
-		ClassSpecMinorVersion: 0,
-		ClassSpecRevision:     "N/A",
+		ClassSpecMajorVersion: specMajorVersion,
+		ClassSpecMinorVersion: specMinorVersion,
+		ClassSpecRevision:     specRevision,
 		GroupCapabilities:     []string{},
 		SupportedInstrumentModels: []string{
 			"SDL1000X",

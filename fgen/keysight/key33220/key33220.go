@@ -16,6 +16,12 @@ import (
 	"github.com/gotmc/ivi/fgen"
 )
 
+const (
+	specMajorVersion = 4
+	specMinorVersion = 3
+	specRevision     = "5.2"
+)
+
 // Key33220 provides the IVI driver for an Agilent 33220A or 33210A
 // function generator.
 type Key33220 struct {
@@ -36,9 +42,9 @@ func New(inst ivi.Instrument, reset bool) (Key33220, error) {
 		channels[i] = Channel{baseChannel}
 	}
 	inherentBase := ivi.InherentBase{
-		ClassSpecMajorVersion: 4,
-		ClassSpecMinorVersion: 3,
-		ClassSpecRevision:     "5.2",
+		ClassSpecMajorVersion: specMajorVersion,
+		ClassSpecMinorVersion: specMinorVersion,
+		ClassSpecRevision:     specRevision,
 		GroupCapabilities: []string{
 			"IviFgenBase",
 			"IviFgenStdfunc",

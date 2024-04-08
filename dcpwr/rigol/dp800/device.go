@@ -19,6 +19,12 @@ import (
 	"github.com/gotmc/ivi/dcpwr"
 )
 
+const (
+	specMajorVersion = 4
+	specMinorVersion = 4
+	specRevision     = "3.0"
+)
+
 // Confirm that the device driver implements the IviDCPwrBase interface.
 var _ dcpwr.Base = (*Device)(nil)
 
@@ -46,9 +52,9 @@ func New(inst ivi.Instrument, reset bool) (*Device, error) {
 		"DP811",
 	}
 	inherentBase := ivi.InherentBase{
-		ClassSpecMajorVersion: 4,
-		ClassSpecMinorVersion: 4,
-		ClassSpecRevision:     "3.0",
+		ClassSpecMajorVersion: specMajorVersion,
+		ClassSpecMinorVersion: specMinorVersion,
+		ClassSpecRevision:     specRevision,
 		GroupCapabilities: []string{
 			"IviDCPwrBase",
 			"IviDCPwrMeasurement",
