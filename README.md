@@ -22,13 +22,12 @@ requirement for this is having an IVI driver for the desired test equipment.
 
 If an [ivi][] driver doesn't exist for a peice of test equipment that you want
 to use, please open an issue and/or submit a pull request. The [IVI
-Specifications][] don't provide APIs for every type of test equipment (e.g.,
-they don't specify an API for electronic loads) in which case a set of APIs will
-be developed as needed for new types of test equipment.
+Specifications][ivi-specs] don't provide APIs for every type of test equipment
+(e.g., they don't specify an API for electronic loads) in which case a set of
+APIs will be developed as needed for new types of test equipment.
 
 Development focus is currently on solidifying the APIs and creating a few IVI
 drivers for each instrument type.
-
 
 ## Installation
 
@@ -42,11 +41,12 @@ The [ivi][] package requires receiving an Instrument interface. The following
 gotmc packages meet the Instrument interface:
 
 - [visa][] — Calls [lxi][] or [usbtmc][] as needed, so that you can identify
-    instruments using a VISA resource address string.
+  instruments using a VISA resource address string.
 - [lxi][] — Used to control LXI enabled instruments via Ethernet.
 - [usbtmc][] — Used to control USBTMC compliant instruments via USB.
-- [prologix][] —  Used to communicate with instruments using a Prologix GPIB
-    controller.
+- [prologix][] — Used to communicate with instruments using a Prologix GPIB
+  controller.
+- [asrl][] — Used to control intstruments via serial.
 
 ## Examples
 
@@ -58,7 +58,7 @@ Documentation can be found at either:
 
 - <https://godoc.org/github.com/gotmc/ivi>
 - <http://localhost:6060/pkg/github.com/gotmc/ivi/> after running `$
-  godoc -http=:6060`
+godoc -http=:6060`
 
 ## Contributing
 
@@ -89,6 +89,7 @@ $ make cover
 [ivi][] is released under the MIT license. Please see the
 [LICENSE.txt][] file for more information.
 
+[asrl]: https://github.com/gotmc/asrl
 [ivi]: https://github.com/gotmc/ivi
 [ivi-foundation]: http://www.ivifoundation.org/
 [ivi-specs]: http://www.ivifoundation.org/specifications/
