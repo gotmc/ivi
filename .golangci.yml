@@ -58,5 +58,13 @@ linters:
     - whitespace
     - wsl
 
+linters-settings:
+  depguard:
+    rules:
+      main:
+        deny:
+          - pkg: io/ioutil
+            desc: The io/ioutil package has been deprecated, see https://go.dev/doc/go1.16#ioutil
+
 run:
   issues-exit-code: 1
