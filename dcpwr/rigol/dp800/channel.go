@@ -10,6 +10,7 @@ import (
 
 	"github.com/gotmc/ivi"
 	"github.com/gotmc/ivi/dcpwr"
+	"github.com/gotmc/query"
 )
 
 // Confirm that the output channel repeated capabilitiy implements the
@@ -73,13 +74,12 @@ func (ch *Channel) SetCurrentLimitBehavior(behavior dcpwr.CurrentLimitBehavior) 
 	return nil
 }
 
-// OutputEnabled determines if all three output channels are enabled or
-// disabled.
+// OutputEnabled determines if the given output channel is enabled or disabled.
 //
 // OutputEnabled is the getter for the read-write IviDCPwrBase Attribute Output
 // Enabled described in Section 4.2.3 of IVI-4.4: IviDCPwr Class Specification.
 func (ch *Channel) OutputEnabled() (bool, error) {
-	return false, dcpwr.ErrNotImplemented
+	return query.Boolf(ch.inst, ":OUTP? %s\n", ch.name)
 }
 
 // SetOutputEnabled sets all three output channels to enabled or disabled.
@@ -89,9 +89,9 @@ func (ch *Channel) OutputEnabled() (bool, error) {
 // Specification.
 func (ch *Channel) SetOutputEnabled(v bool) error {
 	if v {
-		return dcpwr.ErrNotImplemented
+		return ivi.Set(ch.inst, ":OUTP %s,ON\n", ch.name)
 	}
-	return dcpwr.ErrNotImplemented
+	return ivi.Set(ch.inst, ":OUTP %s,OFF\n", ch.name)
 }
 
 // DisableOutput is a convenience function for setting the Output Enabled
@@ -159,7 +159,7 @@ func (ch *Channel) SetOVPLimit(limit float64) error {
 // VoltageLevel is the getter for the read-write IviDCPwrBase Attribute Voltage
 // Level described in Section 4.2.6 of IVI-4.4: IviDCPwr Class Specification.
 func (ch *Channel) VoltageLevel() (float64, error) {
-	return 0.0, dcpwr.ErrNotImplemented
+	return query.Float64f(ch.inst, ":APPL? %s,VOLT\n", ch.name)
 }
 
 // SetVoltageLevel specifies the voltage level the DC power supply attempts
@@ -169,7 +169,7 @@ func (ch *Channel) VoltageLevel() (float64, error) {
 // Voltage Level described in Section 4.2.6 of IVI-4.4: IviDCPwr Class
 // Specification.
 func (ch *Channel) SetVoltageLevel(amp float64) error {
-	return dcpwr.ErrNotImplemented
+	return ivi.Set(ch.inst, ":APPL %s,%f\n", ch.name, amp)
 }
 
 // ConfigureCurrentLimit configures the current limit. It specifies the output
