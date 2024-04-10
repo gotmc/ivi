@@ -149,6 +149,7 @@ func New(inst ivi.Instrument, reset bool) (*Device, error) {
 
 // AvailableCOMPorts lists the avaialble COM ports, including optional ports.
 func AvailableCOMPorts() []string {
+	// FIXME: Is this accurate for all supported models? What about USB?
 	return []string{"GPIB", "RS232"}
 }
 
@@ -168,7 +169,7 @@ func SerialConfig() string {
 // SerialBaudRates lists the available baud rates for the RS-232 serial port
 // from the fastest to the slowest.
 func SerialBaudRates() []int {
-	return []int{9600, 4800, 2400, 1200, 600, 300}
+	return []int{128000, 115200, 57600, 38400, 19200, 14400, 9600, 7200, 4800}
 }
 
 // DefaultSerialBaudRate returns the default baud rate for the RS-232 serial
@@ -180,6 +181,11 @@ func DefaultSerialBaudRate() int {
 // SerialDataFrames lists the available RS-232 data frame formats.
 func SerialDataFrames() []string {
 	return []string{"8N2", "7E2", "7O2"}
+}
+
+// SerialEndMark lists the end mark for commands sent over the RS-232 serial port.
+func SerialEndMark() string {
+	return "\r\n"
 }
 
 // DefaultSerialDataFrame returns the default RS-232 data frame format.
