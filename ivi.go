@@ -26,7 +26,7 @@ import "io"
 
 // Instrument provides the interface required for all IVI Instruments.
 type Instrument interface {
-	io.ReadWriteCloser
+	io.ReadWriter
 	StringWriter
 	Commander
 	Querier

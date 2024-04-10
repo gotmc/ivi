@@ -7,25 +7,27 @@ package ds345
 
 import (
 	"github.com/gotmc/ivi/fgen"
+	"github.com/gotmc/query"
 )
 
-// Make sure that the ds345 driver implements the IviFgenBurst capability
-// group.
-var _ fgen.Burst = (*DS345)(nil)
+// Confirm that the device implements the IviFgenBurst interface.
+var _ fgen.Burst = (*Device)(nil)
 var _ fgen.BurstChannel = (*Channel)(nil)
 
 // BurstCount returns the number of waveform cycles that the function generator
-// produces after it receives a trigger.  BurstCount is the getter for the
-// read-write IviFgenBurst Attribute Burst Count described in Section 17.2.1 of
-// IVI-4.3: IviFgen Class Specification.
+// produces after it receives a trigger.
+//
+// BurstCount is the getter for the read-write IviFgenBurst Attribute Burst
+// Count described in Section 17.2.1 of IVI-4.3: IviFgen Class Specification.
 func (ch *Channel) BurstCount() (int, error) {
-	return ch.QueryInt("BCNT?\n")
+	return query.Int(ch.inst, "BCNT?")
 }
 
 // SetBurstCount sets the number of waveform cycles that the function generator
-// produces after it receives a trigger.  SetBurstCount is the setter for the
-// read-write IviFgenBurst Attribute Burst Count described in Section 17.2.1 of
-// IVI-4.3: IviFgen Class Specification.
+// produces after it receives a trigger.
+//
+// SetBurstCount is the setter for the read-write IviFgenBurst Attribute Burst
+// Count described in Section 17.2.1 of IVI-4.3: IviFgen Class Specification.
 func (ch *Channel) SetBurstCount(count int) error {
-	return ch.Set("BCNT %d\n", count)
+	return ch.inst.Command("BCNT %d", count)
 }

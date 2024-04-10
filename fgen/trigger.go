@@ -5,14 +5,6 @@
 
 package fgen
 
-// Trigger provides the interface required for the IviFgenTrigger extension group.
-type Trigger interface {
-	Channels() ([]*TriggerChannel, error)
-	Channel(name string) (*TriggerChannel, error)
-	ChannelByID(id int) (*TriggerChannel, error)
-	ChannelCount() int
-}
-
 // TriggerChannel provides the interface for the channel repeated capability for
 // the IviFgenTrigger capability group.
 type TriggerChannel interface {

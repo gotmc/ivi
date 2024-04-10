@@ -7,11 +7,13 @@ package fgen
 
 // Base provides the interface required for the IviFgenBase capability group.
 type Base interface {
-	// Channels() ([]*BaseChannel, error)
-	// Channel(name string) (*BaseChannel, error)
-	// ChannelByID(id int) (*BaseChannel, error)
-	// ChannelCount() int
 	OutputCount() int
+	// OutputMode() (OutputMode, error)
+	// SetOutputMode(mode OutputMode) error
+	// ReferenceClockSource() (ClockSource, error)
+	// SetReferenceClockSource(src ClockSource) error
+	AbortGeneration() error
+	// InitiateGeneration() error
 }
 
 // BaseChannel provides the interface for the channel repeated capability for
@@ -23,16 +25,8 @@ type BaseChannel interface {
 	SetOperationMode(mode OperationMode) error
 	OutputEnabled() (bool, error)
 	SetOutputEnabled(b bool) error
-	DisableOutput() error
-	EnableOutput() error
 	OutputImpedance() (float64, error)
 	SetOutputImpedance(impedance float64) error
-	// OutputMode() (OutputMode, error)
-	// SetOutputMode(mode OutputMode) error
-	// ReferenceClockSource() (ClockSource, error)
-	// SetReferenceClockSource(src ClockSource) error
-	// AbortGeneration() error
-	// InitiateGeneration() error
 }
 
 // OperationMode provides the defined values for the Operation Mode defined in
@@ -55,8 +49,9 @@ func (om OperationMode) String() string {
 		return "continuous mode"
 	case BurstMode:
 		return "burst mode"
+	default:
+		return ""
 	}
-	return ""
 }
 
 // OutputMode determines how the function generator produces waveforms. This
@@ -74,6 +69,19 @@ const (
 	Arbitrary
 	Sequence
 )
+
+func (om OutputMode) String() string {
+	switch om {
+	case Function:
+		return "function"
+	case Arbitrary:
+		return "arbitrary"
+	case Sequence:
+		return "sequence"
+	default:
+		return ""
+	}
+}
 
 // ClockSource models the defined values for the Reference Clock Source defined
 // in Section 4.2.7 of IVI-4.3 IviFgenClass Specification.

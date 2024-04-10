@@ -27,9 +27,11 @@ type Channel struct {
 }
 
 // OperationMode determines whether the function generator should produce a
-// continuous or burst output on the channel. OperationMode implements the
-// getter for the read-write IviFgenBase Attribute Operation Mode described in
-// Section 4.2.2 of IVI-4.3: IviFgen Class Specification.
+// continuous or burst output on the channel.
+//
+// OperationMode implements the getter for the read-write IviFgenBase Attribute
+// Operation Mode described in Section 4.2.2 of IVI-4.3: IviFgen Class
+// Specification.
 func (ch *Channel) OperationMode() (fgen.OperationMode, error) {
 	var mode fgen.OperationMode
 	s, err := query.String(ch.inst, "BURS:STAT?")

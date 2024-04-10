@@ -33,11 +33,11 @@ type Device struct {
 	ivi.Inherent
 }
 
-// New creates a new AgilentE36xx IVI Instrument driver. Currently, only the
-// E3631A model is supported, but in the future as other models are added, the
-// New function will query the instrument to determine the model and ensure it
-// is one of the supported models. If reset is true, then the instrument is
-// reset.
+// New creates a new IVI Device driver for the Keysight/Agilent E3600 series of
+// DC power supplies. Currently, only the E3631A model is supported, but in the
+// future as other models are added, the New function will query the instrument
+// to determine the model and ensure it is one of the supported models. If
+// reset is true, then the instrument is reset.
 func New(inst ivi.Instrument, reset bool) (*Device, error) {
 	channelNames := []string{
 		"P6V",

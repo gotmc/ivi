@@ -4,8 +4,8 @@
 // can be found in the LICENSE.txt file for the project.
 
 /*
-Package key33220 implements the IVI Instrument driver for the Agilent/Keysight
-33220A function generator.
+Package key33220 implements the IVI driver for the Keysight/Agilent 33220A and
+33210A function/arbitrary waveform generators.
 
 State Caching: Not implemented
 */
@@ -22,7 +22,7 @@ const (
 	specRevision     = "5.2"
 )
 
-// Confirm that the device driver implements the IviFgenBase interface.
+// Confirm the driver implements the IviFgenBase interface.
 var _ fgen.Base = (*Device)(nil)
 
 // Device provides the IVI driver for a Keysight/Agilent 33220A or 33210A
@@ -101,4 +101,18 @@ func LANPorts() map[string]int {
 // Count described in Section 4.2.1 of IVI-4.3: IviFgen Class Specification.
 func (a *Device) OutputCount() int {
 	return len(a.Channels)
+}
+
+// AbortGeneration aborts a previously initiated signal generation by disabling
+// all outputs.
+//
+// AbortGeneration implements the IviFgenBase function described in Section 4.3.1
+// of IVI-4.3: IviFgen Class Specification.
+func (d *Device) AbortGeneration() error {
+	for _, channel := range d.Channels {
+		if err := channel.DisableOutput(); err != nil {
+			return err
+		}
+	}
+	return nil
 }

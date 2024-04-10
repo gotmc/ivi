@@ -5,7 +5,9 @@
 
 package fgen
 
-// IntTrigger provides the interface required for the IviFgenInternalTrigger extension group.
+// IntTrigger provides the interface required to support the
+// IviFgenInternalTrigger extension group as described in Section 15 of the
+// IVI-4.3: IviFgen Class Specification.
 type IntTrigger interface {
 	Channels() ([]*IntTriggerChannel, error)
 	Channel(name string) (*IntTriggerChannel, error)
@@ -13,8 +15,9 @@ type IntTrigger interface {
 	ChannelCount() int
 }
 
-// IntTriggerChannel provides the interface for the channel repeated capability for
-// the IviFgenInternalTrigger capability group.
+// IntTriggerChannel provides the interface required for the channel repeated
+// capability to support the IviFgenInternalTrigger capability group as
+// described in Section 15 of the IVI-4.3: IviFgen Class Specification.
 type IntTriggerChannel interface {
 	InternalTriggerRate() (float64, error)
 	SetInternalTriggerRate(rate float64) error

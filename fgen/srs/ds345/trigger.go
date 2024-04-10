@@ -11,10 +11,10 @@ import (
 	"strings"
 
 	"github.com/gotmc/ivi/fgen"
+	"github.com/gotmc/query"
 )
 
-// Make sure that the key33220 driver implements the IviFgenTrigger capability
-// group.
+// Confirm that the device implements the IviFgenTrigger interface.
 var _ fgen.TriggerChannel = (*Channel)(nil)
 
 // TriggerSource determines the trigger srouce. TriggerSource is the getter for
@@ -22,7 +22,7 @@ var _ fgen.TriggerChannel = (*Channel)(nil)
 // 9.2.1 of IVI-4.3: IviFgen Class Specification.
 func (ch *Channel) TriggerSource() (fgen.TriggerSource, error) {
 	var src fgen.TriggerSource
-	s, err := ch.QueryString("TSRC?\n")
+	s, err := query.String(ch.inst, "TSRC?")
 	if err != nil {
 		return src, err
 	}
@@ -50,5 +50,5 @@ func (ch *Channel) SetTriggerSource(src fgen.TriggerSource) error {
 		fgen.ExternalTrigger: "2",
 	}
 	log.Printf("Sending command TSRC%s\n", triggers[src])
-	return ch.Set("TSRC%s\n", triggers[src])
+	return ch.inst.Command("TSRC%s", triggers[src])
 }

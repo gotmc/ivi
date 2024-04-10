@@ -5,15 +5,6 @@
 
 package fgen
 
-// StdFunc provides the interface required for the IviFgenStdFunc capability
-// group.
-type StdFunc interface {
-	Channels() ([]*StdFuncChannel, error)
-	Channel(name string) (*StdFuncChannel, error)
-	ChannelByID(id int) (*StdFuncChannel, error)
-	ChannelCount() int
-}
-
 // StdFuncChannel provides the interface for the channel repeated capability for
 // the IviFgenStdFunc capability group.
 type StdFuncChannel interface {

@@ -22,62 +22,68 @@ const (
 	specRevision     = "5.2"
 )
 
-// DS345 provides the IVI driver for a SRS DS345 function generator.
-type DS345 struct {
+// Confirm that the device driver implements the IviFgenBase interface.
+var _ fgen.Base = (*Device)(nil)
+
+// Device provides the IVI driver for a SRS DS345 function generator.
+type Device struct {
 	inst     ivi.Instrument
 	Channels []Channel
 	ivi.Inherent
 }
 
 // New creates a new DS345 IVI Instrument.
-func New(inst ivi.Instrument, reset bool) (*DS345, error) {
+func New(inst ivi.Instrument, reset bool) (*Device, error) {
 	channelNames := []string{
 		"Output",
 	}
 	outputCount := len(channelNames)
 	channels := make([]Channel, outputCount)
-	for i, ch := range channelNames {
-		baseChannel := fgen.NewChannel(i, ch, inst)
-		channels[i] = Channel{baseChannel}
+	for i, channelName := range channelNames {
+		ch := Channel{
+			name: channelName,
+			inst: inst,
+		}
+		channels[i] = ch
 	}
 	inherentBase := ivi.InherentBase{
 		ClassSpecMajorVersion: specMajorVersion,
 		ClassSpecMinorVersion: specMinorVersion,
 		ClassSpecRevision:     specRevision,
+		// Commented out GroupCapabilities still need to be added.
 		GroupCapabilities: []string{
+			// "IviFgenArbFrequency",
+			// "IviFgenArbSeq",
+			// "IviFgenArbWaveform",
 			"IviFgenBase",
+			// "IviFgenBurst",
+			// "IviFgenInternalTrigger",
+			// "IviFgenModulateFM",
+			// "IviFgenModulateAM",
+			// "IviFgenSoftwareTrigger",
 			"IviFgenStdfunc",
 			"IviFgenTrigger",
-			"IviFgenInternalTrigger",
-			"IviFgenBurst",
 		},
 		SupportedInstrumentModels: []string{
 			"DS345",
 		},
 	}
 	inherent := ivi.NewInherent(inst, inherentBase)
-	driver := DS345{
+	device := Device{
 		inst:     inst,
 		Channels: channels,
 		Inherent: inherent,
 	}
 	if reset {
-		if err := driver.Reset(); err != nil {
-			return &driver, err
+		if err := device.Reset(); err != nil {
+			return &device, err
 		}
-		// Default to internal trigger instead of single trigger.
-		if _, err := driver.inst.WriteString("TSRC1\n"); err != nil {
-			return &driver, err
+		// Default to internal trigger instead of single trigger when reset.
+		if err := device.inst.Command("TSRC1"); err != nil {
+			return &device, err
 		}
-		return &driver, nil
 	}
-	return &driver, nil
-}
-
-// Channel represents a repeated capability of an output channel for the
-// function generator.
-type Channel struct {
-	fgen.Channel
+	return &device, nil
 }
 
 // AvailableCOMPorts lists the avaialble COM ports, including optional ports.
@@ -118,4 +124,22 @@ func SerialDataFrames() []string {
 // DefaultSerialDataFrame returns the default RS-232 data frame format.
 func DefaultSerialDataFrame() string {
 	return "8N2"
+}
+
+// OutputCount returns the number of available output channels.
+//
+// OutputCount is the getter for the read-only IviFgenBase Attribute Output
+// Count described in Section 4.2.1 of IVI-4.3: IviFgen Class Specification.
+func (d *Device) OutputCount() int {
+	return len(d.Channels)
+}
+
+// AbortGeneration aborts a previously initiated signal generation. Since the
+// DS345 constantly generates a signal and the output cannot be aborted, this
+// function does nothing and returns no error.
+//
+// AbortGeneration implements the IviFgenBase function described in Section 4.3.1
+// of IVI-4.3: IviFgen Class Specification.
+func (d *Device) AbortGeneration() error {
+	return nil
 }

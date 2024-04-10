@@ -175,7 +175,7 @@ func SerialBaudRates() []int {
 // DefaultSerialBaudRate returns the default baud rate for the RS-232 serial
 // port.
 func DefaultSerialBaudRate() int {
-	return 9600
+	return 128000
 }
 
 // SerialDataFrames lists the available RS-232 data frame formats.

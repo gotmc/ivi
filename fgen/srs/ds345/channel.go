@@ -9,19 +9,20 @@ import (
 	"errors"
 	"fmt"
 
+	"github.com/gotmc/ivi"
 	"github.com/gotmc/ivi/fgen"
+	"github.com/gotmc/query"
 )
 
-// Make sure that the ds345 driver implements the IviFgenBase capability
-// group.
-var _ fgen.Base = (*DS345)(nil)
+// Confirm that the output channel repeated capabilitiy implements the
+// IviFgenBase interface.
 var _ fgen.BaseChannel = (*Channel)(nil)
 
-// OutputCount returns the number of available output channels. OutputCount is
-// the getter for the read-only IviFgenBase Attribute Output Count described in
-// Section 4.2.1 of IVI-4.3: IviFgen Class Specification.
-func (a *DS345) OutputCount() int {
-	return len(a.Channels)
+// Channel models the output channel repeated capabilitiy for the function
+// generator output channel.
+type Channel struct {
+	name string
+	inst ivi.Instrument
 }
 
 // OperationMode determines whether the function generator should produce a
@@ -30,7 +31,7 @@ func (a *DS345) OutputCount() int {
 // Section 4.2.2 of IVI-4.3: IviFgen Class Specification.
 func (ch *Channel) OperationMode() (fgen.OperationMode, error) {
 	var mode fgen.OperationMode
-	s, err := ch.QueryString("MENA?\n")
+	s, err := query.String(ch.inst, "MENA?")
 	if err != nil {
 		return mode, fmt.Errorf("error getting operation mode: %s", err)
 	}
@@ -38,7 +39,7 @@ func (ch *Channel) OperationMode() (fgen.OperationMode, error) {
 	case "0":
 		return fgen.ContinuousMode, nil
 	case "1":
-		mod, err := ch.QueryString("MTYP?\n")
+		mod, err := query.String(ch.inst, "MTYP?")
 		if err != nil {
 			return mode, fmt.Errorf("error determining modulation type: %s", err)
 		}
@@ -54,28 +55,31 @@ func (ch *Channel) OperationMode() (fgen.OperationMode, error) {
 }
 
 // SetOperationMode specifies whether the function generator should produce a
-// continuous or burst output on the channel. SetOperationMode implements the
-// setter for the read-write IviFgenBase Attribute Operation Mode described in
-// Section 4.2.2 of IVI-4.3: IviFgen Class Specification.
+// continuous or burst output on the channel.
+//
+// SetOperationMode implements the setter for the read-write IviFgenBase
+// Attribute Operation Mode described in Section 4.2.2 of IVI-4.3: IviFgen
+// Class Specification.
 func (ch *Channel) SetOperationMode(mode fgen.OperationMode) error {
 	switch mode {
 	case fgen.BurstMode:
-		return ch.Set("MENA1;MTYP5\n")
+		return ch.inst.Command("MENA1;MTYP5")
 	case fgen.ContinuousMode:
-		return ch.Set("MENA0\n")
+		return ch.inst.Command("MENA0")
 	}
 	return errors.New("bad fgen operation mode")
 }
 
 // OutputEnabled determines if the output channel is enabled or disabled.
-// OutputEnabled is the getter for the read-write IviFgenBase Attribute
-// Output Enabled described in Section 4.2.3 of IVI-4.3: IviFgen Class
-// Specification.
+//
+// OutputEnabled is the getter for the read-write IviFgenBase Attribute Output
+// Enabled described in Section 4.2.3 of IVI-4.3: IviFgen Class Specification.
 func (ch *Channel) OutputEnabled() (bool, error) {
 	return false, errors.New("output enabled not implemented")
 }
 
 // SetOutputEnabled sets the output channel to enabled or disabled.
+//
 // SetOutputEnabled is the setter for the read-write IviFgenBase Attribute
 // Output Enabled described in Section 4.2.3 of IVI-4.3: IviFgen Class
 // Specification.
@@ -96,6 +100,7 @@ func (ch *Channel) EnableOutput() error {
 }
 
 // OutputImpedance return the output channel's impedance in ohms.
+//
 // OutputImpedance is the getter for the read-write IviFgenBase Attribute
 // Output Impedance described in Section 4.2.4 of IVI-4.3: IviFgen Class
 // Specification.
@@ -104,6 +109,7 @@ func (ch *Channel) OutputImpedance() (float64, error) {
 }
 
 // SetOutputImpedance sets the output channel's impedance in ohms.
+//
 // SetOutputImpedance is the setter for the read-write IviFgenBase Attribute
 // Output Impedance described in Section 4.2.3 of IVI-4.3: IviFgen Class
 // Specification.
@@ -112,14 +118,4 @@ func (ch *Channel) SetOutputImpedance(impedance float64) error {
 		return errors.New("output impedance must be 50 ohms")
 	}
 	return nil
-}
-
-// AbortGeneration Aborts a previously initiated signal generation. If the
-// function generator is in the Output Generation State, this function moves
-// the function generator to the Configuration State. If the function generator
-// is already in the Configuration State, the function does nothing and returns
-// Success. AbortGeneration implements the IviFgenBase function described in
-// Section 4.3 of IVI-4.3: IviFgen Class Specification.
-func (ch *Channel) AbortGeneration() error {
-	return ch.DisableOutput()
 }
