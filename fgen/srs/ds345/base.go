@@ -22,7 +22,7 @@ const (
 	specRevision     = "5.2"
 )
 
-// Confirm that the IVI driver implements the IviFgenBase interface.
+// Confirm the driver implements the IviFgenBase interface.
 var _ fgen.Base = (*Driver)(nil)
 
 // Driver provides the IVI driver for a SRS DS345 function generator.
