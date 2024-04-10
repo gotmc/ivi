@@ -10,101 +10,120 @@ import (
 	"strings"
 
 	"github.com/gotmc/ivi/fgen"
+	"github.com/gotmc/query"
 )
 
-// Make sure that the key33220 driver implements the IviFgenStdFunc capability
-// group.
+// Confirm that the output channel repeated capabilitiy implements the
+// IviFgenStdFunc interface.
 var _ fgen.StdFuncChannel = (*Channel)(nil)
 
 // Amplitude reads the difference between the maximum and minimum waveform
-// values, i.e., the peak-to-peak voltage value. Amplitude is the getter for
-// the read-write IviFgenStdFunc Attribute Amplitude described in Section 5.2.1
-// of IVI-4.3: IviFgen Class Specification.
+// values, i.e., the peak-to-peak voltage value.
+//
+// Amplitude is the getter for the read-write IviFgenStdFunc Attribute
+// Amplitude described in Section 5.2.1 of IVI-4.3: IviFgen Class
+// Specification.
 func (ch *Channel) Amplitude() (float64, error) {
-	return ch.QueryFloat64("VOLT?\n")
+	return query.Float64(ch.inst, "VOLT?")
 }
 
 // SetAmplitude specifies the difference between the maximum and minimum
-// waveform values, i.e., the peak-to-peak voltage value. Amplitude is the
-// setter for the read-write IviFgenStdFunc Attribute Amplitude described in
-// Section 5.2.1 of IVI-4.3: IviFgen Class Specification.
+// waveform values, i.e., the peak-to-peak voltage value.
+//
+// SetAmplitude is the setter for the read-write IviFgenStdFunc Attribute
+// Amplitude described in Section 5.2.1 of IVI-4.3: IviFgen Class
+// Specification.
 func (ch *Channel) SetAmplitude(amp float64) error {
-	return ch.Set("VOLT %f VPP\n", amp)
+	return ch.inst.Command("VOLT %f VPP", amp)
 }
 
 // DCOffset reads the difference between the average of the maximum and minimum
-// waveform values and the x-axis (0 volts). DCOffset is the getter for
-// the read-write IviFgenStdFunc Attribute DC Offset described in Section 5.2.2
-// of IVI-4.3: IviFgen Class Specification.
+// waveform values and the x-axis (0 volts).
+//
+// DCOffset is the getter for the read-write IviFgenStdFunc Attribute DC Offset
+// described in Section 5.2.2 of IVI-4.3: IviFgen Class Specification.
 func (ch *Channel) DCOffset() (float64, error) {
-	return ch.QueryFloat64("VOLT:OFFS?\n")
+	return query.Float64(ch.inst, "VOLT:OFFS?")
 }
 
 // SetDCOffset sets the difference between the average of the maximum and
-// minimum waveform values and the x-axis (0 volts). SetDCOffset is the setter
-// for the read-write IviFgenStdFunc Attribute DC Offset described in Section
-// 5.2.2 of IVI-4.3: IviFgen Class Specification.
+// minimum waveform values and the x-axis (0 volts).
+//
+// SetDCOffset is the setter for the read-write IviFgenStdFunc Attribute DC
+// Offset described in Section 5.2.2 of IVI-4.3: IviFgen Class Specification.
 func (ch *Channel) SetDCOffset(amp float64) error {
-	return ch.Set("VOLT:OFFS %f\n", amp)
+	return ch.inst.Command("VOLT:OFFS %f", amp)
 }
 
 // DutyCycleHigh reads the percentage of time, specified as 0-100, during one
-// cycle for which the square wave is at its high value.  DutyCycle is the
-// getter for the read-write IviFgenStdFunc Attribute Duty Cycle High described
-// in Section 5.2.3 of IVI-4.3: IviFgen Class Specification.
+// cycle for which the square wave is at its high value.
+//
+// DutyCycle is the getter for the read-write IviFgenStdFunc Attribute Duty
+// Cycle High described in Section 5.2.3 of IVI-4.3: IviFgen Class
+// Specification.
 func (ch *Channel) DutyCycleHigh() (float64, error) {
-	return ch.QueryFloat64("FUNC:SQU:DCYC?\n")
+	return query.Float64(ch.inst, "FUNC:SQU:DCYC?")
 }
 
 // SetDutyCycleHigh sets the percentage of time, specified as 0-100, during one
-// cycle for which the square wave is at its high value. SetDutyCycle is the
-// setter for the read-write IviFgenStdFunc Attribute Duty Cycle High described
-// in Section 5.2.3 of IVI-4.3: IviFgen Class Specification.
+// cycle for which the square wave is at its high value.
+//
+// SetDutyCycle is the setter for the read-write IviFgenStdFunc Attribute Duty
+// Cycle High described in Section 5.2.3 of IVI-4.3: IviFgen Class
+// Specification.
 func (ch *Channel) SetDutyCycleHigh(duty float64) error {
-	return ch.Set("FUNC:SQU:DCYC %f\n", duty)
+	return ch.inst.Command("FUNC:SQU:DCYC %f", duty)
 }
 
 // Frequency reads the number of waveform cycles generated in one second (i.e.,
-// Hz). Frequency is not applicable for a DC waveform.  Frequency is the getter
-// for the read-write IviFgenStdFunc Attribute Frequency described in Section
-// 5.2.4 of IVI-4.3: IviFgen Class Specification.
+// Hz). Frequency is not applicable for a DC waveform.
+//
+// Frequency is the getter for the read-write IviFgenStdFunc Attribute
+// Frequency described in Section 5.2.4 of IVI-4.3: IviFgen Class
+// Specification.
 func (ch *Channel) Frequency() (float64, error) {
-	return ch.QueryFloat64("FREQ?\n")
+	return query.Float64(ch.inst, "FREQ?")
 }
 
 // SetFrequency sets the number of waveform cycles generated in one second
-// (i.e., Hz). Frequency is not applicable for a DC waveform. SetFrequency is
-// the setter for the read-write IviFgenStdFunc Attribute Frequency described
-// in Section 5.2.4 of IVI-4.3: IviFgen Class Specification.
+// (i.e., Hz). Frequency is not applicable for a DC waveform.
+//
+// SetFrequency is the setter for the read-write IviFgenStdFunc Attribute
+// Frequency described in Section 5.2.4 of IVI-4.3: IviFgen Class
+// Specification.
 func (ch *Channel) SetFrequency(freq float64) error {
-	return ch.Set("FREQ %f\n", freq)
+	return ch.inst.Command("FREQ %f", freq)
 }
 
 // StartPhase reads the start phase of the standard waveform the function
 // generator produces. When the Waveform attribute is set to Waveform DC, this
-// attribute does not affect signal output. The units are degrees. StartPhase
-// is the getter for the read-write IviFgenStdFunc Attribute Start Phase described
-// in Section 5.2.5 of IVI-4.3: IviFgen Class Specification.
+// attribute does not affect signal output. The units are degrees.
+//
+// StartPhase is the getter for the read-write IviFgenStdFunc Attribute Start
+// Phase described in Section 5.2.5 of IVI-4.3: IviFgen Class Specification.
 func (ch *Channel) StartPhase() (float64, error) {
-	return ch.QueryFloat64("PHAS?\n")
+	return query.Float64(ch.inst, "PHAS?")
 }
 
 // SetStartPhase writes the start phase of the standard waveform the function
 // generator produces. When the Waveform attribute is set to Waveform DC, this
-// attribute does not affect signal output. The units are degrees. StartPhase
-// is the getter for the read-write IviFgenStdFunc Attribute Start Phase described
-// in Section 5.2.5 of IVI-4.3: IviFgen Class Specification.
+// attribute does not affect signal output. The units are degrees.
+//
+// SetStartPhase is the setter for the read-write IviFgenStdFunc Attribute
+// Start Phase described in Section 5.2.5 of IVI-4.3: IviFgen Class
+// Specification.
 func (ch *Channel) SetStartPhase(freq float64) error {
-	return ch.Set("PHAS %f\n", freq)
+	return ch.inst.Command("PHAS %f", freq)
 }
 
 // StandardWaveform determines if one of the IVI Standard Waveforms is being
 // output by the function generator. If not, an error is returned.
+//
 // StandardWaveform is the getter for the read-write IviFgenStdFunc Attribute
 // Waveform described in Section 5.2.6 of IVI-4.3: IviFgen Class Specification.
 func (ch *Channel) StandardWaveform() (fgen.StandardWaveform, error) {
 	var wave fgen.StandardWaveform
-	s, err := ch.QueryString("FUNC?\n")
+	s, err := query.String(ch.inst, "FUNC?\n")
 	if err != nil {
 		return wave, err
 	}
@@ -117,7 +136,7 @@ func (ch *Channel) StandardWaveform() (fgen.StandardWaveform, error) {
 	case "DC":
 		return fgen.DC, nil
 	case "RAMP":
-		symm, err := ch.QueryFloat64("FUNC:RAMP:SYMM?\n")
+		symm, err := query.Float64(ch.inst, "FUNC:RAMP:SYMM?")
 		if err != nil {
 			return wave, fmt.Errorf(
 				"unable to get symmetry to determine standard waveform: %s",
@@ -139,39 +158,42 @@ func (ch *Channel) StandardWaveform() (fgen.StandardWaveform, error) {
 }
 
 // SetStandardWaveform specifies which standard waveform the function generator
-// produces.  SetStandardWaveform is the setter for the read-write
-// IviFgenStdFunc Attribute Waveform described in Section 5.2.6 of IVI-4.3:
-// IviFgen Class Specification.
+// produces.
+//
+// SetStandardWaveform is the setter for the read-write IviFgenStdFunc
+// Attribute Waveform described in Section 5.2.6 of IVI-4.3: IviFgen Class
+// Specification.
 func (ch *Channel) SetStandardWaveform(wave fgen.StandardWaveform) error {
 	// FIXME(mdr): May need to change the phase offset in order to match the
 	// waveforms shown in Figure 5-1 of IVI-4.3: IviFgen Class Specification.
-	return ch.Set(waveformCommand[wave])
+	return ch.inst.Command(waveformCommand[wave])
 }
 
 var waveformCommand = map[fgen.StandardWaveform]string{
-	fgen.Sine:     "FUNC SIN\n",
-	fgen.Square:   "FUNC SQU\n",
-	fgen.Triangle: "FUNC RAMP; RAMP:SYMM 50\n",
-	fgen.RampUp:   "FUNC RAMP; RAMP:SYMM 100\n",
-	fgen.RampDown: "FUNC RAMP; RAMP:SYMM 0\n",
-	fgen.DC:       "FUNC DC\n",
+	fgen.Sine:     "FUNC SIN",
+	fgen.Square:   "FUNC SQU",
+	fgen.Triangle: "FUNC RAMP; RAMP:SYMM 50",
+	fgen.RampUp:   "FUNC RAMP; RAMP:SYMM 100",
+	fgen.RampDown: "FUNC RAMP; RAMP:SYMM 0",
+	fgen.DC:       "FUNC DC",
 }
 
 var waveformApplyCommand = map[fgen.StandardWaveform]string{
-	fgen.Sine:     "APPL:SIN %.4f, %.4f, %.4f\n",
-	fgen.Square:   "APPL:SQU %.4f, %.4f, %.4f\n",
-	fgen.Triangle: "APPL:RAMP %.4f, %.4f, %.4f;:FUNC:RAMP:SYMM 50\n",
-	fgen.RampUp:   "APPL:RAMP %.4f, %.4f, %.4f;:FUNC:RAMP:SYMM 100\n",
-	fgen.RampDown: "APPL:RAMP %.4f, %.4f, %.4f;:FUNC:RAMP:SYMM 0\n",
-	fgen.DC:       "APPL:DC %.4f, %.4f, %.4f\n",
+	fgen.Sine:     "APPL:SIN %.4f, %.4f, %.4f",
+	fgen.Square:   "APPL:SQU %.4f, %.4f, %.4f",
+	fgen.Triangle: "APPL:RAMP %.4f, %.4f, %.4f;:FUNC:RAMP:SYMM 50",
+	fgen.RampUp:   "APPL:RAMP %.4f, %.4f, %.4f;:FUNC:RAMP:SYMM 100",
+	fgen.RampDown: "APPL:RAMP %.4f, %.4f, %.4f;:FUNC:RAMP:SYMM 0",
+	fgen.DC:       "APPL:DC %.4f, %.4f, %.4f",
 }
 
 // ConfigureStandardWaveform configures the attributes of the function
 // generator that affect standard waveform generation.
+//
 // ConfigureStandardWaveform is the method that implements the Configure
 // Standard Waveform function described in Section 5.3.1 of IVI-4.3: IviFgen
 // Class Specification.
 func (ch *Channel) ConfigureStandardWaveform(wave fgen.StandardWaveform, amp float64,
 	offset float64, freq float64, phase float64) error {
-	return ch.Set(waveformApplyCommand[wave], freq, amp, offset)
+	return ch.inst.Command(waveformApplyCommand[wave], freq, amp, offset)
 }

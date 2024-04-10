@@ -10,18 +10,21 @@ import (
 	"strings"
 
 	"github.com/gotmc/ivi/fgen"
+	"github.com/gotmc/query"
 )
 
-// Make sure that the key33220 driver implements the IviFgenTrigger capability
-// group.
+// Confirm that the output channel repeated capabilitiy implements the
+// IviFgenTrigger interface.
 var _ fgen.TriggerChannel = (*Channel)(nil)
 
-// TriggerSource determines the trigger srouce. TriggerSource is the getter for
-// the read-write IviFgenTrigger Attribute Trigger Source described in Section
-// 9.2.1 of IVI-4.3: IviFgen Class Specification.
+// TriggerSource determines the trigger srouce.
+//
+// TriggerSource is the getter for the read-write IviFgenTrigger Attribute
+// Trigger Source described in Section 9.2.1 of IVI-4.3: IviFgen Class
+// Specification.
 func (ch *Channel) TriggerSource() (fgen.TriggerSource, error) {
 	var src fgen.TriggerSource
-	s, err := ch.QueryString("TRIG:SOUR?\n")
+	s, err := query.String(ch.inst, "TRIG:SOUR?")
 	if err != nil {
 		return src, err
 	}
@@ -39,14 +42,16 @@ func (ch *Channel) TriggerSource() (fgen.TriggerSource, error) {
 	return src, nil
 }
 
-// SetTriggerSource specifies the trigger srouce. SetTriggerSource is the
-// setter for the read-write IviFgenTrigger Attribute Trigger Source described
-// in Section 9.2.1 of IVI-4.3: IviFgen Class Specification.
+// SetTriggerSource specifies the trigger srouce.
+//
+// SetTriggerSource is the setter for the read-write IviFgenTrigger Attribute
+// Trigger Source described in Section 9.2.1 of IVI-4.3: IviFgen Class
+// Specification.
 func (ch *Channel) SetTriggerSource(src fgen.TriggerSource) error {
 	triggers := map[fgen.TriggerSource]string{
 		fgen.InternalTrigger: "IMM",
 		fgen.ExternalTrigger: "EXT",
 		fgen.SoftwareTrigger: "BUS",
 	}
-	return ch.Set("TRIGE:SOUR %s\n", triggers[src])
+	return ch.inst.Command("TRIGE:SOUR %s", triggers[src])
 }

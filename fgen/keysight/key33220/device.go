@@ -4,8 +4,8 @@
 // can be found in the LICENSE.txt file for the project.
 
 /*
-Package key33220 implements the IVI Instrument driver for the Agilent 33220A
-function generator.
+Package key33220 implements the IVI Instrument driver for the Agilent/Keysight
+33220A function generator.
 
 State Caching: Not implemented
 */
@@ -22,24 +22,30 @@ const (
 	specRevision     = "5.2"
 )
 
-// Key33220 provides the IVI driver for an Agilent 33220A or 33210A
+// Confirm that the device driver implements the IviFgenBase interface.
+var _ fgen.Base = (*Device)(nil)
+
+// Device provides the IVI driver for a Keysight/Agilent 33220A or 33210A
 // function generator.
-type Key33220 struct {
+type Device struct {
 	inst     ivi.Instrument
 	Channels []Channel
 	ivi.Inherent
 }
 
 // New creates a new Key33220 IVI Instrument.
-func New(inst ivi.Instrument, reset bool) (Key33220, error) {
+func New(inst ivi.Instrument, reset bool) (*Device, error) {
 	channelNames := []string{
 		"Output",
 	}
 	outputCount := len(channelNames)
 	channels := make([]Channel, outputCount)
-	for i, ch := range channelNames {
-		baseChannel := fgen.NewChannel(i, ch, inst)
-		channels[i] = Channel{baseChannel}
+	for i, channelName := range channelNames {
+		ch := Channel{
+			name: channelName,
+			inst: inst,
+		}
+		channels[i] = ch
 	}
 	inherentBase := ivi.InherentBase{
 		ClassSpecMajorVersion: specMajorVersion,
@@ -58,22 +64,16 @@ func New(inst ivi.Instrument, reset bool) (Key33220, error) {
 		},
 	}
 	inherent := ivi.NewInherent(inst, inherentBase)
-	driver := Key33220{
+	device := Device{
 		inst:     inst,
 		Channels: channels,
 		Inherent: inherent,
 	}
 	if reset {
-		err := driver.Reset()
-		return driver, err
+		err := device.Reset()
+		return &device, err
 	}
-	return driver, nil
-}
-
-// Channel represents a repeated capability of an output channel for the
-// function generator.
-type Channel struct {
-	fgen.Channel
+	return &device, nil
 }
 
 // AvailableCOMPorts lists the avaialble COM ports, including optional ports.
@@ -93,4 +93,12 @@ func LANPorts() map[string]int {
 		"telnet": 5024,
 		"socket": 5025,
 	}
+}
+
+// OutputCount returns the number of available output channels.
+//
+// OutputCount is the getter for the read-only IviFgenBase Attribute Output
+// Count described in Section 4.2.1 of IVI-4.3: IviFgen Class Specification.
+func (a *Device) OutputCount() int {
+	return len(a.Channels)
 }

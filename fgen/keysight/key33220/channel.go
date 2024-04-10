@@ -10,19 +10,20 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/gotmc/ivi"
 	"github.com/gotmc/ivi/fgen"
+	"github.com/gotmc/query"
 )
 
-// Make sure that the key33220 driver implements the IviFgenBase capability
-// group.
-var _ fgen.Base = (*Key33220)(nil)
+// Confirm that the output channel repeated capabilitiy implements the
+// IviFgenBase interface.
 var _ fgen.BaseChannel = (*Channel)(nil)
 
-// OutputCount returns the number of available output channels. OutputCount is
-// the getter for the read-only IviFgenBase Attribute Output Count described in
-// Section 4.2.1 of IVI-4.3: IviFgen Class Specification.
-func (a *Key33220) OutputCount() int {
-	return len(a.Channels)
+// Channel models the output channel repeated capabilitiy for the function
+// generator output channel.
+type Channel struct {
+	name string
+	inst ivi.Instrument
 }
 
 // OperationMode determines whether the function generator should produce a
@@ -31,9 +32,7 @@ func (a *Key33220) OutputCount() int {
 // Section 4.2.2 of IVI-4.3: IviFgen Class Specification.
 func (ch *Channel) OperationMode() (fgen.OperationMode, error) {
 	var mode fgen.OperationMode
-	// TODO(mdr): Should I replace the `ch.QueryString(cmd)` with
-	// `query.String(ch.ivi, cmd)`?
-	s, err := ch.QueryString("BURS:STAT?\n")
+	s, err := query.String(ch.inst, "BURS:STAT?")
 	if err != nil {
 		return mode, fmt.Errorf("error getting operation mode: %s", err)
 	}
@@ -54,9 +53,9 @@ func (ch *Channel) OperationMode() (fgen.OperationMode, error) {
 func (ch *Channel) SetOperationMode(mode fgen.OperationMode) error {
 	switch mode {
 	case fgen.BurstMode:
-		return ch.Set("BURS:MODE TRIG;STAT ON\n")
+		return ch.inst.Command("BURS:MODE TRIG;STAT ON")
 	case fgen.ContinuousMode:
-		return ch.Set("BURS:STAT OFF\n")
+		return ch.inst.Command("BURS:STAT OFF")
 	}
 	return errors.New("bad fgen operation mode")
 }
@@ -66,7 +65,7 @@ func (ch *Channel) SetOperationMode(mode fgen.OperationMode) error {
 // Output Enabled described in Section 4.2.3 of IVI-4.3: IviFgen Class
 // Specification.
 func (ch *Channel) OutputEnabled() (bool, error) {
-	return ch.QueryBool("OUTP?\n")
+	return query.Bool(ch.inst, "OUTP?")
 }
 
 // SetOutputEnabled sets the output channel to enabled or disabled.
@@ -75,9 +74,9 @@ func (ch *Channel) OutputEnabled() (bool, error) {
 // Specification.
 func (ch *Channel) SetOutputEnabled(b bool) error {
 	if b {
-		return ch.Set("OUTP ON\n")
+		return ch.inst.Command("OUTP ON")
 	}
-	return ch.Set("OUTP OFF\n")
+	return ch.inst.Command("OUTP OFF")
 }
 
 // DisableOutput is a convenience function for setting the Output Enabled
@@ -97,7 +96,7 @@ func (ch *Channel) EnableOutput() error {
 // Output Impedance described in Section 4.2.4 of IVI-4.3: IviFgen Class
 // Specification.
 func (ch *Channel) OutputImpedance() (float64, error) {
-	return ch.QueryFloat64("OUTP:LOAD?\n")
+	return query.Float64(ch.inst, "OUTP:LOAD?")
 }
 
 // SetOutputImpedance sets the output channel's impedance in ohms.
@@ -105,7 +104,7 @@ func (ch *Channel) OutputImpedance() (float64, error) {
 // Output Impedance described in Section 4.2.3 of IVI-4.3: IviFgen Class
 // Specification.
 func (ch *Channel) SetOutputImpedance(impedance float64) error {
-	return ch.Set("OUTP:LOAD %f\n", impedance)
+	return ch.inst.Command("OUTP:LOAD %f", impedance)
 }
 
 // AbortGeneration Aborts a previously initiated signal generation. If the
