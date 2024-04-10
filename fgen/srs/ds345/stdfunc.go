@@ -14,8 +14,7 @@ import (
 	"github.com/gotmc/query"
 )
 
-// Make sure that the ds345 driver implements the IviFgenStdFunc capability
-// group.
+// Confirm the driver implements the IviFgenStdFunc extension group.
 var _ fgen.StdFuncChannel = (*Channel)(nil)
 
 // Amplitude reads the difference between the maximum and minimum waveform

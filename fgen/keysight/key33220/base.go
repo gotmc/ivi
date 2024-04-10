@@ -23,18 +23,18 @@ const (
 )
 
 // Confirm the driver implements the IviFgenBase interface.
-var _ fgen.Base = (*Device)(nil)
+var _ fgen.Base = (*Driver)(nil)
 
-// Device provides the IVI driver for a Keysight/Agilent 33220A or 33210A
+// Driver provides the IVI driver for a Keysight/Agilent 33220A or 33210A
 // function generator.
-type Device struct {
+type Driver struct {
 	inst     ivi.Instrument
 	Channels []Channel
 	ivi.Inherent
 }
 
-// New creates a new Key33220 IVI Instrument.
-func New(inst ivi.Instrument, reset bool) (*Device, error) {
+// New creates a new key33220 IVI driver.
+func New(inst ivi.Instrument, reset bool) (*Driver, error) {
 	channelNames := []string{
 		"Output",
 	}
@@ -64,16 +64,16 @@ func New(inst ivi.Instrument, reset bool) (*Device, error) {
 		},
 	}
 	inherent := ivi.NewInherent(inst, inherentBase)
-	device := Device{
+	driver := Driver{
 		inst:     inst,
 		Channels: channels,
 		Inherent: inherent,
 	}
 	if reset {
-		err := device.Reset()
-		return &device, err
+		err := driver.Reset()
+		return &driver, err
 	}
-	return &device, nil
+	return &driver, nil
 }
 
 // AvailableCOMPorts lists the avaialble COM ports, including optional ports.
@@ -99,7 +99,7 @@ func LANPorts() map[string]int {
 //
 // OutputCount is the getter for the read-only IviFgenBase Attribute Output
 // Count described in Section 4.2.1 of IVI-4.3: IviFgen Class Specification.
-func (a *Device) OutputCount() int {
+func (a *Driver) OutputCount() int {
 	return len(a.Channels)
 }
 
@@ -108,7 +108,7 @@ func (a *Device) OutputCount() int {
 //
 // AbortGeneration implements the IviFgenBase function described in Section 4.3.1
 // of IVI-4.3: IviFgen Class Specification.
-func (d *Device) AbortGeneration() error {
+func (d *Driver) AbortGeneration() error {
 	for _, channel := range d.Channels {
 		if err := channel.DisableOutput(); err != nil {
 			return err

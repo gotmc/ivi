@@ -10,7 +10,7 @@ import (
 	"github.com/gotmc/query"
 )
 
-// Confirm that the device implements the IviFgenInternalTrigger interface.
+// Confirm the driver implements the IviFgenInternalTrigger interface.
 var _ fgen.IntTriggerChannel = (*Channel)(nil)
 
 // InternalTriggerRate determines the rate at which the function generator's

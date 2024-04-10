@@ -10,8 +10,8 @@ import (
 	"github.com/gotmc/query"
 )
 
-// Confirm that the device implements the IviFgenBurst interface.
-var _ fgen.Burst = (*Device)(nil)
+// Confirm the driver implements the IviFgenBurst interface.
+var _ fgen.Burst = (*Driver)(nil)
 var _ fgen.BurstChannel = (*Channel)(nil)
 
 // BurstCount returns the number of waveform cycles that the function generator

@@ -14,7 +14,8 @@ import (
 	"github.com/gotmc/query"
 )
 
-// Confirm that the device implements the IviFgenTrigger interface.
+// Confirm the driver implements the interface for the IviFgenTrigger extension
+// group.
 var _ fgen.TriggerChannel = (*Channel)(nil)
 
 // TriggerSource determines the trigger srouce. TriggerSource is the getter for

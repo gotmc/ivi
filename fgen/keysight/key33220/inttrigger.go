@@ -10,8 +10,7 @@ import (
 	"github.com/gotmc/query"
 )
 
-// Make sure that the key33220 driver implements the IviFgenInternalTrigger
-// capability group.
+// Confirm the driver implements the IviFgenInternalTrigger capability group.
 var _ fgen.IntTriggerChannel = (*Channel)(nil)
 
 // InternalTriggerRate determines the rate at which the function generator's
