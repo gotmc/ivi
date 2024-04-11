@@ -8,7 +8,11 @@ package ivi
 import (
 	"errors"
 	"fmt"
+	"log"
 	"strings"
+	"time"
+
+	"github.com/gotmc/query"
 )
 
 type idPart int
@@ -68,6 +72,7 @@ func (inherent *Inherent) InstrumentManufacturer() (string, error) {
 // attribute Instrument Model described in Section 5.20 of IVI-3.2: Inherent
 // Capabilities Specification.
 func (inherent *Inherent) InstrumentModel() (string, error) {
+	log.Print("Executing InstrumentModel() IVI query")
 	return inherent.queryIdentification(modelID)
 }
 
@@ -79,13 +84,18 @@ func (inherent *Inherent) InstrumentSerialNumber() (string, error) {
 
 // Reset resets the instrument.
 func (inherent *Inherent) Reset() error {
-	_, err := inherent.inst.WriteString("*rst\n")
+	log.Println("Sending inherent Reset() command.")
+	err := inherent.inst.Command("*rst")
+	// Need to wait until the device resets.
+	// FIXME: The duration should be device dependent instead of hard coded.
+	time.Sleep(500 * time.Millisecond)
 	return err
 }
 
 // Clear clears the instrument.
 func (inherent *Inherent) Clear() error {
-	_, err := inherent.inst.WriteString("*CLS\n")
+	err := inherent.inst.Command("*cls")
+	time.Sleep(500 * time.Millisecond)
 	return err
 }
 
@@ -98,7 +108,7 @@ func (inherent *Inherent) Disable() error {
 }
 
 func (inherent *Inherent) queryIdentification(part idPart) (string, error) {
-	s, err := inherent.inst.Query("*idn?\n")
+	s, err := query.String(inherent.inst, "*IDN?")
 	if err != nil {
 		return "", err
 	}
