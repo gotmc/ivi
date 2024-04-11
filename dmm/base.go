@@ -19,11 +19,6 @@ type Base interface {
 	SetTriggerDelay(float64) error
 }
 
-// ACMeasurement provides the interface required for the IviDMMACMeasurement
-// capability group.
-type ACMeasurement interface {
-}
-
 // MeasurementFunction provides the defined values for the Measurement Function defined in
 // Section 4.2.1 of IVI-4.2: IviDmm Class Specification.
 type MeasurementFunction int
