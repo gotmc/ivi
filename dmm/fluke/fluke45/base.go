@@ -14,7 +14,7 @@ import (
 
 // MeasurementFunction needs a better comment.
 func (d *DMM) MeasurementFunction() (dmm.MeasurementFunction, error) {
-	fcn, err := d.QueryString("FUNC1?\n")
+	fcn, err := d.QueryString("FUNC1?")
 	if err != nil {
 		return 0, err
 	}

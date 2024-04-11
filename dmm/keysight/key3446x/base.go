@@ -14,7 +14,7 @@ import (
 
 // MeasurementFunction needs a better comment.
 func (d *Ag3446x) MeasurementFunction() (dmm.MeasurementFunction, error) {
-	conf, err := d.QueryString("CONF?\n")
+	conf, err := d.QueryString("CONF?")
 	if err != nil {
 		return 0, err
 	}

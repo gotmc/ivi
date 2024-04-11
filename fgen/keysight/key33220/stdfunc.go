@@ -123,7 +123,7 @@ func (ch *Channel) SetStartPhase(freq float64) error {
 // Waveform described in Section 5.2.6 of IVI-4.3: IviFgen Class Specification.
 func (ch *Channel) StandardWaveform() (fgen.StandardWaveform, error) {
 	var wave fgen.StandardWaveform
-	s, err := query.String(ch.inst, "FUNC?\n")
+	s, err := query.String(ch.inst, "FUNC?")
 	if err != nil {
 		return wave, err
 	}

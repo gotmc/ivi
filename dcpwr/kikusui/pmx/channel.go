@@ -32,7 +32,7 @@ type Channel struct {
 // Current Limit described in Section 4.2.1 of IVI-4.4: IviDCPwr Class
 // Specification.
 func (ch *Channel) CurrentLimit() (float64, error) {
-	return query.Float64(ch.inst, "CURR?\n")
+	return query.Float64(ch.inst, "CURR?")
 }
 
 // SetCurrentLimit specifies the output current limit in Amperes.
@@ -42,9 +42,9 @@ func (ch *Channel) CurrentLimit() (float64, error) {
 // Class Specification.
 func (ch *Channel) SetCurrentLimit(limit float64) error {
 	if ch.currentLimitBehavior == dcpwr.CurrentRegulate {
-		return ivi.Set(ch.inst, "CURR %f;:CURR:PROT MAX\n", limit)
+		return ch.inst.Command("CURR %f;:CURR:PROT MAX", limit)
 	} else if ch.currentLimitBehavior == dcpwr.CurrentTrip {
-		return ivi.Set(ch.inst, "CURR %f;:CURR:PROT %f\n", limit, limit)
+		return ch.inst.Command("CURR %f;:CURR:PROT %f", limit, limit)
 	}
 	return errors.New("current limit behavior not set")
 }
@@ -73,14 +73,14 @@ func (ch *Channel) CurrentLimitBehavior() (dcpwr.CurrentLimitBehavior, error) {
 func (ch *Channel) SetCurrentLimitBehavior(behavior dcpwr.CurrentLimitBehavior) error {
 	if behavior == dcpwr.CurrentRegulate {
 		ch.currentLimitBehavior = dcpwr.CurrentRegulate
-		return ivi.Set(ch.inst, "CURR:PROT MAX\n")
+		return ch.inst.Command("CURR:PROT MAX")
 	} else if behavior == dcpwr.CurrentTrip {
 		ch.currentLimitBehavior = dcpwr.CurrentTrip
-		limit, err := query.Float64(ch.inst, "CURR?\n")
+		limit, err := query.Float64(ch.inst, "CURR?")
 		if err != nil {
 			return err
 		}
-		return ivi.Set(ch.inst, "CURR:PROT %f\n", limit)
+		return ch.inst.Command("CURR:PROT %f", limit)
 	}
 	return errors.New("unknown current limit behavior")
 }
@@ -91,7 +91,7 @@ func (ch *Channel) SetCurrentLimitBehavior(behavior dcpwr.CurrentLimitBehavior) 
 // OutputEnabled is the getter for the read-write IviDCPwrBase Attribute Output
 // Enabled described in Section 4.2.3 of IVI-4.4: IviDCPwr Class Specification.
 func (ch *Channel) OutputEnabled() (bool, error) {
-	return query.Bool(ch.inst, "OUTP?\n")
+	return query.Bool(ch.inst, "OUTP?")
 }
 
 // SetOutputEnabled sets all three output channels to enabled or disabled.
@@ -101,9 +101,9 @@ func (ch *Channel) OutputEnabled() (bool, error) {
 // Specification.
 func (ch *Channel) SetOutputEnabled(v bool) error {
 	if v {
-		return ivi.Set(ch.inst, "OUTP 1\n")
+		return ch.inst.Command("OUTP 1")
 	}
-	return ivi.Set(ch.inst, "OUTP 0\n")
+	return ch.inst.Command("OUTP 0")
 }
 
 // DisableOutput is a convenience function for setting the Output Enabled
@@ -124,11 +124,11 @@ func (ch *Channel) EnableOutput() error {
 // OVPEnabled is the getter for the read-write IviFgenBase Attribute OVP
 // Enabled described in Section 4.2.4 of IVI-4.4: IviDCPwr Class Specification.
 func (ch *Channel) OVPEnabled() (bool, error) {
-	max, err := query.Float64(ch.inst, "VOLT:PROT? MAX\n")
+	max, err := query.Float64(ch.inst, "VOLT:PROT? MAX")
 	if err != nil {
 		return false, err
 	}
-	ovp, err := query.Float64(ch.inst, "VOLT:PROT?\n")
+	ovp, err := query.Float64(ch.inst, "VOLT:PROT?")
 	if err != nil {
 		return false, err
 	}
@@ -147,7 +147,7 @@ func (ch *Channel) OVPEnabled() (bool, error) {
 // Enabled described in Section 4.2.4 of IVI-4.4: IviDCPwr Class Specification.
 func (ch *Channel) SetOVPEnabled(v bool) error {
 	if !v {
-		return ivi.Set(ch.inst, "VOLT:PROT MAX\n")
+		return ch.inst.Command("VOLT:PROT MAX")
 	}
 	return nil
 }
@@ -169,7 +169,7 @@ func (ch *Channel) EnableOVP() error {
 // OPVLimit is the getter for the read-write IviDWPwrBase Attribute OVP Limit
 // described in Section 4.2.5 of IVI-4.4: IviDCPwr Class Specification.
 func (ch *Channel) OVPLimit() (float64, error) {
-	return query.Float64(ch.inst, "VOLT:PROT?\n")
+	return query.Float64(ch.inst, "VOLT:PROT?")
 }
 
 // SetOVPLimit specifies the voltage the power supply allows. The units are
@@ -181,7 +181,7 @@ func (ch *Channel) OVPLimit() (float64, error) {
 // SetOVPLimit is the setter for the read-write IviDCPwrBase Attribute OVP
 // Limit described in Section 4.2.5 of IVI-4.4: IviDCPwr Class Specification.
 func (ch *Channel) SetOVPLimit(limit float64) error {
-	return ivi.Set(ch.inst, "VOLT:PROT %f\n", limit)
+	return ch.inst.Command("VOLT:PROT %f", limit)
 }
 
 // VoltageLevel reads the specified voltage level the DC power supply attempts
@@ -190,7 +190,7 @@ func (ch *Channel) SetOVPLimit(limit float64) error {
 // VoltageLevel is the getter for the read-write IviDCPwrBase Attribute Voltage
 // Level described in Section 4.2.6 of IVI-4.4: IviDCPwr Class Specification.
 func (ch *Channel) VoltageLevel() (float64, error) {
-	return query.Float64(ch.inst, "VOLT?\n")
+	return query.Float64(ch.inst, "VOLT?")
 }
 
 // SetVoltageLevel specifies the voltage level the DC power supply attempts
@@ -200,7 +200,7 @@ func (ch *Channel) VoltageLevel() (float64, error) {
 // Voltage Level described in Section 4.2.6 of IVI-4.4: IviDCPwr Class
 // Specification.
 func (ch *Channel) SetVoltageLevel(level float64) error {
-	return ivi.Set(ch.inst, "VOLT %f\n", level)
+	return ivi.Set(ch.inst, "VOLT %f", level)
 }
 
 // ConfigureCurrentLimit specifies the output current limit value and the
@@ -213,10 +213,10 @@ func (ch *Channel) SetVoltageLevel(level float64) error {
 func (ch *Channel) ConfigureCurrentLimit(behavior dcpwr.CurrentLimitBehavior, limit float64) error {
 	if behavior == dcpwr.CurrentRegulate {
 		ch.currentLimitBehavior = dcpwr.CurrentRegulate
-		return ivi.Set(ch.inst, "CURR %f;:CURR:PROT MAX\n", limit)
+		return ch.inst.Command("CURR %f;:CURR:PROT MAX", limit)
 	} else if behavior == dcpwr.CurrentTrip {
 		ch.currentLimitBehavior = dcpwr.CurrentTrip
-		return ivi.Set(ch.inst, "CURR %f;:CURR:PROT %f\n", limit, limit)
+		return ch.inst.Command("CURR %f;:CURR:PROT %f", limit, limit)
 	}
 	return errors.New("unknown current limit behavior")
 
@@ -248,9 +248,9 @@ func (ch *Channel) ConfigureOutputRange(rt dcpwr.RangeType, rng float64) error {
 // Section 4.3.4 of IVI-4.4: IviDCPwr Class Specification.
 func (ch *Channel) ConfigureOVP(enabled bool, limit float64) error {
 	if !enabled {
-		return ivi.Set(ch.inst, "VOLT:PROT MAX\n")
+		return ch.inst.Command("VOLT:PROT MAX")
 	}
-	return ivi.Set(ch.inst, "VOLT:PROT %f\n", limit)
+	return ch.inst.Command("VOLT:PROT %f", limit)
 }
 
 // QueryCurrentLimitMax returns the maximum programmable current limit that the
@@ -294,7 +294,7 @@ func (ch *Channel) ResetOutputProtection() error {
 // function Measure for the Voltage MeasurementType parameter described in
 // Section 7.2.1 of IVI-4.4: IviDCPwr Class Specification.
 func (ch *Channel) MeasureVoltage() (float64, error) {
-	return query.Float64(ch.inst, ":MEAS:VOLT?\n")
+	return query.Float64(ch.inst, ":MEAS:VOLT?")
 }
 
 // MeasureCurrent takes a measurement of the output signal and returns the

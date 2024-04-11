@@ -16,31 +16,31 @@ import (
 
 // SetSourceOutputLevel sets the source output level.
 func (dev *Key35670) SetSourceOutputLevel(freq float64) error {
-	return ivi.Set(dev.inst, "sour:volt:lev:imm:amp %f\n", freq)
+	return ivi.Set(dev.inst, "sour:volt:lev:imm:amp %f", freq)
 }
 
 // SetSourceOutputLevelUnits sets the source output level and the units for the
 // source output.
 func (dev *Key35670) SetSourceOutputLevelUnits(freq float64, unit dsa.AmpUnits) error {
-	return ivi.Set(dev.inst, "sour:volt:lev:imm:amp %f %s\n", freq, unit)
+	return ivi.Set(dev.inst, "sour:volt:lev:imm:amp %f %s", freq, unit)
 }
 
 // SourceOutputLevel queries the source output level.
 func (dev *Key35670) SourceOutputLevel() (float64, error) {
-	return query.Float64(dev.inst, "sour:volt:lev:imm:amp?\n")
+	return query.Float64(dev.inst, "sour:volt:lev:imm:amp?")
 }
 
 // SourceEnabled determines if the source output is enabled or disabled.
 func (dev *Key35670) SourceEnabled() (bool, error) {
-	return query.Bool(dev.inst, "OUTP?\n")
+	return query.Bool(dev.inst, "OUTP?")
 }
 
 // SetSourceEnabled sets the source output to enabled or disabled.
 func (dev *Key35670) SetSourceEnabled(v bool) error {
 	if v {
-		return ivi.Set(dev.inst, "OUTP ON\n")
+		return ivi.Set(dev.inst, "OUTP ON")
 	}
-	return ivi.Set(dev.inst, "OUTP OFF\n")
+	return ivi.Set(dev.inst, "OUTP OFF")
 }
 
 // DisableSource is a convenience function for setting the Source Enabled
@@ -61,22 +61,22 @@ func (dev *Key35670) SetSourceFrequency(f float64) error {
 	if f < 0 || f > 115000 {
 		return fmt.Errorf("frequency out of allowable range: %f", f)
 	}
-	return ivi.Set(dev.inst, "sour:freq %f\n", f)
+	return ivi.Set(dev.inst, "sour:freq %f", f)
 }
 
 // SourceFrequency queries the source output frequency in Hz.
 func (dev *Key35670) SourceFrequency() (float64, error) {
-	return query.Float64(dev.inst, "sour:freq?\n")
+	return query.Float64(dev.inst, "sour:freq?")
 }
 
 // SetSourceShape sets the source output shape.
 func (dev *Key35670) SetSourceShape(shape dsa.SourceShape) error {
-	return ivi.Set(dev.inst, "sour:func:shap %s\n", shape)
+	return ivi.Set(dev.inst, "sour:func:shap %s", shape)
 }
 
 // SourceShape queries the source output shape.
 func (dev *Key35670) SourceShape() (dsa.SourceShape, error) {
-	s, err := query.String(dev.inst, "sour:func shap?\n")
+	s, err := query.String(dev.inst, "sour:func shap?")
 	if err != nil {
 		return "", err
 	}
