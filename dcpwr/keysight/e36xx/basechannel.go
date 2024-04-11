@@ -42,7 +42,7 @@ func (ch *Channel) CurrentLimit() (float64, error) {
 // Attribute Current Limit described in Section 4.2.1 of IVI-4.4: IviDCPwr
 // Class Specification.
 func (ch *Channel) SetCurrentLimit(limit float64) error {
-	return ivi.Set(ch.inst, "INST %s;:CURR %f\n", ch.name, limit)
+	return ch.inst.Command("INST %s;:CURR %f", ch.name, limit)
 }
 
 // CurrentLimitBehavior determines the behavior of the power supply when the
@@ -77,7 +77,7 @@ func (ch *Channel) SetCurrentLimitBehavior(behavior dcpwr.CurrentLimitBehavior) 
 // OutputEnabled is the getter for the read-write IviDCPwrBase Attribute Output
 // Enabled described in Section 4.2.3 of IVI-4.4: IviDCPwr Class Specification.
 func (ch *Channel) OutputEnabled() (bool, error) {
-	return query.Bool(ch.inst, "OUTP?\n")
+	return query.Bool(ch.inst, "OUTP?")
 }
 
 // SetOutputEnabled sets all three output channels to enabled or disabled.
@@ -87,9 +87,9 @@ func (ch *Channel) OutputEnabled() (bool, error) {
 // Specification.
 func (ch *Channel) SetOutputEnabled(v bool) error {
 	if v {
-		return ivi.Set(ch.inst, "OUTP ON\n")
+		return ch.inst.Command("OUTP ON")
 	}
-	return ivi.Set(ch.inst, "OUTP OFF\n")
+	return ch.inst.Command("OUTP OFF")
 }
 
 // DisableOutput is a convenience function for setting the Output Enabled
@@ -168,7 +168,7 @@ func (ch *Channel) VoltageLevel() (float64, error) {
 // Voltage Level described in Section 4.2.6 of IVI-4.4: IviDCPwr Class
 // Specification.
 func (ch *Channel) SetVoltageLevel(amp float64) error {
-	return ivi.Set(ch.inst, "APPL %s, %f\n", ch.name, amp)
+	return ch.inst.Command("inst %s; volt %.2f", ch.name, amp)
 }
 
 // ConfigureCurrentLimit configures the current limit. It specifies the output
@@ -279,10 +279,13 @@ func (ch *Channel) MeasureCurrent() (float64, error) {
 // is the voltage limit value and the second number 1.000000 is the current
 // limit value for the specified output.
 func (ch *Channel) readVoltageCurrent() (float64, float64, error) {
-	s, err := query.Stringf(ch.inst, "APPL? %s", ch)
+	s, err := query.Stringf(ch.inst, "appl? %s", ch.name)
 	if err != nil {
 		return 0.0, 0.0, err
 	}
+	// The E3631A returns the voltage and current inside double quotes, separated
+	// by a comma, so we need to strip those.
+	s = convert.StripDoubleQuotes(s)
 	floats, err := convert.StringToNFloats(s, ",", 2)
 	if err != nil {
 		return 0.0, 0.0, err

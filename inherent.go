@@ -8,7 +8,6 @@ package ivi
 import (
 	"errors"
 	"fmt"
-	"log"
 	"strings"
 	"time"
 
@@ -72,7 +71,6 @@ func (inherent *Inherent) InstrumentManufacturer() (string, error) {
 // attribute Instrument Model described in Section 5.20 of IVI-3.2: Inherent
 // Capabilities Specification.
 func (inherent *Inherent) InstrumentModel() (string, error) {
-	log.Print("Executing InstrumentModel() IVI query")
 	return inherent.queryIdentification(modelID)
 }
 
@@ -84,7 +82,6 @@ func (inherent *Inherent) InstrumentSerialNumber() (string, error) {
 
 // Reset resets the instrument.
 func (inherent *Inherent) Reset() error {
-	log.Println("Sending inherent Reset() command.")
 	err := inherent.inst.Command("*rst")
 	// Need to wait until the device resets.
 	// FIXME: The duration should be device dependent instead of hard coded.

@@ -44,5 +44,5 @@ type Querier interface {
 }
 
 type Commander interface {
-	Command(format string, a ...interface{}) error
+	Command(format string, a ...any) error
 }
