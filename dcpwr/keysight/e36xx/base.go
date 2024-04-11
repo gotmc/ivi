@@ -22,25 +22,26 @@ const (
 	specRevision     = "3.0"
 )
 
-// Confirm that the device driver implements the IviDCPwrBase interface.
-var _ dcpwr.Base = (*Device)(nil)
+// Confirm the driver implements the interface for the IviDCPwrBase capability
+// group.
+var _ dcpwr.Base = (*Driver)(nil)
 
-// Device provides the IVI driver for the Agilent/Keysight E3600 series of DC
+// Driver provides the IVI driver for the Agilent/Keysight E3600 series of DC
 // power supplies.
-type Device struct {
+type Driver struct {
 	inst     ivi.Instrument
 	Channels []Channel
 	ivi.Inherent
 }
 
-// New creates a new IVI Device driver for the Keysight/Agilent E3600 series of
-// DC power supplies. Currently, only the E3631A model is supported, but in the
+// New creates a new IVI driver for the Keysight/Agilent E3600 series of DC
+// power supplies. Currently, only the E3631A model is supported, but in the
 // future as other models are added, the New function will query the instrument
 // to determine the model and ensure it is one of the supported models. If
 // reset is true, then the instrument is reset.
-func New(inst ivi.Instrument, reset bool) (*Device, error) {
+func New(inst ivi.Instrument, reset bool) (*Driver, error) {
 	channelNames := []string{
-		"P6V",
+		"p6v",
 		"P25V",
 		"N25V",
 	}
@@ -64,18 +65,22 @@ func New(inst ivi.Instrument, reset bool) (*Device, error) {
 		SupportedInstrumentModels: []string{
 			"E3631A",
 		},
+		SupportedBusInterfaces: []string{
+			"GPIB",
+			"SERIAL",
+		},
 	}
 	inherent := ivi.NewInherent(inst, inherentBase)
-	device := Device{
+	driver := Driver{
 		inst:     inst,
 		Channels: channels,
 		Inherent: inherent,
 	}
 	if reset {
-		err := device.Reset()
-		return &device, err
+		err := driver.Reset()
+		return &driver, err
 	}
-	return &device, nil
+	return &driver, nil
 }
 
 // AvailableCOMPorts lists the avaialble COM ports, including optional ports.
@@ -123,6 +128,6 @@ func DefaultSerialDataFrame() string {
 // ChannelCount is the getter for the read-only IviDCPwrBase Attribute Output
 // Channel Count described in Section 4.2.7 of IVI-4.4: IviDCPwr Class
 // Specification.
-func (d Device) ChannelCount() int {
+func (d Driver) ChannelCount() int {
 	return len(d.Channels)
 }

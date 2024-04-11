@@ -22,7 +22,8 @@ const (
 	specRevision     = "5.2"
 )
 
-// Confirm the driver implements the IviFgenBase interface.
+// Confirm the driver implements the interface for the IviFgenBase capability
+// group.
 var _ fgen.Base = (*Driver)(nil)
 
 // Driver provides the IVI driver for a Keysight/Agilent 33220A or 33210A
@@ -33,7 +34,8 @@ type Driver struct {
 	ivi.Inherent
 }
 
-// New creates a new key33220 IVI driver.
+// New creates a new IVI driver for the Keysight 33210A and 33220A
+// function/arbitrary waveform generators.
 func New(inst ivi.Instrument, reset bool) (*Driver, error) {
 	channelNames := []string{
 		"Output",
@@ -53,14 +55,24 @@ func New(inst ivi.Instrument, reset bool) (*Driver, error) {
 		ClassSpecRevision:     specRevision,
 		GroupCapabilities: []string{
 			"IviFgenBase",
+			// "IviFgenArbFrequency",
+			// "IviFgenArbWfm",
+			"IviFgenBurst",
+			"IviFgenInternalTrigger",
+			// "IviFgenModulateAM",
+			// "IviFgenModulateFM",
+			// "IviFgenSoftwareTrigger",
 			"IviFgenStdfunc",
 			"IviFgenTrigger",
-			"IviFgenInternalTrigger",
-			"IviFgenBurst",
 		},
 		SupportedInstrumentModels: []string{
 			"33220A",
 			"33210A",
+		},
+		SupportedBusInterfaces: []string{
+			"TCPIP",
+			"GPIB",
+			"USB",
 		},
 	}
 	inherent := ivi.NewInherent(inst, inherentBase)

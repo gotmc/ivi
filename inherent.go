@@ -34,6 +34,7 @@ type InherentBase struct {
 	ClassSpecRevision         string
 	GroupCapabilities         []string
 	SupportedInstrumentModels []string
+	SupportedBusInterfaces    []string
 	IDNString                 string
 }
 

@@ -16,7 +16,7 @@ import (
 )
 
 // Confirm that the output channel repeated capabilitiy implements the
-// IviFgenBase interface.
+// interface for the IviFgenBase capability group.
 var _ fgen.BaseChannel = (*Channel)(nil)
 
 // Channel models the output channel repeated capabilitiy for the function
