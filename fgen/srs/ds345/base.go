@@ -68,6 +68,10 @@ func New(inst ivi.Instrument, reset bool) (*Driver, error) {
 		SupportedInstrumentModels: []string{
 			"DS345",
 		},
+		SupportedBusInterfaces: []string{
+			"GPIB",
+			"RS232",
+		},
 	}
 	inherent := ivi.NewInherent(inst, inherentBase)
 	driver := Driver{
@@ -85,11 +89,6 @@ func New(inst ivi.Instrument, reset bool) (*Driver, error) {
 		}
 	}
 	return &driver, nil
-}
-
-// AvailableCOMPorts lists the avaialble COM ports, including optional ports.
-func AvailableCOMPorts() []string {
-	return []string{"GPIB", "RS232"}
 }
 
 // DefaultGPIBAddress lists the default GPIB interface address.
@@ -117,7 +116,9 @@ func DefaultSerialBaudRate() int {
 	return 9600
 }
 
-// SerialDataFrames lists the available RS-232 data frame formats.
+// SerialDataFrames lists the available RS-232 data frame formats. The DS345
+// "always sends two stop bits, 8 data bits, and no parity, and will correctly
+// receive data sent with eitehr one or two stop bits." per the User's Manual.
 func SerialDataFrames() []string {
 	return []string{"8N2"}
 }

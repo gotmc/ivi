@@ -5,15 +5,6 @@
 
 package fgen
 
-// Burst provides the interface required for the IviFgenBurst
-// capability group.
-type Burst interface {
-	// Channels() ([]*BurstChannel, error)
-	// Channel(name string) (*BurstChannel, error)
-	// ChannelByID(id int) (*BurstChannel, error)
-	// ChannelCount() int
-}
-
 // BurstChannel provides the interface for the channel repeated capability for
 // the IviFgenBurst capability group.
 type BurstChannel interface {
