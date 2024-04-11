@@ -57,7 +57,7 @@ func New(inst ivi.Instrument, reset bool) (*Driver, error) {
 			// "IviFgenArbSeq",
 			// "IviFgenArbWaveform",
 			"IviFgenBase",
-			// "IviFgenBurst",
+			"IviFgenBurst",
 			// "IviFgenInternalTrigger",
 			// "IviFgenModulateFM",
 			// "IviFgenModulateAM",
