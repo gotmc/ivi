@@ -22,14 +22,13 @@ and creating a few IVI drivers for each instrument type.
 */
 package ivi
 
-import "io"
-
 // Instrument provides the interface required for all IVI Instruments.
 type Instrument interface {
-	io.ReadWriter
-	StringWriter
-	Commander
-	Querier
+	Read(p []byte) (n int, err error)
+	Write(p []byte) (n int, err error)
+	WriteString(s string) (n int, err error)
+	Command(format string, a ...any) error
+	Query(s string) (value string, err error)
 }
 
 // StringWriter provides the interface to write a string.
@@ -37,12 +36,12 @@ type StringWriter interface {
 	WriteString(s string) (n int, err error)
 }
 
+type Commander interface {
+	Command(format string, a ...any) error
+}
+
 // Querier provides the interface to query using a given string and provide the
 // resultant string.
 type Querier interface {
 	Query(s string) (value string, err error)
-}
-
-type Commander interface {
-	Command(format string, a ...any) error
 }
