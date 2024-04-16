@@ -400,7 +400,7 @@ func (d *Driver) IsOverRange(value float64) bool {
 }
 
 func (d *Driver) ReadMeasurement(maxTime time.Duration) (float64, error) {
-	return 0.0, dmm.ErrNotImplemented
+	return query.Float64(d.inst, "read?")
 }
 
 // cmdToMsrFunc maps the SCPI command string name of a measurement function to
@@ -415,6 +415,7 @@ var cmdToMsrFunc = map[string]dmm.MeasurementFunction{
 	"RES":     dmm.TwoWireResistance,
 	"FRES":    dmm.FourWireResistance,
 	"FREQ":    dmm.Frequency,
+	"PER":     dmm.Period,
 	"TEMP":    dmm.Temperature,
 }
 
