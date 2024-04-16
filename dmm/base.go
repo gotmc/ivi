@@ -92,6 +92,16 @@ const (
 	AutoOnce                  // IVIDMM_VAL_AUTO_RANGE_ONCE / IviDammAutoRangeOnce
 )
 
+var autoRanges = map[AutoRange]string{
+	AutoOn:   "Auto Range On",
+	AutoOff:  "Auto Range Off",
+	AutoOnce: "Auto Once",
+}
+
+func (ar AutoRange) String() string {
+	return autoRanges[ar]
+}
+
 // TriggerSource provides the defined values for the Trigger Source Attribute
 // defined in Sectino 4.2.7 of IVI-4.2 IviDmm Class Specification.
 type TriggerSource int

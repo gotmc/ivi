@@ -18,7 +18,6 @@ package key3446x
 
 import (
 	"fmt"
-	"strings"
 	"time"
 
 	"github.com/gotmc/convert"
@@ -102,17 +101,16 @@ func (d *Driver) QueryString(cmd string) (string, error) {
 // MeasurementFunction is the getter for the read-write IviDmmBase Attribute
 // Function described in Section 4.2.1 of IVI-4.2: IviDmm Class Specification.
 func (d *Driver) MeasurementFunction() (dmm.MeasurementFunction, error) {
-	conf, err := d.QueryString("CONF?")
+	response, err := query.String(d.inst, "func?")
 	if err != nil {
 		return 0, err
 	}
 
-	conf = convert.StripDoubleQuotes(conf)
-	fcnString := strings.Split(conf, " ")[0]
-	fcn, ok := stringToMeasurementFunction[fcnString]
+	response = convert.StripDoubleQuotes(response)
+	fcn, ok := cmdToMsrFunc[response]
 
 	if !ok {
-		return 0, fmt.Errorf("%s is not a valid measurement function", fcnString)
+		return 0, fmt.Errorf("%s is not a valid measurement function", response)
 	}
 
 	return fcn, nil
@@ -123,7 +121,8 @@ func (d *Driver) MeasurementFunction() (dmm.MeasurementFunction, error) {
 // SetMeasurementFunction is the setter for the read-write IviDmmBase Attribute
 // Function described in Section 4.2.1 of IVI-4.2: IviDmm Class Specification.
 func (d *Driver) SetMeasurementFunction(msrFunc dmm.MeasurementFunction) error {
-	cmd := msrFuncToConfigCommand[msrFunc]
+	// Need to return a quoted string, so use %q in the fmt.Sprintf
+	cmd := fmt.Sprintf("func %q", msrFuncToCmd[msrFunc])
 	return d.inst.Command(cmd)
 }
 
@@ -161,7 +160,27 @@ func (d *Driver) SetMeasurementFunction(msrFunc dmm.MeasurementFunction) error {
 // Range is the getter for the read-write IviDmmBase Attribute Range described
 // in Section 4.2.2 of IVI-4.2: IviDmm Class Specification.
 func (d *Driver) Range() (dmm.AutoRange, float64, error) {
-	return 0, 0.0, dmm.ErrNotImplemented
+	fcn, err := d.MeasurementFunction()
+	if err != nil {
+		return 0, 0.0, err
+	}
+
+	isAutoRange, err := query.Boolf(d.inst, "%s:rang:auto?", msrFuncToCmd[fcn])
+	if err != nil {
+		return 0, 0.0, err
+	}
+
+	autoRange := dmm.AutoOn
+	if !isAutoRange {
+		autoRange = dmm.AutoOff
+	}
+
+	rng, err := query.Float64f(d.inst, "%s:rang?", msrFuncToCmd[fcn])
+	if err != nil {
+		return 0, 0.0, err
+	}
+
+	return autoRange, rng, nil
 }
 
 // SetRange sets the range corresponding to the maximum input value based on
@@ -173,7 +192,40 @@ func (d *Driver) Range() (dmm.AutoRange, float64, error) {
 // SetRange is the setter for the read-write IviDmmBase Attribute
 // Range described in Section 4.2.2 of IVI-4.2: IviDmm Class Specification.
 func (d *Driver) SetRange(autoRange dmm.AutoRange, rangeValue float64) error {
-	return dmm.ErrNotImplemented
+	fcn, err := d.MeasurementFunction()
+	if err != nil {
+		return err
+	}
+
+	// Set the range to auto if appropriate.
+	if autoRange == dmm.AutoOn {
+		return d.inst.Command("%s:rang:auto on", msrFuncToCmd[fcn])
+	}
+
+	// Not auto ranging, so  we need to determine the appropriate SCPI range
+	// string for the given range value and measurement function.
+	var rng string
+
+	switch fcn {
+	case dmm.DCVolts, dmm.ACVolts:
+		// 100 mV|1 V|10 V|100 V|1000 V
+		rng, err = determineManualVoltageRange(rangeValue)
+		if err != nil {
+			return err
+		}
+	case dmm.DCCurrent:
+	case dmm.ACCurrent:
+	case dmm.TwoWireResistance:
+		rng, err = determineManualResistanceRange(rangeValue)
+	case dmm.FourWireResistance:
+	case dmm.ACPlusDCVolts:
+	case dmm.ACPlusDCCurrent:
+	case dmm.Frequency:
+	case dmm.Period:
+	case dmm.Temperature:
+	}
+
+	return d.inst.Command("%s:rang %s", msrFuncToCmd[fcn], rng)
 }
 
 func (d *Driver) ResolutionAbsolute() (float64, error) {
@@ -294,16 +346,40 @@ func determineVoltageRange(autoRange dmm.AutoRange, rangeValue float64) (string,
 func determineManualVoltageRange(rangeValue float64) (string, error) {
 	switch {
 	case rangeValue <= 0.1:
-		return "100 mV", nil
+		return "0.1", nil
 	case rangeValue <= 1.0:
-		return "1 V", nil
+		return "1", nil
 	case rangeValue <= 10.0:
-		return "10 V", nil
+		return "10", nil
 	case rangeValue <= 100.0:
-		return "100 V", nil
+		return "100", nil
 	case rangeValue <= 1000.0:
-		return "1000 V", nil
+		return "1000", nil
 	}
+
+	return "", dmm.ErrNotImplemented
+}
+
+func determineManualResistanceRange(rangeValue float64) (string, error) {
+	switch {
+	case rangeValue <= 100:
+		return "100", nil
+	case rangeValue <= 1.0e3:
+		return "1e3", nil
+	case rangeValue <= 10e3:
+		return "10e3", nil
+	case rangeValue <= 100e3:
+		return "100e3", nil
+	case rangeValue <= 1e6:
+		return "1e6", nil
+	case rangeValue <= 10e6:
+		return "10e6", nil
+	case rangeValue <= 100e6:
+		return "100e6", nil
+	case rangeValue <= 1e9:
+		return "1e9", nil
+	}
+
 	return "", dmm.ErrNotImplemented
 }
 
@@ -327,9 +403,9 @@ func (d *Driver) ReadMeasurement(maxTime time.Duration) (float64, error) {
 	return 0.0, dmm.ErrNotImplemented
 }
 
-// stringToMeasurementFunction maps the string name of a measurement function to the
-// MeasurementFunction.
-var stringToMeasurementFunction = map[string]dmm.MeasurementFunction{
+// cmdToMsrFunc maps the SCPI command string name of a measurement function to
+// the MeasurementFunction.
+var cmdToMsrFunc = map[string]dmm.MeasurementFunction{
 	"VOLT":    dmm.DCVolts,
 	"VOLT:DC": dmm.DCVolts,
 	"VOLT:AC": dmm.ACVolts,
@@ -342,15 +418,17 @@ var stringToMeasurementFunction = map[string]dmm.MeasurementFunction{
 	"TEMP":    dmm.Temperature,
 }
 
-// msrFuncToConfigCommand maps the MeasurementFunction to the SCPI
-// CONFigure command.
-var msrFuncToConfigCommand = map[dmm.MeasurementFunction]string{
-	dmm.DCVolts:            "CONF:VOLT:DC",
-	dmm.ACVolts:            "CONF:VOLT:AC",
-	dmm.DCCurrent:          "CONF:CURR:DC",
+// msrFuncToCmd maps the MeasurementFunction to the SCPI command string
+var msrFuncToCmd = map[dmm.MeasurementFunction]string{
+	dmm.DCVolts:            "VOLT",
+	dmm.ACVolts:            "VOLT:AC",
+	dmm.DCCurrent:          "CURR",
 	dmm.ACCurrent:          "CURR:AC",
-	dmm.TwoWireResistance:  "CONF:RES",
-	dmm.FourWireResistance: "CONF:FRES",
-	dmm.Frequency:          "CONF:FREQ",
-	dmm.Temperature:        "CONF:TEMP",
+	dmm.TwoWireResistance:  "RES",
+	dmm.FourWireResistance: "FRES",
+	dmm.ACPlusDCVolts:      "VOLT:AC",
+	dmm.ACPlusDCCurrent:    "CURR:AC",
+	dmm.Frequency:          "FREQ",
+	dmm.Period:             "PER",
+	dmm.Temperature:        "TEMP",
 }
