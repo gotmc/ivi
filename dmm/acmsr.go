@@ -5,7 +5,13 @@
 
 package dmm
 
-// ACMeasurement provides the interface required for the IviDMMACMeasurement
-// capability group.
+// ACMeasurement provides the interface required for the IviDmmACMeasurement
+// extension group described in Section 5 of IVI-4.2 IviDmm Class
+// Specification.
 type ACMeasurement interface {
+	MaxACFrequency() (float64, error)
+	SetMaxACFrequency(maxFreq float64) error
+	MinACFrequency() (float64, error)
+	SetMinACFrequency(minFreq float64) error
+	ConfigureACBandwidth(minFreq, maxFreq float64) error
 }
