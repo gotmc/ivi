@@ -18,6 +18,15 @@ linters-settings:
   nolintlint:
     require-explanation: true
     require-specific: true
+  depguard:
+    rules:
+      main:
+        list-mode: lax
+        files:
+          - "!**/*_a _file.go"
+        deny:
+          - pkg: "io/ioutil"
+            desc: The io/ioutil package has been deprecated.
 
 linters:
   disable-all: true
@@ -57,14 +66,6 @@ linters:
     - varcheck
     - whitespace
     - wsl
-
-linters-settings:
-  depguard:
-    rules:
-      main:
-        deny:
-          - pkg: io/ioutil
-            desc: The io/ioutil package has been deprecated, see https://go.dev/doc/go1.16#ioutil
 
 run:
   issues-exit-code: 1
