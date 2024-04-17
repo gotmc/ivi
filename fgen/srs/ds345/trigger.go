@@ -22,10 +22,12 @@ var _ fgen.TriggerChannel = (*Channel)(nil)
 // 9.2.1 of IVI-4.3: IviFgen Class Specification.
 func (ch *Channel) TriggerSource() (fgen.TriggerSource, error) {
 	var src fgen.TriggerSource
+
 	s, err := query.String(ch.inst, "TSRC?")
 	if err != nil {
 		return src, err
 	}
+
 	s = strings.TrimSpace(strings.ToUpper(s))
 	switch s {
 	case "1":
@@ -35,6 +37,7 @@ func (ch *Channel) TriggerSource() (fgen.TriggerSource, error) {
 	default:
 		return src, errors.New("error determining trigger source")
 	}
+
 	return src, nil
 }
 
@@ -45,9 +48,11 @@ func (ch *Channel) SetTriggerSource(src fgen.TriggerSource) error {
 	if src == fgen.SoftwareTrigger {
 		return errors.New("software trigger not supported")
 	}
+
 	triggers := map[fgen.TriggerSource]string{
 		fgen.InternalTrigger: "1",
 		fgen.ExternalTrigger: "2",
 	}
+
 	return ch.inst.Command("TSRC%s", triggers[src])
 }

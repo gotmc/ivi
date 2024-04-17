@@ -123,10 +123,13 @@ func (ch *Channel) SetStartPhase(freq float64) error {
 // Waveform described in Section 5.2.6 of IVI-4.3: IviFgen Class Specification.
 func (ch *Channel) StandardWaveform() (fgen.StandardWaveform, error) {
 	var wave fgen.StandardWaveform
+
 	s, err := query.String(ch.inst, "FUNC?")
+
 	if err != nil {
 		return wave, err
 	}
+
 	s = strings.TrimSpace(s)
 	switch s {
 	case "0":
@@ -140,6 +143,7 @@ func (ch *Channel) StandardWaveform() (fgen.StandardWaveform, error) {
 		if err != nil {
 			return wave, fmt.Errorf("unable to determine ramp up vs ramp down: %s", err)
 		}
+
 		switch invrt {
 		case "0":
 			return fgen.RampUp, nil
@@ -147,6 +151,7 @@ func (ch *Channel) StandardWaveform() (fgen.StandardWaveform, error) {
 			return fgen.RampDown, nil
 		}
 	}
+
 	return wave, fmt.Errorf("unable to determine standard waveform type: %s", s)
 }
 
@@ -162,6 +167,7 @@ func (ch *Channel) SetStandardWaveform(wave fgen.StandardWaveform) error {
 	if wave == fgen.DC {
 		return errors.New("dc standard waveform not implemented")
 	}
+
 	return ch.inst.Command(waveformCommand[wave])
 }
 
@@ -184,6 +190,7 @@ func (ch *Channel) ConfigureStandardWaveform(wave fgen.StandardWaveform, amp flo
 	if wave == fgen.DC {
 		return errors.New("dc standard waveform not implemented")
 	}
+
 	return ch.inst.Command(waveformApplyCommand[wave], freq, amp, offset, phase)
 }
 

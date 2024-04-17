@@ -42,6 +42,7 @@ func New(inst ivi.Instrument, reset bool) (*Driver, error) {
 	}
 	outputCount := len(channelNames)
 	channels := make([]Channel, outputCount)
+
 	for i, channelName := range channelNames {
 		ch := Channel{
 			name: channelName,
@@ -49,6 +50,7 @@ func New(inst ivi.Instrument, reset bool) (*Driver, error) {
 		}
 		channels[i] = ch
 	}
+
 	inherentBase := ivi.InherentBase{
 		ClassSpecMajorVersion: specMajorVersion,
 		ClassSpecMinorVersion: specMinorVersion,
@@ -83,6 +85,7 @@ func New(inst ivi.Instrument, reset bool) (*Driver, error) {
 		Channels: channels,
 		Inherent: inherent,
 	}
+
 	if reset {
 		if err := driver.Reset(); err != nil {
 			return &driver, err
@@ -92,6 +95,7 @@ func New(inst ivi.Instrument, reset bool) (*Driver, error) {
 			return &driver, err
 		}
 	}
+
 	return &driver, nil
 }
 

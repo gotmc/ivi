@@ -14,11 +14,15 @@ import (
 	"github.com/gotmc/query"
 )
 
-// Confirm that the output channel repeated capabilitiy implements the
+// Confirm that the output channel repeated capability implements the
 // IviFgenBase interface.
 var _ fgen.BaseChannel = (*Channel)(nil)
 
-// Channel models the output channel repeated capabilitiy for the function
+const (
+	outputImpedance = 50.0
+)
+
+// Channel models the output channel repeated capability for the function
 // generator output channel.
 type Channel struct {
 	name string
@@ -31,10 +35,12 @@ type Channel struct {
 // Section 4.2.2 of IVI-4.3: IviFgen Class Specification.
 func (ch *Channel) OperationMode() (fgen.OperationMode, error) {
 	var mode fgen.OperationMode
+
 	s, err := query.String(ch.inst, "MENA?")
 	if err != nil {
 		return mode, fmt.Errorf("error getting operation mode: %s", err)
 	}
+
 	switch s {
 	case "0":
 		return fgen.ContinuousMode, nil
@@ -43,6 +49,7 @@ func (ch *Channel) OperationMode() (fgen.OperationMode, error) {
 		if err != nil {
 			return mode, fmt.Errorf("error determining modulation type: %s", err)
 		}
+
 		switch mod {
 		case "5":
 			return fgen.BurstMode, nil
@@ -63,10 +70,13 @@ func (ch *Channel) OperationMode() (fgen.OperationMode, error) {
 func (ch *Channel) SetOperationMode(mode fgen.OperationMode) error {
 	switch mode {
 	case fgen.BurstMode:
-		return ch.inst.Command("MENA1;MTYP5")
+		// Set the modulation type to BURST and enable modulation.
+		return ch.inst.Command("MTYP5;MENA1")
 	case fgen.ContinuousMode:
+		// Disable modulation.
 		return ch.inst.Command("MENA0")
 	}
+
 	return errors.New("bad fgen operation mode")
 }
 
@@ -105,7 +115,7 @@ func (ch *Channel) EnableOutput() error {
 // Output Impedance described in Section 4.2.4 of IVI-4.3: IviFgen Class
 // Specification.
 func (ch *Channel) OutputImpedance() (float64, error) {
-	return 50.0, nil
+	return outputImpedance, nil
 }
 
 // SetOutputImpedance sets the output channel's impedance in ohms.
@@ -114,8 +124,9 @@ func (ch *Channel) OutputImpedance() (float64, error) {
 // Output Impedance described in Section 4.2.3 of IVI-4.3: IviFgen Class
 // Specification.
 func (ch *Channel) SetOutputImpedance(impedance float64) error {
-	if impedance != 50 {
+	if impedance != outputImpedance {
 		return errors.New("output impedance must be 50 ohms")
 	}
+
 	return nil
 }
