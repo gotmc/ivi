@@ -38,8 +38,7 @@ var _ dmm.Base = (*Driver)(nil)
 
 // Driver provides the IVI driver for the Keysight 3446x family of DMMs.
 type Driver struct {
-	inst        ivi.Instrument
-	outputCount int
+	inst ivi.Instrument
 	ivi.Inherent
 }
 
@@ -80,9 +79,8 @@ func New(inst ivi.Instrument, reset bool) (*Driver, error) {
 	}
 	inherent := ivi.NewInherent(inst, inherentBase)
 	driver := Driver{
-		inst:        inst,
-		outputCount: 1,
-		Inherent:    inherent,
+		inst:     inst,
+		Inherent: inherent,
 	}
 
 	if reset {
@@ -268,43 +266,6 @@ func (d *Driver) ConfigureMeasurement(
 
 	return d.inst.Command(cmd)
 }
-
-func createConfigureMeasurementCommand(
-	msrFunc dmm.MeasurementFunction,
-	autoRange dmm.AutoRange,
-	rangeValue float64,
-	resolution float64,
-) (string, error) {
-	switch msrFunc {
-	case dmm.DCVolts:
-		return createConfigureVoltageDCCommand(autoRange, rangeValue, resolution)
-	case dmm.ACVolts:
-		return createConfigureVoltageACCommand(autoRange, rangeValue)
-	case dmm.DCCurrent:
-		// return createConfigureCurrentDCCommand(autoRange, rangeValue, resolution)
-		return "", dmm.ErrNotImplemented
-	case dmm.ACCurrent:
-		// return createConfigureCurrentACCommand(autoRange, rangeValue)
-		return "", dmm.ErrNotImplemented
-	case dmm.TwoWireResistance:
-		return "", dmm.ErrNotImplemented
-	case dmm.FourWireResistance:
-		return "", dmm.ErrNotImplemented
-	case dmm.ACPlusDCVolts:
-		return "", dmm.ErrNotImplemented
-	case dmm.ACPlusDCCurrent:
-		return "", dmm.ErrNotImplemented
-	case dmm.Frequency:
-		return "", dmm.ErrNotImplemented
-	case dmm.Period:
-		return "", dmm.ErrNotImplemented
-	case dmm.Temperature:
-		return "", dmm.ErrNotImplemented
-	}
-
-	return "", dmm.ErrNotImplemented
-}
-
 func createConfigureVoltageDCCommand(
 	autoRange dmm.AutoRange,
 	rangeValue float64,
@@ -314,11 +275,83 @@ func createConfigureVoltageDCCommand(
 	if err != nil {
 		return "", dmm.ErrNotImplemented
 	}
+
 	if autoRange == dmm.AutoOff {
 		return fmt.Sprintf("CONF:VOLT:DC %s,%f", rng, resolution), nil
 	}
 
 	return fmt.Sprintf("CONF:VOLT:DC %s", rng), nil
+}
+func (d *Driver) ConfigureTrigger(src dmm.TriggerSource, delay time.Duration) error {
+	return dmm.ErrNotImplemented
+}
+
+// FetchMeasurement returns the measured value from a measurement that the
+// Initiate function initiates. After this function executes, the Reading
+// parameter contains an actual reading or a value indicating that an overrange
+// condition occurred.
+//
+// Currently, the maxTime is ignored.
+//
+// FetchMeasurement implements the IviDmmBase function described in Section
+// 4.3.4 of the IVI-4.2 IviDmm Class Specification.
+func (d *Driver) FetchMeasurement(maxTime time.Duration) (float64, error) {
+	return query.Float64(d.inst, "fetc?")
+}
+
+// InitiateMeasurement initiates a measurement. When this function executes,
+// the DMM leaves the idle state and waits for a trigger.
+//
+// This function does not check the instrument status. Typically, the end-user
+// calls this function only in a sequence of calls to other low-level driver
+// functions. The sequence performs one operation. The end-user uses the
+// low-level functions to optimize one or more aspects of interaction with the
+// instrument. To check the instrument status, call the Error Query function at
+// the conclusion of the sequence.
+//
+// InitiateMeasurement implements the IviDmmBase function described in Section
+// 4.3.5 of the IVI-4.2 IviDmm Class Specification.
+func (d *Driver) InitiateMeasurement() error {
+	return d.inst.Command("init")
+}
+
+func (d *Driver) IsOverRange(value float64) bool {
+	return true
+}
+
+func (d *Driver) ReadMeasurement(maxTime time.Duration) (float64, error) {
+	return query.Float64(d.inst, "read?")
+}
+
+// cmdToMsrFunc maps the SCPI command string name of a measurement function to
+// the MeasurementFunction.
+var cmdToMsrFunc = map[string]dmm.MeasurementFunction{
+	"VOLT":    dmm.DCVolts,
+	"VOLT:DC": dmm.DCVolts,
+	"VOLT:AC": dmm.ACVolts,
+	"CURR":    dmm.DCCurrent,
+	"CURR:DC": dmm.DCCurrent,
+	"CURR:AC": dmm.ACCurrent,
+	"RES":     dmm.TwoWireResistance,
+	"FRES":    dmm.FourWireResistance,
+	"FREQ":    dmm.Frequency,
+	"PER":     dmm.Period,
+	"TEMP":    dmm.Temperature,
+}
+
+// msrFuncToCmd maps the MeasurementFunction to the SCPI command string
+var msrFuncToCmd = map[dmm.MeasurementFunction]string{
+	dmm.DCVolts:            "VOLT",
+	dmm.ACVolts:            "VOLT:AC",
+	dmm.DCCurrent:          "CURR",
+	dmm.ACCurrent:          "CURR:AC",
+	dmm.TwoWireResistance:  "RES",
+	dmm.FourWireResistance: "FRES",
+	dmm.ACPlusDCVolts:      "VOLT:AC",
+	dmm.ACPlusDCCurrent:    "CURR:AC",
+	dmm.Frequency:          "FREQ",
+	dmm.Period:             "PER",
+	dmm.Temperature:        "TEMP",
 }
 
 func createConfigureVoltageACCommand(
@@ -342,6 +375,7 @@ func determineVoltageRange(autoRange dmm.AutoRange, rangeValue float64) (string,
 	case dmm.AutoOnce:
 		return "", dmm.ErrNotImplemented
 	}
+
 	return "", dmm.ErrNotImplemented
 }
 
@@ -385,53 +419,38 @@ func determineManualResistanceRange(rangeValue float64) (string, error) {
 	return "", dmm.ErrNotImplemented
 }
 
-func (d *Driver) ConfigureTrigger(src dmm.TriggerSource, delay time.Duration) error {
-	return dmm.ErrNotImplemented
-}
+func createConfigureMeasurementCommand(
+	msrFunc dmm.MeasurementFunction,
+	autoRange dmm.AutoRange,
+	rangeValue float64,
+	resolution float64,
+) (string, error) {
+	switch msrFunc {
+	case dmm.DCVolts:
+		return createConfigureVoltageDCCommand(autoRange, rangeValue, resolution)
+	case dmm.ACVolts:
+		return createConfigureVoltageACCommand(autoRange, rangeValue)
+	case dmm.DCCurrent:
+		// return createConfigureCurrentDCCommand(autoRange, rangeValue, resolution)
+		return "", dmm.ErrNotImplemented
+	case dmm.ACCurrent:
+		// return createConfigureCurrentACCommand(autoRange, rangeValue)
+		return "", dmm.ErrNotImplemented
+	case dmm.TwoWireResistance:
+		return "", dmm.ErrNotImplemented
+	case dmm.FourWireResistance:
+		return "", dmm.ErrNotImplemented
+	case dmm.ACPlusDCVolts:
+		return "", dmm.ErrNotImplemented
+	case dmm.ACPlusDCCurrent:
+		return "", dmm.ErrNotImplemented
+	case dmm.Frequency:
+		return "", dmm.ErrNotImplemented
+	case dmm.Period:
+		return "", dmm.ErrNotImplemented
+	case dmm.Temperature:
+		return "", dmm.ErrNotImplemented
+	}
 
-func (d *Driver) FetchMeasurement(maxTime time.Duration) (float64, error) {
-	return 0.0, dmm.ErrNotImplemented
-}
-
-func (d *Driver) InitiateMeasurement() error {
-	return dmm.ErrNotImplemented
-}
-
-func (d *Driver) IsOverRange(value float64) bool {
-	return true
-}
-
-func (d *Driver) ReadMeasurement(maxTime time.Duration) (float64, error) {
-	return query.Float64(d.inst, "read?")
-}
-
-// cmdToMsrFunc maps the SCPI command string name of a measurement function to
-// the MeasurementFunction.
-var cmdToMsrFunc = map[string]dmm.MeasurementFunction{
-	"VOLT":    dmm.DCVolts,
-	"VOLT:DC": dmm.DCVolts,
-	"VOLT:AC": dmm.ACVolts,
-	"CURR":    dmm.DCCurrent,
-	"CURR:DC": dmm.DCCurrent,
-	"CURR:AC": dmm.ACCurrent,
-	"RES":     dmm.TwoWireResistance,
-	"FRES":    dmm.FourWireResistance,
-	"FREQ":    dmm.Frequency,
-	"PER":     dmm.Period,
-	"TEMP":    dmm.Temperature,
-}
-
-// msrFuncToCmd maps the MeasurementFunction to the SCPI command string
-var msrFuncToCmd = map[dmm.MeasurementFunction]string{
-	dmm.DCVolts:            "VOLT",
-	dmm.ACVolts:            "VOLT:AC",
-	dmm.DCCurrent:          "CURR",
-	dmm.ACCurrent:          "CURR:AC",
-	dmm.TwoWireResistance:  "RES",
-	dmm.FourWireResistance: "FRES",
-	dmm.ACPlusDCVolts:      "VOLT:AC",
-	dmm.ACPlusDCCurrent:    "CURR:AC",
-	dmm.Frequency:          "FREQ",
-	dmm.Period:             "PER",
-	dmm.Temperature:        "TEMP",
+	return "", dmm.ErrNotImplemented
 }
