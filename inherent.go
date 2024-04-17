@@ -35,10 +35,12 @@ type InherentBase struct {
 	ClassSpecMajorVersion     int
 	ClassSpecMinorVersion     int
 	ClassSpecRevision         string
+	IDNString                 string
+	ResetDelay                time.Duration
+	ClearDelay                time.Duration
 	GroupCapabilities         []string
 	SupportedInstrumentModels []string
 	SupportedBusInterfaces    []string
-	IDNString                 string
 }
 
 // NewInherent creates a new Inherent struct using the given Instrument
@@ -85,14 +87,16 @@ func (inherent *Inherent) Reset() error {
 	err := inherent.inst.Command("*rst")
 	// Need to wait until the device resets.
 	// FIXME: The duration should be device dependent instead of hard coded.
-	time.Sleep(500 * time.Millisecond)
+	time.Sleep(inherent.ResetDelay)
+
 	return err
 }
 
 // Clear clears the instrument.
 func (inherent *Inherent) Clear() error {
 	err := inherent.inst.Command("*cls")
-	time.Sleep(500 * time.Millisecond)
+	time.Sleep(inherent.ClearDelay)
+
 	return err
 }
 
@@ -109,13 +113,18 @@ func (inherent *Inherent) queryIdentification(part idPart) (string, error) {
 	if err != nil {
 		return "", err
 	}
+
 	return parseIdentification(s, part)
 }
 
 func parseIdentification(idn string, part idPart) (string, error) {
+	const numIdentificationParts = 4
+
 	parts := strings.Split(idn, ",")
-	if len(parts) != 4 {
+
+	if len(parts) != numIdentificationParts {
 		return "", fmt.Errorf("idn string (`%s`) could not be split in four", idn)
 	}
+
 	return parts[part], nil
 }

@@ -12,6 +12,8 @@ State Caching: Not implemented
 package ds345
 
 import (
+	"time"
+
 	"github.com/gotmc/ivi"
 	"github.com/gotmc/ivi/fgen"
 )
@@ -51,6 +53,8 @@ func New(inst ivi.Instrument, reset bool) (*Driver, error) {
 		ClassSpecMajorVersion: specMajorVersion,
 		ClassSpecMinorVersion: specMinorVersion,
 		ClassSpecRevision:     specRevision,
+		ResetDelay:            500 * time.Millisecond,
+		ClearDelay:            500 * time.Millisecond,
 		// Commented out GroupCapabilities still need to be added.
 		GroupCapabilities: []string{
 			// "IviFgenArbFrequency",

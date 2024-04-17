@@ -12,6 +12,8 @@ State Caching: Not implemented
 package sdl10xx
 
 import (
+	"time"
+
 	"github.com/gotmc/ivi"
 	"github.com/gotmc/ivi/load"
 )
@@ -47,6 +49,8 @@ func New(inst ivi.Instrument, reset bool) (*SDL10xx, error) {
 		ClassSpecMajorVersion: specMajorVersion,
 		ClassSpecMinorVersion: specMinorVersion,
 		ClassSpecRevision:     specRevision,
+		ResetDelay:            500 * time.Millisecond,
+		ClearDelay:            500 * time.Millisecond,
 		GroupCapabilities:     []string{},
 		SupportedInstrumentModels: []string{
 			"SDL1000X",

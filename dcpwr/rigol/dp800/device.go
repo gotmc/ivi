@@ -14,6 +14,7 @@ package dp800
 import (
 	"fmt"
 	"slices"
+	"time"
 
 	"github.com/gotmc/ivi"
 	"github.com/gotmc/ivi/dcpwr"
@@ -55,6 +56,8 @@ func New(inst ivi.Instrument, reset bool) (*Device, error) {
 		ClassSpecMajorVersion: specMajorVersion,
 		ClassSpecMinorVersion: specMinorVersion,
 		ClassSpecRevision:     specRevision,
+		ResetDelay:            500 * time.Millisecond,
+		ClearDelay:            500 * time.Millisecond,
 		GroupCapabilities: []string{
 			"IviDCPwrBase",
 			"IviDCPwrMeasurement",

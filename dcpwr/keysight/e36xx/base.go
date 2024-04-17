@@ -12,6 +12,8 @@ State Caching: Not implemented
 package e36xx
 
 import (
+	"time"
+
 	"github.com/gotmc/ivi"
 	"github.com/gotmc/ivi/dcpwr"
 )
@@ -58,6 +60,8 @@ func New(inst ivi.Instrument, reset bool) (*Driver, error) {
 		ClassSpecMajorVersion: specMajorVersion,
 		ClassSpecMinorVersion: specMinorVersion,
 		ClassSpecRevision:     specRevision,
+		ResetDelay:            500 * time.Millisecond,
+		ClearDelay:            500 * time.Millisecond,
 		GroupCapabilities: []string{
 			"IviDCPwrBase",
 			"IviDCPwrMeasurement",

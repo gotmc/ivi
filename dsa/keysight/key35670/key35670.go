@@ -6,6 +6,8 @@
 package key35670
 
 import (
+	"time"
+
 	"github.com/gotmc/ivi"
 	"github.com/gotmc/ivi/dsa"
 )
@@ -47,6 +49,8 @@ func New(inst ivi.Instrument, reset bool) (*Key35670, error) {
 		ClassSpecMajorVersion: specMajorVersion,
 		ClassSpecMinorVersion: specMinorVersion,
 		ClassSpecRevision:     specRevision,
+		ResetDelay:            500 * time.Millisecond,
+		ClearDelay:            500 * time.Millisecond,
 		GroupCapabilities: []string{
 			"IviDSABase",
 		},
