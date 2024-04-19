@@ -6,12 +6,8 @@
 package ds345
 
 import (
-	"github.com/gotmc/ivi/fgen"
 	"github.com/gotmc/query"
 )
-
-// Confirm the driver implements the IviFgenInternalTrigger interface.
-var _ fgen.IntTriggerChannel = (*Channel)(nil)
 
 // InternalTriggerRate determines the rate at which the function generator's
 // internal trigger source produces a trigger in triggers per second.

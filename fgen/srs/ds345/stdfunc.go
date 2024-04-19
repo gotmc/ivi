@@ -14,9 +14,6 @@ import (
 	"github.com/gotmc/query"
 )
 
-// Confirm the driver implements the IviFgenStdFunc extension group.
-var _ fgen.StdFuncChannel = (*Channel)(nil)
-
 // Amplitude reads the difference between the maximum and minimum waveform
 // values, i.e., the peak-to-peak voltage value.
 //

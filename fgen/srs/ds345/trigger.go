@@ -13,10 +13,6 @@ import (
 	"github.com/gotmc/query"
 )
 
-// Confirm the driver implements the interface for the IviFgenTrigger extension
-// group.
-var _ fgen.TriggerChannel = (*Channel)(nil)
-
 // TriggerSource determines the trigger srouce. TriggerSource is the getter for
 // the read-write IviFgenTrigger Attribute Trigger Source described in Section
 // 9.2.1 of IVI-4.3: IviFgen Class Specification.

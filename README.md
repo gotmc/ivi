@@ -29,13 +29,31 @@ APIs will be developed as needed for new types of test equipment.
 Development focus is currently on solidifying the APIs and creating a few IVI
 drivers for each instrument type.
 
+### IVI Driver Goal
+
+Per Section 2.6 Capability Groups in IVI-3.1 Driver Architecture Specification:
+
+> The fundamental goal of IVI drivers is to allow test developers to change the
+> instrumentation hardware on their test systems without changing test program
+> source code, recompiling, or re-linking. To achieve this goal, instrument
+> drivers must have a standard programming interface...Because instruments do
+> not have identical functionality or capability, it is impossible to create a
+> single programming interface that covers all features of all instruments in a
+> class. For this reason, the IVI Foundation recognizes different types of
+> capabilities – Inherent Capabilities, Base Class Capabilities, Class Extension
+> Capabilities and Instrument Specific Capabilities.
+
 ### IVI Specification Deviation
+
+**TL;DR:** When developing Go-based IVI drivers follow the .NET methods and
+prototypes as much as possible but deviate as required.
 
 As stated in Section 1.5 Conformance Requirements of the _IVI-3.1: Driver
 Architecture Specification, Revision 3.8_, "IVI drivers can be developed with a
-COM, ANSI-C, or .NET API." Given the desire to write idiomatic Go, where
-necessary and where it makes sense, the Go-based IVI drivers deviate from the
-detailed [IVI Specifications][ivi-specs] at times.
+COM, ANSI-C, or .NET API." In general, the Go method signatures try to be as
+close to the .NET signatures as possible. However, given the desire to write
+idiomatic Go, where necessary and where it makes sense, the Go-based IVI drivers
+deviate from the detailed [IVI Specifications][ivi-specs] at times.
 
 For instance, since Go does not provide [method overloading][go-overload],
 the .NET method prototypes cannot be followed in all cases. For example,

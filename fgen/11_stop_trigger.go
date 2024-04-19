@@ -4,10 +4,3 @@
 // can be found in the LICENSE.txt file for the project.
 
 package fgen
-
-// BurstChannel provides the interface for the channel repeated capability for
-// the IviFgenBurst capability group.
-type BurstChannel interface {
-	BurstCount() (int, error)
-	SetBurstCount(count int) error
-}
