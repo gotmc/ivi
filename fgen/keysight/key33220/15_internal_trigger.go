@@ -18,11 +18,11 @@ var _ fgen.IntTriggerChannel = (*Channel)(nil)
 // InternalTriggerRate is the getter for the read-write IviFgenInternalTrigger
 // Attribute Internal Trigger Rate described in Section 15.2.1 of IVI-4.3:
 // IviFgen Class Specification.
-func (ch *Channel) InternalTriggerRate() (float64, error) {
+func (d *Driver) InternalTriggerRate() (float64, error) {
 	// The Agilent 33220A needs to know the burst period in seconds; however, the
 	// IVI API expects the number of triggers per second. Therefore, we need the
 	// inverse.
-	per, err := query.Float64(ch.inst, "BURS:INT:PER?")
+	per, err := query.Float64(d.inst, "BURS:INT:PER?")
 	if err != nil {
 		return 0.0, err
 	}
@@ -35,23 +35,9 @@ func (ch *Channel) InternalTriggerRate() (float64, error) {
 // SetInternalTriggerRate is the setter for the read-write
 // IviFgenInternalTrigger Attribute Internal Trigger Rate described in Section
 // 15.2.1 of IVI-4.3: IviFgen Class Specification.
-func (ch *Channel) SetInternalTriggerRate(rate float64) error {
+func (d *Driver) SetInternalTriggerRate(rate float64) error {
 	// The Agilent 33220A needs to know the burst period in seconds; however, the
 	// IVI API expects the number of triggers per second. Therefore, we need the
 	// inverse.
-	return ch.inst.Command("BURS:INT:PER %v", 1/rate)
-}
-
-// InternalTriggerPeriod determines the internal trigger period in seconds.
-// InternalTriggerPeriod is not part of the IVI API, which only provides
-// InternalTriggerRate, but this is a convenience function.
-func (ch *Channel) InternalTriggerPeriod() (float64, error) {
-	return query.Float64(ch.inst, "BURS:INT:PER?")
-}
-
-// SetInternalTriggerPeriod specifies the internal trigger period in seconds.
-// SetInternalTriggerPeriod is not part of the IVI API, which only provides
-// SetInternalTriggerRate, but this is a convenience function.
-func (ch *Channel) SetInternalTriggerPeriod(period float64) error {
-	return ch.inst.Command("BURS:INT:PER %v", period)
+	return d.inst.Command("BURS:INT:PER %v", 1/rate)
 }
