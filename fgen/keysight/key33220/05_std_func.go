@@ -116,17 +116,19 @@ func (ch *Channel) SetStartPhase(freq float64) error {
 	return ch.inst.Command("PHAS %f", freq)
 }
 
-// StandardWaveform determines if one of the IVI Standard Waveforms is being
-// output by the function generator. If not, an error is returned.
+// Waveform determines if one of the IVI Standard Waveforms is being output by
+// the function generator. If not, an error is returned.
 //
-// StandardWaveform is the getter for the read-write IviFgenStdFunc Attribute
-// Waveform described in Section 5.2.6 of IVI-4.3: IviFgen Class Specification.
-func (ch *Channel) StandardWaveform() (fgen.StandardWaveform, error) {
+// Waveform is the getter for the read-write IviFgenStdFunc Attribute Waveform
+// described in Section 5.2.6 of IVI-4.3: IviFgen Class Specification.
+func (ch *Channel) Waveform() (fgen.StandardWaveform, error) {
 	var wave fgen.StandardWaveform
+
 	s, err := query.String(ch.inst, "FUNC?")
 	if err != nil {
 		return wave, err
 	}
+
 	s = strings.TrimSpace(s)
 	switch s {
 	case "SIN":
@@ -143,6 +145,7 @@ func (ch *Channel) StandardWaveform() (fgen.StandardWaveform, error) {
 				err,
 			)
 		}
+
 		switch symm {
 		case 0.0:
 			return fgen.RampDown, nil
@@ -154,16 +157,16 @@ func (ch *Channel) StandardWaveform() (fgen.StandardWaveform, error) {
 			return wave, fmt.Errorf("unable to determine waveform type RAMP with SYMM %f", symm)
 		}
 	}
+
 	return wave, fmt.Errorf("unable to determine standard waveform type: %s", s)
 }
 
-// SetStandardWaveform specifies which standard waveform the function generator
+// SetWaveform specifies which standard waveform the function generator
 // produces.
 //
-// SetStandardWaveform is the setter for the read-write IviFgenStdFunc
-// Attribute Waveform described in Section 5.2.6 of IVI-4.3: IviFgen Class
-// Specification.
-func (ch *Channel) SetStandardWaveform(wave fgen.StandardWaveform) error {
+// SetWaveform is the setter for the read-write IviFgenStdFunc Attribute
+// Waveform described in Section 5.2.6 of IVI-4.3: IviFgen Class Specification.
+func (ch *Channel) SetWaveform(wave fgen.StandardWaveform) error {
 	// FIXME(mdr): May need to change the phase offset in order to match the
 	// waveforms shown in Figure 5-1 of IVI-4.3: IviFgen Class Specification.
 	return ch.inst.Command(waveformCommand[wave])
@@ -187,13 +190,13 @@ var waveformApplyCommand = map[fgen.StandardWaveform]string{
 	fgen.DC:       "APPL:DC %.4f, %.4f, %.4f",
 }
 
-// ConfigureStandardWaveform configures the attributes of the function
-// generator that affect standard waveform generation.
+// ConfigureWaveform configures the attributes of the function generator that
+// affect standard waveform generation.
 //
-// ConfigureStandardWaveform is the method that implements the Configure
-// Standard Waveform function described in Section 5.3.1 of IVI-4.3: IviFgen
-// Class Specification.
-func (ch *Channel) ConfigureStandardWaveform(wave fgen.StandardWaveform, amp float64,
+// ConfigureWaveform is the method that implements the Configure Standard
+// Waveform function described in Section 5.3.1 of IVI-4.3: IviFgen Class
+// Specification.
+func (ch *Channel) ConfigureWaveform(wave fgen.StandardWaveform, amp float64,
 	offset float64, freq float64, phase float64) error {
 	return ch.inst.Command(waveformApplyCommand[wave], freq, amp, offset)
 }

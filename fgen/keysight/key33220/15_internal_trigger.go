@@ -26,6 +26,7 @@ func (ch *Channel) InternalTriggerRate() (float64, error) {
 	if err != nil {
 		return 0.0, err
 	}
+
 	return 1 / per, nil
 }
 

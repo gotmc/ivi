@@ -16,8 +16,8 @@ import (
 // TriggerSource determines the trigger srouce. TriggerSource is the getter for
 // the read-write IviFgenTrigger Attribute Trigger Source described in Section
 // 9.2.1 of IVI-4.3: IviFgen Class Specification.
-func (ch *Channel) TriggerSource() (fgen.TriggerSource, error) {
-	var src fgen.TriggerSource
+func (ch *Channel) TriggerSource() (fgen.OldTriggerSource, error) {
+	var src fgen.OldTriggerSource
 
 	s, err := query.String(ch.inst, "TSRC?")
 	if err != nil {
@@ -27,9 +27,9 @@ func (ch *Channel) TriggerSource() (fgen.TriggerSource, error) {
 	s = strings.TrimSpace(strings.ToUpper(s))
 	switch s {
 	case "1":
-		src = fgen.InternalTrigger
+		src = fgen.OldTriggerSourceInternal
 	case "2", "3":
-		src = fgen.ExternalTrigger
+		src = fgen.OldTriggerSourceExternal
 	default:
 		return src, errors.New("error determining trigger source")
 	}
@@ -40,14 +40,14 @@ func (ch *Channel) TriggerSource() (fgen.TriggerSource, error) {
 // SetTriggerSource specifies the trigger srouce. SetTriggerSource is the
 // setter for the read-write IviFgenTrigger Attribute Trigger Source described
 // in Section 9.2.1 of IVI-4.3: IviFgen Class Specification.
-func (ch *Channel) SetTriggerSource(src fgen.TriggerSource) error {
-	if src == fgen.SoftwareTrigger {
+func (ch *Channel) SetTriggerSource(src fgen.OldTriggerSource) error {
+	if src == fgen.OldTriggerSourceSoftware {
 		return errors.New("software trigger not supported")
 	}
 
-	triggers := map[fgen.TriggerSource]string{
-		fgen.InternalTrigger: "1",
-		fgen.ExternalTrigger: "2",
+	triggers := map[fgen.OldTriggerSource]string{
+		fgen.OldTriggerSourceInternal: "1",
+		fgen.OldTriggerSourceExternal: "2",
 	}
 
 	return ch.inst.Command("TSRC%s", triggers[src])

@@ -8,6 +8,9 @@ Package ds345 implements the IVI driver for the Stanford Research System
 DS345 function generator.
 
 State Caching: Not implemented
+
+The serial port is a DB25 DCE. The [Green-utech USB RS-232 to DB25 serial
+cable](https://www.amazon.com/dp/B08J2VMNFY) does work.
 */
 package ds345
 

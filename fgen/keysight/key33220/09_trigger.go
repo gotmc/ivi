@@ -7,6 +7,7 @@ package key33220
 
 import (
 	"errors"
+	"fmt"
 	"strings"
 
 	"github.com/gotmc/ivi/fgen"
@@ -22,8 +23,8 @@ var _ fgen.TriggerChannel = (*Channel)(nil)
 // TriggerSource is the getter for the read-write IviFgenTrigger Attribute
 // Trigger Source described in Section 9.2.1 of IVI-4.3: IviFgen Class
 // Specification.
-func (ch *Channel) TriggerSource() (fgen.TriggerSource, error) {
-	var src fgen.TriggerSource
+func (ch *Channel) TriggerSource() (fgen.OldTriggerSource, error) {
+	var src fgen.OldTriggerSource
 	s, err := query.String(ch.inst, "TRIG:SOUR?")
 	if err != nil {
 		return src, err
@@ -31,11 +32,11 @@ func (ch *Channel) TriggerSource() (fgen.TriggerSource, error) {
 	s = strings.TrimSpace(strings.ToUpper(s))
 	switch s {
 	case "IMM":
-		src = fgen.InternalTrigger
+		src = fgen.OldTriggerSourceInternal
 	case "EXT":
-		src = fgen.ExternalTrigger
+		src = fgen.OldTriggerSourceExternal
 	case "BUS":
-		src = fgen.SoftwareTrigger
+		src = fgen.OldTriggerSourceSoftware
 	default:
 		return src, errors.New("error determining trigger source")
 	}
@@ -47,11 +48,15 @@ func (ch *Channel) TriggerSource() (fgen.TriggerSource, error) {
 // SetTriggerSource is the setter for the read-write IviFgenTrigger Attribute
 // Trigger Source described in Section 9.2.1 of IVI-4.3: IviFgen Class
 // Specification.
-func (ch *Channel) SetTriggerSource(src fgen.TriggerSource) error {
-	triggers := map[fgen.TriggerSource]string{
-		fgen.InternalTrigger: "IMM",
-		fgen.ExternalTrigger: "EXT",
-		fgen.SoftwareTrigger: "BUS",
+func (ch *Channel) SetTriggerSource(src fgen.OldTriggerSource) error {
+	triggers := map[fgen.OldTriggerSource]string{
+		fgen.OldTriggerSourceInternal: "IMM",
+		fgen.OldTriggerSourceExternal: "EXT",
+		fgen.OldTriggerSourceSoftware: "BUS",
 	}
-	return ch.inst.Command("TRIGE:SOUR %s", triggers[src])
+	triggerSource, ok := triggers[src]
+	if !ok {
+		return fmt.Errorf("trigger source %s not supported", src)
+	}
+	return ch.inst.Command("TRIGE:SOUR %s", triggerSource)
 }
