@@ -33,12 +33,12 @@ to None.
 
 Below are the .NET attributes, since they are the basis for the Go interfaces.
 
-| Section | Attribute            | Type     | Access | AppliesTo |
-| ------- | ----------------     | ------   | ------ | --------- |
-|  10.2.1 | Start Trigger Delay  | TimeSpan | R/W    | Channel   |
-|  10.2.2 | Start Trigger Slope  | Int32    | R/W    | Channel   |
-|  10.2.3 | Start Trigger Source | String   | R/W    | Channel   |
-|  10.2.4 | Start Trigger Thrhld | Real64   | R/W    | Channel   |
+| Section | Attribute               | Type     | Access | AppliesTo |
+| ------- | ----------------------- | ------   | ------ | --------- |
+|  10.2.1 | Start Trigger Delay     | TimeSpan | R/W    | Channel   |
+|  10.2.2 | Start Trigger Slope     | Int32    | R/W    | Channel   |
+|  10.2.3 | Start Trigger Source    | String   | R/W    | Channel   |
+|  10.2.4 | Start Trigger Threshold | Real64   | R/W    | Channel   |
 
 
 ## Section 10.3 IviFgenStartTrigger Functions
@@ -52,7 +52,7 @@ Below are the .NET functions, since they are the basis for the Go interfaces.
 */
 
 // StartTriggerChannel provides the interface for the channel repeated
-// capability for the IviFgenStartTrigger capability group.
+// capability for the IviFgenStartTrigger extension group.
 type StartTriggerChannel interface {
 	StartTriggerDelay() (time.Duration, error)
 	SetStartTriggerDelay(delay time.Duration) error

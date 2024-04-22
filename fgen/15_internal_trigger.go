@@ -48,7 +48,7 @@ type IntTrigger interface {
 }
 
 // IntTriggerChannel provides the interface required for the channel repeated
-// capability to support the IviFgenInternalTrigger capability group as
+// capability to support the IviFgenInternalTrigger extension group as
 // described in Section 15 of the IVI-4.3: IviFgen Class Specification.
 type IntTriggerChannel interface {
 }

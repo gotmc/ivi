@@ -52,10 +52,10 @@ Below are the .NET functions, since they are the basis for the Go interfaces.
 type ArbWfm interface {
 	ArbitrarySampleRate() (float64, error)
 	SetArbitrarySampleRate(rate float64) error
-	NumberWaveformsMax() int
-	WaveformSizeMax() int
-	WaveformSizeMin() int
-	WaveformQuantum() int
+	ArbWfmNumberWaveformsMax() int
+	ArbWfmMaxSize() int
+	ArbWfmMinSize() int
+	ArbWfmQuantum() int
 }
 
 // ArbWfmChannel provides the interface required for the channel repeated

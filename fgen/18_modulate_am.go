@@ -43,3 +43,24 @@ Below are the .NET functions, since they are the basis for the Go interfaces.
                                   Double frequency);
 
 */
+
+// ModulateAM provides the interface required for the IviFgenModulateAM
+// extension group.
+type ModulateAM interface {
+	AMModulationInternalDepth() (float64, error)
+	SetAMModulationInternalDepth(depth float64) error
+	AMModulationInternalFrequency() (float64, error)
+	SetAMModulationInternalFrequency(freq float64) error
+	AMModulationInternalWaveform() (StandardWaveform, error)
+	SetAMModulationInternalWaveform(StandardWaveform) error
+	ConfigureInternalAM(depth float64, wave StandardWaveform, freq float64) error
+}
+
+// ModulateAMChannel provides the interface for the channel repeated
+// capability for the IviFgenModulateAM extension group.
+type ModulateAMChannel interface {
+	AMModulationEnabled() (bool, error)
+	SetAMModulationEnabled(b bool) error
+	AMModulationSource() (AMSource, error)
+	SetAMModulationSource(AMSource) error
+}

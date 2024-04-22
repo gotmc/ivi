@@ -29,3 +29,9 @@ Below are the .NET functions, since they are the basis for the Go interfaces.
 16.2.1 void SendSoftwareTrigger ();
 
 */
+
+// SoftwareTrigger provides the interface required for the
+// IviFgenSoftwareTrigger extension group.
+type SoftwareTrigger interface {
+	SendStartSoftwareTrigger() error
+}

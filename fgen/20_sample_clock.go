@@ -25,7 +25,7 @@ to the corresponding frequency of the external sample clock.
 Below are the .NET attributes, since they are the basis for the Go interfaces.
 
 | Section | Attribute                 | Type   | Access | AppliesTo |
-| ------- | ----------------          | ------ | ------ | --------- |
+| ------- | ------------------------- | ------ | ------ | --------- |
 |  20.2.1 | Sample Clk Source         | Int32  | R/W    | N/A       |
 |  20.2.2 | Sample Clk Output Enabled | Bool   | R/W    | N/A       |
 
@@ -37,3 +37,12 @@ Below are the .NET functions, since they are the basis for the Go interfaces.
 None.
 
 */
+
+// SampleClock provides the interface required for the IviFgenSampleClock
+// extension group.
+type SampleClock interface {
+	SampleClockSource() (SampleClockSource, error)
+	SetSampleClockSource(SampleClockSource) error
+	SampleClockOutputEnabled() (bool, error)
+	SetSampleClockOutputEnabled(b bool) error
+}

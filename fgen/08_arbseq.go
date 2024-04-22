@@ -45,7 +45,7 @@ Below are the .NET functions, since they are the basis for the Go interfaces.
 
 8.3.1 void Arbitrary.ClearMemory ();
 8.3.2 void Arbitrary.Sequence.Clear (Int32 handle);
-8.3.3 void Arbitrary.Sequency.Configure (String channelName,
+8.3.3 void Arbitrary.Sequence.Configure (String channelName,
                                          Int32 handle,
                                          Double gain,
                                          Double offset);
@@ -54,7 +54,8 @@ Below are the .NET functions, since they are the basis for the Go interfaces.
 
 */
 
-// ArbSeq provides the interface required for the IviFgenBase capability group.
+// ArbSeq provides the interface required for the IviFgenArbSeq extension
+// group.
 type ArbSeq interface {
 	NumSeqMax() (int, error)
 	LoopCountMax() (int, error)
@@ -65,7 +66,7 @@ type ArbSeq interface {
 }
 
 // ArbSeqChannel provides the interface required for the channel repeated
-// capability for the IviFgenBase capability group.
+// capability for the IviFgenArbSeq extension group.
 type ArbSeqChannel interface {
 	ArbSeqHandle(int, error)
 	SetArbSeqHandle(handle int) error

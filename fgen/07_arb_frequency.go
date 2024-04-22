@@ -41,7 +41,7 @@ None.
 */
 
 // ArbFrequencyChannel provides the interface required for the channel repeated
-// capability group for the IviFgenArbFrequency capability group.
+// capability group for the IviFgenArbFrequency extension group.
 type ArbFrequencyChannel interface {
 	ArbitraryFrequency() (float64, error)
 	SetArbitraryFrequency(freq float64) error

@@ -43,3 +43,24 @@ Below are the .NET functions, since they are the basis for the Go interfaces.
                                   Double frequency);
 
 */
+
+// ModulateFM provides the interface required for the IviFgenModulateFM
+// extension group.
+type ModulateFM interface {
+	FMModulationInternalDeviation() (float64, error)
+	SetFMModulationInternalDeviation(deviation float64) error
+	FMModulationInternalFrequency() (float64, error)
+	SetFMModulationInternalFrequency(freq float64) error
+	FMModulationInternalWaveform() (StandardWaveform, error)
+	SetFMModulationInternalWaveform(StandardWaveform) error
+	ConfigureInternalFM(deviation float64, wave StandardWaveform, freq float64) error
+}
+
+// ModulateFMChannel provides the interface for the channel repeated
+// capability for the IviFgenModulateFM extension group.
+type ModulateFMChannel interface {
+	FMModulationEnabled() (bool, error)
+	SetFMModulationEnabled(b bool) error
+	FMModulationSource() (FMSource, error)
+	SetFMModulationSource(FMSource) error
+}

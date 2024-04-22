@@ -42,7 +42,7 @@ There are no .NET functions for Section 9.3.
 */
 
 // TriggerChannel provides the interface for the channel repeated capability for
-// the IviFgenTrigger capability group.
+// the IviFgenTrigger extension group.
 type TriggerChannel interface {
 	TriggerSource() (OldTriggerSource, error)
 	SetTriggerSource(OldTriggerSource) error

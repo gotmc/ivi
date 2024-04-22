@@ -46,7 +46,7 @@ None.
 */
 
 // BurstChannel provides the interface for the channel repeated capability for
-// the IviFgenBurst capability group.
+// the IviFgenBurst extension group.
 type BurstChannel interface {
 	BurstCount() (int, error)
 	SetBurstCount(count int) error

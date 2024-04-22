@@ -17,19 +17,22 @@ type OutputMode int
 // IviFgenStdFunc extension group. Arbitrary indicates the IVI driver uses the
 // attributes and functions of the IviFgenArbWfm extension group.
 const (
-	OutputFunction OutputMode = iota
-	OutputArbitrary
-	OutputSequence
+	OutputModeFunction OutputMode = iota
+	OutputModeArbitrary
+	OutputModeSequence
+	OutputModeNoise
 )
 
 func (om OutputMode) String() string {
 	switch om {
-	case OutputFunction:
+	case OutputModeFunction:
 		return "function"
-	case OutputArbitrary:
+	case OutputModeArbitrary:
 		return "arbitrary"
-	case OutputSequence:
+	case OutputModeSequence:
 		return "sequence"
+	case OutputModeNoise:
+		return "noise"
 	default:
 		return ""
 	}
@@ -108,6 +111,24 @@ const (
 	OldTriggerSourceInternal OldTriggerSource = iota
 	OldTriggerSourceExternal
 	OldTriggerSourceSoftware
+	OldTriggerSourceTTL0
+	OldTriggerSourceTTL1
+	OldTriggerSourceTTL2
+	OldTriggerSourceTTL3
+	OldTriggerSourceTTL4
+	OldTriggerSourceTTL5
+	OldTriggerSourceTTL6
+	OldTriggerSourceTTL7
+	OldTriggerSourceECL0
+	OldTriggerSourceECL1
+	OldTriggerSourcePXIStar
+	OldTriggerSourceRTSI0
+	OldTriggerSourceRTSI1
+	OldTriggerSourceRTSI2
+	OldTriggerSourceRTSI3
+	OldTriggerSourceRTSI4
+	OldTriggerSourceRTSI5
+	OldTriggerSourceRTSI6
 )
 
 func (ts OldTriggerSource) String() string {
@@ -118,6 +139,42 @@ func (ts OldTriggerSource) String() string {
 		return "external trigger"
 	case OldTriggerSourceSoftware:
 		return "software trigger"
+	case OldTriggerSourceTTL0:
+		return "TTL0 trigger"
+	case OldTriggerSourceTTL1:
+		return "TTL1 trigger"
+	case OldTriggerSourceTTL2:
+		return "TTL2 trigger"
+	case OldTriggerSourceTTL3:
+		return "TTL3 trigger"
+	case OldTriggerSourceTTL4:
+		return "TTL4 trigger"
+	case OldTriggerSourceTTL5:
+		return "TTL5 trigger"
+	case OldTriggerSourceTTL6:
+		return "TTL6 trigger"
+	case OldTriggerSourceTTL7:
+		return "TTL7 trigger"
+	case OldTriggerSourceECL0:
+		return "ECL0 trigger"
+	case OldTriggerSourceECL1:
+		return "ECL1 trigger"
+	case OldTriggerSourcePXIStar:
+		return "PXI star trigger"
+	case OldTriggerSourceRTSI0:
+		return "RTSI0 trigger"
+	case OldTriggerSourceRTSI1:
+		return "RTSI1 trigger"
+	case OldTriggerSourceRTSI2:
+		return "RTSI2 trigger"
+	case OldTriggerSourceRTSI3:
+		return "RTSI3 trigger"
+	case OldTriggerSourceRTSI4:
+		return "RTSI4 trigger"
+	case OldTriggerSourceRTSI5:
+		return "RTSI5 trigger"
+	case OldTriggerSourceRTSI6:
+		return "RTSI6 trigger"
 	}
 
 	return ""
@@ -182,10 +239,10 @@ const (
 	TriggerSourceRTSI6
 )
 
-type SampleClock int
+type SampleClockSource int
 
 const (
-	SampleClockInternal SampleClock = iota
+	SampleClockInternal SampleClockSource = iota
 	SampleClockExternal
 )
 
@@ -203,6 +260,19 @@ const (
 	AMSourceExternal
 )
 
+// FIXME: I'm going to try to use the StandardWaveform instead, since that's
+// what the standard calls for. However, the AM Modulation doesn't allow a DC
+// standard waveform, whereas the StdFunc does.
+type AMWaveform int
+
+const (
+	AMInternalSine AMWaveform = iota
+	AMInternalSquare
+	AMInternalTriangle
+	AMInternalRampUp
+	AMInternalRampDown
+)
+
 type FMSource int
 
 const (
@@ -217,10 +287,10 @@ const (
 	BinaryAlignmentRight
 )
 
-type TerminalConfiguration int
+type TerminalConfigurationType int
 
 const (
-	TerminalConfigurationSingleEnded TerminalConfiguration = iota
+	TerminalConfigurationSingleEnded TerminalConfigurationType = iota
 	TerminalConfigurationDifferential
 )
 

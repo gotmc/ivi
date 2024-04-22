@@ -46,7 +46,6 @@ type Base interface {
 	ReferenceClockSource() (ClockSource, error)
 	SetReferenceClockSource(src ClockSource) error
 	AbortGeneration() error
-	GetChannelName(index int) (string, error)
 	InitiateGeneration() error
 }
 
@@ -54,7 +53,6 @@ type Base interface {
 // capability for the IviFgenBase capability group.
 type BaseChannel interface {
 	Name() string
-	VirtualName() string
 	OperationMode() (OperationMode, error)
 	SetOperationMode(mode OperationMode) error
 	OutputEnabled() (bool, error)
