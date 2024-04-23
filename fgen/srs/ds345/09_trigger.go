@@ -37,9 +37,11 @@ func (ch *Channel) TriggerSource() (fgen.OldTriggerSource, error) {
 	return src, nil
 }
 
-// SetTriggerSource specifies the trigger srouce. SetTriggerSource is the
-// setter for the read-write IviFgenTrigger Attribute Trigger Source described
-// in Section 9.2.1 of IVI-4.3: IviFgen Class Specification.
+// SetTriggerSource specifies the trigger srouce.
+//
+// SetTriggerSource is the setter for the read-write IviFgenTrigger Attribute
+// Trigger Source described in Section 9.2.1 of IVI-4.3: IviFgen Class
+// Specification.
 func (ch *Channel) SetTriggerSource(src fgen.OldTriggerSource) error {
 	if src == fgen.OldTriggerSourceSoftware {
 		return errors.New("software trigger not supported")

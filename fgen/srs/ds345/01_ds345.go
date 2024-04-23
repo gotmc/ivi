@@ -33,7 +33,7 @@ const (
 var _ fgen.Base = (*Driver)(nil)
 var _ fgen.BaseChannel = (*Channel)(nil)
 var _ fgen.BurstChannel = (*Channel)(nil)
-var _ fgen.IntTriggerChannel = (*Channel)(nil)
+var _ fgen.IntTrigger = (*Driver)(nil)
 var _ fgen.StdFuncChannel = (*Channel)(nil)
 var _ fgen.TriggerChannel = (*Channel)(nil)
 

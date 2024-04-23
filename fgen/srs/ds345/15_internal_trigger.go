@@ -6,25 +6,35 @@
 package ds345
 
 import (
+	"github.com/gotmc/ivi"
 	"github.com/gotmc/query"
 )
 
 // InternalTriggerRate determines the rate at which the function generator's
-// internal trigger source produces a trigger in triggers per second.
+// internal trigger source produces a trigger in triggers per second. The DS345
+// rounds the trigger rate to two significant digits and may range from 0.001
+// Hz to 10 kHz.
 //
 // InternalTriggerRate is the getter for the read-write IviFgenInternalTrigger
 // Attribute Internal Trigger Rate described in Section 15.2.1 of IVI-4.3:
 // IviFgen Class Specification.
-func (ch *Channel) InternalTriggerRate() (float64, error) {
-	return query.Float64(ch.inst, "TRAT?")
+func (d *Driver) InternalTriggerRate() (float64, error) {
+	return query.Float64(d.inst, "TRAT?")
 }
 
 // SetInternalTriggerRate specifies the rate at which the function generator's
-// internal trigger source produces a trigger in triggers per second.
+// internal trigger source produces a trigger in triggers per second. The DS345
+// rounds the trigger rate to two significant digits and may range from 0.001
+// Hz to 10 kHz.
 //
 // SetInternalTriggerRate is the setter for the read-write
 // IviFgenInternalTrigger Attribute Internal Trigger Rate described in Section
 // 15.2.1 of IVI-4.3: IviFgen Class Specification.
-func (ch *Channel) SetInternalTriggerRate(rate float64) error {
-	return ch.inst.Command("TRAT %.3f", rate)
+func (d *Driver) SetInternalTriggerRate(rate float64) error {
+	// The DS345 supports internal trigger rates from 0.001 Hz to 10 kHz.
+	if rate < 0.001 || rate > 10000 {
+		return ivi.ErrValueNotSupported
+	}
+
+	return d.inst.Command("TRAT %.3f", rate)
 }
