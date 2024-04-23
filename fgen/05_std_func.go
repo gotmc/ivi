@@ -62,7 +62,7 @@ type StdFuncChannel interface {
 	SetFrequency(freq float64) error
 	StartPhase() (float64, error)
 	SetStartPhase(start float64) error
-	Waveform() (StandardWaveform, error)
-	SetWaveform(StandardWaveform) error
-	ConfigureWaveform(wave StandardWaveform, amp, offset, freq, phase float64) error
+	StandardWaveform() (StandardWaveform, error)
+	SetStandardWaveform(StandardWaveform) error
+	ConfigureStandardWaveform(wave StandardWaveform, amp, offset, freq, phase float64) error
 }

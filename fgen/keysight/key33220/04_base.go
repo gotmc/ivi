@@ -3,217 +3,118 @@
 // Use of this source code is governed by a MIT-style license that
 // can be found in the LICENSE.txt file for the project.
 
-/*
-Package key33220 implements the IVI driver for the Keysight/Agilent 33220A and
-33210A function/arbitrary waveform generators.
-
-State Caching: Not implemented
-*/
 package key33220
 
 import (
+	"errors"
 	"fmt"
-	"time"
+	"strings"
 
 	"github.com/gotmc/ivi"
 	"github.com/gotmc/ivi/fgen"
 	"github.com/gotmc/query"
 )
 
-const (
-	specMajorVersion   = 4
-	specMinorVersion   = 3
-	specRevision       = "5.2"
-	defaultGPIBAddress = 10
-	telnetPort         = 5024
-	socketPort         = 5025
-)
+// Confirm that the output channel repeated capabilitiy implements the
+// interface for the IviFgenBase capability group.
+var _ fgen.BaseChannel = (*Channel)(nil)
 
-// Confirm the driver implements the interface for the IviFgenBase capability
-// group.
-var _ fgen.Base = (*Driver)(nil)
-
-// Driver provides the IVI driver for a Keysight/Agilent 33220A or 33210A
-// function generator.
-type Driver struct {
-	inst     ivi.Instrument
-	Channels []Channel
-	ivi.Inherent
+// Channel models the output channel repeated capabilitiy for the function
+// generator output channel.
+type Channel struct {
+	name string
+	inst ivi.Instrument
 }
 
-// New creates a new IVI driver for the Keysight 33210A and 33220A
-// function/arbitrary waveform generators.
-func New(inst ivi.Instrument, reset bool) (*Driver, error) {
-	channelNames := []string{
-		"Output",
-	}
-	outputCount := len(channelNames)
-	channels := make([]Channel, outputCount)
-
-	for i, channelName := range channelNames {
-		ch := Channel{
-			name: channelName,
-			inst: inst,
-		}
-		channels[i] = ch
-	}
-
-	inherentBase := ivi.InherentBase{
-		ClassSpecMajorVersion: specMajorVersion,
-		ClassSpecMinorVersion: specMinorVersion,
-		ClassSpecRevision:     specRevision,
-		ResetDelay:            500 * time.Millisecond,
-		ClearDelay:            500 * time.Millisecond,
-		GroupCapabilities: []string{
-			"IviFgenBase",
-			// "IviFgenArbFrequency",
-			// "IviFgenArbWfm",
-			"IviFgenBurst",
-			"IviFgenInternalTrigger",
-			// "IviFgenModulateAM",
-			// "IviFgenModulateFM",
-			// "IviFgenSoftwareTrigger",
-			"IviFgenStdfunc",
-			"IviFgenTrigger",
-		},
-		SupportedInstrumentModels: []string{
-			"33220A",
-			"33210A",
-		},
-		SupportedBusInterfaces: []string{
-			"TCPIP",
-			"GPIB",
-			"USB",
-		},
-	}
-	inherent := ivi.NewInherent(inst, inherentBase)
-	driver := Driver{
-		inst:     inst,
-		Channels: channels,
-		Inherent: inherent,
-	}
-
-	if reset {
-		err := driver.Reset()
-		return &driver, err
-	}
-
-	return &driver, nil
-}
-
-// AvailableCOMPorts lists the available COM ports, including optional ports.
-func AvailableCOMPorts() []string {
-	return []string{"GPIB", "LAN", "USB"}
-}
-
-// DefaultGPIBAddress lists the default GPIB interface address.
-func DefaultGPIBAddress() int {
-	return defaultGPIBAddress
-}
-
-// LANPorts returns a map of the different ports with the key being the type of
-// port.
-func LANPorts() map[string]int {
-	return map[string]int{
-		"telnet": telnetPort,
-		"socket": socketPort,
-	}
-}
-
-// OutputCount returns the number of available output channels.
+// OperationMode determines whether the function generator should produce a
+// continuous or burst output on the channel.
 //
-// OutputCount is the getter for the read-only IviFgenBase Attribute Output
-// Count described in Section 4.2.1 of IVI-4.3: IviFgen Class Specification.
-func (d *Driver) OutputCount() int {
-	return len(d.Channels)
-}
-
-// OutputMode returns the determines how the function generator produces
-// waveforms. This attribute determines which extension group’s functions and
-// attributes are used to configure the waveform the function generator
-// produces.
-//
-// OutputMode is the getter for the read-only IviFgenBase Attribute Output
-// Mode described in Section 4.2.5 of IVI-4.3: IviFgen Class Specification.
-func (d *Driver) OutputMode() (fgen.OutputMode, error) {
-	var outputMode fgen.OutputMode
-
-	funcType, err := query.String(d.inst, "FUNC?")
+// OperationMode implements the getter for the read-write IviFgenBase Attribute
+// Operation Mode described in Section 4.2.2 of IVI-4.3: IviFgen Class
+// Specification.
+func (ch *Channel) OperationMode() (fgen.OperationMode, error) {
+	var mode fgen.OperationMode
+	s, err := query.String(ch.inst, "BURS:STAT?")
 	if err != nil {
-		return outputMode, fmt.Errorf("error determining the output function type: %w", err)
+		return mode, fmt.Errorf("error getting operation mode: %s", err)
 	}
-
-	switch funcType {
-	case "SIN", "SQU", "RAMP":
-		return fgen.OutputModeFunction, nil
-	case "NOIS":
-		return fgen.OutputModeNoise, nil
-	case "USER":
-		return fgen.OutputModeArbitrary, nil
+	switch strings.TrimSpace(s) {
+	case "0":
+		return fgen.ContinuousMode, nil
+	case "1":
+		return fgen.BurstMode, nil
+	default:
+		return mode, fmt.Errorf("error determining operation mode; received: %s", s)
 	}
-
-	return 0, fmt.Errorf("unknown output mode type")
 }
 
-// SetOutputMode sets how the function generator produces waveforms. This
-// attribute determines which extension group’s functions and attributes are
-// used to configure the waveform the function generator produces.
-//
-// OutputMode is the setter for the read-only IviFgenBase Attribute Output
-// Mode described in Section 4.2.5 of IVI-4.3: IviFgen Class Specification.
-func (d *Driver) SetOutputMode(outputMode fgen.OutputMode) error {
-	switch outputMode {
-	case fgen.OutputModeFunction:
-		return d.inst.Command("FUNC SIN")
-	case fgen.OutputModeArbitrary:
-		return d.inst.Command("FUNC USER")
-	case fgen.OutputModeSequence:
-		return fmt.Errorf("function generator does not support output mode sequency")
-	case fgen.OutputModeNoise:
-		return d.inst.Command("FUNC NOIS")
+// SetOperationMode specifies whether the function generator should produce a
+// continuous or burst output on the channel. SetOperationMode implements the
+// setter for the read-write IviFgenBase Attribute Operation Mode described in
+// Section 4.2.2 of IVI-4.3: IviFgen Class Specification.
+func (ch *Channel) SetOperationMode(mode fgen.OperationMode) error {
+	switch mode {
+	case fgen.BurstMode:
+		return ch.inst.Command("BURS:MODE TRIG;STAT ON")
+	case fgen.ContinuousMode:
+		return ch.inst.Command("BURS:STAT OFF")
 	}
-
-	return fmt.Errorf("error setting output mode")
+	return errors.New("bad fgen operation mode")
 }
 
-// InitiateGeneration initiates signal generation by enabling all outputs.
-// Instead of calling this function, the user can simply enable outputs.
-//
-// InitiateGeneration implements the IviFgenBase function described in Section
-// 4.3.8 of IVI-4.3: IviFgen Class Specification.
-func (d *Driver) InitiateGeneration() error {
-	for _, channel := range d.Channels {
-		if err := channel.EnableOutput(); err != nil {
-			return err
-		}
+// OutputEnabled determines if the output channel is enabled or disabled.
+// OutputEnabled is the getter for the read-write IviFgenBase Attribute
+// Output Enabled described in Section 4.2.3 of IVI-4.3: IviFgen Class
+// Specification.
+func (ch *Channel) OutputEnabled() (bool, error) {
+	return query.Bool(ch.inst, "OUTP?")
+}
+
+// SetOutputEnabled sets the output channel to enabled or disabled.
+// SetOutputEnabled is the setter for the read-write IviFgenBase Attribute
+// Output Enabled described in Section 4.2.3 of IVI-4.3: IviFgen Class
+// Specification.
+func (ch *Channel) SetOutputEnabled(b bool) error {
+	if b {
+		return ch.inst.Command("OUTP ON")
 	}
-
-	return nil
+	return ch.inst.Command("OUTP OFF")
 }
 
-// AbortGeneration aborts a previously initiated signal generation by disabling
-// all outputs.
-//
-// AbortGeneration implements the IviFgenBase function described in Section 4.3.1
-// of IVI-4.3: IviFgen Class Specification.
-func (d *Driver) AbortGeneration() error {
-	for _, channel := range d.Channels {
-		if err := channel.DisableOutput(); err != nil {
-			return err
-		}
-	}
-
-	return nil
+// DisableOutput is a convenience function for setting the Output Enabled
+// attribute to false.
+func (ch *Channel) DisableOutput() error {
+	return ch.SetOutputEnabled(false)
 }
 
-func (d *Driver) ReferenceClockSource() (fgen.ClockSource, error) {
-	return fgen.RefClockInternal, nil
+// EnableOutput is a convenience function for setting the Output Enabled
+// attribute to true.
+func (ch *Channel) EnableOutput() error {
+	return ch.SetOutputEnabled(true)
 }
 
-func (d *Driver) SetReferenceClockSource(_ fgen.ClockSource) error {
-	return nil
+// OutputImpedance return the output channel's impedance in ohms.
+// OutputImpedance is the getter for the read-write IviFgenBase Attribute
+// Output Impedance described in Section 4.2.4 of IVI-4.3: IviFgen Class
+// Specification.
+func (ch *Channel) OutputImpedance() (float64, error) {
+	return query.Float64(ch.inst, "OUTP:LOAD?")
 }
 
-func (ch *Channel) Name() string {
-	return "output"
+// SetOutputImpedance sets the output channel's impedance in ohms.
+// SetOutputImpedance is the setter for the read-write IviFgenBase Attribute
+// Output Impedance described in Section 4.2.3 of IVI-4.3: IviFgen Class
+// Specification.
+func (ch *Channel) SetOutputImpedance(impedance float64) error {
+	return ch.inst.Command("OUTP:LOAD %f", impedance)
+}
+
+// AbortGeneration Aborts a previously initiated signal generation. If the
+// function generator is in the Output Generation State, this function moves
+// the function generator to the Configuration State. If the function generator
+// is already in the Configuration State, the function does nothing and returns
+// Success. AbortGeneration implements the IviFgenBase function described in
+// Section 4.3 of IVI-4.3: IviFgen Class Specification.
+func (ch *Channel) AbortGeneration() error {
+	return ch.DisableOutput()
 }
