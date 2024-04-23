@@ -59,5 +59,5 @@ func (ch *Channel) SetTriggerSource(src fgen.OldTriggerSource) error {
 		return fmt.Errorf("trigger source %s not supported", src)
 	}
 
-	return ch.inst.Command("TRIGE:SOUR %s", triggerSource)
+	return ch.inst.Command("TRIG:SOUR %s", triggerSource)
 }

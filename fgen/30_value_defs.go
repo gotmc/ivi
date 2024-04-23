@@ -23,19 +23,16 @@ const (
 	OutputModeNoise
 )
 
+// String implements the Stringer interface for OutputMode.
 func (om OutputMode) String() string {
-	switch om {
-	case OutputModeFunction:
-		return "function"
-	case OutputModeArbitrary:
-		return "arbitrary"
-	case OutputModeSequence:
-		return "sequence"
-	case OutputModeNoise:
-		return "noise"
-	default:
-		return ""
+	outputModes := map[OutputMode]string{
+		OutputModeFunction:  "function",
+		OutputModeArbitrary: "arbitrary",
+		OutputModeSequence:  "sequence",
+		OutputModeNoise:     "noise",
 	}
+
+	return outputModes[om]
 }
 
 // ClockSource models the defined values for the Reference Clock Source defined
@@ -63,15 +60,14 @@ const (
 	BurstMode
 )
 
+var operationModes = map[OperationMode]string{
+	ContinuousMode: "continuous mode",
+	BurstMode:      "burst mode",
+}
+
+// String implements the Stringer interface for OperationMode.
 func (om OperationMode) String() string {
-	switch om {
-	case ContinuousMode:
-		return "continuous mode"
-	case BurstMode:
-		return "burst mode"
-	default:
-		return ""
-	}
+	return operationModes[om]
 }
 
 // StandardWaveform models the defined values for the Standard Waveform defined
@@ -132,52 +128,31 @@ const (
 )
 
 func (ts OldTriggerSource) String() string {
-	switch ts {
-	case OldTriggerSourceInternal:
-		return "internal trigger"
-	case OldTriggerSourceExternal:
-		return "external trigger"
-	case OldTriggerSourceSoftware:
-		return "software trigger"
-	case OldTriggerSourceTTL0:
-		return "TTL0 trigger"
-	case OldTriggerSourceTTL1:
-		return "TTL1 trigger"
-	case OldTriggerSourceTTL2:
-		return "TTL2 trigger"
-	case OldTriggerSourceTTL3:
-		return "TTL3 trigger"
-	case OldTriggerSourceTTL4:
-		return "TTL4 trigger"
-	case OldTriggerSourceTTL5:
-		return "TTL5 trigger"
-	case OldTriggerSourceTTL6:
-		return "TTL6 trigger"
-	case OldTriggerSourceTTL7:
-		return "TTL7 trigger"
-	case OldTriggerSourceECL0:
-		return "ECL0 trigger"
-	case OldTriggerSourceECL1:
-		return "ECL1 trigger"
-	case OldTriggerSourcePXIStar:
-		return "PXI star trigger"
-	case OldTriggerSourceRTSI0:
-		return "RTSI0 trigger"
-	case OldTriggerSourceRTSI1:
-		return "RTSI1 trigger"
-	case OldTriggerSourceRTSI2:
-		return "RTSI2 trigger"
-	case OldTriggerSourceRTSI3:
-		return "RTSI3 trigger"
-	case OldTriggerSourceRTSI4:
-		return "RTSI4 trigger"
-	case OldTriggerSourceRTSI5:
-		return "RTSI5 trigger"
-	case OldTriggerSourceRTSI6:
-		return "RTSI6 trigger"
+	oldTriggerSources := map[OldTriggerSource]string{
+		OldTriggerSourceInternal: "internal trigger",
+		OldTriggerSourceExternal: "external trigger",
+		OldTriggerSourceSoftware: "software trigger",
+		OldTriggerSourceTTL0:     "TTL0 trigger",
+		OldTriggerSourceTTL1:     "TTL1 trigger",
+		OldTriggerSourceTTL2:     "TTL2 trigger",
+		OldTriggerSourceTTL3:     "TTL3 trigger",
+		OldTriggerSourceTTL4:     "TTL4 trigger",
+		OldTriggerSourceTTL5:     "TTL5 trigger",
+		OldTriggerSourceTTL6:     "TTL6 trigger",
+		OldTriggerSourceTTL7:     "TTL7 trigger",
+		OldTriggerSourceECL0:     "ECL0 trigger",
+		OldTriggerSourceECL1:     "ECL1 trigger",
+		OldTriggerSourcePXIStar:  "PXI star trigger",
+		OldTriggerSourceRTSI0:    "RTSI0 trigger",
+		OldTriggerSourceRTSI1:    "RTSI1 trigger",
+		OldTriggerSourceRTSI2:    "RTSI2 trigger",
+		OldTriggerSourceRTSI3:    "RTSI3 trigger",
+		OldTriggerSourceRTSI4:    "RTSI4 trigger",
+		OldTriggerSourceRTSI5:    "RTSI5 trigger",
+		OldTriggerSourceRTSI6:    "RTSI6 trigger",
 	}
 
-	return ""
+	return oldTriggerSources[ts]
 }
 
 // TriggerSource models the defined values for the Start Trigger Source, Stop
@@ -238,6 +213,62 @@ const (
 	TriggerSourceRTSI5
 	TriggerSourceRTSI6
 )
+
+// String implements the Stringer interface for TriggerSource.
+func (ts TriggerSource) String() string {
+	triggerSources := map[TriggerSource]string{
+		TriggerSourceNone:       "none",
+		TriggerSourceImmediate:  "immediate",
+		TriggerSourceExternal:   "external",
+		TriggerSourceInternal:   "internal",
+		TriggerSourceSoftware:   "software",
+		TriggerSourceLAN0:       "lan0",
+		TriggerSourceLAN1:       "lan1",
+		TriggerSourceLAN2:       "lan2",
+		TriggerSourceLAN3:       "lan3",
+		TriggerSourceLAN4:       "lan4",
+		TriggerSourceLAN5:       "lan5",
+		TriggerSourceLAN6:       "lan6",
+		TriggerSourceLAN7:       "lan7",
+		TriggerSourceLXI0:       "lxi0",
+		TriggerSourceLXI1:       "lxi1",
+		TriggerSourceLXI2:       "lxi2",
+		TriggerSourceLXI3:       "lxi3",
+		TriggerSourceLXI4:       "lxi4",
+		TriggerSourceLXI5:       "lxi5",
+		TriggerSourceLXI6:       "lxi6",
+		TriggerSourceLXI7:       "lxi7",
+		TriggerSourceTTL0:       "ttl0",
+		TriggerSourceTTL1:       "ttl1",
+		TriggerSourceTTL2:       "ttl2",
+		TriggerSourceTTL3:       "ttl3",
+		TriggerSourceTTL4:       "ttl4",
+		TriggerSourceTTL5:       "ttl5",
+		TriggerSourceTTL6:       "ttl6",
+		TriggerSourceTTL7:       "ttl7",
+		TriggerSourcePXIStar:    "pxi star",
+		TriggerSourcePXITrig0:   "pxi trigger 0",
+		TriggerSourcePXITrig1:   "pxi trigger 1",
+		TriggerSourcePXITrig2:   "pxi trigger 2",
+		TriggerSourcePXITrig3:   "pxi trigger 3",
+		TriggerSourcePXITrig4:   "pxi trigger 4",
+		TriggerSourcePXITrig5:   "pxi trigger 5",
+		TriggerSourcePXITrig6:   "pxi trigger 6",
+		TriggerSourcePXITrig7:   "pxi trigger 7",
+		TriggerSourcePXIeDStarA: "pxied star a",
+		TriggerSourcePXIeDStarB: "pxied star b",
+		TriggerSourcePXIeDStarC: "pxied stard c",
+		TriggerSourceRTSI0:      "rtsi0",
+		TriggerSourceRTSI1:      "rtsi1",
+		TriggerSourceRTSI2:      "rtsi2",
+		TriggerSourceRTSI3:      "rtsi3",
+		TriggerSourceRTSI4:      "rtsi4",
+		TriggerSourceRTSI5:      "rtsi5",
+		TriggerSourceRTSI6:      "rtsi6",
+	}
+
+	return triggerSources[ts]
+}
 
 type SampleClockSource int
 
@@ -303,3 +334,14 @@ const (
 	TriggerSlopeNegative
 	TriggerSlopeEither
 )
+
+// String implements the Stringer interface for TriggerSlope.
+func (ts TriggerSlope) String() string {
+	triggerSlopes := map[TriggerSlope]string{
+		TriggerSlopePositive: "positive",
+		TriggerSlopeNegative: "negative",
+		TriggerSlopeEither:   "either",
+	}
+
+	return triggerSlopes[ts]
+}
