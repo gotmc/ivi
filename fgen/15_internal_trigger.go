@@ -46,9 +46,3 @@ type IntTrigger interface {
 	InternalTriggerRate() (float64, error)
 	SetInternalTriggerRate(rate float64) error
 }
-
-// IntTriggerChannel provides the interface required for the channel repeated
-// capability to support the IviFgenInternalTrigger extension group as
-// described in Section 15 of the IVI-4.3: IviFgen Class Specification.
-type IntTriggerChannel interface {
-}
