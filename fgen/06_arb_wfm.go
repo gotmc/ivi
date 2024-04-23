@@ -66,8 +66,6 @@ type ArbWfmChannel interface {
 	SetArbitraryGain(gain float64) error
 	ArbitraryOffset() (float64, error)
 	SetArbitraryOffset(offset float64) error
-	ArbitrarySampleRate() (float64, error)
-	SetArbitrarySampleRate(rate float64) error
 	ArbitraryWaveformHandle() (int, error)
 	SetArbitraryWaveformHandle(handle int) error
 }
