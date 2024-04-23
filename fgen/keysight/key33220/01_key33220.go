@@ -34,6 +34,8 @@ var _ fgen.StdFuncChannel = (*Channel)(nil)
 var _ fgen.TriggerChannel = (*Channel)(nil)
 var _ fgen.IntTrigger = (*Driver)(nil)
 var _ fgen.BurstChannel = (*Channel)(nil)
+var _ fgen.ArbWfm = (*Driver)(nil)
+var _ fgen.ArbWfmChannel = (*Channel)(nil)
 
 // Driver provides the IVI driver for a Keysight/Agilent 33220A or 33210A
 // function generator.
