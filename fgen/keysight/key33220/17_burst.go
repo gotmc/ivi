@@ -6,12 +6,8 @@
 package key33220
 
 import (
-	"github.com/gotmc/ivi/fgen"
 	"github.com/gotmc/query"
 )
-
-// Confirm the driver implements the IviFgenBurst interface.
-var _ fgen.BurstChannel = (*Channel)(nil)
 
 // BurstCount returns the number of waveform cycles that the function generator
 // produces after it receives a trigger.

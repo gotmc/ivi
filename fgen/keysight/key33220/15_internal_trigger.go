@@ -6,15 +6,12 @@
 package key33220
 
 import (
-	"github.com/gotmc/ivi/fgen"
 	"github.com/gotmc/query"
 )
 
-// Confirm the driver implements the IviFgenInternalTrigger capability group.
-var _ fgen.IntTriggerChannel = (*Channel)(nil)
-
 // InternalTriggerRate determines the rate at which the function generator's
-// internal trigger source produces a trigger in triggers per second.
+// internal trigger source produces a trigger in triggers per second (Hz).
+//
 // InternalTriggerRate is the getter for the read-write IviFgenInternalTrigger
 // Attribute Internal Trigger Rate described in Section 15.2.1 of IVI-4.3:
 // IviFgen Class Specification.
@@ -31,7 +28,8 @@ func (d *Driver) InternalTriggerRate() (float64, error) {
 }
 
 // SetInternalTriggerRate specifies the rate at which the function generator's
-// internal trigger source produces a trigger in triggers per second.
+// internal trigger source produces a trigger in triggers per second (Hz).
+//
 // SetInternalTriggerRate is the setter for the read-write
 // IviFgenInternalTrigger Attribute Internal Trigger Rate described in Section
 // 15.2.1 of IVI-4.3: IviFgen Class Specification.

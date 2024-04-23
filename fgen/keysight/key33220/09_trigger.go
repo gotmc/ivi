@@ -14,10 +14,6 @@ import (
 	"github.com/gotmc/query"
 )
 
-// Confirm that the output channel repeated capabilitiy implements the
-// IviFgenTrigger interface.
-var _ fgen.TriggerChannel = (*Channel)(nil)
-
 // TriggerSource determines the trigger srouce.
 //
 // TriggerSource is the getter for the read-write IviFgenTrigger Attribute
@@ -25,10 +21,12 @@ var _ fgen.TriggerChannel = (*Channel)(nil)
 // Specification.
 func (ch *Channel) TriggerSource() (fgen.OldTriggerSource, error) {
 	var src fgen.OldTriggerSource
+
 	s, err := query.String(ch.inst, "TRIG:SOUR?")
 	if err != nil {
 		return src, err
 	}
+
 	s = strings.TrimSpace(strings.ToUpper(s))
 	switch s {
 	case "IMM":
@@ -40,6 +38,7 @@ func (ch *Channel) TriggerSource() (fgen.OldTriggerSource, error) {
 	default:
 		return src, errors.New("error determining trigger source")
 	}
+
 	return src, nil
 }
 
@@ -54,9 +53,11 @@ func (ch *Channel) SetTriggerSource(src fgen.OldTriggerSource) error {
 		fgen.OldTriggerSourceExternal: "EXT",
 		fgen.OldTriggerSourceSoftware: "BUS",
 	}
+
 	triggerSource, ok := triggers[src]
 	if !ok {
 		return fmt.Errorf("trigger source %s not supported", src)
 	}
+
 	return ch.inst.Command("TRIGE:SOUR %s", triggerSource)
 }

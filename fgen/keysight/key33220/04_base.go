@@ -10,20 +10,106 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/gotmc/ivi"
 	"github.com/gotmc/ivi/fgen"
 	"github.com/gotmc/query"
 )
 
-// Confirm that the output channel repeated capabilitiy implements the
-// interface for the IviFgenBase capability group.
-var _ fgen.BaseChannel = (*Channel)(nil)
+// OutputCount returns the number of available output channels.
+//
+// OutputCount is the getter for the read-only IviFgenBase Attribute Output
+// Count described in Section 4.2.1 of IVI-4.3: IviFgen Class Specification.
+func (d *Driver) OutputCount() int {
+	return len(d.Channels)
+}
 
-// Channel models the output channel repeated capabilitiy for the function
-// generator output channel.
-type Channel struct {
-	name string
-	inst ivi.Instrument
+// OutputMode returns the determines how the function generator produces
+// waveforms. This attribute determines which extension group’s functions and
+// attributes are used to configure the waveform the function generator
+// produces.
+//
+// OutputMode is the getter for the read-only IviFgenBase Attribute Output
+// Mode described in Section 4.2.5 of IVI-4.3: IviFgen Class Specification.
+func (d *Driver) OutputMode() (fgen.OutputMode, error) {
+	var outputMode fgen.OutputMode
+
+	funcType, err := query.String(d.inst, "FUNC?")
+	if err != nil {
+		return outputMode, fmt.Errorf("error determining the output function type: %w", err)
+	}
+
+	switch funcType {
+	case "SIN", "SQU", "RAMP":
+		return fgen.OutputModeFunction, nil
+	case "NOIS":
+		return fgen.OutputModeNoise, nil
+	case "USER":
+		return fgen.OutputModeArbitrary, nil
+	}
+
+	return 0, fmt.Errorf("unknown output mode type")
+}
+
+// SetOutputMode sets how the function generator produces waveforms. This
+// attribute determines which extension group’s functions and attributes are
+// used to configure the waveform the function generator produces.
+//
+// OutputMode is the setter for the read-only IviFgenBase Attribute Output
+// Mode described in Section 4.2.5 of IVI-4.3: IviFgen Class Specification.
+func (d *Driver) SetOutputMode(outputMode fgen.OutputMode) error {
+	switch outputMode {
+	case fgen.OutputModeFunction:
+		return d.inst.Command("FUNC SIN")
+	case fgen.OutputModeArbitrary:
+		return d.inst.Command("FUNC USER")
+	case fgen.OutputModeSequence:
+		return fmt.Errorf("function generator does not support output mode sequency")
+	case fgen.OutputModeNoise:
+		return d.inst.Command("FUNC NOIS")
+	}
+
+	return fmt.Errorf("error setting output mode")
+}
+
+// InitiateGeneration initiates signal generation by enabling all outputs.
+// Instead of calling this function, the user can simply enable outputs.
+//
+// InitiateGeneration implements the IviFgenBase function described in Section
+// 4.3.8 of IVI-4.3: IviFgen Class Specification.
+func (d *Driver) InitiateGeneration() error {
+	for _, channel := range d.Channels {
+		if err := channel.EnableOutput(); err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
+// AbortGeneration aborts a previously initiated signal generation by disabling
+// all outputs.
+//
+// AbortGeneration implements the IviFgenBase function described in Section 4.3.1
+// of IVI-4.3: IviFgen Class Specification.
+func (d *Driver) AbortGeneration() error {
+	for _, channel := range d.Channels {
+		if err := channel.DisableOutput(); err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
+func (d *Driver) ReferenceClockSource() (fgen.ClockSource, error) {
+	return fgen.RefClockInternal, nil
+}
+
+func (d *Driver) SetReferenceClockSource(_ fgen.ClockSource) error {
+	return nil
+}
+
+func (ch *Channel) Name() string {
+	return "output"
 }
 
 // OperationMode determines whether the function generator should produce a
@@ -34,10 +120,12 @@ type Channel struct {
 // Specification.
 func (ch *Channel) OperationMode() (fgen.OperationMode, error) {
 	var mode fgen.OperationMode
+
 	s, err := query.String(ch.inst, "BURS:STAT?")
 	if err != nil {
 		return mode, fmt.Errorf("error getting operation mode: %s", err)
 	}
+
 	switch strings.TrimSpace(s) {
 	case "0":
 		return fgen.ContinuousMode, nil
@@ -59,6 +147,7 @@ func (ch *Channel) SetOperationMode(mode fgen.OperationMode) error {
 	case fgen.ContinuousMode:
 		return ch.inst.Command("BURS:STAT OFF")
 	}
+
 	return errors.New("bad fgen operation mode")
 }
 
@@ -78,6 +167,7 @@ func (ch *Channel) SetOutputEnabled(b bool) error {
 	if b {
 		return ch.inst.Command("OUTP ON")
 	}
+
 	return ch.inst.Command("OUTP OFF")
 }
 

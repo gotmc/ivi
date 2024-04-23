@@ -7,4 +7,7 @@ package ivi
 
 import "errors"
 
-var ErrFunctionNotSupported = errors.New("function not supported")
+var (
+	ErrFunctionNotSupported = errors.New("function not supported")
+	ErrValueNotSupported    = errors.New("value not supported")
+)
