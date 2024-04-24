@@ -1,3 +1,5 @@
+# -*- Justfile -*-
+
 # List the available justfile recipes.
 @default:
   just --list
@@ -26,3 +28,7 @@ cover:
 # List the outdated go modules.
 outdated:
   go list -u -m all
+
+# List the lines of code in the project.
+loc:
+  scc --remap-unknown "-*- Justfile -*-":"justfile"
