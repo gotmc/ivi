@@ -48,14 +48,14 @@ Below are the .NET functions, since they are the basis for the Go interfaces.
 
 // Base provides the interface for the IviDCPwrBase capability group.
 type Base interface {
-	OutputChannelCount() (int, error)
-	OutputChannelItem(name string) (BaseChannel, error)
+	OutputChannelCount() int
+	// OutputChannelItem(name string) (BaseChannel, error)
 }
 
 // BaseChannel provides the interface for the channel repeated capability for
 // the IviDCPwrBase capability group.
 type BaseChannel interface {
-	OutputChannelName() (string, error)
+	Name() string
 	CurrentLimit() (float64, error)
 	SetCurrentLimit(limit float64) error
 	CurrentLimitBehavior() (CurrentLimitBehavior, error)

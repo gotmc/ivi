@@ -9,21 +9,21 @@ import (
 	"errors"
 
 	"github.com/gotmc/convert"
-	"github.com/gotmc/ivi"
 	"github.com/gotmc/ivi/dcpwr"
 	"github.com/gotmc/query"
 )
 
-// Confirm that the output channel repeated capabilitiy implements the
-// IviDCPwrBase and IviDCPwrMeasurement interfaces.
-var _ dcpwr.BaseChannel = (*Channel)(nil)
-var _ dcpwr.MeasurementChannel = (*Channel)(nil)
+// OutputChannelCount returns the number of available output channels.
+//
+// OutputChannelCount is the getter for the read-only IviDCPwrBase Attribute
+// Output Channel Count described in Section 4.2.7 of IVI-4.4: IviDCPwr Class
+// Specification.
+func (d *Driver) OutputChannelCount() int {
+	return len(d.Channels)
+}
 
-// Channel models the output channel repeated capabilitiy for the DC power
-// supply output channel.
-type Channel struct {
-	name string
-	inst ivi.Instrument
+func (ch *Channel) Name() string {
+	return ch.name
 }
 
 // CurrentLimit determines the output current limit. The units are Amps.
@@ -32,8 +32,7 @@ type Channel struct {
 // Current Limit described in Section 4.2.1 of IVI-4.4: IviDCPwr Class
 // Specification.
 func (ch *Channel) CurrentLimit() (float64, error) {
-	_, current, err := ch.readVoltageCurrent()
-	return current, err
+	return query.Float64f(ch.inst, "inst %s; curr?", ch.name)
 }
 
 // SetCurrentLimit specifies the output current limit in Amperes.
@@ -42,7 +41,7 @@ func (ch *Channel) CurrentLimit() (float64, error) {
 // Attribute Current Limit described in Section 4.2.1 of IVI-4.4: IviDCPwr
 // Class Specification.
 func (ch *Channel) SetCurrentLimit(limit float64) error {
-	return ch.inst.Command("INST %s;:CURR %f", ch.name, limit)
+	return ch.inst.Command("inst %s; curr %.4f", ch.name, limit)
 }
 
 // CurrentLimitBehavior determines the behavior of the power supply when the
@@ -68,6 +67,7 @@ func (ch *Channel) SetCurrentLimitBehavior(behavior dcpwr.CurrentLimitBehavior) 
 	if behavior == dcpwr.CurrentTrip {
 		return errors.New("current trip is not supported")
 	}
+
 	return nil
 }
 
@@ -89,6 +89,7 @@ func (ch *Channel) SetOutputEnabled(v bool) error {
 	if v {
 		return ch.inst.Command("OUTP ON")
 	}
+
 	return ch.inst.Command("OUTP OFF")
 }
 
@@ -117,7 +118,7 @@ func (ch *Channel) OVPEnabled() (bool, error) {
 //
 // SetOVPEnabled is the setter for the read-write IviFgenBase Attribute OVP
 // Enabled described in Section 4.2.4 of IVI-4.4: IviDCPwr Class Specification.
-func (ch *Channel) SetOVPEnabled(v bool) error {
+func (ch *Channel) SetOVPEnabled(_ bool) error {
 	return dcpwr.ErrOVPUnsupported
 }
 
@@ -147,7 +148,7 @@ func (ch *Channel) OVPLimit() (float64, error) {
 //
 // SetOVPLimit is the setter for the read-write IviDCPwrBase Attribute OVP
 // Limit described in Section 4.2.5 of IVI-4.4: IviDCPwr Class Specification.
-func (ch *Channel) SetOVPLimit(limit float64) error {
+func (ch *Channel) SetOVPLimit(_ float64) error {
 	return dcpwr.ErrOVPUnsupported
 }
 
@@ -157,8 +158,7 @@ func (ch *Channel) SetOVPLimit(limit float64) error {
 // VoltageLevel is the getter for the read-write IviDCPwrBase Attribute Voltage
 // Level described in Section 4.2.6 of IVI-4.4: IviDCPwr Class Specification.
 func (ch *Channel) VoltageLevel() (float64, error) {
-	voltage, _, err := ch.readVoltageCurrent()
-	return voltage, err
+	return query.Float64f(ch.inst, "inst %s; volt?", ch.name)
 }
 
 // SetVoltageLevel specifies the voltage level the DC power supply attempts
@@ -168,7 +168,7 @@ func (ch *Channel) VoltageLevel() (float64, error) {
 // Voltage Level described in Section 4.2.6 of IVI-4.4: IviDCPwr Class
 // Specification.
 func (ch *Channel) SetVoltageLevel(amp float64) error {
-	return ch.inst.Command("inst %s; volt %.2f", ch.name, amp)
+	return ch.inst.Command("inst %s; volt %.4f", ch.name, amp)
 }
 
 // ConfigureCurrentLimit configures the current limit. It specifies the output
@@ -177,7 +177,7 @@ func (ch *Channel) SetVoltageLevel(amp float64) error {
 //
 // ConfigureCurrentLimit implements the IviDCPwrBase function described in
 // Section 4.3.1 of IVI-4.4: IviDCPwr Class Specification.
-func (ch *Channel) ConfigureCurrentLimit(behavior dcpwr.CurrentLimitBehavior, limit float64) error {
+func (ch *Channel) ConfigureCurrentLimit(_ dcpwr.CurrentLimitBehavior, _ float64) error {
 	return dcpwr.ErrNotImplemented
 }
 
@@ -198,7 +198,7 @@ func (ch *Channel) ConfigureCurrentLimit(behavior dcpwr.CurrentLimitBehavior, li
 //
 // ConfigureOutputRange implements the IviDCPwrBase function described in
 // Section 4.3.3 of IVI-4.4: IviDCPwr Class Specification.
-func (ch *Channel) ConfigureOutputRange(rt dcpwr.RangeType, rng float64) error {
+func (ch *Channel) ConfigureOutputRange(_ dcpwr.RangeType, _ float64) error {
 	return dcpwr.ErrNotImplemented
 }
 
@@ -210,7 +210,7 @@ func (ch *Channel) ConfigureOutputRange(rt dcpwr.RangeType, rng float64) error {
 //
 // ConfigureOVP implements the IviDCPwrBase function described in Section 4.3.4
 // of IVI-4.4: IviDCPwr Class Specification.
-func (ch *Channel) ConfigureOVP(b bool, limit float64) error {
+func (ch *Channel) ConfigureOVP(_ bool, _ float64) error {
 	return dcpwr.ErrNotImplemented
 }
 
@@ -219,7 +219,7 @@ func (ch *Channel) ConfigureOVP(b bool, limit float64) error {
 //
 // QueryCurrentLimitMax implements the IviDCPwrBase function described in
 // Section 4.3.7 of IVI-4.4: IviDCPwr Class Specification.
-func (ch *Channel) QueryCurrentLimitMax(voltage float64) (float64, error) {
+func (ch *Channel) QueryCurrentLimitMax(_ float64) (float64, error) {
 	return 0.0, dcpwr.ErrNotImplemented
 }
 
@@ -228,7 +228,7 @@ func (ch *Channel) QueryCurrentLimitMax(voltage float64) (float64, error) {
 //
 // QueryVoltageLevelMax implements the IviDCPwrBase function described in
 // Section 4.3.8 of IVI-4.4: IviDCPwr Class Specification.
-func (ch *Channel) QueryVoltageLevelMax(currentLimit float64) (float64, error) {
+func (ch *Channel) QueryVoltageLevelMax(_ float64) (float64, error) {
 	return 0.0, dcpwr.ErrNotImplemented
 }
 
@@ -237,7 +237,7 @@ func (ch *Channel) QueryVoltageLevelMax(currentLimit float64) (float64, error) {
 //
 // QueryOutputState implements the IviDCPwrBase function described in Section
 // 4.3.9 of IVI-4.4: IviDCPwr Class Specification.
-func (ch *Channel) QueryOutputState(os dcpwr.OutputState) (bool, error) {
+func (ch *Channel) QueryOutputState(_ dcpwr.OutputState) (bool, error) {
 	return false, dcpwr.ErrNotImplemented
 }
 
@@ -250,26 +250,6 @@ func (ch *Channel) ResetOutputProtection() error {
 	return dcpwr.ErrNotImplemented
 }
 
-// MeasureVoltage takes a measurement on the output signal and returns the
-// measured voltage.
-//
-// MeasureVoltage implements the IviDCPwrMeasurement function Measure for the
-// Voltage MeasurementType parameter described in Section 7.2.1 of IVI-4.4:
-// IviDCPwr Class Specification.
-func (ch *Channel) MeasureVoltage() (float64, error) {
-	return query.Float64f(ch.inst, "MEAS:VOLT? %s", ch.name)
-}
-
-// MeasureCurrent takes a measurement on the output signal and returns the
-// measured current.
-//
-// MeasureCurrent implements the IviDCPwrMeasurement function Measure for the
-// Current MeasurementType parameter described in Section 7.2.1 of IVI-4.4:
-// IviDCPwr Class Specification.
-func (ch *Channel) MeasureCurrent() (float64, error) {
-	return query.Float64f(ch.inst, "MEAS:CURR? %s", ch.name)
-}
-
 // readVoltageCurrent queries the power supply's present voltage and current
 // values for each output and returns a quoted string. The voltage and current
 // are returned in sequence as shown in the sample string below (the quotation
@@ -278,7 +258,7 @@ func (ch *Channel) MeasureCurrent() (float64, error) {
 // returned. "5.000000,1.000000" In the above string, the first number 5.000000
 // is the voltage limit value and the second number 1.000000 is the current
 // limit value for the specified output.
-func (ch *Channel) readVoltageCurrent() (float64, float64, error) {
+func (ch *Channel) readVoltageCurrent() (voltage, current float64, err error) {
 	s, err := query.Stringf(ch.inst, "appl? %s", ch.name)
 	if err != nil {
 		return 0.0, 0.0, err
@@ -287,8 +267,10 @@ func (ch *Channel) readVoltageCurrent() (float64, float64, error) {
 	// by a comma, so we need to strip those.
 	s = convert.StripDoubleQuotes(s)
 	floats, err := convert.StringToNFloats(s, ",", 2)
+
 	if err != nil {
 		return 0.0, 0.0, err
 	}
+
 	return floats[0], floats[1], nil
 }
