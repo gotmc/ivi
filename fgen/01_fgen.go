@@ -6,7 +6,7 @@
 /*
 Package fgen provides the defined values, interfaces, structs, methods, and
 enums that are common among all instruments meeting the IVI-4.3: IviFgen Class
-Specification.
+Specification, Revision 5.2 dated October 14, 2016.
 
 Files are split based on the class capability groups listed in Table 2-1
 IviFgen Group Names in the IVI-4.3 IviFgen Class Specification.
