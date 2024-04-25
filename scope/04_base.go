@@ -5,6 +5,8 @@
 
 package scope
 
+import "time"
+
 /*
 
 # Section 4 IviScopeBase Capability Group
@@ -109,15 +111,72 @@ Below are the .NET functions, since they are the basis for the Go interfaces.
 
 // Base provides the interface required for the IviFgenBase capability group.
 type Base interface {
-	OutputCount() int
-	AbortGeneration() error
-	InitiateGeneration() error
-	// Incomplete
+	AcquisitionStartTime() (time.Duration, error)
+	SetAcquisitionStartTime(startTime time.Duration) error
+	AcquisitionStatus() (AcquisitionStatus, error)
+	AcquisitionType() (AcquisitionType, error)
+	SetAcquisitionType(acquisitionType AcquisitionType) error
+	ChannelsCount() int
+	ChannelItem() (*BaseChannel, error) // 4.2.6 Channel Item
+	AcquisitionMinNumPoints() (int, error)
+	SetAcquisitionMinNumPoints(numPoints int) error
+	AcquisitionRecordLength() (int, error)
+	AcquisitionSampleRate() (float64, error)
+	AcquisitionTimePerRecord() (time.Duration, error)
+	SetAcquisitionTimePerRecord(timePerRecord time.Duration) error
+	TriggerHoldoff() (float64, error)
+	SetTriggerHoldoff(holdoff float64) error
+	TriggerLevel() (float64, error)
+	SetTriggerLevel(level float64) error
+	TriggerSlope() (TriggerSlope, error)
+	SetTriggerSlope(slope TriggerSlope) error
+	TriggerSource() (TriggerSource, error)
+	SetTriggerSource(source TriggerSource) error
+	TriggerType() (TriggerType, error)
+	SetTriggerType(triggerType TriggerType) error
+	AbortMeasurement() error
+	ConfigureAcquisitionRecord(
+		timePerRecord time.Duration,
+		minNumPoints int,
+		acquisitionStartTime time.Duration,
+	) error
+	CreateWaveform(numSamples int) error
+	ConfigureEdgeTrigger(triggerType TriggerType, level float64, slope TriggerSlope) error
+	ConfigureTrigger(triggerType TriggerType, holdoff time.Duration) error
+	InitiateMeasurement() error
 }
 
 // BaseChannel provides the interface required for the channel repeated
 // capability for the IviFgenBase capability group.
 type BaseChannel interface {
+	ChannelEnabled() (bool, error)
+	SetChannelEnabled(b bool) error
 	Name() string
-	// Incomplete
+	InputImpedance() (float64, error)
+	SetInputImpedance(impedance float64) error
+	MaxInputFrequency() (float64, error)
+	SetMaxInputFrequency(freq float64) error
+	ProbeAttenuation() (float64, error)
+	SetProbeAttenuation(atten float64) error
+	ProbeAttenuationAuto() (bool, error)
+	SetProbeAttenuationAuto(b bool) error
+	TriggerCoupling() (TriggerCoupling, error)
+	SetTriggerCoupling(coupling TriggerCoupling) error
+	VerticalCoupling() (VerticalCoupling, error)
+	SetVerticalCoupling(coupling VerticalCoupling) error
+	VerticalOffset() (float64, error)
+	SetVerticalOffset(offset float64) error
+	VerticalRange() (float64, error)
+	SetVerticalRange(rng float64) error
+	Configure(
+		rng float64,
+		offset float64,
+		coupling VerticalCoupling,
+		autoProbeAttenuation bool,
+		probeAttenuation float64,
+		enabled bool,
+	) error
+	ConfigureCharacteristics(inputImepdance, inputFreqMax float64) error
+	FetchWaveform(waveform Waveform) error
+	ReadWaveform(maximumTime time.Duration, waveform Waveform) error
 }

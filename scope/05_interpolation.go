@@ -31,3 +31,7 @@ Below are the .NET functions, since they are the basis for the Go interfaces.
 None.
 
 */
+
+type Interpolation interface {
+	AcquisitionInterpolation(interp InterpolationMethod) error
+}

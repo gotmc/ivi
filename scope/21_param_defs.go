@@ -4,3 +4,17 @@
 // can be found in the LICENSE.txt file for the project.
 
 package scope
+
+/*
+
+# Section 21 IviScope Function Parameter Value Definitions
+
+*/
+
+type AcquisitionStatus int
+
+const (
+	AcquisitionComplete AcquisitionStatus = iota
+	AcquisitionInprogress
+	AcquisitionStatusUnknown
+)
