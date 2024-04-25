@@ -4,3 +4,30 @@
 // can be found in the LICENSE.txt file for the project.
 
 package dmm
+
+/*
+
+# Section 14 IviDmmDeviceInfo Capability Group
+
+## Section 14.1 IviDmmDeviceInfo Overview
+
+The IviDmmDeviceInfo extension group defines a set of read-only attributes for
+DMMs that can be queried to determine how they are presently configured. These
+attributes are the aperture time and the aperture time units.
+
+## Section 14.2 IviDmmDeviceInfo Attributes
+
+Below are the .NET attributes, since they are the basis for the Go interfaces.
+
+| Section | Attribute               | Type     | Access | AppliesTo |
+| ------- | ----------------------- | -------- | ------ | --------- |
+|  14.2.1 | Aperture Time           | Real64   | RO     | N/A       |
+|  14.2.2 | Aperture Time Units     | Int32    | RO     | N/A       |
+
+## Section 14.3 IviDmmDeviceInfo Functions
+
+Below are the .NET functions, since they are the basis for the Go interfaces.
+
+None.
+
+*/

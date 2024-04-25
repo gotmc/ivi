@@ -4,3 +4,21 @@
 // can be found in the LICENSE.txt file for the project.
 
 package dmm
+
+/*
+
+# Section 13 IviDmmSoftwareTrigger Capability Group
+
+## Section 13.1 IviDmmSoftwareTrigger Overview
+
+The IviDmmSoftwareTrigger extension group supports DMMs that can initiate a
+measurement based on a software trigger signal. The user can send a software
+trigger to cause the DMM to initiate a measurement.
+
+## Section 13.2 IviDmmSoftwareTrigger Functions
+
+Below are the .NET functions, since they are the basis for the Go interfaces.
+
+13.2 void SendSoftwareTrigger();
+
+*/

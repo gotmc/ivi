@@ -4,3 +4,27 @@
 // can be found in the LICENSE.txt file for the project.
 
 package dmm
+
+/*
+
+# Section 15 IviDmmAutoRangeValue Capability Group
+
+## Section 15.1 IviDmmAutoRangeValue Overview
+
+The IviDmmAutoRangeValue extension supports DMMs with the capability to return
+the actual range value when auto ranging.
+
+## Section 15.2 IviDmmAutoRangeValue Attributes
+
+Below are the .NET attributes, since they are the basis for the Go interfaces.
+
+Note: Ause the Range property for .NET instead of the Auto Range Value
+attribute.
+
+## Section 15.3 IviDmmAutoRangeValue Functions
+
+Below are the .NET functions, since they are the basis for the Go interfaces.
+
+None.
+
+*/
