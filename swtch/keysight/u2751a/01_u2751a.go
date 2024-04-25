@@ -38,6 +38,7 @@ func (ct ChannelType) String() string {
 	if ct == Row {
 		return "row"
 	}
+
 	return "column"
 }
 
@@ -73,10 +74,12 @@ func New(inst ivi.Instrument, reset, standalone bool) (U2751A, error) {
 		{"Col8", Col, 8},
 	}
 	outputCount := len(infoChannels)
+
 	channels := make([]Channel, outputCount)
 	for i, ch := range infoChannels {
 		channels[i] = newChannel(i, ch.name, ch.chType, ch.switchID, inst, standalone)
 	}
+
 	inherentBase := ivi.InherentBase{
 		ClassSpecMajorVersion: specMajorVersion,
 		ClassSpecMinorVersion: specMinorVersion,
@@ -96,10 +99,12 @@ func New(inst ivi.Instrument, reset, standalone bool) (U2751A, error) {
 		channels: channels,
 		Inherent: inherent,
 	}
+
 	if reset {
 		err := driver.Reset()
 		return driver, err
 	}
+
 	return driver, nil
 }
 
@@ -159,6 +164,7 @@ func (d *U2751A) ChannelByID(id int) (*Channel, error) {
 	if id < 0 || id > len(d.channels) {
 		return &Channel{}, fmt.Errorf("channel %d not found", id)
 	}
+
 	return &d.channels[id], nil
 }
 
@@ -177,10 +183,12 @@ func newChannel(
 ) Channel {
 	dcVoltageMax := 42.0
 	acVoltageMax := 35.0
+
 	if !standalone {
 		dcVoltageMax = 180.0
 		acVoltageMax = 180.0
 	}
+
 	return Channel{
 		id:                    id,
 		name:                  name,
@@ -223,5 +231,6 @@ func (d *U2751A) SetVirtualNames(names map[string]string) error {
 			}
 		}
 	}
+
 	return nil
 }

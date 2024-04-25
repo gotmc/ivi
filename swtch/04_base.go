@@ -8,6 +8,8 @@ package swtch
 import (
 	"errors"
 	"time"
+
+	"github.com/gotmc/ivi"
 )
 
 // Base provides the interface required for the IviSwtchBase capability group.
@@ -75,3 +77,20 @@ var (
 	ErrCannotConnectToSelf      = errors.New("cannot connect to self")
 	ErrPathNotFound             = errors.New("path not found")
 )
+
+// Channel models the repeated capability of a generic channel.
+type Channel struct {
+	id   int
+	name string
+	inst ivi.Instrument
+}
+
+// NewChannel returns a Channel for a switch.
+func NewChannel(id int, name string, inst ivi.Instrument) Channel {
+	return Channel{id, name, inst}
+}
+
+// Set writes the format string, using the given paarameters to the channel.
+func (ch *Channel) Set(format string, a ...interface{}) error {
+	return ivi.Set(ch.inst, format, a...)
+}

@@ -31,10 +31,10 @@ func (ch *Channel) ACCurrentCarryMax() float64 {
 	return ch.acCurrentCarryMax
 }
 
-// ACCurrentSwitchingMax returns the maximum AC current the channel can switch in
-// amperes RMS. ACCurrentSwitchingMax is the getter for the read-only IviSwtchBase
-// attribute Characteristics.ACCurrentSwitchingMax described in Section 4.2.2 of
-// IVI-4.6:IviSwtch Class Specification.
+// ACCurrentSwitchingMax returns the maximum AC current the channel can switch
+// in amperes RMS. ACCurrentSwitchingMax is the getter for the read-only
+// IviSwtchBase attribute Characteristics.ACCurrentSwitchingMax described in
+// Section 4.2.2 of IVI-4.6:IviSwtch Class Specification.
 func (ch *Channel) ACCurrentSwitchingMax() float64 {
 	return ch.acCurrentSwitchingMax
 }
@@ -172,7 +172,7 @@ func (ch *Channel) IsDebounced() bool {
 	return ch.isDebounced
 }
 
-// IsSourceChannel returns true if this channel has been delcared as a source
+// IsSourceChannel returns true if this channel has been declared as a source
 // channel. If a user ever attempts to connect two channels that are either
 // sources or have their own connections to sources, the path creation
 // operation returns an error. IsSourceChannel is the getter for the read-write
@@ -230,6 +230,7 @@ func (d *U2751A) CanConnect(ch1name, ch2name string) (bool, error) {
 	if err != nil {
 		return false, err
 	}
+
 	ch2, err := d.Channel(ch2name)
 	if err != nil {
 		return false, err
@@ -237,6 +238,7 @@ func (d *U2751A) CanConnect(ch1name, ch2name string) (bool, error) {
 
 	smallID := ch1.id
 	largeID := ch2.id
+
 	if largeID < smallID {
 		smallID = ch2.id
 		largeID = ch1.id
@@ -266,6 +268,7 @@ func (d *U2751A) CanConnect(ch1name, ch2name string) (bool, error) {
 			return false, swtch.ErrPathExists
 		}
 	}
+
 	return true, nil
 }
 
@@ -278,6 +281,7 @@ func (d *U2751A) Connect(ch1name, ch2name string) error {
 		// Should I return an Unknown Channel Name per IVI-3.2 Table 9-2?
 		return err
 	}
+
 	ch2, err := d.Channel(ch2name)
 	if err != nil {
 		return err
@@ -285,6 +289,7 @@ func (d *U2751A) Connect(ch1name, ch2name string) error {
 
 	smallID := ch1.id
 	largeID := ch2.id
+
 	if largeID < smallID {
 		smallID = ch2.id
 		largeID = ch1.id
@@ -324,14 +329,18 @@ func (d *U2751A) Connect(ch1name, ch2name string) error {
 	// Make the connection.
 	row := ch1.switchID
 	col := ch2.switchID
+
 	if ch1.chType != Row || ch2.chType != Col {
 		return fmt.Errorf("expected a row and a col got: %s and %s", ch1.chType, ch2.chType)
 	}
+
 	err = ivi.Set(d.inst, "ROUT:CLOS (@%1d%02d)\n", row, col)
 	if err != nil {
 		return err
 	}
+
 	d.paths = append(d.paths, newPath)
+
 	return nil
 }
 
@@ -339,6 +348,7 @@ func pathsEqual(pathA, pathB []string) bool {
 	if len(pathA) != len(pathB) {
 		return false
 	}
+
 	for i := range pathA {
 		if pathA[i] != pathB[i] {
 			return false
