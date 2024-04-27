@@ -32,15 +32,15 @@ type Inherent struct {
 // InherentBase provides the exported properties for the inherent capabilities
 // of all IVI instruments.
 type InherentBase struct {
-	ClassSpecMajorVersion     int
-	ClassSpecMinorVersion     int
 	ClassSpecRevision         string
 	IDNString                 string
-	ResetDelay                time.Duration
-	ClearDelay                time.Duration
 	GroupCapabilities         []string
 	SupportedInstrumentModels []string
 	SupportedBusInterfaces    []string
+	ClassSpecMajorVersion     int
+	ClassSpecMinorVersion     int
+	ResetDelay                time.Duration
+	ClearDelay                time.Duration
 }
 
 // NewInherent creates a new Inherent struct using the given Instrument

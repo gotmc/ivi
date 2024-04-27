@@ -5,10 +5,14 @@
 
 package ivi
 
-import "errors"
+type Number interface {
+	int | float64
+}
 
-var (
-	ErrNotImplemented       = errors.New("not implemented in ivi driver")
-	ErrFunctionNotSupported = errors.New("function not supported")
-	ErrValueNotSupported    = errors.New("value not supported")
-)
+type Waveform struct {
+	item *[]float64
+}
+
+func (w *Waveform) GetAllElements() (*[]float64, error) {
+	return w.item, nil
+}
