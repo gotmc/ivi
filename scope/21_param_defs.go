@@ -18,3 +18,12 @@ const (
 	AcquisitionInprogress
 	AcquisitionStatusUnknown
 )
+
+// String implements the stringer interface for AcquisitionStatus.
+func (as AcquisitionStatus) String() string {
+	return map[AcquisitionStatus]string{
+		AcquisitionComplete:      "acquisition complete",
+		AcquisitionInprogress:    "acquisition in progress",
+		AcquisitionStatusUnknown: "acquisition status unknown",
+	}[as]
+}

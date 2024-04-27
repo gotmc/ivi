@@ -15,6 +15,16 @@ const (
 	AverageAcquisition
 )
 
+func (at AcquisitionType) String() string {
+	return map[AcquisitionType]string{
+		NormalAcquisition:         "normal",
+		PeakDetectAcquisition:     "peak detect",
+		HighResolutionAcquisition: "high resolution",
+		EnvelopeAcquisition:       "evnvelope",
+		AverageAcquisition:        "average",
+	}[at]
+}
+
 type VerticalCoupling int
 
 const (

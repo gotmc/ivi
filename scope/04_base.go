@@ -5,7 +5,11 @@
 
 package scope
 
-import "time"
+import (
+	"time"
+
+	"github.com/gotmc/ivi"
+)
 
 /*
 
@@ -117,7 +121,7 @@ type Base interface {
 	AcquisitionType() (AcquisitionType, error)
 	SetAcquisitionType(acquisitionType AcquisitionType) error
 	ChannelsCount() int
-	ChannelItem() (*BaseChannel, error) // 4.2.6 Channel Item
+	ChannelItem() (*BaseChannel, error)
 	AcquisitionMinNumPoints() (int, error)
 	SetAcquisitionMinNumPoints(numPoints int) error
 	AcquisitionRecordLength() (int, error)
@@ -177,6 +181,6 @@ type BaseChannel interface {
 		enabled bool,
 	) error
 	ConfigureCharacteristics(inputImepdance, inputFreqMax float64) error
-	FetchWaveform(waveform Waveform) error
-	ReadWaveform(maximumTime time.Duration, waveform Waveform) error
+	FetchWaveform(waveform ivi.Waveform) error
+	ReadWaveform(maximumTime time.Duration, waveform ivi.Waveform) error
 }
