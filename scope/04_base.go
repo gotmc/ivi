@@ -120,8 +120,7 @@ type Base interface {
 	AcquisitionStatus() (AcquisitionStatus, error)
 	AcquisitionType() (AcquisitionType, error)
 	SetAcquisitionType(acquisitionType AcquisitionType) error
-	ChannelsCount() int
-	ChannelItem() (*BaseChannel, error)
+	ChannelCount() int
 	AcquisitionMinNumPoints() (int, error)
 	SetAcquisitionMinNumPoints(numPoints int) error
 	AcquisitionRecordLength() (int, error)

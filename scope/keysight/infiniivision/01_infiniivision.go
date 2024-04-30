@@ -29,7 +29,7 @@ const (
 
 // Confirm the implemented interfaces by the driver.
 var _ scope.Base = (*Driver)(nil)
-var _ scop3.BaseChannel = (*Channel)(nil)
+var _ scope.BaseChannel = (*Channel)(nil)
 
 // Driver provides the IVI driver for a Keysigh InfiniiVision family of
 // oscilloscopes.
