@@ -28,6 +28,8 @@ const (
 
 // Confirm that the device driver implements the IviDCPwrBase interface.
 var _ dcpwr.Base = (*Device)(nil)
+var _ dcpwr.BaseChannel = (*Channel)(nil)
+var _ dcpwr.MeasurementChannel = (*Channel)(nil)
 
 // Device provides the IVI driver for the Rigol DP800 series of DC power
 // supplies.
@@ -148,6 +150,18 @@ func New(inst ivi.Instrument, reset bool) (*Device, error) {
 		return &driver, err
 	}
 	return &driver, nil
+}
+
+// Channel models the output channel repeated capabilitiy for the DC power
+// supply output channel.
+type Channel struct {
+	name                 string
+	inst                 ivi.Instrument
+	currentLimitBehavior dcpwr.CurrentLimitBehavior
+	minVoltage           float64
+	maxVoltage           float64
+	minCurrent           float64
+	maxCurrent           float64
 }
 
 // AvailableCOMPorts lists the avaialble COM ports, including optional ports.

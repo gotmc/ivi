@@ -3,17 +3,6 @@
 // Use of this source code is governed by a MIT-style license that
 // can be found in the LICENSE.txt file for the project.
 
-/*
-Package key3446x implements the IVI Instrument driver for the Keysight 3446x
-family of DMM.
-
-The Keysight 3446x family of DMMs use LAN port 5025 for SCPI Telnet sessions
-and port 5025 for SCPI Socket sessions (confirmed for the Keysight 34461A and
-assumed for the others). The default GPIB address for the 34461A is 22 (per p.
-475 of the manual).
-
-State Caching: Not implemented
-*/
 package key3446x
 
 import (
@@ -25,76 +14,6 @@ import (
 	"github.com/gotmc/ivi/dmm"
 	"github.com/gotmc/query"
 )
-
-const (
-	specMajorVersion = 4
-	specMinorVersion = 2
-	specRevision     = "4.1"
-)
-
-// Confirm the driver implements the interface for the IviDMMBase capability
-// group.
-var _ dmm.Base = (*Driver)(nil)
-
-// Driver provides the IVI driver for the Keysight 3446x family of DMMs.
-type Driver struct {
-	inst ivi.Instrument
-	ivi.Inherent
-}
-
-// New creates a new IVI driver for the Keysight 3446x series of DMMs.
-func New(inst ivi.Instrument, reset bool) (*Driver, error) {
-	inherentBase := ivi.InherentBase{
-		ClassSpecMajorVersion: specMajorVersion,
-		ClassSpecMinorVersion: specMinorVersion,
-		ClassSpecRevision:     specRevision,
-		ResetDelay:            500 * time.Millisecond,
-		ClearDelay:            500 * time.Millisecond,
-		GroupCapabilities: []string{
-			"IviDmmBase",
-			"IviDmmACMeasurement",
-			"IviDmmFrequencyMeasurement",
-			// "IviDmmTemperatureMeasurement",
-			// "IviDmmResistanceTemperatureDevice",
-			// "IviDmmThermistor",
-			// "IviDmmMultiPoint",
-			// "IviDmmTriggerSlope",
-			// "IviDmmSoftwareTrigger",
-			// "IviDmmDeviceInfo",
-			// "IviDmmAutoRangeValue",
-			// "IviDmmAutoZero",
-			// "IviDmmPowerLineFrequency",
-		},
-		SupportedInstrumentModels: []string{
-			"34460A",
-			"34461A",
-			"34465A",
-			"34470A",
-		},
-		SupportedBusInterfaces: []string{
-			"USB",
-			"GPIB",
-			"LAN",
-		},
-	}
-	inherent := ivi.NewInherent(inst, inherentBase)
-	driver := Driver{
-		inst:     inst,
-		Inherent: inherent,
-	}
-
-	if reset {
-		err := driver.Reset()
-		return &driver, err
-	}
-
-	return &driver, nil
-}
-
-// QueryString queries the DMM and returns a string.
-func (d *Driver) QueryString(cmd string) (string, error) {
-	return query.String(d.inst, cmd)
-}
 
 // MeasurementFunction returns the currently specified measurement function.
 //
@@ -229,28 +148,28 @@ func (d *Driver) SetRange(autoRange dmm.AutoRange, rangeValue float64) error {
 }
 
 func (d *Driver) ResolutionAbsolute() (float64, error) {
-	return 0.0, dmm.ErrNotImplemented
+	return 0.0, ivi.ErrNotImplemented
 }
 func (d *Driver) SetResolutionAbsolute(resolution float64) error {
-	return dmm.ErrNotImplemented
+	return ivi.ErrNotImplemented
 }
 func (d *Driver) TriggerDelay() (bool, float64, error) {
-	return false, 0.0, dmm.ErrNotImplemented
+	return false, 0.0, ivi.ErrNotImplemented
 }
 func (d *Driver) SetTriggerDelay(autoDelay bool, delay float64) error {
-	return dmm.ErrNotImplemented
+	return ivi.ErrNotImplemented
 }
 
 func (d *Driver) TriggerSource() (dmm.TriggerSource, error) {
-	return 0, dmm.ErrNotImplemented
+	return 0, ivi.ErrNotImplemented
 }
 
 func (d *Driver) SetTriggerSource(src dmm.TriggerSource) error {
-	return dmm.ErrNotImplemented
+	return ivi.ErrNotImplemented
 }
 
 func (d *Driver) Abort() error {
-	return dmm.ErrNotImplemented
+	return ivi.ErrNotImplemented
 }
 
 func (d *Driver) ConfigureMeasurement(
@@ -273,7 +192,7 @@ func createConfigureVoltageDCCommand(
 ) (string, error) {
 	rng, err := determineVoltageRange(autoRange, rangeValue)
 	if err != nil {
-		return "", dmm.ErrNotImplemented
+		return "", ivi.ErrNotImplemented
 	}
 
 	if autoRange == dmm.AutoOff {
@@ -283,7 +202,7 @@ func createConfigureVoltageDCCommand(
 	return fmt.Sprintf("CONF:VOLT:DC %s", rng), nil
 }
 func (d *Driver) ConfigureTrigger(src dmm.TriggerSource, delay time.Duration) error {
-	return dmm.ErrNotImplemented
+	return ivi.ErrNotImplemented
 }
 
 // FetchMeasurement returns the measured value from a measurement that the
@@ -315,8 +234,16 @@ func (d *Driver) InitiateMeasurement() error {
 	return d.inst.Command("init")
 }
 
-func (d *Driver) IsOverRange(value float64) bool {
-	return true
+func (d *Driver) IsOutOfRange(value float64) (bool, error) {
+	return true, ivi.ErrNotImplemented
+}
+
+func (d *Driver) IsOverRange(value float64) (bool, error) {
+	return true, ivi.ErrNotImplemented
+}
+
+func (d *Driver) IsUnderRange(value float64) (bool, error) {
+	return true, ivi.ErrNotImplemented
 }
 
 func (d *Driver) ReadMeasurement(maxTime time.Duration) (float64, error) {
@@ -360,7 +287,7 @@ func createConfigureVoltageACCommand(
 ) (string, error) {
 	rng, err := determineVoltageRange(autoRange, rangeValue)
 	if err != nil {
-		return "", dmm.ErrNotImplemented
+		return "", ivi.ErrNotImplemented
 	}
 
 	return fmt.Sprintf("CONF:VOLT:AC %s", rng), nil
@@ -373,10 +300,10 @@ func determineVoltageRange(autoRange dmm.AutoRange, rangeValue float64) (string,
 	case dmm.AutoOff:
 		return determineManualVoltageRange(rangeValue)
 	case dmm.AutoOnce:
-		return "", dmm.ErrNotImplemented
+		return "", ivi.ErrNotImplemented
 	}
 
-	return "", dmm.ErrNotImplemented
+	return "", ivi.ErrNotImplemented
 }
 
 func determineManualVoltageRange(rangeValue float64) (string, error) {
@@ -393,7 +320,7 @@ func determineManualVoltageRange(rangeValue float64) (string, error) {
 		return "1000", nil
 	}
 
-	return "", dmm.ErrNotImplemented
+	return "", ivi.ErrNotImplemented
 }
 
 func determineManualResistanceRange(rangeValue float64) (string, error) {
@@ -416,7 +343,7 @@ func determineManualResistanceRange(rangeValue float64) (string, error) {
 		return "1e9", nil
 	}
 
-	return "", dmm.ErrNotImplemented
+	return "", ivi.ErrNotImplemented
 }
 
 func createConfigureMeasurementCommand(
@@ -432,25 +359,25 @@ func createConfigureMeasurementCommand(
 		return createConfigureVoltageACCommand(autoRange, rangeValue)
 	case dmm.DCCurrent:
 		// return createConfigureCurrentDCCommand(autoRange, rangeValue, resolution)
-		return "", dmm.ErrNotImplemented
+		return "", ivi.ErrNotImplemented
 	case dmm.ACCurrent:
 		// return createConfigureCurrentACCommand(autoRange, rangeValue)
-		return "", dmm.ErrNotImplemented
+		return "", ivi.ErrNotImplemented
 	case dmm.TwoWireResistance:
-		return "", dmm.ErrNotImplemented
+		return "", ivi.ErrNotImplemented
 	case dmm.FourWireResistance:
-		return "", dmm.ErrNotImplemented
+		return "", ivi.ErrNotImplemented
 	case dmm.ACPlusDCVolts:
-		return "", dmm.ErrNotImplemented
+		return "", ivi.ErrNotImplemented
 	case dmm.ACPlusDCCurrent:
-		return "", dmm.ErrNotImplemented
+		return "", ivi.ErrNotImplemented
 	case dmm.Frequency:
-		return "", dmm.ErrNotImplemented
+		return "", ivi.ErrNotImplemented
 	case dmm.Period:
-		return "", dmm.ErrNotImplemented
+		return "", ivi.ErrNotImplemented
 	case dmm.Temperature:
-		return "", dmm.ErrNotImplemented
+		return "", ivi.ErrNotImplemented
 	}
 
-	return "", dmm.ErrNotImplemented
+	return "", ivi.ErrNotImplemented
 }

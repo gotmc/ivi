@@ -127,6 +127,6 @@ func LANPorts() map[string]int {
 // Channel models the output channel repeated capability for the function
 // generator output channel.
 type Channel struct {
-	name string
 	inst ivi.Instrument
+	name string
 }

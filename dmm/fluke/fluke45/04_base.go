@@ -3,11 +3,6 @@
 // Use of this source code is governed by a MIT-style license that
 // can be found in the LICENSE.txt file for the project.
 
-/*
-Package fluke45 implements the IVI driver for the Fluke 45 DMM.
-
-State Caching: Not implemented
-*/
 package fluke45
 
 import (
@@ -19,61 +14,6 @@ import (
 	"github.com/gotmc/ivi/dmm"
 	"github.com/gotmc/query"
 )
-
-const (
-	specMajorVersion = 4
-	specMinorVersion = 2
-	specRevision     = "4.1"
-)
-
-// Confirm the driver implements the interface for the IviDMMBase capability
-// group.
-var _ dmm.Base = (*Driver)(nil)
-
-// Driver provides the IVI driver for the Fluke 45 DMM.
-type Driver struct {
-	inst ivi.Instrument
-	ivi.Inherent
-}
-
-// New creates a new Agilent3446x IVI Instrument.
-func New(inst ivi.Instrument, reset bool) (*Driver, error) {
-	inherentBase := ivi.InherentBase{
-		ClassSpecMajorVersion: specMajorVersion,
-		ClassSpecMinorVersion: specMinorVersion,
-		ClassSpecRevision:     specRevision,
-		ResetDelay:            500 * time.Millisecond,
-		ClearDelay:            500 * time.Millisecond,
-		GroupCapabilities: []string{
-			"IviDmmBase",
-			"IviDmmACMeasurement",
-			"IviDmmFrequencyMeasurement",
-			"IviDmmDeviceInfo",
-		},
-		SupportedInstrumentModels: []string{
-			"45",
-		},
-		SupportedBusInterfaces: []string{
-			"GPIB",
-			"Serial",
-		},
-	}
-	inherent := ivi.NewInherent(inst, inherentBase)
-	driver := Driver{
-		inst:     inst,
-		Inherent: inherent,
-	}
-	if reset {
-		err := driver.Reset()
-		return &driver, err
-	}
-	return &driver, nil
-}
-
-// QueryString queries the DMM and returns a string.
-func (d *Driver) QueryString(cmd string) (string, error) {
-	return query.String(d.inst, cmd)
-}
 
 // MeasurementFunction returns the currently specified measurement function.
 //
@@ -301,28 +241,28 @@ func determineRangeCommand(
 }
 
 func (d *Driver) ResolutionAbsolute() (float64, error) {
-	return 0.0, dmm.ErrNotImplemented
+	return 0.0, ivi.ErrNotImplemented
 }
 func (d *Driver) SetResolutionAbsolute(resolution float64) error {
-	return dmm.ErrNotImplemented
+	return ivi.ErrNotImplemented
 }
 func (d *Driver) TriggerDelay() (bool, float64, error) {
-	return false, 0.0, dmm.ErrNotImplemented
+	return false, 0.0, ivi.ErrNotImplemented
 }
 func (d *Driver) SetTriggerDelay(autoDelay bool, delay float64) error {
-	return dmm.ErrNotImplemented
+	return ivi.ErrNotImplemented
 }
 
 func (d *Driver) TriggerSource() (dmm.TriggerSource, error) {
-	return 0, dmm.ErrNotImplemented
+	return 0, ivi.ErrNotImplemented
 }
 
 func (d *Driver) SetTriggerSource(src dmm.TriggerSource) error {
-	return dmm.ErrNotImplemented
+	return ivi.ErrNotImplemented
 }
 
 func (d *Driver) Abort() error {
-	return dmm.ErrNotImplemented
+	return ivi.ErrNotImplemented
 }
 
 func (d *Driver) ConfigureMeasurement(
@@ -331,23 +271,31 @@ func (d *Driver) ConfigureMeasurement(
 	rangeValue float64,
 	resolution float64,
 ) error {
-	return dmm.ErrNotImplemented
+	return ivi.ErrNotImplemented
 }
 
 func (d *Driver) ConfigureTrigger(src dmm.TriggerSource, delay time.Duration) error {
-	return dmm.ErrNotImplemented
+	return ivi.ErrNotImplemented
 }
 
 func (d *Driver) FetchMeasurement(maxTime time.Duration) (float64, error) {
-	return 0.0, dmm.ErrNotImplemented
+	return 0.0, ivi.ErrNotImplemented
 }
 
 func (d *Driver) InitiateMeasurement() error {
-	return dmm.ErrNotImplemented
+	return ivi.ErrNotImplemented
 }
 
-func (d *Driver) IsOverRange(value float64) bool {
-	return true
+func (d *Driver) IsOutOfRange(value float64) (bool, error) {
+	return true, ivi.ErrNotImplemented
+}
+
+func (d *Driver) IsOverRange(value float64) (bool, error) {
+	return true, ivi.ErrNotImplemented
+}
+
+func (d *Driver) IsUnderRange(value float64) (bool, error) {
+	return true, ivi.ErrNotImplemented
 }
 
 func (d *Driver) ReadMeasurement(maxTime time.Duration) (float64, error) {

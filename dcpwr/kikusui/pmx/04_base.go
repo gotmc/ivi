@@ -13,17 +13,12 @@ import (
 	"github.com/gotmc/query"
 )
 
-// Confirm that the output channel repeated capabilitiy implements the
-// IviDCPwrBase and IviDCPwrMeasurement interfaces.
-var _ dcpwr.BaseChannel = (*Channel)(nil)
-var _ dcpwr.MeasurementChannel = (*Channel)(nil)
+func (d *Device) OutputChannelCount() int {
+	return 0
+}
 
-// Channel models the output channel repeated capabilitiy for the DC power
-// supply output channel.
-type Channel struct {
-	name                 string
-	inst                 ivi.Instrument
-	currentLimitBehavior dcpwr.CurrentLimitBehavior
+func (ch *Channel) Name() string {
+	return ch.name
 }
 
 // CurrentLimit determines the output current limit. The units are Amps.
@@ -287,20 +282,4 @@ func (ch *Channel) QueryOutputState(os dcpwr.OutputState) (bool, error) {
 // Section 4.3.10 of IVI-4.4: IviDCPwr Class Specification.
 func (ch *Channel) ResetOutputProtection() error {
 	return dcpwr.ErrNotImplemented
-}
-
-// MeasureVoltage takes a measurement on the output signal and returns the
-// measured voltage.  MeasureVoltage implements the IviDCPwrMeasurement
-// function Measure for the Voltage MeasurementType parameter described in
-// Section 7.2.1 of IVI-4.4: IviDCPwr Class Specification.
-func (ch *Channel) MeasureVoltage() (float64, error) {
-	return query.Float64(ch.inst, ":MEAS:VOLT?")
-}
-
-// MeasureCurrent takes a measurement of the output signal and returns the
-// measured current. MeasureCurrent implements the IviDCPwrMeasurement
-// function Measure for the Current MeasurementType parameter described in
-// Section 7.2.1 of IVI-4.4: IviDCPwr Class Specification.
-func (ch *Channel) MeasureCurrent() (float64, error) {
-	return query.Float64(ch.inst, ":MEAS:CURR?")
 }

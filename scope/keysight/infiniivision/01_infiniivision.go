@@ -116,35 +116,3 @@ func New(inst ivi.Instrument, reset bool) (*Driver, error) {
 func DefaultGPIBAddress() int {
 	return defaultGPIBAddress
 }
-
-// SerialConfig lists whether the RS-232 serial port is configured as a DCE
-// (Data Circuit-Terminating Equipment) or a DTE (Data Terminal Equipment). Computers
-// running the IVI program are DTEs; therefore, use a straight through serial
-// cable when connecting to DCEs and a null modem cable when connecting to DTEs.
-func SerialConfig() string {
-	return "DCE"
-}
-
-// SerialBaudRates lists the available baud rates for the RS-232 serial port
-// from the fastest to the slowest.
-func SerialBaudRates() []int {
-	return []int{19200, 9600, 4800, 2400, 1200, 600, 300}
-}
-
-// DefaultSerialBaudRate returns the default baud rate for the RS-232 serial
-// port.
-func DefaultSerialBaudRate() int {
-	return defaultSerialBuadRate
-}
-
-// SerialDataFrames lists the available RS-232 data frame formats. The DS345
-// "always sends two stop bits, 8 data bits, and no parity, and will correctly
-// receive data sent with eitehr one or two stop bits." per the User's Manual.
-func SerialDataFrames() []string {
-	return []string{"8N2"}
-}
-
-// DefaultSerialDataFrame returns the default RS-232 data frame format.
-func DefaultSerialDataFrame() string {
-	return "8N2"
-}

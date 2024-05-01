@@ -290,6 +290,7 @@ func (ch *Channel) SetChannelEnabled(b bool) error {
 	if !b {
 		cmd = "0"
 	}
+
 	return ch.inst.Command(":CHAN%d:DISPL %s", ch.num, cmd)
 }
 
@@ -298,7 +299,7 @@ func (ch *Channel) SetChannelEnabled(b bool) error {
 //	Name is the getter for the read-only IviScopeBase Attribute Channel Name
 //	described in Section 4.2.7 of the IVI-4.1: IviScope Class Specification.
 func (ch *Channel) Name() string {
-	return fmt.Sprint("CH%d", ch.num)
+	return fmt.Sprintf("CH%d", ch.num)
 }
 
 // InputImpedance queries the input impedance for the channel in Ohms. Legal
@@ -312,6 +313,7 @@ func (ch *Channel) InputImpedance() (float64, error) {
 	if err != nil {
 		return 0.0, err
 	}
+
 	switch imped {
 	case "ONEM":
 		return 1.0e6, nil

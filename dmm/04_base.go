@@ -6,7 +6,6 @@
 package dmm
 
 import (
-	"errors"
 	"time"
 )
 
@@ -72,19 +71,13 @@ Below are the .NET functions, since they are the basis for the Go interfaces.
 
 // Base provides the interface required for the IviDCPwrBase capability group.
 type Base interface {
-	ChannelCount() int
-}
-
-// Base provides the interface required for the IviDMMBase capability group
-// described in Section 4 of IVI-4.2 IviDmm Class Specification.
-type BaseChannel interface {
 	MeasurementFunction() (MeasurementFunction, error)
 	SetMeasurementFunction(msrFunc MeasurementFunction) error
-	Range() (AutoRange, float64, error)
+	Range() (autoRange AutoRange, rangeValue float64, err error)
 	SetRange(autoRange AutoRange, rangeValue float64) error
 	ResolutionAbsolute() (float64, error)
 	SetResolutionAbsolute(resolution float64) error
-	TriggerDelay() (bool, float64, error)
+	TriggerDelay() (autoDelay bool, delay float64, err error)
 	SetTriggerDelay(autoDelay bool, delay float64) error
 	TriggerSource() (TriggerSource, error)
 	SetTriggerSource(src TriggerSource) error
@@ -98,13 +91,8 @@ type BaseChannel interface {
 	ConfigureTrigger(src TriggerSource, delay time.Duration) error
 	FetchMeasurement(maxTime time.Duration) (float64, error)
 	InitiateMeasurement() error
-	IsOverRange(value float64) bool
+	IsOutOfRange(value float64) (bool, error)
+	IsOverRange(value float64) (bool, error)
+	IsUnderRange(value float64) (bool, error)
 	ReadMeasurement(maxTime time.Duration) (float64, error)
 }
-
-// Error codes related to the IviDCPwr Class Specification.
-var (
-	ErrNotImplemented     = errors.New("not implemented in ivi driver")
-	ErrOVPUnsupported     = errors.New("ovp not supported")
-	ErrTriggerNotSoftware = errors.New("trigger source is not set to software trigger")
-)

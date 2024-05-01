@@ -24,8 +24,10 @@ const (
 	specRevision     = "3.0"
 )
 
-// Confirm that the device driver implements the IviDCPwrBase interface.
+// Confirm implemented interfaces by the pmx driver.
 var _ dcpwr.Base = (*Device)(nil)
+var _ dcpwr.BaseChannel = (*Channel)(nil)
+var _ dcpwr.MeasurementChannel = (*Channel)(nil)
 
 // Device provides the IVI driver for the Kikusui PMX series of DC power
 // supplies.
@@ -33,6 +35,14 @@ type Device struct {
 	inst     ivi.Instrument
 	Channels []Channel
 	ivi.Inherent
+}
+
+// Channel models the output channel repeated capabilitiy for the DC power
+// supply output channel.
+type Channel struct {
+	name                 string
+	inst                 ivi.Instrument
+	currentLimitBehavior dcpwr.CurrentLimitBehavior
 }
 
 // New creates a new PMX IVI Instrument. Currently, only the E3631A

@@ -40,8 +40,8 @@ type Driver struct {
 // Channel models the output channel repeated capability for the DC power
 // supply output channel.
 type Channel struct {
-	name string
 	inst ivi.Instrument
+	name string
 }
 
 // New creates a new IVI driver for the Keysight/Agilent E3600 series of DC
