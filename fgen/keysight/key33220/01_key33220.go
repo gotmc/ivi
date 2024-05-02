@@ -27,7 +27,7 @@ const (
 	socketPort         = 5025
 )
 
-// Confirm the implemented interfaces by the driver.
+// Confirm the interfaces implemented by the driver.
 var _ fgen.Base = (*Driver)(nil)
 var _ fgen.BaseChannel = (*Channel)(nil)
 var _ fgen.StdFuncChannel = (*Channel)(nil)

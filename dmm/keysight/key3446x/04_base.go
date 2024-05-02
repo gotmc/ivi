@@ -20,7 +20,7 @@ import (
 // MeasurementFunction is the getter for the read-write IviDmmBase Attribute
 // Function described in Section 4.2.1 of IVI-4.2: IviDmm Class Specification.
 func (d *Driver) MeasurementFunction() (dmm.MeasurementFunction, error) {
-	response, err := query.String(d.inst, "func?")
+	response, err := query.String(d.inst, "FUNC?")
 	if err != nil {
 		return 0, err
 	}
@@ -41,7 +41,7 @@ func (d *Driver) MeasurementFunction() (dmm.MeasurementFunction, error) {
 // Function described in Section 4.2.1 of IVI-4.2: IviDmm Class Specification.
 func (d *Driver) SetMeasurementFunction(msrFunc dmm.MeasurementFunction) error {
 	// Need to return a quoted string, so use %q in the fmt.Sprintf
-	cmd := fmt.Sprintf("func %q", msrFuncToCmd[msrFunc])
+	cmd := fmt.Sprintf("FUNC %q", msrFuncToCmd[msrFunc])
 	return d.inst.Command(cmd)
 }
 
@@ -185,22 +185,7 @@ func (d *Driver) ConfigureMeasurement(
 
 	return d.inst.Command(cmd)
 }
-func createConfigureVoltageDCCommand(
-	autoRange dmm.AutoRange,
-	rangeValue float64,
-	resolution float64,
-) (string, error) {
-	rng, err := determineVoltageRange(autoRange, rangeValue)
-	if err != nil {
-		return "", ivi.ErrNotImplemented
-	}
 
-	if autoRange == dmm.AutoOff {
-		return fmt.Sprintf("CONF:VOLT:DC %s,%f", rng, resolution), nil
-	}
-
-	return fmt.Sprintf("CONF:VOLT:DC %s", rng), nil
-}
 func (d *Driver) ConfigureTrigger(src dmm.TriggerSource, delay time.Duration) error {
 	return ivi.ErrNotImplemented
 }
@@ -214,8 +199,8 @@ func (d *Driver) ConfigureTrigger(src dmm.TriggerSource, delay time.Duration) er
 //
 // FetchMeasurement implements the IviDmmBase function described in Section
 // 4.3.4 of the IVI-4.2 IviDmm Class Specification.
-func (d *Driver) FetchMeasurement(maxTime time.Duration) (float64, error) {
-	return query.Float64(d.inst, "fetc?")
+func (d *Driver) FetchMeasurement(_ time.Duration) (float64, error) {
+	return query.Float64(d.inst, "FETC?")
 }
 
 // InitiateMeasurement initiates a measurement. When this function executes,
@@ -234,19 +219,19 @@ func (d *Driver) InitiateMeasurement() error {
 	return d.inst.Command("init")
 }
 
-func (d *Driver) IsOutOfRange(value float64) (bool, error) {
+func (d *Driver) IsOutOfRange(_ float64) (bool, error) {
 	return true, ivi.ErrNotImplemented
 }
 
-func (d *Driver) IsOverRange(value float64) (bool, error) {
+func (d *Driver) IsOverRange(_ float64) (bool, error) {
 	return true, ivi.ErrNotImplemented
 }
 
-func (d *Driver) IsUnderRange(value float64) (bool, error) {
+func (d *Driver) IsUnderRange(_ float64) (bool, error) {
 	return true, ivi.ErrNotImplemented
 }
 
-func (d *Driver) ReadMeasurement(maxTime time.Duration) (float64, error) {
+func (d *Driver) ReadMeasurement(_ time.Duration) (float64, error) {
 	return query.Float64(d.inst, "read?")
 }
 
@@ -281,13 +266,30 @@ var msrFuncToCmd = map[dmm.MeasurementFunction]string{
 	dmm.Temperature:        "TEMP",
 }
 
+func createConfigureVoltageDCCommand(
+	autoRange dmm.AutoRange,
+	rangeValue float64,
+	resolution float64,
+) (string, error) {
+	rng, err := determineVoltageRange(autoRange, rangeValue)
+	if err != nil {
+		return "", ivi.ErrNotImplemented
+	}
+
+	if autoRange == dmm.AutoOff {
+		return fmt.Sprintf("CONF:VOLT:DC %s,%f", rng, resolution), nil
+	}
+
+	return fmt.Sprintf("CONF:VOLT:DC %s", rng), nil
+}
+
 func createConfigureVoltageACCommand(
 	autoRange dmm.AutoRange,
 	rangeValue float64,
 ) (string, error) {
 	rng, err := determineVoltageRange(autoRange, rangeValue)
 	if err != nil {
-		return "", ivi.ErrNotImplemented
+		return "", err
 	}
 
 	return fmt.Sprintf("CONF:VOLT:AC %s", rng), nil
@@ -320,7 +322,7 @@ func determineManualVoltageRange(rangeValue float64) (string, error) {
 		return "1000", nil
 	}
 
-	return "", ivi.ErrNotImplemented
+	return "", ivi.ErrValueNotSupported
 }
 
 func determineManualResistanceRange(rangeValue float64) (string, error) {
