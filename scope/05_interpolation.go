@@ -32,6 +32,8 @@ None.
 
 */
 
+// Interpolation provides the interface required for the IviScopeInterpolation
+// extension group.
 type Interpolation interface {
 	AcquisitionInterpolation(interp InterpolationMethod) error
 }

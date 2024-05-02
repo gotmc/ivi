@@ -129,6 +129,10 @@ const (
 	LinearInterpolation
 )
 
+// TVTriggerEvent models the defined values for the available events on which
+// the oscilloscope triggers defined in Section 20 IviScope Attribute Value
+// Definitions and used in the TV Trigger Event attribute in Section 6.2.1 of
+// IVI-4.1: IviScopeClass Specification.
 type TVTriggerEvent int
 
 const (
@@ -204,4 +208,29 @@ type MaximumTime int
 const (
 	Zero MaximumTime = iota
 	MaxTimeValue
+)
+
+type WaveformMeasurement int
+
+const (
+	RiseTime WaveformMeasurement = iota
+	FallTime
+	Frequency
+	Period
+	VoltageRMS
+	VoltageCycleRMS
+	VoltageMax
+	VoltageMin
+	VoltagePeakToPeak
+	VoltageHigh
+	VoltageLow
+	VoltageAverage
+	VoltageCycleAverage
+	WidthNegative
+	WidthPositive
+	DutyCycleNegative
+	DutyCyclePositive
+	Amplitude
+	Overshoot
+	Preshoot
 )

@@ -5,6 +5,8 @@
 
 package scope
 
+import "time"
+
 /*
 
 # Section 8 IviScopeGlitchTrigger Extension Group
@@ -43,3 +45,22 @@ Below are the .NET functions, since they are the basis for the Go interfaces.
                                      GlitchCondition condition)
 
 */
+
+// GlitchTriggerer provides the interface required for the
+// IviScopeGlitchTrigger extension group.
+type GlitchTriggerer interface {
+	GlitchCondition() (GlitchCondition, error)
+	SetGlitchCondition(condition GlitchCondition) error
+	GlitchPolarity() (Polarity, error)
+	SetGlitchPolarity(polarity Polarity) error
+	RuntPolarity() (Polarity, error)
+	SetRuntPolarity(polarity Polarity) error
+	GlitchWidth() (time.Duration, error)
+	SetGlitchWidth(width time.Duration) error
+	ConfigureGlitchTrigger(
+		source TriggerSource,
+		width time.Duration,
+		polarity Polarity,
+		condition GlitchCondition,
+	) error
+}

@@ -41,3 +41,19 @@ Below are the .NET functions, since they are the basis for the Go interfaces.
                                    Polarity polarity);
 
 */
+
+// RuntTriggerer provides the interface required for the IviScopeRuntTrigger
+// extension group.
+type RuntTriggerer interface {
+	RuntHighThreshold() (float64, error)
+	SetRuntHighThreshold(float64) error
+	RuntLowThreshold() (float64, error)
+	SetRuntLowThreshold(float64) error
+	RuntPolarity() (Polarity, error)
+	SetRuntPolarity(polarity Polarity) error
+	ConfigureRuntTrigger(
+		source TriggerSource,
+		lowThreshold, highThreshold float64,
+		polarity Polarity,
+	) error
+}

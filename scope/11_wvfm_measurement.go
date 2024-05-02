@@ -5,6 +5,8 @@
 
 package scope
 
+import "time"
+
 /*
 
 # Section 11 IviScopeWaveformMeasurement Extension Group
@@ -51,3 +53,20 @@ Below are the .NET functions, since they are the basis for the Go interfaces.
                                   PrecisionTimeSpan maximumTime);
 
 */
+
+// WaveformMeasurement provides the interface required for the
+// IviScopeWaveformMeasurement extension group.
+type WaveformMeasurer interface {
+	HighReferenceLevel() (float64, error)
+	SetHighReferenceLevel(high float64) error
+	LowReferenceLevel() (float64, error)
+	SetLowReferenceLevel(low float64) error
+	MiddleReferenceLevel() (float64, error)
+	SetMiddleReferenceLevel(mid float64) error
+	ConfigureReferenceLevels(low, mid, high float64) error
+}
+
+type WaveformMeasurerChannel interface {
+	FetchWaveformMeasurement(msrmnt WaveformMeasurement) (float64, error)
+	ReadWaveformMeasurement(msrmnt WaveformMeasurement, maxTime time.Duration) (float64, error)
+}

@@ -35,3 +35,10 @@ Below are the .NET functions, since they are the basis for the Go interfaces.
 None.
 
 */
+
+// ACLineTriggerer provides the interface required for the
+// IviScopeAcLineTrigger extension group.
+type ACLineTriggerer interface {
+	ACLineTriggerSlope() (ACLineTriggerSlope, error)
+	SetACLineTriggerSlope(slope ACLineTriggerSlope) error
+}

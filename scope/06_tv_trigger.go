@@ -36,3 +36,22 @@ Below are the .NET functions, since they are the basis for the Go interfaces.
                                  TVTriggerPolarity polarity);
 
 */
+
+// TVTriggerer provides the interface required for the IviScopeTVTrigger
+// extension group.
+type TVTriggerer interface {
+	TVTriggerEvent() (TVTriggerEvent, error)
+	SetTVTriggerEvent(event TVTriggerEvent) error
+	TVTriggerLineNumber() (int, error)
+	SetTVTriggerLineNumber(line int) error
+	TVTriggerPolarity() (TVTriggerPolarity, error)
+	SetTVTriggerPolarity(polarity TVTriggerPolarity) error
+	TVTriggerSignalFormat() (TVTriggerSignalFormat, error)
+	SetTVTriggerSignalFormat(format TVTriggerSignalFormat) error
+	ConfigureTVTrigger(
+		source TriggerSource,
+		format TVTriggerSignalFormat,
+		event TVTriggerEvent,
+		polarity TVTriggerPolarity,
+	) error
+}

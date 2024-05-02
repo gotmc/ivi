@@ -5,6 +5,8 @@
 
 package scope
 
+import "time"
+
 /*
 
 # Section 9 IviScopeWidthTrigger Extension Group
@@ -43,3 +45,22 @@ Below are the .NET functions, since they are the basis for the Go interfaces.
                                     WidthCondition condition);
 
 */
+
+// WidthTriggerer provides the interface required for the
+// IviScopeWidthTrigger extension group.
+type WidthTriggerer interface {
+	WidthCondition() (WidthCondition, error)
+	SetWidthCondition(condition WidthCondition) error
+	WidthHighThreshold() (time.Duration, error)
+	SetWidthHighThreshold(highTime time.Duration) error
+	WidthLowThreshold() (time.Duration, error)
+	SetWidthLowThreshold(lowTime time.Duration) error
+	WidthPolarity() (Polarity, error)
+	SetWidthPolarity(polarity Polarity) error
+	ConfigureWidthTrigger(
+		source TriggerSource,
+		lowTime, highTime time.Duration,
+		polarity Polarity,
+		condition WidthCondition,
+	) error
+}

@@ -45,8 +45,8 @@ Per Section 2.6 Capability Groups in IVI-3.1 Driver Architecture Specification:
 
 ### IVI Specification Deviation
 
-**TL;DR:** When developing Go-based IVI drivers follow the .NET methods and
-prototypes as much as possible but deviate as required.
+**TL;DR:** When developing the Go-based IVI drivers, follow the .NET methods and
+prototypes as much as possible.
 
 As stated in Section 1.5 Conformance Requirements of the _IVI-3.1: Driver
 Architecture Specification, Revision 3.8_, "IVI drivers can be developed with a
