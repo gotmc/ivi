@@ -7,7 +7,7 @@ package dmm
 
 /*
 
-# Section 8 IviDmmThermocouple Capability Group
+# Section 8 IviDmmThermocouple Extension Group
 
 ## Section 8.1 IviDmmThermocouple Overview
 
@@ -33,3 +33,16 @@ Below are the .NET functions, since they are the basis for the Go interfaces.
                             ReferenceJunctionType referenceJunctionType);
 
 */
+
+// ThermocoupleExtension provides the interface required for the
+// IviDmmThermocouple extension group described in Section 8 of IVI-4.2 IviDmm
+// Class Specification.
+type ThermocoupleExtension interface {
+	FixedRefJunctionTemperature() (float64, error)
+	SetFixedRefJunctionTemperature(temp float64) error
+	RefJunctionType() (ReferenceJunctionType, error)
+	SetRefJunctionType(refType ReferenceJunctionType) error
+	ThermocoupleType() (ThermocoupleType, error)
+	SetThermocoupleType(thermoType ThermocoupleType) error
+	ConfigureThermocouple(thermoType ThermocoupleType, refType ReferenceJunctionType) error
+}

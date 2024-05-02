@@ -78,7 +78,7 @@ func (fcn MeasurementFunction) String() string {
 }
 
 // TriggerSource provides the defined values for the Trigger Source Attribute
-// defined in Sectino 4.2.7 of IVI-4.2 IviDmm Class Specification.
+// defined in Section 4.2.7 of IVI-4.2 IviDmm Class Specification.
 type TriggerSource int
 
 // The TriggerSource defined values are the available trigger sources.
@@ -86,6 +86,7 @@ const (
 	Immediate TriggerSource = iota
 	External
 	SoftwareTrigger
+	Interval
 	TTL0
 	TTL1
 	TTL2
@@ -113,4 +114,61 @@ const (
 	Thermistor
 	TwoWireRTD
 	FourWireRTD
+)
+
+type ReferenceJunctionType int
+
+const (
+	InternalReferenceJunction ReferenceJunctionType = iota
+	FixedReferenceJunction
+)
+
+type ThermocoupleType int
+
+const (
+	ThermocoupleB ThermocoupleType = iota
+	ThermocoupleC
+	ThermocoupleD
+	ThermocoupleE
+	ThermocoupleG
+	ThermocoupleJ
+	ThermocoupleK
+	ThermocoupleN
+	ThermocoupleR
+	ThermocoupleS
+	ThermocoupleT
+	ThermocoupleU
+	ThermocoupleV
+)
+
+type MeasurementDestination int
+
+const (
+	MsrDestinationNone MeasurementDestination = iota
+	MsrDestinationExternal
+	MsrDestinationTTL0
+	MsrDestinationTTL1
+	MsrDestinationTTL2
+	MsrDestinationTTL3
+	MsrDestinationTTL4
+	MsrDestinationTTL5
+	MsrDestinationTTL6
+	MsrDestinationTTL7
+	MsrDestinationECL0
+	MsrDestinationECL1
+	MsrDestinationPXIStar
+	MsrDestinationRTSI0
+	MsrDestinationRTSI1
+	MsrDestinationRTSI2
+	MsrDestinationRTSI3
+	MsrDestinationRTSI4
+	MsrDestinationRTSI5
+	MsrDestinationRTSI6
+)
+
+type TriggerSlope int
+
+const (
+	PositiveTriggerSlope TriggerSlope = iota
+	NegativeTriggerSlope
 )

@@ -7,7 +7,7 @@ package dmm
 
 /*
 
-# Section 9 IviDmmResistanceTemperatureDevice Capability Group
+# Section 9 IviDmmResistanceTemperatureDevice Extension Group
 
 ## Section 9.1 IviDmmResistanceTemperatureDevice Overview
 
@@ -25,7 +25,7 @@ Below are the .NET attributes, since they are the basis for the Go interfaces.
 | Section | Attribute               | Type     | Access | AppliesTo |
 | ------- | ----------------------- | -------- | ------ | --------- |
 |   9.2.1 | RTD Alpha               | Real64   | R/W    | N/A       |
-|   9.2.2 | RTD Resistance          | Int32    | R/W    | N/A       |
+|   9.2.2 | RTD Resistance          | Real64   | R/W    | N/A       |
 
 ## Section 9.3 IviDmmResistanceTemperatureDevice Functions
 
@@ -34,3 +34,14 @@ Below are the .NET functions, since they are the basis for the Go interfaces.
 9.3.1 void Temperature.Rtd.Configure(Double alpha, Double resistance);
 
 */
+
+// RTDExtension provides the interface required for the
+// IviDmmResistanceTemperatureDevice extension group described in Section 9 of
+// IVI-4.2 IviDmm Class Specification.
+type RTDExtension interface {
+	RTDAlpha() (float64, error)
+	SetRTDAlpha(alpha float64) error
+	RTDResistance() (float64, error)
+	SetRTDResistance(resistance float64) error
+	ConfigureRTD(alpha, resistance float64) error
+}

@@ -7,7 +7,7 @@ package dmm
 
 /*
 
-# Section 6 IviDmmFrequencyMeasurement Capability Group
+# Section 6 IviDmmFrequencyMeasurement Extension Group
 
 ## Section 6.1 IviDmmFrequencyMeasurement Overview
 
@@ -32,10 +32,10 @@ None.
 
 */
 
-// FrequencyMeasurement provides the interface required for the
+// FrequencyMeasurementExtension provides the interface required for the
 // IviDmmFrequencyMeasurement extension group described in Section 6 of IVI-4.2
 // IviDmm Class Specification.
-type FrequencyMeasurement interface {
+type FrequencyMeasurementExtension interface {
 	FrequencyVoltageRange() (autoRange bool, rangeValue float64, err error)
 	SetFrequencyVoltageRange(autoRange bool, rangeValue float64) error
 }

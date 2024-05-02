@@ -7,7 +7,7 @@ package dmm
 
 /*
 
-# Section 15 IviDmmAutoRangeValue Capability Group
+# Section 15 IviDmmAutoRangeValue Extension Group
 
 ## Section 15.1 IviDmmAutoRangeValue Overview
 
@@ -18,7 +18,7 @@ the actual range value when auto ranging.
 
 Below are the .NET attributes, since they are the basis for the Go interfaces.
 
-Note: Ause the Range property for .NET instead of the Auto Range Value
+Note: Use the Range property for .NET instead of the Auto Range Value
 attribute.
 
 ## Section 15.3 IviDmmAutoRangeValue Functions

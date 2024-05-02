@@ -7,7 +7,7 @@ package dmm
 
 /*
 
-# Section 16 IviDmmAutoZero Capability Group
+# Section 16 IviDmmAutoZero Extension Group
 
 ## Section 16.1 IviDmmAutoZero Overview
 
@@ -30,3 +30,11 @@ Below are the .NET functions, since they are the basis for the Go interfaces.
 None.
 
 */
+
+// AutoZeroExtension provides the interface required for the IviDmmAutoZero
+// extension group described in Section 16 of IVI-4.2 IviDmm Class
+// Specification.
+type AutoZeroExtension interface {
+	AutoZero() (AutoZero, error)
+	SetAutoZero(autoZero AutoZero) error
+}

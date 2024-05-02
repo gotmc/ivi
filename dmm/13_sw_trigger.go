@@ -7,7 +7,7 @@ package dmm
 
 /*
 
-# Section 13 IviDmmSoftwareTrigger Capability Group
+# Section 13 IviDmmSoftwareTrigger Extension Group
 
 ## Section 13.1 IviDmmSoftwareTrigger Overview
 
@@ -22,3 +22,10 @@ Below are the .NET functions, since they are the basis for the Go interfaces.
 13.2 void SendSoftwareTrigger();
 
 */
+
+// SoftwareTriggerExtension provides the interface required for the
+// IviDmmSoftwareTrigger extension group described in Section 13 of IVI-4.2
+// IviDmm Class Specification.
+type SoftwareTriggerExtension interface {
+	SendSoftwareTrigger() error
+}

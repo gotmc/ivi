@@ -7,7 +7,7 @@ package dmm
 
 /*
 
-# Section 10 IviDmmThermistor Capability Group
+# Section 10 IviDmmThermistor Extension Group
 
 ## Section 10.1 IviDmmThermistor Overview
 
@@ -33,3 +33,11 @@ Below are the .NET functions, since they are the basis for the Go interfaces.
 None.
 
 */
+
+// ThermistorExtension provides the interface required for the IviDmmThermistor
+// extension group described in Section 10 of IVI-4.2 IviDmm Class
+// Specification.
+type ThermistorExtension interface {
+	ThermistorResistance() (float64, error)
+	SetThermistorResistance(resistance float64) error
+}

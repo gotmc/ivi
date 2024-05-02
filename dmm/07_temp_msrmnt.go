@@ -7,7 +7,7 @@ package dmm
 
 /*
 
-# Section 7 IviDmmTemperatureMeasurement Capability Group
+# Section 7 IviDmmTemperatureMeasurement Extension Group
 
 ## Section 7.1 IviDmmTemperatureMeasurement Overview
 
@@ -33,10 +33,10 @@ None.
 
 */
 
-// TemperatureMeasurement provides the interface required for the
-// IviDmmTemperatureMeasurement extension group described in Section 7 of IVI-4.2
-// IviDmm Class Specification.
-type TemperatureMeasurement interface {
+// TemperatureMeasurementExtension provides the interface required for the
+// IviDmmTemperatureMeasurement extension group described in Section 7 of
+// IVI-4.2 IviDmm Class Specification.
+type TemperatureMeasurementExtension interface {
 	TemperatureTransducerType() (TempTransducerType, error)
 	SetTemperatureTransducerType(t TempTransducerType) error
 }

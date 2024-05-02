@@ -7,7 +7,7 @@ package dmm
 
 /*
 
-# Section 14 IviDmmDeviceInfo Capability Group
+# Section 14 IviDmmDeviceInfo Extension Group
 
 ## Section 14.1 IviDmmDeviceInfo Overview
 
@@ -31,3 +31,11 @@ Below are the .NET functions, since they are the basis for the Go interfaces.
 None.
 
 */
+
+// DeviceInfoExtension provides the interface required for the IviDmmDeviceInfo
+// extension group described in Section 14 of IVI-4.2 IviDmm Class
+// Specification.
+type DeviceInfoExtension interface {
+	ApertureTime() (float64, error)
+	ApertureTimeUnits() (ApertureTimeUnits, error)
+}

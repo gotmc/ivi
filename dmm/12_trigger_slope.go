@@ -7,7 +7,7 @@ package dmm
 
 /*
 
-# Section 12 IviDmmTriggerSlope Capability Group
+# Section 12 IviDmmTriggerSlope Extension Group
 
 ## Section 12.1 IviDmmTriggerSlope Overview
 
@@ -49,3 +49,11 @@ Below are the .NET functions, since they are the basis for the Go interfaces.
 None.
 
 */
+
+// TriggerSlopeExtension provides the interface required for the IviDmmTriggerSlope
+// extension group described in Section 12 of IVI-4.2 IviDmm Class
+// Specification.
+type TriggerSlopeExtension interface {
+	TriggerSlope() (TriggerSlope, error)
+	SetTriggerSlope(slope TriggerSlope) error
+}

@@ -7,7 +7,7 @@ package dmm
 
 /*
 
-# Section 17 IviDmmPowerLineFrequency Capability Group
+# Section 17 IviDmmPowerLineFrequency Extension Group
 
 ## Section 17.1 IviDmmPowerLineFrequency Overview
 
@@ -51,3 +51,11 @@ Below are the .NET functions, since they are the basis for the Go interfaces.
 None.
 
 */
+
+// PowerLineFrequencyExtension provides the interface required for the
+// IviDmmowerLineFrequencyAutoZero extension group described in Section 17 of
+// IVI-4.2 IviDmm Class Specification.
+type PowerLineFrequencyExtension interface {
+	PowerLineFrequency() (float64, error)
+	SetPowerLineFrequency(freq float64) error
+}

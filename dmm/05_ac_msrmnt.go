@@ -7,7 +7,7 @@ package dmm
 
 /*
 
-# Section 5 IviDmmACMeasurement Capability Group
+# Section 5 IviDmmACMeasurement Extension Group
 
 ## Section 5.1 IviDmmACMeasurement Overview
 
@@ -35,10 +35,10 @@ Below are the .NET functions, since they are the basis for the Go interfaces.
 
 */
 
-// ACMeasurement provides the interface required for the IviDmmACMeasurement
-// extension group described in Section 5 of IVI-4.2 IviDmm Class
-// Specification.
-type ACMeasurement interface {
+// ACMeasurementExtension provides the interface required for the
+// IviDmmACMeasurement extension group described in Section 5 of IVI-4.2 IviDmm
+// Class Specification.
+type ACMeasurementExtension interface {
 	MaxACFrequency() (float64, error)
 	SetMaxACFrequency(maxFreq float64) error
 	MinACFrequency() (float64, error)
