@@ -49,8 +49,13 @@ type Channel struct {
 
 // New creates a new InfiniiVision IVI Instrument.
 func New(inst ivi.Instrument, reset bool) (*Driver, error) {
+	// FIXME: Need to query the instrument for the model and then determine the
+	// number of channels based on the model returned.
 	channelNames := []string{
-		"Output",
+		"CHAN1",
+		"CHAN2",
+		"CHAN3",
+		"CHAN4",
 	}
 	outputCount := len(channelNames)
 	channels := make([]Channel, outputCount)
@@ -101,10 +106,6 @@ func New(inst ivi.Instrument, reset bool) (*Driver, error) {
 
 	if reset {
 		if err := driver.Reset(); err != nil {
-			return &driver, err
-		}
-		// Default to internal trigger instead of single trigger when reset.
-		if err := driver.inst.Command("TSRC1"); err != nil {
 			return &driver, err
 		}
 	}

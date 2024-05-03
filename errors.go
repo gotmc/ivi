@@ -11,4 +11,5 @@ var (
 	ErrNotImplemented       = errors.New("not implemented in ivi driver")
 	ErrFunctionNotSupported = errors.New("function not supported")
 	ErrValueNotSupported    = errors.New("value not supported")
+	ErrUnexpectedResponse   = errors.New("unexpected response from instrument")
 )

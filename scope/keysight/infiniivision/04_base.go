@@ -7,6 +7,9 @@ package infiniivision
 
 import (
 	"fmt"
+	"log"
+	"strconv"
+	"strings"
 	"time"
 
 	"github.com/gotmc/ivi"
@@ -14,7 +17,13 @@ import (
 	"github.com/gotmc/query"
 )
 
-// AcquisitionStartTime queries the length of time from the trigger event to
+const (
+	oneMeg    = 1.0e6
+	fiftyOhms = 50.0
+)
+
+// AcquisitionStartTime, also referred to as the Horizontal Time Per Record in
+// the IVI specification, queries the length of time from the trigger event to
 // the first point in the waveform record. If the value is positive, the first
 // point in the waveform record occurs after the trigger event. If the value is
 // negative, the first point in the waveform record occurs before the trigger
@@ -24,7 +33,67 @@ import (
 // Acquisition Start Time described in Section 4.2.1 of the IVI-4.1: IviScope
 // Class Specification.
 func (d *Driver) AcquisitionStartTime() (time.Duration, error) {
-	return 0, ivi.ErrNotImplemented
+	// The InfiniiVision 3000 X-series scopes have 10 divisions, and the
+	// reference can either be the center, one division from the left, or one
+	// division from the right. Therefore, find the current range and reference.
+	timebaseInfo, err := query.String(d.inst, ":TIM?")
+	if err != nil {
+		return 0, err
+	}
+
+	log.Printf("timebase = %s", timebaseInfo)
+
+	timebase, err := decodeTimebase(timebaseInfo)
+	if err != nil {
+		return 0, err
+	}
+
+	if timebase.mode != "MAIN" && timebase.reference != "CENT" && timebase.position != 0.0 {
+		// FIXME: I need to handle the abnormal situations.
+		return 0, ivi.ErrValueNotSupported
+	}
+
+	// The reference is in the center, so per IVI scope, the acquisition start
+	// time is the negative value of seconds from the left (waveform start) to
+	// the center.
+	return durationFromSeconds(-timebase.rng / 2), nil
+}
+
+type timebase struct {
+	mode      string
+	reference string
+	rng       float64
+	position  float64
+}
+
+func decodeTimebase(s string) (timebase, error) {
+	foo := strings.Split(s, ";")
+	if len(foo) != 4 {
+		return timebase{}, fmt.Errorf("should have received four responses but got %d", len(foo))
+	}
+
+	mode := strings.TrimPrefix(foo[0], ":TIM:MODE ")
+
+	ref := strings.TrimPrefix(foo[1], "REF ")
+
+	rngString := strings.TrimPrefix(foo[2], "MAIN:RANG ")
+	rng, err := strconv.ParseFloat(strings.TrimSpace(rngString), 64)
+	if err != nil {
+		return timebase{}, err
+	}
+
+	posString := strings.TrimPrefix(foo[3], "POS ")
+	pos, err := strconv.ParseFloat(strings.TrimSpace(posString), 64)
+	if err != nil {
+		return timebase{}, err
+	}
+
+	return timebase{
+		mode:      mode,
+		reference: ref,
+		rng:       rng,
+		position:  pos,
+	}, nil
 }
 
 // SetAcquisitionStartTime sets the length of time from the trigger event to
@@ -36,8 +105,8 @@ func (d *Driver) AcquisitionStartTime() (time.Duration, error) {
 // SetAcquisitionStartTime is the setter for the read-write IviScopeBase
 // Acquisition Start Time described in Section 4.2.1 of the IVI-4.1: IviScope
 // Class Specification.
-func (d *Driver) SetAcquisitionStartTime(startTime time.Duration) error {
-	return ivi.ErrNotImplemented
+func (d *Driver) SetAcquisitionStartTime(delay time.Duration) error {
+	return ivi.ErrFunctionNotSupported
 }
 
 // AcquisitionStatus indicates whether an acquisition is in progress, complete,
@@ -68,19 +137,21 @@ func (d *Driver) AcquisitionType() (scope.AcquisitionType, error) {
 	if err != nil {
 		return 0, err
 	}
+
 	acType, ok := map[string]scope.AcquisitionType{
 		"NORM": scope.NormalAcquisition,
 		"AVER": scope.AverageAcquisition,
 		"HRES": scope.HighResolutionAcquisition,
 		"PEAK": scope.PeakDetectAcquisition,
-	}[s]
+	}[strings.TrimSpace(s)]
 	if !ok {
-		return 0, ivi.ErrValueNotSupported
+		return 0, fmt.Errorf("%w: %s", ivi.ErrValueNotSupported, s)
 	}
+
 	return acType, nil
 }
 
-// SetAcquisitionType specifices how the oscilloscope acquires data and fills
+// SetAcquisitionType specifies how the oscilloscope acquires data and fills
 // the waveform record.
 //
 // SetAcquisitionType is the setter for the read-write IviScopeBase Acquisition
@@ -88,6 +159,7 @@ func (d *Driver) AcquisitionType() (scope.AcquisitionType, error) {
 // Specification.
 func (d *Driver) SetAcquisitionType(acType scope.AcquisitionType) error {
 	var cmd string
+
 	switch acType {
 	case scope.NormalAcquisition:
 		cmd = "NORM"
@@ -97,6 +169,8 @@ func (d *Driver) SetAcquisitionType(acType scope.AcquisitionType) error {
 		cmd = "HRES"
 	case scope.PeakDetectAcquisition:
 		cmd = "PEAK"
+	case scope.EnvelopeAcquisition:
+		return ivi.ErrNotImplemented
 	default:
 		return ivi.ErrNotImplemented
 	}
@@ -167,14 +241,19 @@ func (d *Driver) AcquisitionSampleRate() (float64, error) {
 	return query.Float64(d.inst, ":ACQ:SRAT?")
 }
 
-// AcquisitionSampleRate queries the length of time that corresponds to the
+// AcquisitionTimePerRecord queries the length of time that corresponds to the
 // record length.
 //
 // AcquisitionTimePerRecord is the getter for the read-write IviScopeBase
 // Horizontal Time Per Record described in Section 4.2.11 of the IVI-4.1:
 // IviScope Class Specification.
 func (d *Driver) AcquisitionTimePerRecord() (time.Duration, error) {
-	return 0, ivi.ErrNotImplemented
+	seconds, err := query.Float64(d.inst, ":TIM:RANG?")
+	if err != nil {
+		return 0, fmt.Errorf("%w: %v", ivi.ErrValueNotSupported, err)
+	}
+
+	return durationFromSeconds(seconds), nil
 }
 
 // SetAcquisitionSampleRate specifies the length of time that corresponds to
@@ -184,7 +263,7 @@ func (d *Driver) AcquisitionTimePerRecord() (time.Duration, error) {
 // Horizontal Time Per Record described in Section 4.2.11 of the IVI-4.1:
 // IviScope Class Specification.
 func (d *Driver) SetAcquisitionTimePerRecord(timePerRecord time.Duration) error {
-	return ivi.ErrNotImplemented
+	return d.inst.Command(":TIM:RANG %.4e", timePerRecord.Seconds())
 }
 
 // TriggerHoldoff queries the length of time the oscilloscope waits after it
@@ -199,20 +278,40 @@ func (d *Driver) SetAcquisitionTimePerRecord(timePerRecord time.Duration) error 
 //
 // TriggerHoldoff is the getter for the read-write IviScopeBase Trigger Holdoff
 // described in Section 4.2.18 of the IVI-4.1: IviScope Class Specification.
-func (d *Driver) TriggerHoldoff() (float64, error) {
-	return 0.0, ivi.ErrNotImplemented
+func (d *Driver) TriggerHoldoff() (time.Duration, error) {
+	seconds, err := query.Float64(d.inst, ":TRIG:HOLD?")
+	if err != nil {
+		return 0, fmt.Errorf("%w: %v", ivi.ErrValueNotSupported, err)
+	}
+
+	return durationFromSeconds(seconds), nil
 }
 
-func (d *Driver) SetTriggerHoldoff(holdoff float64) error {
-	return ivi.ErrNotImplemented
+func (d *Driver) SetTriggerHoldoff(holdoff time.Duration) error {
+	const (
+		minHoldoff = 40 * time.Nanosecond
+		maxHoldoff = 10 * time.Second
+	)
+
+	if holdoff < minHoldoff || holdoff > maxHoldoff {
+		return fmt.Errorf(
+			"%w: holdoff must be between %s and %s, received %s",
+			ivi.ErrValueNotSupported,
+			minHoldoff,
+			maxHoldoff,
+			holdoff,
+		)
+	}
+
+	return d.inst.Command(":TRIG:HOLD %e", holdoff.Seconds())
 }
 
 func (d *Driver) TriggerLevel() (float64, error) {
-	return 0.0, ivi.ErrNotImplemented
+	return query.Float64(d.inst, ":TRIG:EDGE:LEV?")
 }
 
 func (d *Driver) SetTriggerLevel(level float64) error {
-	return ivi.ErrNotImplemented
+	return d.inst.Command(":TRIG:EDGE:LEV %e", level)
 }
 
 func (d *Driver) TriggerSlope() (scope.TriggerSlope, error) {
@@ -220,6 +319,8 @@ func (d *Driver) TriggerSlope() (scope.TriggerSlope, error) {
 }
 
 func (d *Driver) SetTriggerSlope(slope scope.TriggerSlope) error {
+	// Need to determine if in TV Trigger mode, because that has a different
+	// command.
 	return ivi.ErrNotImplemented
 }
 
@@ -232,11 +333,46 @@ func (d *Driver) SetTriggerSource(source scope.TriggerSource) error {
 }
 
 func (d *Driver) TriggerType() (scope.TriggerType, error) {
-	return 0, ivi.ErrNotImplemented
+	mode, err := query.String(d.inst, ":TRIG:MODE?")
+	if err != nil {
+		return 0, ivi.ErrValueNotSupported
+	}
+
+	switch strings.TrimSpace(mode) {
+	case "EDGE":
+		return scope.EdgeTrigger, nil
+	case "GLIT":
+		return scope.GlitchTrigger, nil
+	case "PATT":
+		return scope.WidthTrigger, nil
+	case "TV":
+		return scope.TVTrigger, nil
+	case "RUNT":
+		return scope.RuntTrigger, nil
+	default:
+		return 0, ivi.ErrValueNotSupported
+	}
 }
 
 func (d *Driver) SetTriggerType(triggerType scope.TriggerType) error {
-	return ivi.ErrNotImplemented
+	switch triggerType {
+	case scope.EdgeTrigger:
+		return d.inst.Command(":TRIG:MODE EDGE")
+	case scope.WidthTrigger:
+		return d.inst.Command(":TRIG:MODE PATT")
+	case scope.RuntTrigger:
+		return d.inst.Command(":TRIG:MODE RUNT")
+	case scope.GlitchTrigger:
+		return d.inst.Command(":TRIG:MODE GLIT")
+	case scope.TVTrigger:
+		return d.inst.Command(":TRIG:MODE TV")
+	case scope.ImmediateTrigger:
+		return d.inst.Command(":TRIG:FORC")
+	case scope.ACLineTrigger:
+		return fmt.Errorf("%s not supported: %w", scope.TVTrigger, ivi.ErrValueNotSupported)
+	default:
+		return fmt.Errorf("%s not supported: %w", triggerType, ivi.ErrValueNotSupported)
+	}
 }
 
 func (d *Driver) AbortMeasurement() error {
@@ -262,9 +398,15 @@ func (d *Driver) ConfigureEdgeTrigger(
 ) error {
 	return ivi.ErrNotImplemented
 }
+
 func (d *Driver) ConfigureTrigger(triggerType scope.TriggerType, holdoff time.Duration) error {
-	return ivi.ErrNotImplemented
+	if err := d.SetTriggerType(triggerType); err != nil {
+		return err
+	}
+
+	return d.SetTriggerHoldoff(holdoff)
 }
+
 func (d *Driver) InitiateMeasurement() error {
 	return ivi.ErrNotImplemented
 }
@@ -276,7 +418,7 @@ func (d *Driver) InitiateMeasurement() error {
 // Channel Enabled described in Section 4.2.5 of the IVI-4.1: IviScope Class
 // Specification.
 func (ch *Channel) ChannelEnabled() (bool, error) {
-	return query.Boolf(ch.inst, ":CHAN%d:DISPL?", ch.num)
+	return query.Boolf(ch.inst, ":CHAN%d:DISP?", ch.num)
 }
 
 // SetChannelEnabled sets the channel to either acquire (enabled) or not
@@ -291,7 +433,7 @@ func (ch *Channel) SetChannelEnabled(b bool) error {
 		cmd = "0"
 	}
 
-	return ch.inst.Command(":CHAN%d:DISPL %s", ch.num, cmd)
+	return ch.inst.Command(":CHAN%d:DISP %s", ch.num, cmd)
 }
 
 // Name returns the name of the channel.
@@ -316,9 +458,9 @@ func (ch *Channel) InputImpedance() (float64, error) {
 
 	switch imped {
 	case "ONEM":
-		return 1.0e6, nil
+		return oneMeg, nil
 	case "FIFT":
-		return 50.0, nil
+		return fiftyOhms, nil
 	default:
 		return 0.0, ivi.ErrValueNotSupported
 	}
@@ -332,9 +474,9 @@ func (ch *Channel) InputImpedance() (float64, error) {
 // Specification.
 func (ch *Channel) SetInputImpedance(impedance float64) error {
 	switch impedance {
-	case 50.0:
+	case fiftyOhms:
 		return ch.inst.Command(":CHAN%d:IMP FIFT", ch.num)
-	case 1000000.0:
+	case oneMeg:
 		return ch.inst.Command(":CHAN%d:IMP ONEM", ch.num)
 	default:
 		return ivi.ErrValueNotSupported
@@ -355,7 +497,7 @@ func (ch *Channel) MaxInputFrequency() (float64, error) {
 	return 0.0, ivi.ErrNotImplemented
 }
 
-func (ch *Channel) SetMaxInputFrequency(freq float64) error {
+func (ch *Channel) SetMaxInputFrequency(_ float64) error {
 	return ivi.ErrNotImplemented
 }
 
@@ -412,6 +554,7 @@ func (ch *Channel) SetProbeAttenuationAuto(b bool) error {
 	if b {
 		return ivi.ErrValueNotSupported
 	}
+
 	return nil
 }
 
@@ -428,6 +571,7 @@ func (ch *Channel) VerticalCoupling() (scope.VerticalCoupling, error) {
 	if err != nil {
 		return 0, err
 	}
+
 	switch coupling {
 	case "AC":
 		return scope.ACVerticalCoupling, nil
@@ -444,6 +588,8 @@ func (ch *Channel) SetVerticalCoupling(coupling scope.VerticalCoupling) error {
 		return ch.inst.Command(":CHAN%d:COUP AC", ch.num)
 	case scope.DCVerticalCoupling:
 		return ch.inst.Command(":CHAN%d:COUP DC", ch.num)
+	case scope.GndVerticalCoupling:
+		return ivi.ErrValueNotSupported
 	default:
 		return ivi.ErrValueNotSupported
 	}
@@ -453,7 +599,7 @@ func (ch *Channel) SetVerticalCoupling(coupling scope.VerticalCoupling) error {
 // Vertical Range attribute specifies. The value is with respect to ground and
 // is in volts. For example, to acquire a sine wave that spans between on 0.0
 // and 10.0 volts, set this attribute to 5.0 volts.
-
+//
 // VerticalOffset is the getter for the read-write IviScopeBase Vertical Offset
 // described in Section 4.2.24 of the IVI-4.1: IviScope Class Specification.
 func (ch *Channel) VerticalOffset() (float64, error) {
@@ -464,7 +610,7 @@ func (ch *Channel) VerticalOffset() (float64, error) {
 // Vertical Range attribute specifies. The value is with respect to ground and
 // is in volts. For example, to acquire a sine wave that spans between on 0.0
 // and 10.0 volts, set this attribute to 5.0 volts.
-
+//
 // SetVerticalOffset is the setter for the read-write IviScopeBase Vertical
 // Offset described in Section 4.2.24 of the IVI-4.1: IviScope Class
 // Specification.
@@ -475,7 +621,7 @@ func (ch *Channel) SetVerticalOffset(offset float64) error {
 // VerticalRange queries the absolute value of the full-scale input range for a
 // channel. The units are volts. For example, to acquire a sine wave that spans
 // between -5.0 and 5.0 volts, set the Vertical Range attribute to 10.0 volts.
-
+//
 // VerticalRange is the getter for the read-write IviScopeBase Vertical Range
 // described in Section 4.2.25 of the IVI-4.1: IviScope Class Specification.
 func (ch *Channel) VerticalRange() (float64, error) {
@@ -486,7 +632,7 @@ func (ch *Channel) VerticalRange() (float64, error) {
 // channel. The units are volts with valid ranges from 0.008 to 40.0. For
 // example, to acquire a sine wave that spans between -5.0 and 5.0 volts, set
 // the Vertical Range attribute to 10.0 volts.
-
+//
 // SetVerticalRange is the setter for the read-write IviScopeBase Vertical
 // Range described in Section 4.2.25 of the IVI-4.1: IviScope Class
 // Specification.
@@ -494,6 +640,7 @@ func (ch *Channel) SetVerticalRange(rng float64) error {
 	if rng < 0.008 || rng > 40.0 {
 		return ivi.ErrValueNotSupported
 	}
+
 	return ch.inst.Command(":CHAN%d:RANG %E", ch.num, rng)
 }
 
@@ -505,7 +652,25 @@ func (ch *Channel) Configure(
 	probeAttenuation float64,
 	enabled bool,
 ) error {
-	return ivi.ErrNotImplemented
+	if err := ch.SetVerticalRange(rng); err != nil {
+		return err
+	}
+
+	if err := ch.SetVerticalOffset(offset); err != nil {
+		return err
+	}
+
+	if err := ch.SetVerticalCoupling(coupling); err != nil {
+		return err
+	}
+
+	if !autoProbeAttenuation {
+		if err := ch.SetProbeAttenuation(probeAttenuation); err != nil {
+			return err
+		}
+	}
+
+	return ch.SetChannelEnabled(enabled)
 }
 
 func (ch *Channel) ConfigureCharacteristics(inputImepdance, inputFreqMax float64) error {
@@ -518,4 +683,8 @@ func (ch *Channel) FetchWaveform(waveform ivi.Waveform) error {
 
 func (ch *Channel) ReadWaveform(maximumTime time.Duration, waveform ivi.Waveform) error {
 	return ivi.ErrNotImplemented
+}
+
+func durationFromSeconds(seconds float64) time.Duration {
+	return time.Duration(seconds * float64(time.Second))
 }

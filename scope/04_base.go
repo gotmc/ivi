@@ -127,8 +127,8 @@ type Base interface {
 	AcquisitionSampleRate() (float64, error)
 	AcquisitionTimePerRecord() (time.Duration, error)
 	SetAcquisitionTimePerRecord(timePerRecord time.Duration) error
-	TriggerHoldoff() (float64, error)
-	SetTriggerHoldoff(holdoff float64) error
+	TriggerHoldoff() (time.Duration, error)
+	SetTriggerHoldoff(holdoff time.Duration) error
 	TriggerLevel() (float64, error)
 	SetTriggerLevel(level float64) error
 	TriggerSlope() (TriggerSlope, error)

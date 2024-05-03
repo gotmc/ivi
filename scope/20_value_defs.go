@@ -117,6 +117,19 @@ const (
 	ACLineTrigger
 )
 
+// String implements the Stringer interface for TriggerType.
+func (tt TriggerType) String() string {
+	return map[TriggerType]string{
+		EdgeTrigger:      "Edge trigger",
+		WidthTrigger:     "Width trigger",
+		RuntTrigger:      "Runt trigger",
+		GlitchTrigger:    "Glitch trigger",
+		TVTrigger:        "TV trigger",
+		ImmediateTrigger: "Immediate trigger",
+		ACLineTrigger:    "A/C line trigger",
+	}[tt]
+}
+
 // InterpolationType models the defined values for the available interpolation
 // methods defined in Section 20 IviScope Attribute Value Definitions and used
 // in the Interpolation function in Section 5.2.1 of IVI-4.1: IviScopeClass
