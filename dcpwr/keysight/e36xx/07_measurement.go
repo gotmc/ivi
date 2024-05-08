@@ -8,6 +8,7 @@ package e36xx
 import (
 	"fmt"
 
+	"github.com/gotmc/ivi"
 	"github.com/gotmc/ivi/dcpwr"
 	"github.com/gotmc/query"
 )
@@ -20,7 +21,7 @@ func (ch *Channel) Measure(msrType dcpwr.MeasurementType) (float64, error) {
 		return ch.MeasureVoltage()
 	}
 
-	return 0.0, fmt.Errorf("unknown measurment type: %v", msrType)
+	return 0.0, fmt.Errorf("Measure: %w: %v", ivi.ErrValueNotSupported, msrType)
 }
 
 // MeasureVoltage takes a measurement on the output signal and returns the

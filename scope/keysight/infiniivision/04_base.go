@@ -59,43 +59,6 @@ func (d *Driver) AcquisitionStartTime() (time.Duration, error) {
 	return durationFromSeconds(-timebase.rng / 2), nil
 }
 
-type timebase struct {
-	mode      string
-	reference string
-	rng       float64
-	position  float64
-}
-
-func decodeTimebase(s string) (timebase, error) {
-	foo := strings.Split(s, ";")
-	if len(foo) != 4 {
-		return timebase{}, fmt.Errorf("should have received four responses but got %d", len(foo))
-	}
-
-	mode := strings.TrimPrefix(foo[0], ":TIM:MODE ")
-
-	ref := strings.TrimPrefix(foo[1], "REF ")
-
-	rngString := strings.TrimPrefix(foo[2], "MAIN:RANG ")
-	rng, err := strconv.ParseFloat(strings.TrimSpace(rngString), 64)
-	if err != nil {
-		return timebase{}, err
-	}
-
-	posString := strings.TrimPrefix(foo[3], "POS ")
-	pos, err := strconv.ParseFloat(strings.TrimSpace(posString), 64)
-	if err != nil {
-		return timebase{}, err
-	}
-
-	return timebase{
-		mode:      mode,
-		reference: ref,
-		rng:       rng,
-		position:  pos,
-	}, nil
-}
-
 // SetAcquisitionStartTime sets the length of time from the trigger event to
 // the first point in the waveform record. If the value is positive, the first
 // point in the waveform record occurs after the trigger event. If the value is
@@ -687,4 +650,41 @@ func (ch *Channel) ReadWaveform(maximumTime time.Duration, waveform ivi.Waveform
 
 func durationFromSeconds(seconds float64) time.Duration {
 	return time.Duration(seconds * float64(time.Second))
+}
+
+type timebase struct {
+	mode      string
+	reference string
+	rng       float64
+	position  float64
+}
+
+func decodeTimebase(s string) (timebase, error) {
+	foo := strings.Split(s, ";")
+	if len(foo) != 4 {
+		return timebase{}, fmt.Errorf("should have received four responses but got %d", len(foo))
+	}
+
+	mode := strings.TrimPrefix(foo[0], ":TIM:MODE ")
+
+	ref := strings.TrimPrefix(foo[1], "REF ")
+
+	rngString := strings.TrimPrefix(foo[2], "MAIN:RANG ")
+	rng, err := strconv.ParseFloat(strings.TrimSpace(rngString), 64)
+	if err != nil {
+		return timebase{}, err
+	}
+
+	posString := strings.TrimPrefix(foo[3], "POS ")
+	pos, err := strconv.ParseFloat(strings.TrimSpace(posString), 64)
+	if err != nil {
+		return timebase{}, err
+	}
+
+	return timebase{
+		mode:      mode,
+		reference: ref,
+		rng:       rng,
+		position:  pos,
+	}, nil
 }

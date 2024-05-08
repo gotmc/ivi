@@ -51,7 +51,7 @@ type Channel struct {
 // reset is true, then the instrument is reset.
 func New(inst ivi.Instrument, reset bool) (*Driver, error) {
 	channelNames := []string{
-		"p6v",
+		"P6V",
 		"P25V",
 		"N25V",
 	}
