@@ -1,11 +1,5 @@
 # -*- Justfile -*-
 
-set dotenv-filename := "config/.env.dev"
-
-app_name := "snippetbox"
-app_port := "4100"
-db_name := "lenslocked-db"
-db_user := "baloo"
 coverage_file := "coverage.out"
 env_file := "config/.env"
 
