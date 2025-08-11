@@ -74,20 +74,48 @@ func (d *Driver) ArbWfmQuantum() int {
 	return WaveformQuantum
 }
 
+// ArbitraryGain returns the gain of the arbitrary waveform the function
+// generator produces. This value is unitless.
+//
+// ArbitraryGain is the getter for the read-write IviFgenArbWfm attribute
+// Arbitrary Gain described in Section 6.2.1 of IVI-4.3: IviFgen Class
+// Specification.
 func (ch *Channel) ArbitraryGain() (float64, error) {
-	return 0.0, ivi.ErrFunctionNotSupported
+	amp, err := ch.Amplitude()
+	if err != nil {
+		return 0.0, err
+	}
+	return amp / 2, nil
 }
 
-func (ch *Channel) SetArbitraryGain(_ float64) error {
-	return ivi.ErrFunctionNotSupported
+// SetArbitraryGain sets the gain of the arbitrary waveform the function
+// generator produces. This value is unitless.
+//
+// SetArbitraryGain is the setter for the read-write IviFgenArbWfm attribute
+// Arbitrary Gain described in Section 6.2.1 of IVI-4.3: IviFgen Class
+// Specification.
+func (ch *Channel) SetArbitraryGain(gain float64) error {
+	return ch.SetAmplitude(2 * gain)
 }
 
+// ArbitraryOffset returns the the offset of the arbitrary waveform the
+// function generator produces. The units are volts.
+//
+// ArbitraryOffset is the getter for the read-write IviFgenArbWfm attribute
+// Arbitrary Offset described in Section 6.2.2 of IVI-4.3: IviFgen Class
+// Specification.
 func (ch *Channel) ArbitraryOffset() (float64, error) {
-	return 0.0, ivi.ErrFunctionNotSupported
+	return ch.DCOffset()
 }
 
-func (ch *Channel) SetArbitraryOffset(_ float64) error {
-	return ivi.ErrFunctionNotSupported
+// SetArbitraryOffset sets the the offset of the arbitrary waveform the
+// function generator produces. The units are volts.
+//
+// SetArbitraryOffset is the setter for the read-write IviFgenArbWfm attribute
+// Arbitrary Offset described in Section 6.2.2 of IVI-4.3: IviFgen Class
+// Specification.
+func (ch *Channel) SetArbitraryOffset(offset float64) error {
+	return ch.SetDCOffset(offset)
 }
 
 func (ch *Channel) ArbitraryWaveformHandle() (int, error) {

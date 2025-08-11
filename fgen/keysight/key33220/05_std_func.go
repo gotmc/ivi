@@ -47,8 +47,8 @@ func (ch *Channel) DCOffset() (float64, error) {
 //
 // SetDCOffset is the setter for the read-write IviFgenStdFunc Attribute DC
 // Offset described in Section 5.2.2 of IVI-4.3: IviFgen Class Specification.
-func (ch *Channel) SetDCOffset(amp float64) error {
-	return ch.inst.Command("VOLT:OFFS %f", amp)
+func (ch *Channel) SetDCOffset(offset float64) error {
+	return ch.inst.Command("VOLT:OFFS %f", offset)
 }
 
 // DutyCycleHigh reads the percentage of time, specified as 0-100, during one
