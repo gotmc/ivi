@@ -1,7 +1,6 @@
 # -*- Justfile -*-
 
 coverage_file := "coverage.out"
-env_file := "config/.env"
 
 # List the available justfile recipes.
 [group('general')]
