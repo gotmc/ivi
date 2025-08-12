@@ -37,7 +37,7 @@ type Device struct {
 	ivi.Inherent
 }
 
-// Channel models the output channel repeated capabilitiy for the DC power
+// Channel models the output channel repeated capability for the DC power
 // supply output channel.
 type Channel struct {
 	name                 string

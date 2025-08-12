@@ -27,6 +27,7 @@ const (
 type Inherent struct {
 	inst Instrument
 	InherentBase
+	timeoutConfig *TimeoutConfig
 }
 
 // InherentBase provides the exported properties for the inherent capabilities
@@ -47,8 +48,9 @@ type InherentBase struct {
 // interface and the InherentBase struct.
 func NewInherent(inst Instrument, base InherentBase) Inherent {
 	return Inherent{
-		inst:         inst,
-		InherentBase: base,
+		inst:          inst,
+		InherentBase:  base,
+		timeoutConfig: NewDefaultTimeoutConfig(),
 	}
 }
 
@@ -84,9 +86,10 @@ func (inherent *Inherent) InstrumentSerialNumber() (string, error) {
 
 // Reset resets the instrument.
 func (inherent *Inherent) Reset() error {
-	err := inherent.inst.Command("*rst")
+	// Use timeout wrapper if available
+	inst := inherent.getInstrumentWithTimeout()
+	err := inst.Command("*rst")
 	// Need to wait until the device resets.
-	// FIXME: The duration should be device dependent instead of hard coded.
 	time.Sleep(inherent.ResetDelay)
 
 	return err
@@ -94,7 +97,9 @@ func (inherent *Inherent) Reset() error {
 
 // Clear clears the instrument.
 func (inherent *Inherent) Clear() error {
-	err := inherent.inst.Command("*cls")
+	// Use timeout wrapper if available
+	inst := inherent.getInstrumentWithTimeout()
+	err := inst.Command("*cls")
 	time.Sleep(inherent.ClearDelay)
 
 	return err
@@ -127,4 +132,46 @@ func parseIdentification(idn string, part idPart) (string, error) {
 	}
 
 	return parts[part], nil
+}
+
+// getInstrumentWithTimeout returns the instrument wrapped with timeout support if not already wrapped.
+func (inherent *Inherent) getInstrumentWithTimeout() Instrument {
+	// Check if instrument already has timeout support
+	if _, ok := inherent.inst.(*WithTimeout); ok {
+		return inherent.inst
+	}
+	// Wrap the instrument with timeout support
+	return NewWithTimeout(inherent.inst, inherent.timeoutConfig)
+}
+
+// SetTimeoutConfig sets the timeout configuration for the instrument.
+func (inherent *Inherent) SetTimeoutConfig(config *TimeoutConfig) {
+	if config != nil {
+		inherent.timeoutConfig = config
+		// If the instrument is already wrapped, update its config
+		if wt, ok := inherent.inst.(*WithTimeout); ok {
+			wt.SetTimeoutConfig(config)
+		}
+	}
+}
+
+// GetTimeoutConfig returns the current timeout configuration.
+func (inherent *Inherent) GetTimeoutConfig() *TimeoutConfig {
+	return inherent.timeoutConfig
+}
+
+// SetTimeout sets a simple timeout for all operations.
+func (inherent *Inherent) SetTimeout(timeout time.Duration) {
+	inherent.timeoutConfig.IOTimeout = timeout
+	inherent.timeoutConfig.QueryTimeout = timeout + 5*time.Second
+	inherent.timeoutConfig.CommandTimeout = timeout
+	// If the instrument is already wrapped, update its timeout
+	if wt, ok := inherent.inst.(*WithTimeout); ok {
+		wt.SetTimeout(timeout)
+	}
+}
+
+// GetTimeout returns the current IO timeout.
+func (inherent *Inherent) GetTimeout() time.Duration {
+	return inherent.timeoutConfig.IOTimeout
 }

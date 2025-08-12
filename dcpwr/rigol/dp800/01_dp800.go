@@ -71,7 +71,7 @@ func New(inst ivi.Instrument, reset bool) (*Device, error) {
 
 	model, err := inherent.InstrumentModel()
 	if err != nil {
-		return nil, fmt.Errorf("error determinig instrument model: %s", err)
+		return nil, fmt.Errorf("error determining instrument model: %s", err)
 	}
 
 	if !slices.Contains(supportedModels, model) {
@@ -152,7 +152,7 @@ func New(inst ivi.Instrument, reset bool) (*Device, error) {
 	return &driver, nil
 }
 
-// Channel models the output channel repeated capabilitiy for the DC power
+// Channel models the output channel repeated capability for the DC power
 // supply output channel.
 type Channel struct {
 	name                 string
@@ -164,7 +164,7 @@ type Channel struct {
 	maxCurrent           float64
 }
 
-// AvailableCOMPorts lists the avaialble COM ports, including optional ports.
+// AvailableCOMPorts lists the available COM ports, including optional ports.
 func AvailableCOMPorts() []string {
 	// FIXME: Is this accurate for all supported models? What about USB?
 	return []string{"GPIB", "RS232"}

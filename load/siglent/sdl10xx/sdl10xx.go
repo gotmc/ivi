@@ -70,7 +70,7 @@ func New(inst ivi.Instrument, reset bool) (*SDL10xx, error) {
 	return &driver, nil
 }
 
-// AvailableCOMPorts lists the avaialble COM ports, including optional ports.
+// AvailableCOMPorts lists the available COM ports, including optional ports.
 func AvailableCOMPorts() []string {
 	return []string{"RS232", "USB", "LAN", "GPIB"}
 }

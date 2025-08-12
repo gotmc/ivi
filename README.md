@@ -146,6 +146,8 @@ gotmc packages meet the Instrument interface:
 
 Examples can be found at <https://github.com/gotmc/ivi-examples>.
 
+For timeout usage examples, see the [timeout examples](https://github.com/gotmc/ivi-examples/blob/master/timeout_example.md) in the ivi-examples repository.
+
 ## Documentation
 
 Documentation can be found at either:
@@ -153,6 +155,76 @@ Documentation can be found at either:
 - <https://godoc.org/github.com/gotmc/ivi>
 - <http://localhost:6060/pkg/github.com/gotmc/ivi/> after running `$
 godoc -http=:6060`
+
+## Timeout Support
+
+The `ivi` package now provides comprehensive timeout support for instrument communications, addressing [Issue #3](https://github.com/gotmc/ivi/issues/3). This feature helps prevent hanging operations when instruments become unresponsive or network issues occur.
+
+### Basic Usage
+
+```go
+// Create an instrument with default timeout configuration
+inst := ivi.NewWithTimeout(baseInstrument, ivi.NewDefaultTimeoutConfig())
+
+// Create a driver with the timeout-wrapped instrument
+dmm, err := key3446x.New(inst, false)
+
+// All operations will now timeout if they take too long
+manufacturer, err := dmm.InstrumentManufacturer()
+if err == context.DeadlineExceeded {
+    log.Println("Query timed out")
+}
+```
+
+### Custom Timeout Configuration
+
+```go
+// Create custom timeout configuration
+config := &ivi.TimeoutConfig{
+    IOTimeout:      5 * time.Second,   // For read/write operations
+    QueryTimeout:   10 * time.Second,  // For query operations (write + read)
+    CommandTimeout: 5 * time.Second,   // For command operations
+    ResetTimeout:   30 * time.Second,  // For reset operations
+    ClearTimeout:   5 * time.Second,   // For clear operations
+}
+
+// Wrap instrument with custom timeout configuration
+inst := ivi.NewWithTimeout(baseInstrument, config)
+```
+
+### Context-Based Timeouts
+
+For fine-grained control over individual operations:
+
+```go
+// Create a context with a specific timeout
+ctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
+defer cancel()
+
+// Use context-aware methods
+response, err := inst.QueryWithContext(ctx, "*IDN?")
+```
+
+### Setting Timeouts on Existing Drivers
+
+```go
+// Create a driver
+dmm, _ := key3446x.New(instrument, false)
+
+// Set a simple timeout for all operations
+dmm.SetTimeout(15 * time.Second)
+
+// Or set a custom timeout configuration
+dmm.SetTimeoutConfig(&ivi.TimeoutConfig{
+    IOTimeout:    3 * time.Second,
+    QueryTimeout: 8 * time.Second,
+    // ... other timeout settings
+})
+```
+
+The timeout feature is backward compatible - existing code will continue to work without modification. To enable timeouts, simply wrap your instrument with `ivi.NewWithTimeout()` when creating drivers.
+
+For more detailed examples and advanced usage patterns, see the [timeout examples](https://github.com/gotmc/ivi-examples/blob/master/timeout_example.md) in the ivi-examples repository.
 
 ## Contributing
 
