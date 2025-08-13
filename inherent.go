@@ -6,7 +6,6 @@
 package ivi
 
 import (
-	"errors"
 	"fmt"
 	"strings"
 	"time"
@@ -42,11 +41,16 @@ type InherentBase struct {
 	ClassSpecMinorVersion     int
 	ResetDelay                time.Duration
 	ClearDelay                time.Duration
+	ReturnToLocal             bool // Whether to return to local control on Close/Disable
 }
 
 // NewInherent creates a new Inherent struct using the given Instrument
 // interface and the InherentBase struct.
 func NewInherent(inst Instrument, base InherentBase) Inherent {
+	// Default to returning to local control.
+	if !base.ReturnToLocal && base.ClassSpecMajorVersion == 0 {
+		base.ReturnToLocal = true // Default to true if not explicitly set
+	}
 	return Inherent{
 		inst:          inst,
 		InherentBase:  base,
@@ -106,11 +110,35 @@ func (inherent *Inherent) Clear() error {
 }
 
 // Disable places the instrument in a quiescent state as quickly as possible.
-// Disable provides the method described in Section 6.4 of IVI-3.2: Inherent
-// Capabilities Specification.
+// If ReturnToLocal is true, this method also returns the instrument to local
+// control by sending the SYST:LOC command, allowing the front panel to regain
+// control. Disable provides the method described in Section 6.4 of IVI-3.2:
+// Inherent Capabilities Specification.
 func (inherent *Inherent) Disable() error {
-	// FIXME(mdr): Implement!!!!
-	return errors.New("disable not implemented")
+	if !inherent.ReturnToLocal {
+		// Skip sending local control command if not requested
+		return nil
+	}
+
+	// Use timeout wrapper if available
+	inst := inherent.getInstrumentWithTimeout()
+
+	// Send the system local command to return control to the front panel
+	// This addresses the issue where instruments remain in remote mode
+	// after the program terminates.
+	err := inst.Command("SYST:LOC")
+	if err != nil {
+		// If SYST:LOC fails, try the alternative SCPI command
+		fallbackErr := inst.Command("SYSTem:LOCal")
+		if fallbackErr != nil {
+			// Return the original error if both fail
+			return err
+		}
+		// Fallback succeeded
+		return nil
+	}
+
+	return err
 }
 
 func (inherent *Inherent) queryIdentification(part idPart) (string, error) {
@@ -174,4 +202,36 @@ func (inherent *Inherent) SetTimeout(timeout time.Duration) {
 // GetTimeout returns the current IO timeout.
 func (inherent *Inherent) GetTimeout() time.Duration {
 	return inherent.timeoutConfig.IOTimeout
+}
+
+// SetReturnToLocal controls whether the instrument returns to local control
+// when Disable() or Close() is called. Default is true.
+func (inherent *Inherent) SetReturnToLocal(enabled bool) {
+	inherent.ReturnToLocal = enabled
+}
+
+// GetReturnToLocal returns whether the instrument will return to local control
+// when Disable() or Close() is called.
+func (inherent *Inherent) GetReturnToLocal() bool {
+	return inherent.ReturnToLocal
+}
+
+// Close properly shuts down the instrument connection by returning it to local
+// control and then closing the underlying connection if it implements io.Closer.
+// This method should be called when finished with an instrument to ensure it
+// returns to local control for front panel operation.
+func (inherent *Inherent) Close() error {
+	// First, return the instrument to local control
+	disableErr := inherent.Disable()
+
+	// Try to close the underlying connection if it implements io.Closer
+	if closer, ok := inherent.inst.(interface{ Close() error }); ok {
+		closeErr := closer.Close()
+		// Return the first error that occurred, prioritizing close errors
+		if closeErr != nil {
+			return closeErr
+		}
+	}
+
+	return disableErr
 }

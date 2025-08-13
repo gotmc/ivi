@@ -46,6 +46,7 @@ func New(inst ivi.Instrument, reset bool) (*Driver, error) {
 		ClassSpecRevision:     specRevision,
 		ResetDelay:            500 * time.Millisecond,
 		ClearDelay:            500 * time.Millisecond,
+		ReturnToLocal:         true, // Default to returning to local control
 		GroupCapabilities: []string{
 			"IviDmmBase",
 			"IviDmmACMeasurement",
@@ -85,4 +86,10 @@ func New(inst ivi.Instrument, reset bool) (*Driver, error) {
 	}
 
 	return &driver, nil
+}
+
+// Close properly shuts down the DMM by returning it to local control.
+// This ensures the instrument's front panel regains control after use.
+func (d *Driver) Close() error {
+	return d.Inherent.Close()
 }

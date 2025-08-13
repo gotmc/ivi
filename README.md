@@ -222,9 +222,87 @@ dmm.SetTimeoutConfig(&ivi.TimeoutConfig{
 })
 ```
 
-The timeout feature is backward compatible - existing code will continue to work without modification. To enable timeouts, simply wrap your instrument with `ivi.NewWithTimeout()` when creating drivers.
+The timeout feature is backward compatible---existing code will continue to work
+without modification. To enable timeouts, simply wrap your instrument with
+`ivi.NewWithTimeout()` when creating drivers.
 
-For more detailed examples and advanced usage patterns, see the [timeout examples](https://github.com/gotmc/ivi-examples/blob/master/timeout_example.md) in the ivi-examples repository.
+For more detailed examples and advanced usage patterns, see the [timeout
+examples](https://github.com/gotmc/ivi-examples/blob/master/timeout_example.md)
+in the ivi-examples repository.
+
+## Proper Cleanup and Local Control
+
+When working with instruments, it's important to properly clean up connections
+and optionally return instruments to local control so their front panels remain
+operational after your program ends.
+
+### Basic Cleanup Pattern
+
+```go
+// Create and use your instrument
+dmm, err := key3446x.New(inst, false)
+if err != nil {
+    log.Fatal(err)
+}
+
+// Always defer Close() to ensure proper cleanup
+defer func() {
+    if err := dmm.Close(); err != nil {
+        log.Printf("Error during cleanup: %v", err)
+    }
+}()
+
+// Use the instrument...
+manufacturer, _ := dmm.InstrumentManufacturer()
+```
+
+By default, `Close()` returns the instrument to local control (front panel
+regains control) before closing the connection.
+
+### Controlling Local Return Behavior
+
+You can control whether the instrument returns to local control:
+
+```go
+// Disable automatic return to local control
+dmm.SetReturnToLocal(false)
+
+// Re-enable it later if needed
+dmm.SetReturnToLocal(true)
+
+// Check current setting
+if dmm.GetReturnToLocal() {
+    fmt.Println("Will return to local control on Close/Disable")
+}
+```
+
+### Manual Local Control
+
+If you need to return an instrument to local control without closing the
+connection:
+
+```go
+// Return to local control (front panel regains control)
+err := dmm.Disable()
+if err != nil {
+    log.Printf("Error returning to local: %v", err)
+}
+```
+
+### Use Cases
+
+**Keep Remote Control** (set `ReturnToLocal` to false):
+
+- Automated test systems where instruments should stay in remote mode
+- Continuous monitoring applications
+- When switching between multiple controlling applications
+
+**Return to Local** (default, `ReturnToLocal` is true):
+
+- Development and debugging
+- Manual testing with occasional automation
+- Single-use scripts
+- Educational environments
 
 ## Contributing
 
