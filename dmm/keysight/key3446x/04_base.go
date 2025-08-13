@@ -136,6 +136,9 @@ func (d *Driver) SetRange(autoRange dmm.AutoRange, rangeValue float64) error {
 	case dmm.ACCurrent:
 	case dmm.TwoWireResistance:
 		rng, err = determineManualResistanceRange(rangeValue)
+		if err != nil {
+			return err
+		}
 	case dmm.FourWireResistance:
 	case dmm.ACPlusDCVolts:
 	case dmm.ACPlusDCCurrent:

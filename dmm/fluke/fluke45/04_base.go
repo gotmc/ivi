@@ -128,6 +128,9 @@ func (d *Driver) SetRange(autoRange dmm.AutoRange, rangeValue float64) error {
 	// readings/sec), and fast (20 readings/sec). The ranges differ based on the
 	// selected sampling rate, so we needf to query the rate first.
 	rate, err := query.String(d.inst, "RATE?")
+	if err != nil {
+		return err
+	}
 
 	fcn, err := d.MeasurementFunction()
 	if err != nil {
@@ -135,6 +138,9 @@ func (d *Driver) SetRange(autoRange dmm.AutoRange, rangeValue float64) error {
 	}
 
 	rangeCmd, err := determineRangeCommand(rate, fcn, rangeValue)
+	if err != nil {
+		return err
+	}
 
 	return d.inst.Command("RANG %d", rangeCmd)
 }
