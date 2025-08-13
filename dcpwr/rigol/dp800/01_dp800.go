@@ -87,39 +87,39 @@ func New(inst ivi.Instrument, reset bool) (*Device, error) {
 	}
 
 	availableChannels := map[string][]genericChannel{
-		"DP831A": []genericChannel{
+		"DP831A": {
 			{"CH1", 0.0, 8.4, 0.0, 5.3},
 			{"CH2", 0.0, 32.0, 0.0, 2.1},
 			{"CH3", -32.0, 0.0, 0.0, 2.1},
 		},
-		"DP832A": []genericChannel{
+		"DP832A": {
 			{"CH1", 0.0, 32.0, 0.0, 3.2},
 			{"CH2", 0.0, 32.0, 0.0, 2.1},
 			{"CH3", -5.3, 0.0, 0.0, 3.2},
 		},
-		"DP821A": []genericChannel{
+		"DP821A": {
 			{"CH1", 0.0, 63.0, 0.0, 1.05},
 			{"CH2", 0.0, 8.4, 0.0, 10.5},
 		},
-		"DP811A": []genericChannel{
+		"DP811A": {
 			{"Range1", 0.0, 21.0, 0.0, 10.5},
 			{"Range2", 0.0, 42.0, 0.0, 5.3},
 		},
-		"DP831": []genericChannel{
+		"DP831": {
 			{"CH1", 0.0, 8.4, 0.0, 5.3},
 			{"CH2", 0.0, 32.0, 0.0, 2.1},
 			{"CH3", -32.0, 0.0, 0.0, 2.1},
 		},
-		"DP832": []genericChannel{
+		"DP832": {
 			{"CH1", 0.0, 32.0, 0.0, 3.2},
 			{"CH2", 0.0, 32.0, 0.0, 3.2},
 			{"CH3", -5.3, 0.0, 0.0, 3.2},
 		},
-		"DP821": []genericChannel{
+		"DP821": {
 			{"CH1", 0.0, 63.0, 0.0, 1.05},
 			{"CH2", 0.0, 8.4, 0.0, 10.5},
 		},
-		"DP811": []genericChannel{
+		"DP811": {
 			{"Range1", 0.0, 63.0, 0.0, 1.05},
 			{"Range2", 0.0, 8.4, 0.0, 10.5},
 		},

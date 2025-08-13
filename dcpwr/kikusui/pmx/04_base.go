@@ -36,12 +36,14 @@ func (ch *Channel) CurrentLimit() (float64, error) {
 // Attribute Current Limit described in Section 4.2.1 of IVI-4.4: IviDCPwr
 // Class Specification.
 func (ch *Channel) SetCurrentLimit(limit float64) error {
-	if ch.currentLimitBehavior == dcpwr.CurrentRegulate {
+	switch ch.currentLimitBehavior {
+	case dcpwr.CurrentRegulate:
 		return ch.inst.Command("CURR %f;:CURR:PROT MAX", limit)
-	} else if ch.currentLimitBehavior == dcpwr.CurrentTrip {
+	case dcpwr.CurrentTrip:
 		return ch.inst.Command("CURR %f;:CURR:PROT %f", limit, limit)
+	default:
+		return errors.New("current limit behavior not set")
 	}
-	return errors.New("current limit behavior not set")
 }
 
 // CurrentLimitBehavior determines the behavior of the power supply when the
@@ -66,18 +68,20 @@ func (ch *Channel) CurrentLimitBehavior() (dcpwr.CurrentLimitBehavior, error) {
 // Attribute Current Limit Behavior described in Section 4.2.2 of IVI-4.4:
 // IviDCPwr Class Specification.
 func (ch *Channel) SetCurrentLimitBehavior(behavior dcpwr.CurrentLimitBehavior) error {
-	if behavior == dcpwr.CurrentRegulate {
+	switch behavior {
+	case dcpwr.CurrentRegulate:
 		ch.currentLimitBehavior = dcpwr.CurrentRegulate
 		return ch.inst.Command("CURR:PROT MAX")
-	} else if behavior == dcpwr.CurrentTrip {
+	case dcpwr.CurrentTrip:
 		ch.currentLimitBehavior = dcpwr.CurrentTrip
 		limit, err := query.Float64(ch.inst, "CURR?")
 		if err != nil {
 			return err
 		}
 		return ch.inst.Command("CURR:PROT %f", limit)
+	default:
+		return errors.New("unknown current limit behavior")
 	}
-	return errors.New("unknown current limit behavior")
 }
 
 // OutputEnabled determines if all three output channels are enabled or
@@ -206,14 +210,16 @@ func (ch *Channel) SetVoltageLevel(level float64) error {
 // function described in Section 4.3.1 of IVI-4.4: IviDCPwr Class
 // Specification.
 func (ch *Channel) ConfigureCurrentLimit(behavior dcpwr.CurrentLimitBehavior, limit float64) error {
-	if behavior == dcpwr.CurrentRegulate {
+	switch behavior {
+	case dcpwr.CurrentRegulate:
 		ch.currentLimitBehavior = dcpwr.CurrentRegulate
 		return ch.inst.Command("CURR %f;:CURR:PROT MAX", limit)
-	} else if behavior == dcpwr.CurrentTrip {
+	case dcpwr.CurrentTrip:
 		ch.currentLimitBehavior = dcpwr.CurrentTrip
 		return ch.inst.Command("CURR %f;:CURR:PROT %f", limit, limit)
+	default:
+		return errors.New("unknown current limit behavior")
 	}
-	return errors.New("unknown current limit behavior")
 
 }
 

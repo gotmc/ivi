@@ -199,7 +199,11 @@ func TestWithTimeout_SetTimeout(t *testing.T) {
 
 	// Check that query timeout is adjusted
 	if inst.config.QueryTimeout != newTimeout+5*time.Second {
-		t.Errorf("Expected query timeout of %v, got %v", newTimeout+5*time.Second, inst.config.QueryTimeout)
+		t.Errorf(
+			"Expected query timeout of %v, got %v",
+			newTimeout+5*time.Second,
+			inst.config.QueryTimeout,
+		)
 	}
 }
 

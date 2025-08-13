@@ -126,7 +126,10 @@ func TestInherent_Close_WithoutCloser(t *testing.T) {
 
 	err := inherent.Close()
 	if err != nil {
-		t.Errorf("Expected no error when underlying instrument doesn't implement Close(), got %v", err)
+		t.Errorf(
+			"Expected no error when underlying instrument doesn't implement Close(), got %v",
+			err,
+		)
 	}
 }
 
@@ -166,4 +169,3 @@ func TestInherent_ReturnToLocal_Control(t *testing.T) {
 		t.Errorf("Expected 1 command when ReturnToLocal is true, got %d", len(mock.commandsSent))
 	}
 }
-
