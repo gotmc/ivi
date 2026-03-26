@@ -5,14 +5,12 @@
 
 package ivi
 
-type Number interface {
-	int | float64
-}
-
+// Waveform represents acquired waveform data from an oscilloscope channel.
 type Waveform struct {
-	item *[]float64
+	items []float64
 }
 
-func (w *Waveform) GetAllElements() (*[]float64, error) {
-	return w.item, nil
+// GetAllElements returns all waveform elements.
+func (w *Waveform) GetAllElements() ([]float64, error) {
+	return w.items, nil
 }

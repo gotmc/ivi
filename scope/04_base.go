@@ -180,6 +180,6 @@ type BaseChannel interface {
 		enabled bool,
 	) error
 	ConfigureCharacteristics(inputImepdance, inputFreqMax float64) error
-	FetchWaveform(waveform ivi.Waveform) error
-	ReadWaveform(maximumTime time.Duration, waveform ivi.Waveform) error
+	FetchWaveform(waveform *ivi.Waveform) error
+	ReadWaveform(maximumTime time.Duration, waveform *ivi.Waveform) error
 }

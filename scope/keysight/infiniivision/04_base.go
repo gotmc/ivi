@@ -640,11 +640,11 @@ func (ch *Channel) ConfigureCharacteristics(inputImepdance, inputFreqMax float64
 	return ivi.ErrNotImplemented
 }
 
-func (ch *Channel) FetchWaveform(waveform ivi.Waveform) error {
+func (ch *Channel) FetchWaveform(waveform *ivi.Waveform) error {
 	return ivi.ErrNotImplemented
 }
 
-func (ch *Channel) ReadWaveform(maximumTime time.Duration, waveform ivi.Waveform) error {
+func (ch *Channel) ReadWaveform(maximumTime time.Duration, waveform *ivi.Waveform) error {
 	return ivi.ErrNotImplemented
 }
 
