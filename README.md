@@ -318,14 +318,14 @@ Contributions are welcome! To contribute please:
 Prior to submitting a [pull request][], please run:
 
 ```bash
-$ make check
-$ make lint
+$ just check
+$ just lint
 ```
 
 To update and view the test coverage report:
 
 ```bash
-$ make cover
+$ just cover
 ```
 
 ## License
@@ -341,6 +341,7 @@ $ make cover
 [go-overload]: https://go.dev/doc/faq#overloading
 [godoc badge]: https://godoc.org/github.com/gotmc/ivi?status.svg
 [godoc link]: https://godoc.org/github.com/gotmc/ivi
+[just]: https://just.systems/
 [LICENSE.txt]: https://github.com/gotmc/ivi/blob/master/LICENSE.txt
 [license badge]: https://img.shields.io/badge/license-MIT-blue.svg
 [lxi]: https://github.com/gotmc/lxi

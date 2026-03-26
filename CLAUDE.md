@@ -8,7 +8,10 @@ code in this repository.
 ### Building and Testing
 
 - **Run tests**: `just unit` - formats, vets, and runs unit tests with coverage
+- **Run single test**: `just unit -run TestName` - run a specific test
+- **Run single package tests**: `just unit ./dmm/...` - run tests in a package
 - **Integration tests**: `just int` - runs integration tests
+- **E2E tests**: `just e2e` - runs end-to-end tests
 - **Linting**: `just lint` - runs golangci-lint with the project's configuration
 - **Coverage report**: `just cover` - generates HTML coverage report
 - **Format and vet**: `just check` - formats and vets code (runs before tests
@@ -28,69 +31,69 @@ code in this repository.
 This is a Go implementation of the IVI (Interchangeable Virtual Instrument)
 Foundation specifications for programming test instruments. The architecture
 follows IVI class specifications with standardized APIs across different
-instrument manufacturers.
+instrument manufacturers. The main advantage is abstracting SCPI commands behind
+a standard API so different instruments (e.g., Agilent 33220A and SRS DS345
+function generators) can be programmed identically.
 
 ### Key Components
 
 #### Core Interface Layer (`ivi.go`, `inherent.go`)
 
-- `Instrument` interface: Core abstraction for all test instruments requiring
-  Read/Write/Command/Query methods
+- `Instrument` interface: Core abstraction requiring Read, Write, WriteString,
+  Command, and Query methods
 - `Inherent` struct: Base capabilities common to all IVI instruments (reset,
-  clear, identification)
-- Inherent capabilities follow IVI-3.2 specification for standardized instrument
-  behavior
+  clear, identification, timeout, local control)
+- `InherentBase` struct: Metadata about the driver (class spec version, supported
+  models, bus interfaces, reset/clear delays)
+- Inherent capabilities follow IVI-3.2 specification
 
 #### Instrument Class Packages
 
-Each directory represents an IVI instrument class with numbered files organized
-by capability groups:
+Each directory defines interfaces for an IVI instrument class:
 
-**DMM (Digital Multimeter)** - `dmm/`
+- `dmm/` — IVI-4.2 IviDmm Class (Digital Multimeter)
+- `fgen/` — IVI-4.3 IviFgen Class (Function Generator)
+- `dcpwr/` — IVI-4.4 IviDCPwr Class (DC Power Supply)
+- `scope/` — IVI-4.1 IviScope Class (Oscilloscope)
 
-- Implements IVI-4.2 IviDmm Class Specification
-- Base capabilities in `04_base.go`, measurements in `05_ac_msrmnt.go`, etc.
-- Keysight 3446x family driver in `dmm/keysight/key3446x/`
-
-**Function Generators** - `fgen/`
-
-- Implements IVI-4.3 IviFgen Class Specification
-- Standard functions (`05_std_func.go`), arbitrary waveforms (`06_arb_wfm.go`),
-  triggers (`09_trigger.go`)
-- Keysight 33220A driver in `fgen/keysight/key33220/`
-
-**DC Power Supplies** - `dcpwr/`
-
-- Implements IVI-4.4 IviDCPwr Class Specification
-- Base functions, triggers, measurements organized by capability groups
-- Keysight E36xx series driver in `dcpwr/keysight/e36xx/`
-
-**Oscilloscopes** - `scope/`
-
-- Implements IVI-4.1 IviScope Class Specification
-- Waveform measurements, triggers, acquisition modes
-- Keysight InfiniiVision driver in `scope/keysight/infiniivision/`
+Each class package defines Go interfaces for capability groups (Base,
+StdFunc, Trigger, etc.) that drivers must implement.
 
 #### Driver Implementation Pattern
 
-All instrument drivers follow consistent patterns:
+Drivers live under `<class>/<manufacturer>/<model>/` (e.g.,
+`fgen/keysight/key33220/`). All drivers follow this structure:
 
-- `01_<instrument>.go`: Package documentation and main driver struct
-- `04_base.go`: Base capability group implementation
-- Numbered files correspond to IVI capability groups from specifications
-- Each driver implements relevant interfaces and embeds `ivi.Inherent`
-- Channel-based instruments have separate Channel structs for repeated capabilities
+- `01_<model>.go`: Package doc, Driver struct, Channel struct, `New()` constructor
+- `04_base.go` and subsequent numbered files: One file per IVI capability group
+
+The Driver struct always follows this pattern:
+
+```go
+type Driver struct {
+    inst     ivi.Instrument
+    Channels []Channel
+    ivi.Inherent  // Embedded for inherent capabilities
+}
+```
+
+The `New(inst ivi.Instrument, reset bool) (*Driver, error)` constructor creates
+channels, populates `InherentBase` metadata, and calls `ivi.NewInherent()`.
+
+Channel structs hold an `ivi.Instrument` reference and a channel `name` string,
+implementing per-channel capability interfaces.
 
 ### Design Philosophy
 
 - **Idiomatic Go over strict IVI compliance**: Uses Go enums and type safety
-  instead of magic numbers
+  instead of magic numbers. Go method signatures follow .NET prototypes where
+  possible, but deviate when needed for idiomatic Go (e.g., separate AutoRange
+  type instead of negative sentinel values).
 - **No state caching**: All attributes read directly from instruments for
   reliability
 - **Interface-based**: Drivers implement capability interfaces, enabling
   instrument interchangeability
 - **Capability groups**: Code organized by IVI specification capability groups
-  for maintainability
 
 ### Dependencies
 
@@ -102,7 +105,7 @@ All instrument drivers follow consistent patterns:
 
 ### File Organization
 
-- Files prefixed with numbers (01*, 04*, 05\_) correspond to IVI specification
+- Files prefixed with numbers (01_, 04_, 05_) correspond to IVI specification
   sections
 - Capability groups determine file boundaries (Base, AC Measurements, Triggers,
   etc.)
@@ -111,23 +114,21 @@ All instrument drivers follow consistent patterns:
 
 ### Interface Compliance Verification
 
-All drivers include interface compliance checks using blank identifiers:
+All drivers include compile-time interface compliance checks:
 
 ```go
 var _ dmm.Base = (*Driver)(nil)
 var _ dmm.BaseChannel = (*Channel)(nil)
 ```
 
+### Testing Patterns
+
+- Table-driven tests with `t.Run()` subtests
+- Mock instruments implementing the `Instrument` interface for unit tests
+- Integration tests use `Integration` prefix, E2E tests use `E2E` prefix in
+  test names (filtered by `-run` flag)
+
 ### Error Handling
 
 - Package-specific error variables defined in main package files
-- Standard Go error handling patterns throughout
 - IVI-specific errors like `ErrNotImplemented` for unsupported features
-
-### Code Quality
-
-- golangci-lint configuration in `.golangci.yaml` includes staticcheck, gosec,
-  misspell
-- Comprehensive linting rules ensure code quality and security
-- Test coverage reporting available via `just cover`
-
