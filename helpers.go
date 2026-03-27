@@ -12,7 +12,7 @@ import (
 
 // Set formats according to a format specifier and then writes the resulting
 // string to the given StringWriter interface.
-func Set(sw StringWriter, format string, a ...interface{}) error {
+func Set(sw StringWriter, format string, a ...any) error {
 	cmd := format
 	if a != nil {
 		cmd = fmt.Sprintf(format, a...)

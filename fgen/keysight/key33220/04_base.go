@@ -124,7 +124,7 @@ func (ch *Channel) OperationMode(ctx context.Context) (fgen.OperationMode, error
 
 	s, err := query.String(ctx, ch.inst, "BURS:STAT?")
 	if err != nil {
-		return mode, fmt.Errorf("error getting operation mode: %s", err)
+		return mode, fmt.Errorf("error getting operation mode: %w", err)
 	}
 
 	switch strings.TrimSpace(s) {

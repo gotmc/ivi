@@ -40,9 +40,11 @@ function generators) can be programmed identically.
 #### Core Interface Layer (`ivi.go`, `inherent.go`)
 
 - `Instrument` interface: Core abstraction requiring Read, Write, WriteString,
-  Command, and Query methods
+  Command, and Query methods. Command and Query take `context.Context` as their
+  first parameter.
 - `Inherent` struct: Base capabilities common to all IVI instruments (reset,
-  clear, identification, timeout, local control)
+  clear, identification, timeout, local control). All methods that communicate
+  with instruments take `context.Context`.
 - `InherentBase` struct: Metadata about the driver (class spec version, supported
   models, bus interfaces, reset/clear delays)
 - Inherent capabilities follow IVI-3.2 specification
@@ -57,7 +59,8 @@ Each directory defines interfaces for an IVI instrument class:
 - `scope/` — IVI-4.1 IviScope Class (Oscilloscope)
 
 Each class package defines Go interfaces for capability groups (Base,
-StdFunc, Trigger, etc.) that drivers must implement.
+StdFunc, Trigger, etc.) that drivers must implement. All interface methods
+that communicate with instruments take `context.Context` as first parameter.
 
 #### Driver Implementation Pattern
 
@@ -79,6 +82,7 @@ type Driver struct {
 
 The `New(inst ivi.Instrument, reset bool) (*Driver, error)` constructor creates
 channels, populates `InherentBase` metadata, and calls `ivi.NewInherent()`.
+When `reset` is true, the constructor uses `context.Background()` internally.
 
 Channel structs hold an `ivi.Instrument` reference and a channel `name` string,
 implementing per-channel capability interfaces.
@@ -94,6 +98,13 @@ implementing per-channel capability interfaces.
 - **Interface-based**: Drivers implement capability interfaces, enabling
   instrument interchangeability
 - **Capability groups**: Code organized by IVI specification capability groups
+
+### Transport Layer
+
+The `Instrument` interface is satisfied by external transport packages:
+`visa`, `lxi`, `usbtmc`, `prologix`, `asrl` (all under `github.com/gotmc/`).
+Drivers are transport-agnostic — they only depend on the `ivi.Instrument`
+interface.
 
 ### Dependencies
 

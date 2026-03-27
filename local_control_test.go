@@ -139,13 +139,13 @@ func TestInherent_ReturnToLocal_Control(t *testing.T) {
 	inherent := NewInherent(mock, InherentBase{})
 
 	// Should default to true
-	if !inherent.GetReturnToLocal() {
+	if !inherent.IsReturnToLocal() {
 		t.Error("Expected ReturnToLocal to default to true")
 	}
 
 	// Test disabling return to local
 	inherent.SetReturnToLocal(false)
-	if inherent.GetReturnToLocal() {
+	if inherent.IsReturnToLocal() {
 		t.Error("Expected ReturnToLocal to be false after setting")
 	}
 

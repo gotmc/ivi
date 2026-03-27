@@ -138,7 +138,7 @@ func (ch *Channel) StandardWaveform(ctx context.Context) (fgen.StandardWaveform,
 		symm, err := query.Float64(ctx, ch.inst, "FUNC:RAMP:SYMM?")
 		if err != nil {
 			return wave, fmt.Errorf(
-				"unable to get symmetry to determine standard waveform: %s",
+				"unable to get symmetry to determine standard waveform: %w",
 				err,
 			)
 		}

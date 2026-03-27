@@ -15,14 +15,16 @@ const (
 	AverageAcquisition
 )
 
+var acquisitionTypes = map[AcquisitionType]string{
+	NormalAcquisition:         "normal",
+	PeakDetectAcquisition:     "peak detect",
+	HighResolutionAcquisition: "high resolution",
+	EnvelopeAcquisition:       "envelope",
+	AverageAcquisition:        "average",
+}
+
 func (at AcquisitionType) String() string {
-	return map[AcquisitionType]string{
-		NormalAcquisition:         "normal",
-		PeakDetectAcquisition:     "peak detect",
-		HighResolutionAcquisition: "high resolution",
-		EnvelopeAcquisition:       "evnvelope",
-		AverageAcquisition:        "average",
-	}[at]
+	return acquisitionTypes[at]
 }
 
 type VerticalCoupling int
@@ -79,29 +81,29 @@ const (
 	TriggerSourceRTSI6
 )
 
+var triggerSources = map[TriggerSource]string{
+	TriggerSourceExternal: "external",
+	TriggerSourceTTL0:     "ttl0",
+	TriggerSourceTTL1:     "ttl1",
+	TriggerSourceTTL2:     "ttl2",
+	TriggerSourceTTL3:     "ttl3",
+	TriggerSourceTTL4:     "ttl4",
+	TriggerSourceTTL5:     "ttl5",
+	TriggerSourceTTL6:     "ttl6",
+	TriggerSourceTTL7:     "ttl7",
+	TriggerSourceECL0:     "ecl0",
+	TriggerSourceECL1:     "ecl1",
+	TriggerSourceRTSI0:    "rtsi0",
+	TriggerSourceRTSI1:    "rtsi1",
+	TriggerSourceRTSI2:    "rtsi2",
+	TriggerSourceRTSI3:    "rtsi3",
+	TriggerSourceRTSI4:    "rtsi4",
+	TriggerSourceRTSI5:    "rtsi5",
+	TriggerSourceRTSI6:    "rtsi6",
+}
+
 // String implements the Stringer interface for TriggerSource.
 func (ts TriggerSource) String() string {
-	triggerSources := map[TriggerSource]string{
-		TriggerSourceExternal: "external",
-		TriggerSourceTTL0:     "ttl0",
-		TriggerSourceTTL1:     "ttl1",
-		TriggerSourceTTL2:     "ttl2",
-		TriggerSourceTTL3:     "ttl3",
-		TriggerSourceTTL4:     "ttl4",
-		TriggerSourceTTL5:     "ttl5",
-		TriggerSourceTTL6:     "ttl6",
-		TriggerSourceTTL7:     "ttl7",
-		TriggerSourceECL0:     "ecl0",
-		TriggerSourceECL1:     "ecl1",
-		TriggerSourceRTSI0:    "rtsi0",
-		TriggerSourceRTSI1:    "rtsi1",
-		TriggerSourceRTSI2:    "rtsi2",
-		TriggerSourceRTSI3:    "rtsi3",
-		TriggerSourceRTSI4:    "rtsi4",
-		TriggerSourceRTSI5:    "rtsi5",
-		TriggerSourceRTSI6:    "rtsi6",
-	}
-
 	return triggerSources[ts]
 }
 
@@ -117,17 +119,19 @@ const (
 	ACLineTrigger
 )
 
+var triggerTypes = map[TriggerType]string{
+	EdgeTrigger:      "Edge trigger",
+	WidthTrigger:     "Width trigger",
+	RuntTrigger:      "Runt trigger",
+	GlitchTrigger:    "Glitch trigger",
+	TVTrigger:        "TV trigger",
+	ImmediateTrigger: "Immediate trigger",
+	ACLineTrigger:    "A/C line trigger",
+}
+
 // String implements the Stringer interface for TriggerType.
 func (tt TriggerType) String() string {
-	return map[TriggerType]string{
-		EdgeTrigger:      "Edge trigger",
-		WidthTrigger:     "Width trigger",
-		RuntTrigger:      "Runt trigger",
-		GlitchTrigger:    "Glitch trigger",
-		TVTrigger:        "TV trigger",
-		ImmediateTrigger: "Immediate trigger",
-		ACLineTrigger:    "A/C line trigger",
-	}[tt]
+	return triggerTypes[tt]
 }
 
 // InterpolationType models the defined values for the available interpolation

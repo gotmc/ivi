@@ -7,11 +7,11 @@ package ds345
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"strconv"
 	"strings"
 
+	"github.com/gotmc/ivi"
 	"github.com/gotmc/ivi/fgen"
 	"github.com/gotmc/query"
 )
@@ -68,7 +68,7 @@ func (ch *Channel) SetDCOffset(ctx context.Context, amp float64) error {
 // Cycle High described in Section 5.2.3 of IVI-4.3: IviFgen Class
 // Specification.
 func (ch *Channel) DutyCycleHigh(_ context.Context) (float64, error) {
-	return 0.0, errors.New("duty cycle not yet implemented")
+	return 0.0, ivi.ErrNotImplemented
 }
 
 // SetDutyCycleHigh sets the percentage of time, specified as 0-100, during one
@@ -78,7 +78,7 @@ func (ch *Channel) DutyCycleHigh(_ context.Context) (float64, error) {
 // Cycle High described in Section 5.2.3 of IVI-4.3: IviFgen Class
 // Specification.
 func (ch *Channel) SetDutyCycleHigh(_ context.Context, duty float64) error {
-	return errors.New("not yet implemented; difficult in ds345")
+	return ivi.ErrNotImplemented
 }
 
 // Frequency reads the number of waveform cycles generated in one second (i.e.,
@@ -147,7 +147,7 @@ func (ch *Channel) StandardWaveform(ctx context.Context) (fgen.StandardWaveform,
 	case "3":
 		invrt, err := query.String(ctx, ch.inst, "INVT?")
 		if err != nil {
-			return wave, fmt.Errorf("unable to determine ramp up vs ramp down: %s", err)
+			return wave, fmt.Errorf("unable to determine ramp up vs ramp down: %w", err)
 		}
 
 		switch invrt {
@@ -171,7 +171,7 @@ func (ch *Channel) SetStandardWaveform(ctx context.Context, wave fgen.StandardWa
 	// FIXME(mdr): May need to change the phase offset in order to match the
 	// waveforms shown in Figure 5-1 of IVI-4.3: IviFgen Class Specification.
 	if wave == fgen.DC {
-		return errors.New("dc standard waveform not implemented")
+		return ivi.ErrNotImplemented
 	}
 
 	return ch.inst.Command(ctx, waveformCommand[wave])
@@ -200,7 +200,7 @@ func (ch *Channel) ConfigureStandardWaveform(
 	phase float64,
 ) error {
 	if wave == fgen.DC {
-		return errors.New("dc standard waveform not implemented")
+		return ivi.ErrNotImplemented
 	}
 
 	return ch.inst.Command(

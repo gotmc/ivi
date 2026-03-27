@@ -48,7 +48,7 @@ type InherentBase struct {
 // interface and the InherentBase struct.
 func NewInherent(inst Instrument, base InherentBase) Inherent {
 	// Default to returning to local control.
-	if !base.ReturnToLocal && base.ClassSpecMajorVersion == 0 {
+	if !base.ReturnToLocal {
 		base.ReturnToLocal = true // Default to true if not explicitly set
 	}
 	return Inherent{
@@ -162,9 +162,9 @@ func (inherent *Inherent) SetReturnToLocal(enabled bool) {
 	inherent.ReturnToLocal = enabled
 }
 
-// GetReturnToLocal returns whether the instrument will return to local control
+// IsReturnToLocal returns whether the instrument will return to local control
 // when Disable() or Close() is called.
-func (inherent *Inherent) GetReturnToLocal() bool {
+func (inherent *Inherent) IsReturnToLocal() bool {
 	return inherent.ReturnToLocal
 }
 

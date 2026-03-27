@@ -8,7 +8,6 @@ package infiniivision
 import (
 	"context"
 	"fmt"
-	"log"
 	"strconv"
 	"strings"
 	"time"
@@ -41,8 +40,6 @@ func (d *Driver) AcquisitionStartTime(ctx context.Context) (time.Duration, error
 	if err != nil {
 		return 0, err
 	}
-
-	log.Printf("timebase = %s", timebaseInfo)
 
 	timebase, err := decodeTimebase(timebaseInfo)
 	if err != nil {
@@ -678,22 +675,22 @@ type timebase struct {
 }
 
 func decodeTimebase(s string) (timebase, error) {
-	foo := strings.Split(s, ";")
-	if len(foo) != 4 {
-		return timebase{}, fmt.Errorf("should have received four responses but got %d", len(foo))
+	parts := strings.Split(s, ";")
+	if len(parts) != 4 {
+		return timebase{}, fmt.Errorf("should have received four responses but got %d", len(parts))
 	}
 
-	mode := strings.TrimPrefix(foo[0], ":TIM:MODE ")
+	mode := strings.TrimPrefix(parts[0], ":TIM:MODE ")
 
-	ref := strings.TrimPrefix(foo[1], "REF ")
+	ref := strings.TrimPrefix(parts[1], "REF ")
 
-	rngString := strings.TrimPrefix(foo[2], "MAIN:RANG ")
+	rngString := strings.TrimPrefix(parts[2], "MAIN:RANG ")
 	rng, err := strconv.ParseFloat(strings.TrimSpace(rngString), 64)
 	if err != nil {
 		return timebase{}, err
 	}
 
-	posString := strings.TrimPrefix(foo[3], "POS ")
+	posString := strings.TrimPrefix(parts[3], "POS ")
 	pos, err := strconv.ParseFloat(strings.TrimSpace(posString), 64)
 	if err != nil {
 		return timebase{}, err

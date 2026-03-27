@@ -10,7 +10,7 @@ type Waveform struct {
 	items []float64
 }
 
-// GetAllElements returns all waveform elements.
-func (w *Waveform) GetAllElements() ([]float64, error) {
+// AllElements returns all waveform elements.
+func (w *Waveform) AllElements() ([]float64, error) {
 	return w.items, nil
 }

@@ -23,13 +23,15 @@ const (
 	AutoOnce
 )
 
+var autoRanges = map[AutoRange]string{
+	AutoOff:  "Auto Range Off",
+	AutoOn:   "Auto Range On",
+	AutoOnce: "Auto Range Once",
+}
+
 // String implements the Stringer interface for AutoRange.
 func (ar AutoRange) String() string {
-	return map[AutoRange]string{
-		AutoOff:  "Auto Range Off",
-		AutoOn:   "Auto Range On",
-		AutoOnce: "Auto Range Once",
-	}[ar]
+	return autoRanges[ar]
 }
 
 type AutoZero int
@@ -60,21 +62,23 @@ const (
 	Temperature
 )
 
+var measurementFunctions = map[MeasurementFunction]string{
+	DCVolts:            "DC Volts",
+	ACVolts:            "AC Volts",
+	DCCurrent:          "DC Current",
+	ACCurrent:          "AC Current",
+	TwoWireResistance:  "2-wire Resistance",
+	FourWireResistance: "4-wire Resistance",
+	ACPlusDCVolts:      "AC Plus DC Volts",
+	ACPlusDCCurrent:    "AC Plus DC Current",
+	Frequency:          "Frequency",
+	Period:             "Period",
+	Temperature:        "Temperature",
+}
+
 // String implements the Stringer interface for MeasurementFunction.
 func (fcn MeasurementFunction) String() string {
-	return map[MeasurementFunction]string{
-		DCVolts:            "DC Volts",
-		ACVolts:            "AC Volts",
-		DCCurrent:          "DC Current",
-		ACCurrent:          "AC Current",
-		TwoWireResistance:  "2-wire Resistance",
-		FourWireResistance: "4-wire Resistance",
-		ACPlusDCVolts:      "AC Plus DC Volts",
-		ACPlusDCCurrent:    "AC Plus DC Current",
-		Frequency:          "Frequency",
-		Period:             "Period",
-		Temperature:        "Temperature",
-	}[fcn]
+	return measurementFunctions[fcn]
 }
 
 // TriggerSource provides the defined values for the Trigger Source Attribute

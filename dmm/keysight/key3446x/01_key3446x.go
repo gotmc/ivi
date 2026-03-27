@@ -47,7 +47,6 @@ func New(inst ivi.Instrument, reset bool) (*Driver, error) {
 		ClassSpecRevision:     specRevision,
 		ResetDelay:            500 * time.Millisecond,
 		ClearDelay:            500 * time.Millisecond,
-		ReturnToLocal:         true, // Default to returning to local control
 		GroupCapabilities: []string{
 			"IviDmmBase",
 			"IviDmmACMeasurement",

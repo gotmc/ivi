@@ -84,7 +84,7 @@ func (ch *Channel) OperationMode(ctx context.Context) (fgen.OperationMode, error
 
 	isModulationEnabled, err := query.Bool(ctx, ch.inst, "MENA?")
 	if err != nil {
-		return mode, fmt.Errorf("error determining if modulation is enabled: %s", err)
+		return mode, fmt.Errorf("error determining if modulation is enabled: %w", err)
 	}
 
 	if !isModulationEnabled {
@@ -93,7 +93,7 @@ func (ch *Channel) OperationMode(ctx context.Context) (fgen.OperationMode, error
 
 	modType, err := query.Int(ctx, ch.inst, "MTYP?")
 	if err != nil {
-		return mode, fmt.Errorf("error determining modulation type: %s", err)
+		return mode, fmt.Errorf("error determining modulation type: %w", err)
 	}
 
 	switch modType {

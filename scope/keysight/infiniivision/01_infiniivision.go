@@ -76,26 +76,20 @@ func New(inst ivi.Instrument, reset bool) (*Driver, error) {
 		ClassSpecRevision:     specRevision,
 		ResetDelay:            defaultResetDelay,
 		ClearDelay:            defaultClearDelay,
-		// Commented out GroupCapabilities still need to be added.
 		GroupCapabilities: []string{
-			// "IviFgenArbFrequency",
-			// "IviFgenArbSeq",
-			// "IviFgenArbWaveform",
-			"IviFgenBase",
-			"IviFgenBurst",
-			// "IviFgenInternalTrigger",
-			// "IviFgenModulateFM",
-			// "IviFgenModulateAM",
-			// "IviFgenSoftwareTrigger",
-			"IviFgenStdfunc",
-			"IviFgenTrigger",
+			"IviScopeBase",
+			"IviScopeWaveformMeasurement",
 		},
 		SupportedInstrumentModels: []string{
-			"DS345",
+			"DSOX3024A",
+			"DSOX3034A",
+			"MSOX3024A",
+			"MSOX3034A",
 		},
 		SupportedBusInterfaces: []string{
+			"USB",
 			"GPIB",
-			"RS232",
+			"LAN",
 		},
 	}
 	inherent := ivi.NewInherent(inst, inherentBase)

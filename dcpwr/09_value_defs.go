@@ -51,31 +51,31 @@ const (
 	TriggerSourceRTSI6
 )
 
+var triggerSources = map[TriggerSource]string{
+	TriggerSourceImmediate: "immediate",
+	TriggerSourceExternal:  "external",
+	TriggerSourceSoftware:  "software",
+	TriggerSourceTTL0:      "ttl0",
+	TriggerSourceTTL1:      "ttl1",
+	TriggerSourceTTL2:      "ttl2",
+	TriggerSourceTTL3:      "ttl3",
+	TriggerSourceTTL4:      "ttl4",
+	TriggerSourceTTL5:      "ttl5",
+	TriggerSourceTTL6:      "ttl6",
+	TriggerSourceTTL7:      "ttl7",
+	TriggerSourceECL0:      "ecl0",
+	TriggerSourceECL1:      "ecl1",
+	TriggerSourcePXIStar:   "pxi star",
+	TriggerSourceRTSI0:     "rtsi0",
+	TriggerSourceRTSI1:     "rtsi1",
+	TriggerSourceRTSI2:     "rtsi2",
+	TriggerSourceRTSI3:     "rtsi3",
+	TriggerSourceRTSI4:     "rtsi4",
+	TriggerSourceRTSI5:     "rtsi5",
+	TriggerSourceRTSI6:     "rtsi6",
+}
+
 // String implements the Stringer interface for TriggerSource.
 func (ts TriggerSource) String() string {
-	triggerSources := map[TriggerSource]string{
-		TriggerSourceImmediate: "immediate",
-		TriggerSourceExternal:  "external",
-		TriggerSourceSoftware:  "software",
-		TriggerSourceTTL0:      "ttl0",
-		TriggerSourceTTL1:      "ttl1",
-		TriggerSourceTTL2:      "ttl2",
-		TriggerSourceTTL3:      "ttl3",
-		TriggerSourceTTL4:      "ttl4",
-		TriggerSourceTTL5:      "ttl5",
-		TriggerSourceTTL6:      "ttl6",
-		TriggerSourceTTL7:      "ttl7",
-		TriggerSourceECL0:      "ecl0",
-		TriggerSourceECL1:      "ecl1",
-		TriggerSourcePXIStar:   "pxi star",
-		TriggerSourceRTSI0:     "rtsi0",
-		TriggerSourceRTSI1:     "rtsi1",
-		TriggerSourceRTSI2:     "rtsi2",
-		TriggerSourceRTSI3:     "rtsi3",
-		TriggerSourceRTSI4:     "rtsi4",
-		TriggerSourceRTSI5:     "rtsi5",
-		TriggerSourceRTSI6:     "rtsi6",
-	}
-
 	return triggerSources[ts]
 }
