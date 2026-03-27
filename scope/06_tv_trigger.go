@@ -1,9 +1,11 @@
-// Copyright (c) 2017-2025 The ivi developers. All rights reserved.
+// Copyright (c) 2017-2026 The ivi developers. All rights reserved.
 // Project site: https://github.com/gotmc/ivi
 // Use of this source code is governed by a MIT-style license that
 // can be found in the LICENSE.txt file for the project.
 
 package scope
+
+import "context"
 
 /*
 
@@ -40,15 +42,16 @@ Below are the .NET functions, since they are the basis for the Go interfaces.
 // TVTriggerer provides the interface required for the IviScopeTVTrigger
 // extension group.
 type TVTriggerer interface {
-	TVTriggerEvent() (TVTriggerEvent, error)
-	SetTVTriggerEvent(event TVTriggerEvent) error
-	TVTriggerLineNumber() (int, error)
-	SetTVTriggerLineNumber(line int) error
-	TVTriggerPolarity() (TVTriggerPolarity, error)
-	SetTVTriggerPolarity(polarity TVTriggerPolarity) error
-	TVTriggerSignalFormat() (TVTriggerSignalFormat, error)
-	SetTVTriggerSignalFormat(format TVTriggerSignalFormat) error
+	TVTriggerEvent(ctx context.Context) (TVTriggerEvent, error)
+	SetTVTriggerEvent(ctx context.Context, event TVTriggerEvent) error
+	TVTriggerLineNumber(ctx context.Context) (int, error)
+	SetTVTriggerLineNumber(ctx context.Context, line int) error
+	TVTriggerPolarity(ctx context.Context) (TVTriggerPolarity, error)
+	SetTVTriggerPolarity(ctx context.Context, polarity TVTriggerPolarity) error
+	TVTriggerSignalFormat(ctx context.Context) (TVTriggerSignalFormat, error)
+	SetTVTriggerSignalFormat(ctx context.Context, format TVTriggerSignalFormat) error
 	ConfigureTVTrigger(
+		ctx context.Context,
 		source TriggerSource,
 		format TVTriggerSignalFormat,
 		event TVTriggerEvent,

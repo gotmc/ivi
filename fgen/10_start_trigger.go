@@ -1,11 +1,14 @@
-// Copyright (c) 2017-2025 The ivi developers. All rights reserved.
+// Copyright (c) 2017-2026 The ivi developers. All rights reserved.
 // Project site: https://github.com/gotmc/ivi
 // Use of this source code is governed by a MIT-style license that
 // can be found in the LICENSE.txt file for the project.
 
 package fgen
 
-import "time"
+import (
+	"context"
+	"time"
+)
 
 /*
 
@@ -54,13 +57,13 @@ Below are the .NET functions, since they are the basis for the Go interfaces.
 // StartTriggerChannel provides the interface for the channel repeated
 // capability for the IviFgenStartTrigger extension group.
 type StartTriggerChannel interface {
-	StartTriggerDelay() (time.Duration, error)
-	SetStartTriggerDelay(delay time.Duration) error
-	StartTriggerSlope() (TriggerSlope, error)
-	SetStartTriggerSlope(slope TriggerSlope) error
-	StartTriggerSource() (TriggerSource, error)
-	SetStartTriggerSource(source TriggerSource) error
-	StartTriggerThreshold() (float64, error)
-	SetStartTriggerThreshold(threshold float64) error
-	StartTriggerConfigure(source TriggerSource, slope TriggerSlope) error
+	StartTriggerDelay(ctx context.Context) (time.Duration, error)
+	SetStartTriggerDelay(ctx context.Context, delay time.Duration) error
+	StartTriggerSlope(ctx context.Context) (TriggerSlope, error)
+	SetStartTriggerSlope(ctx context.Context, slope TriggerSlope) error
+	StartTriggerSource(ctx context.Context) (TriggerSource, error)
+	SetStartTriggerSource(ctx context.Context, source TriggerSource) error
+	StartTriggerThreshold(ctx context.Context) (float64, error)
+	SetStartTriggerThreshold(ctx context.Context, threshold float64) error
+	StartTriggerConfigure(ctx context.Context, source TriggerSource, slope TriggerSlope) error
 }

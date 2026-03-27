@@ -1,9 +1,11 @@
-// Copyright (c) 2017-2025 The ivi developers. All rights reserved.
+// Copyright (c) 2017-2026 The ivi developers. All rights reserved.
 // Project site: https://github.com/gotmc/ivi
 // Use of this source code is governed by a MIT-style license that
 // can be found in the LICENSE.txt file for the project.
 
 package fgen
+
+import "context"
 
 /*
 
@@ -41,8 +43,8 @@ None.
 // SampleClock provides the interface required for the IviFgenSampleClock
 // extension group.
 type SampleClock interface {
-	SampleClockSource() (SampleClockSource, error)
-	SetSampleClockSource(SampleClockSource) error
-	SampleClockOutputEnabled() (bool, error)
-	SetSampleClockOutputEnabled(b bool) error
+	SampleClockSource(ctx context.Context) (SampleClockSource, error)
+	SetSampleClockSource(ctx context.Context, src SampleClockSource) error
+	SampleClockOutputEnabled(ctx context.Context) (bool, error)
+	SetSampleClockOutputEnabled(ctx context.Context, b bool) error
 }

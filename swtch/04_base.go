@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2025 The ivi developers. All rights reserved.
+// Copyright (c) 2017-2026 The ivi developers. All rights reserved.
 // Project site: https://github.com/gotmc/ivi
 // Use of this source code is governed by a MIT-style license that
 // can be found in the LICENSE.txt file for the project.
@@ -6,6 +6,7 @@
 package swtch
 
 import (
+	"context"
 	"errors"
 	"time"
 
@@ -14,18 +15,18 @@ import (
 
 // Base provides the interface required for the IviSwtchBase capability group.
 type Base interface {
-	CanConnect(ch1, ch2 string) error
-	Channel(name string) (BaseChannel, error)
-	ChannelByID(id int) (BaseChannel, error)
+	CanConnect(ctx context.Context, ch1, ch2 string) error
+	Channel(ctx context.Context, name string) (BaseChannel, error)
+	ChannelByID(ctx context.Context, id int) (BaseChannel, error)
 	ChannelCount() int
-	Channels() ([]BaseChannel, error)
-	Connect(ch1, ch2 string) error
-	Disconnect(ch1, ch2 string) error
-	DisconnectAll() error
-	GetPath(ch1, ch2 string) ([]string, error)
-	SetPath(chs []string) error
-	WaitForDebounce(maxTime time.Duration) error
-	SetVirtualNames(names []string) error
+	Channels(ctx context.Context) ([]BaseChannel, error)
+	Connect(ctx context.Context, ch1, ch2 string) error
+	Disconnect(ctx context.Context, ch1, ch2 string) error
+	DisconnectAll(ctx context.Context) error
+	GetPath(ctx context.Context, ch1, ch2 string) ([]string, error)
+	SetPath(ctx context.Context, chs []string) error
+	WaitForDebounce(ctx context.Context, maxTime time.Duration) error
+	SetVirtualNames(ctx context.Context, names []string) error
 }
 
 // BaseChannel provides the interface for the channel repeated capability for
@@ -42,17 +43,17 @@ type BaseChannel interface {
 	DCPowerCarryMax() float64
 	DCPowerSwitchingMax() float64
 	DCVoltageMax() float64
-	DisableConfigChannel() error
-	DisableSourceChannel() error
-	EnableConfigChannel() error
-	EnableSourceChannel() error
+	DisableConfigChannel(ctx context.Context) error
+	DisableSourceChannel(ctx context.Context) error
+	EnableConfigChannel(ctx context.Context) error
+	EnableSourceChannel(ctx context.Context) error
 	Impedance() float64
 	IsConfigChannel() bool
 	IsDebounced() bool
 	IsSourceChannel() bool
 	Name() string
-	SetConfigChannel(b bool) error
-	SetSourceChannel(b bool) error
+	SetConfigChannel(ctx context.Context, b bool) error
+	SetSourceChannel(ctx context.Context, b bool) error
 	SettlingTime() time.Duration
 	VirtualName() string
 	WireMode() int

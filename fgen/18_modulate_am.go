@@ -1,9 +1,11 @@
-// Copyright (c) 2017-2025 The ivi developers. All rights reserved.
+// Copyright (c) 2017-2026 The ivi developers. All rights reserved.
 // Project site: https://github.com/gotmc/ivi
 // Use of this source code is governed by a MIT-style license that
 // can be found in the LICENSE.txt file for the project.
 
 package fgen
+
+import "context"
 
 /*
 
@@ -47,20 +49,25 @@ Below are the .NET functions, since they are the basis for the Go interfaces.
 // ModulateAM provides the interface required for the IviFgenModulateAM
 // extension group.
 type ModulateAM interface {
-	AMModulationInternalDepth() (float64, error)
-	SetAMModulationInternalDepth(depth float64) error
-	AMModulationInternalFrequency() (float64, error)
-	SetAMModulationInternalFrequency(freq float64) error
-	AMModulationInternalWaveform() (StandardWaveform, error)
-	SetAMModulationInternalWaveform(StandardWaveform) error
-	ConfigureInternalAM(depth float64, wave StandardWaveform, freq float64) error
+	AMModulationInternalDepth(ctx context.Context) (float64, error)
+	SetAMModulationInternalDepth(ctx context.Context, depth float64) error
+	AMModulationInternalFrequency(ctx context.Context) (float64, error)
+	SetAMModulationInternalFrequency(ctx context.Context, freq float64) error
+	AMModulationInternalWaveform(ctx context.Context) (StandardWaveform, error)
+	SetAMModulationInternalWaveform(ctx context.Context, wave StandardWaveform) error
+	ConfigureInternalAM(
+		ctx context.Context,
+		depth float64,
+		wave StandardWaveform,
+		freq float64,
+	) error
 }
 
 // ModulateAMChannel provides the interface for the channel repeated
 // capability for the IviFgenModulateAM extension group.
 type ModulateAMChannel interface {
-	AMModulationEnabled() (bool, error)
-	SetAMModulationEnabled(b bool) error
-	AMModulationSource() (AMSource, error)
-	SetAMModulationSource(AMSource) error
+	AMModulationEnabled(ctx context.Context) (bool, error)
+	SetAMModulationEnabled(ctx context.Context, b bool) error
+	AMModulationSource(ctx context.Context) (AMSource, error)
+	SetAMModulationSource(ctx context.Context, src AMSource) error
 }

@@ -1,11 +1,14 @@
-// Copyright (c) 2017-2025 The ivi developers. All rights reserved.
+// Copyright (c) 2017-2026 The ivi developers. All rights reserved.
 // Project site: https://github.com/gotmc/ivi
 // Use of this source code is governed by a MIT-style license that
 // can be found in the LICENSE.txt file for the project.
 
 package fgen
 
-import "time"
+import (
+	"context"
+	"time"
+)
 
 /*
 
@@ -51,19 +54,19 @@ Below are the .NET functions, since they are the basis for the Go interfaces.
 // ResumeTrigger provides the interface required for the IviFgenHoldTrigger
 // extension group.
 type ResumeTrigger interface {
-	SendSoftwareResumeTrigger() error
+	SendSoftwareResumeTrigger(ctx context.Context) error
 }
 
 // ResumeTriggerChannel provides the interface for the channel repeated
 // capability for the IviFgenResumeTrigger extension group.
 type ResumeTriggerChannel interface {
-	ResumeTriggerDelay() (time.Duration, error)
-	SetResumeTriggerDelay(delay time.Duration) error
-	ResumeTriggerSlope() (TriggerSlope, error)
-	SetResumeTriggerSlope(slope TriggerSlope) error
-	ResumeTriggerSource() (TriggerSource, error)
-	SetResumeTriggerSource(source TriggerSource) error
-	ResumeTriggerThreshold() (float64, error)
-	SetResumeTriggerThreshold(threshold float64) error
-	ResumeTriggerConfigure(source TriggerSource, slope TriggerSlope) error
+	ResumeTriggerDelay(ctx context.Context) (time.Duration, error)
+	SetResumeTriggerDelay(ctx context.Context, delay time.Duration) error
+	ResumeTriggerSlope(ctx context.Context) (TriggerSlope, error)
+	SetResumeTriggerSlope(ctx context.Context, slope TriggerSlope) error
+	ResumeTriggerSource(ctx context.Context) (TriggerSource, error)
+	SetResumeTriggerSource(ctx context.Context, source TriggerSource) error
+	ResumeTriggerThreshold(ctx context.Context) (float64, error)
+	SetResumeTriggerThreshold(ctx context.Context, threshold float64) error
+	ResumeTriggerConfigure(ctx context.Context, source TriggerSource, slope TriggerSlope) error
 }

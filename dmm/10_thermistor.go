@@ -1,9 +1,11 @@
-// Copyright (c) 2017-2025 The ivi developers. All rights reserved.
+// Copyright (c) 2017-2026 The ivi developers. All rights reserved.
 // Project site: https://github.com/gotmc/ivi
 // Use of this source code is governed by a MIT-style license that
 // can be found in the LICENSE.txt file for the project.
 
 package dmm
+
+import "context"
 
 /*
 
@@ -38,6 +40,6 @@ None.
 // extension group described in Section 10 of IVI-4.2 IviDmm Class
 // Specification.
 type ThermistorExtension interface {
-	ThermistorResistance() (float64, error)
-	SetThermistorResistance(resistance float64) error
+	ThermistorResistance(ctx context.Context) (float64, error)
+	SetThermistorResistance(ctx context.Context, resistance float64) error
 }

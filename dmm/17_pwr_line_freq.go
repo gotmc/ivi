@@ -1,9 +1,11 @@
-// Copyright (c) 2017-2025 The ivi developers. All rights reserved.
+// Copyright (c) 2017-2026 The ivi developers. All rights reserved.
 // Project site: https://github.com/gotmc/ivi
 // Use of this source code is governed by a MIT-style license that
 // can be found in the LICENSE.txt file for the project.
 
 package dmm
+
+import "context"
 
 /*
 
@@ -56,6 +58,6 @@ None.
 // IviDmmowerLineFrequencyAutoZero extension group described in Section 17 of
 // IVI-4.2 IviDmm Class Specification.
 type PowerLineFrequencyExtension interface {
-	PowerLineFrequency() (float64, error)
-	SetPowerLineFrequency(freq float64) error
+	PowerLineFrequency(ctx context.Context) (float64, error)
+	SetPowerLineFrequency(ctx context.Context, freq float64) error
 }

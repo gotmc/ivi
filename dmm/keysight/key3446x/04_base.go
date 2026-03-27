@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2025 The ivi developers. All rights reserved.
+// Copyright (c) 2017-2026 The ivi developers. All rights reserved.
 // Project site: https://github.com/gotmc/ivi
 // Use of this source code is governed by a MIT-style license that
 // can be found in the LICENSE.txt file for the project.
@@ -6,6 +6,7 @@
 package key3446x
 
 import (
+	"context"
 	"fmt"
 	"time"
 
@@ -19,8 +20,8 @@ import (
 //
 // MeasurementFunction is the getter for the read-write IviDmmBase Attribute
 // Function described in Section 4.2.1 of IVI-4.2: IviDmm Class Specification.
-func (d *Driver) MeasurementFunction() (dmm.MeasurementFunction, error) {
-	response, err := query.String(d.inst, "FUNC?")
+func (d *Driver) MeasurementFunction(ctx context.Context) (dmm.MeasurementFunction, error) {
+	response, err := query.String(ctx, d.inst, "FUNC?")
 	if err != nil {
 		return 0, err
 	}
@@ -39,10 +40,13 @@ func (d *Driver) MeasurementFunction() (dmm.MeasurementFunction, error) {
 //
 // SetMeasurementFunction is the setter for the read-write IviDmmBase Attribute
 // Function described in Section 4.2.1 of IVI-4.2: IviDmm Class Specification.
-func (d *Driver) SetMeasurementFunction(msrFunc dmm.MeasurementFunction) error {
+func (d *Driver) SetMeasurementFunction(
+	ctx context.Context,
+	msrFunc dmm.MeasurementFunction,
+) error {
 	// Need to return a quoted string, so use %q in the fmt.Sprintf
 	cmd := fmt.Sprintf("FUNC %q", msrFuncToCmd[msrFunc])
-	return d.inst.Command(cmd)
+	return d.inst.Command(ctx, cmd)
 }
 
 // Range returns the measurement range and whether auto range is enabled,
@@ -78,13 +82,15 @@ func (d *Driver) SetMeasurementFunction(msrFunc dmm.MeasurementFunction) error {
 //
 // Range is the getter for the read-write IviDmmBase Attribute Range described
 // in Section 4.2.2 of IVI-4.2: IviDmm Class Specification.
-func (d *Driver) Range() (dmm.AutoRange, float64, error) {
-	fcn, err := d.MeasurementFunction()
+func (d *Driver) Range(ctx context.Context) (dmm.AutoRange, float64, error) {
+	fcn, err := d.MeasurementFunction(ctx)
 	if err != nil {
 		return 0, 0.0, err
 	}
 
-	isAutoRange, err := query.Boolf(d.inst, "%s:rang:auto?", msrFuncToCmd[fcn])
+	isAutoRange, err := query.Boolf(
+		ctx, d.inst, "%s:rang:auto?", msrFuncToCmd[fcn],
+	)
 	if err != nil {
 		return 0, 0.0, err
 	}
@@ -94,7 +100,7 @@ func (d *Driver) Range() (dmm.AutoRange, float64, error) {
 		autoRange = dmm.AutoOff
 	}
 
-	rng, err := query.Float64f(d.inst, "%s:rang?", msrFuncToCmd[fcn])
+	rng, err := query.Float64f(ctx, d.inst, "%s:rang?", msrFuncToCmd[fcn])
 	if err != nil {
 		return 0, 0.0, err
 	}
@@ -110,15 +116,15 @@ func (d *Driver) Range() (dmm.AutoRange, float64, error) {
 //
 // SetRange is the setter for the read-write IviDmmBase Attribute
 // Range described in Section 4.2.2 of IVI-4.2: IviDmm Class Specification.
-func (d *Driver) SetRange(autoRange dmm.AutoRange, rangeValue float64) error {
-	fcn, err := d.MeasurementFunction()
+func (d *Driver) SetRange(ctx context.Context, autoRange dmm.AutoRange, rangeValue float64) error {
+	fcn, err := d.MeasurementFunction(ctx)
 	if err != nil {
 		return err
 	}
 
 	// Set the range to auto if appropriate.
 	if autoRange == dmm.AutoOn {
-		return d.inst.Command("%s:rang:auto on", msrFuncToCmd[fcn])
+		return d.inst.Command(ctx, "%s:rang:auto on", msrFuncToCmd[fcn])
 	}
 
 	// Not auto ranging, so  we need to determine the appropriate SCPI range
@@ -147,35 +153,36 @@ func (d *Driver) SetRange(autoRange dmm.AutoRange, rangeValue float64) error {
 	case dmm.Temperature:
 	}
 
-	return d.inst.Command("%s:rang %s", msrFuncToCmd[fcn], rng)
+	return d.inst.Command(ctx, "%s:rang %s", msrFuncToCmd[fcn], rng)
 }
 
-func (d *Driver) ResolutionAbsolute() (float64, error) {
+func (d *Driver) ResolutionAbsolute(_ context.Context) (float64, error) {
 	return 0.0, ivi.ErrNotImplemented
 }
-func (d *Driver) SetResolutionAbsolute(resolution float64) error {
+func (d *Driver) SetResolutionAbsolute(_ context.Context, resolution float64) error {
 	return ivi.ErrNotImplemented
 }
-func (d *Driver) TriggerDelay() (bool, float64, error) {
+func (d *Driver) TriggerDelay(_ context.Context) (bool, float64, error) {
 	return false, 0.0, ivi.ErrNotImplemented
 }
-func (d *Driver) SetTriggerDelay(autoDelay bool, delay float64) error {
+func (d *Driver) SetTriggerDelay(_ context.Context, autoDelay bool, delay float64) error {
 	return ivi.ErrNotImplemented
 }
 
-func (d *Driver) TriggerSource() (dmm.TriggerSource, error) {
+func (d *Driver) TriggerSource(_ context.Context) (dmm.TriggerSource, error) {
 	return 0, ivi.ErrNotImplemented
 }
 
-func (d *Driver) SetTriggerSource(src dmm.TriggerSource) error {
+func (d *Driver) SetTriggerSource(_ context.Context, src dmm.TriggerSource) error {
 	return ivi.ErrNotImplemented
 }
 
-func (d *Driver) Abort() error {
+func (d *Driver) Abort(_ context.Context) error {
 	return ivi.ErrNotImplemented
 }
 
 func (d *Driver) ConfigureMeasurement(
+	ctx context.Context,
 	msrFunc dmm.MeasurementFunction,
 	autoRange dmm.AutoRange,
 	rangeValue float64,
@@ -186,10 +193,14 @@ func (d *Driver) ConfigureMeasurement(
 		return err
 	}
 
-	return d.inst.Command(cmd)
+	return d.inst.Command(ctx, cmd)
 }
 
-func (d *Driver) ConfigureTrigger(src dmm.TriggerSource, delay time.Duration) error {
+func (d *Driver) ConfigureTrigger(
+	_ context.Context,
+	src dmm.TriggerSource,
+	delay time.Duration,
+) error {
 	return ivi.ErrNotImplemented
 }
 
@@ -202,8 +213,8 @@ func (d *Driver) ConfigureTrigger(src dmm.TriggerSource, delay time.Duration) er
 //
 // FetchMeasurement implements the IviDmmBase function described in Section
 // 4.3.4 of the IVI-4.2 IviDmm Class Specification.
-func (d *Driver) FetchMeasurement(_ time.Duration) (float64, error) {
-	return query.Float64(d.inst, "FETC?")
+func (d *Driver) FetchMeasurement(ctx context.Context, _ time.Duration) (float64, error) {
+	return query.Float64(ctx, d.inst, "FETC?")
 }
 
 // InitiateMeasurement initiates a measurement. When this function executes,
@@ -218,24 +229,24 @@ func (d *Driver) FetchMeasurement(_ time.Duration) (float64, error) {
 //
 // InitiateMeasurement implements the IviDmmBase function described in Section
 // 4.3.5 of the IVI-4.2 IviDmm Class Specification.
-func (d *Driver) InitiateMeasurement() error {
-	return d.inst.Command("init")
+func (d *Driver) InitiateMeasurement(ctx context.Context) error {
+	return d.inst.Command(ctx, "init")
 }
 
-func (d *Driver) IsOutOfRange(_ float64) (bool, error) {
+func (d *Driver) IsOutOfRange(_ context.Context, _ float64) (bool, error) {
 	return true, ivi.ErrNotImplemented
 }
 
-func (d *Driver) IsOverRange(_ float64) (bool, error) {
+func (d *Driver) IsOverRange(_ context.Context, _ float64) (bool, error) {
 	return true, ivi.ErrNotImplemented
 }
 
-func (d *Driver) IsUnderRange(_ float64) (bool, error) {
+func (d *Driver) IsUnderRange(_ context.Context, _ float64) (bool, error) {
 	return true, ivi.ErrNotImplemented
 }
 
-func (d *Driver) ReadMeasurement(_ time.Duration) (float64, error) {
-	return query.Float64(d.inst, "read?")
+func (d *Driver) ReadMeasurement(ctx context.Context, _ time.Duration) (float64, error) {
+	return query.Float64(ctx, d.inst, "read?")
 }
 
 // cmdToMsrFunc maps the SCPI command string name of a measurement function to

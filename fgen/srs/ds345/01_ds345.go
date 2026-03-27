@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2025 The ivi developers. All rights reserved.
+// Copyright (c) 2017-2026 The ivi developers. All rights reserved.
 // Project site: https://github.com/gotmc/ivi
 // Use of this source code is governed by a MIT-style license that
 // can be found in the LICENSE.txt file for the project.
@@ -15,6 +15,7 @@ cable](https://www.amazon.com/dp/B08J2VMNFY) does work.
 package ds345
 
 import (
+	"context"
 	"time"
 
 	"github.com/gotmc/ivi"
@@ -105,11 +106,11 @@ func New(inst ivi.Instrument, reset bool) (*Driver, error) {
 	}
 
 	if reset {
-		if err := driver.Reset(); err != nil {
+		if err := driver.Reset(context.Background()); err != nil {
 			return &driver, err
 		}
 		// Default to internal trigger instead of single trigger when reset.
-		if err := driver.inst.Command("TSRC1"); err != nil {
+		if err := driver.inst.Command(context.Background(), "TSRC1"); err != nil {
 			return &driver, err
 		}
 	}

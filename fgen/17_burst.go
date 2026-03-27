@@ -1,9 +1,11 @@
-// Copyright (c) 2017-2025 The ivi developers. All rights reserved.
+// Copyright (c) 2017-2026 The ivi developers. All rights reserved.
 // Project site: https://github.com/gotmc/ivi
 // Use of this source code is governed by a MIT-style license that
 // can be found in the LICENSE.txt file for the project.
 
 package fgen
+
+import "context"
 
 /*
 
@@ -48,6 +50,6 @@ None.
 // BurstChannel provides the interface for the channel repeated capability for
 // the IviFgenBurst extension group.
 type BurstChannel interface {
-	BurstCount() (int, error)
-	SetBurstCount(count int) error
+	BurstCount(ctx context.Context) (int, error)
+	SetBurstCount(ctx context.Context, count int) error
 }

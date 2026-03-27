@@ -1,9 +1,11 @@
-// Copyright (c) 2017-2025 The ivi developers. All rights reserved.
+// Copyright (c) 2017-2026 The ivi developers. All rights reserved.
 // Project site: https://github.com/gotmc/ivi
 // Use of this source code is governed by a MIT-style license that
 // can be found in the LICENSE.txt file for the project.
 
 package fgen
+
+import "context"
 
 /*
 
@@ -52,17 +54,21 @@ Below are the .NET functions, since they are the basis for the Go interfaces.
 // StdFuncChannel provides the interface for the channel repeated capability
 // for the IviFgenStdFunc extension group.
 type StdFuncChannel interface {
-	Amplitude() (float64, error)
-	SetAmplitude(amp float64) error
-	DCOffset() (float64, error)
-	SetDCOffset(offset float64) error
-	DutyCycleHigh() (float64, error)
-	SetDutyCycleHigh(duty float64) error
-	Frequency() (float64, error)
-	SetFrequency(freq float64) error
-	StartPhase() (float64, error)
-	SetStartPhase(start float64) error
-	StandardWaveform() (StandardWaveform, error)
-	SetStandardWaveform(StandardWaveform) error
-	ConfigureStandardWaveform(wave StandardWaveform, amp, offset, freq, phase float64) error
+	Amplitude(ctx context.Context) (float64, error)
+	SetAmplitude(ctx context.Context, amp float64) error
+	DCOffset(ctx context.Context) (float64, error)
+	SetDCOffset(ctx context.Context, offset float64) error
+	DutyCycleHigh(ctx context.Context) (float64, error)
+	SetDutyCycleHigh(ctx context.Context, duty float64) error
+	Frequency(ctx context.Context) (float64, error)
+	SetFrequency(ctx context.Context, freq float64) error
+	StartPhase(ctx context.Context) (float64, error)
+	SetStartPhase(ctx context.Context, start float64) error
+	StandardWaveform(ctx context.Context) (StandardWaveform, error)
+	SetStandardWaveform(ctx context.Context, wave StandardWaveform) error
+	ConfigureStandardWaveform(
+		ctx context.Context,
+		wave StandardWaveform,
+		amp, offset, freq, phase float64,
+	) error
 }

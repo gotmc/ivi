@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2025 The ivi developers. All rights reserved.
+// Copyright (c) 2017-2026 The ivi developers. All rights reserved.
 // Project site: https://github.com/gotmc/ivi
 // Use of this source code is governed by a MIT-style license that
 // can be found in the LICENSE.txt file for the project.
@@ -6,6 +6,7 @@
 package ds345
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"strconv"
@@ -21,8 +22,8 @@ import (
 // Amplitude is the getter for the read-write IviFgenStdFunc Attribute
 // Amplitude described in Section 5.2.1 of IVI-4.3: IviFgen Class
 // Specification.
-func (ch *Channel) Amplitude() (float64, error) {
-	s, err := query.String(ch.inst, "AMPL? VP")
+func (ch *Channel) Amplitude(ctx context.Context) (float64, error) {
+	s, err := query.String(ctx, ch.inst, "AMPL? VP")
 	if err != nil {
 		return 0.0, err
 	}
@@ -38,8 +39,8 @@ func (ch *Channel) Amplitude() (float64, error) {
 // SetAmplitude is the setter for the read-write IviFgenStdFunc Attribute
 // Amplitude described in Section 5.2.1 of IVI-4.3: IviFgen Class
 // Specification.
-func (ch *Channel) SetAmplitude(amp float64) error {
-	return ch.inst.Command("AMPL %fVP", amp)
+func (ch *Channel) SetAmplitude(ctx context.Context, amp float64) error {
+	return ch.inst.Command(ctx, "AMPL %fVP", amp)
 }
 
 // DCOffset reads the difference between the average of the maximum and minimum
@@ -47,8 +48,8 @@ func (ch *Channel) SetAmplitude(amp float64) error {
 //
 // DCOffset is the getter for the read-write IviFgenStdFunc Attribute DC Offset
 // described in Section 5.2.2 of IVI-4.3: IviFgen Class Specification.
-func (ch *Channel) DCOffset() (float64, error) {
-	return query.Float64(ch.inst, "OFFS?")
+func (ch *Channel) DCOffset(ctx context.Context) (float64, error) {
+	return query.Float64(ctx, ch.inst, "OFFS?")
 }
 
 // SetDCOffset sets the difference between the average of the maximum and
@@ -56,8 +57,8 @@ func (ch *Channel) DCOffset() (float64, error) {
 //
 // SetDCOffset is the setter for the read-write IviFgenStdFunc Attribute DC
 // Offset described in Section 5.2.2 of IVI-4.3: IviFgen Class Specification.
-func (ch *Channel) SetDCOffset(amp float64) error {
-	return ch.inst.Command("OFFS %f", amp)
+func (ch *Channel) SetDCOffset(ctx context.Context, amp float64) error {
+	return ch.inst.Command(ctx, "OFFS %f", amp)
 }
 
 // DutyCycleHigh reads the percentage of time, specified as 0-100, during one
@@ -66,7 +67,7 @@ func (ch *Channel) SetDCOffset(amp float64) error {
 // DutyCycle is the getter for the read-write IviFgenStdFunc Attribute Duty
 // Cycle High described in Section 5.2.3 of IVI-4.3: IviFgen Class
 // Specification.
-func (ch *Channel) DutyCycleHigh() (float64, error) {
+func (ch *Channel) DutyCycleHigh(_ context.Context) (float64, error) {
 	return 0.0, errors.New("duty cycle not yet implemented")
 }
 
@@ -76,7 +77,7 @@ func (ch *Channel) DutyCycleHigh() (float64, error) {
 // SetDutyCycle is the setter for the read-write IviFgenStdFunc Attribute Duty
 // Cycle High described in Section 5.2.3 of IVI-4.3: IviFgen Class
 // Specification.
-func (ch *Channel) SetDutyCycleHigh(duty float64) error {
+func (ch *Channel) SetDutyCycleHigh(_ context.Context, duty float64) error {
 	return errors.New("not yet implemented; difficult in ds345")
 }
 
@@ -86,8 +87,8 @@ func (ch *Channel) SetDutyCycleHigh(duty float64) error {
 // Frequency is the getter for the read-write IviFgenStdFunc Attribute
 // Frequency described in Section 5.2.4 of IVI-4.3: IviFgen Class
 // Specification.
-func (ch *Channel) Frequency() (float64, error) {
-	return query.Float64(ch.inst, "FREQ?")
+func (ch *Channel) Frequency(ctx context.Context) (float64, error) {
+	return query.Float64(ctx, ch.inst, "FREQ?")
 }
 
 // SetFrequency sets the number of waveform cycles generated in one second
@@ -96,8 +97,8 @@ func (ch *Channel) Frequency() (float64, error) {
 // SetFrequency is the setter for the read-write IviFgenStdFunc Attribute
 // Frequency described in Section 5.2.4 of IVI-4.3: IviFgen Class
 // Specification.
-func (ch *Channel) SetFrequency(freq float64) error {
-	return ch.inst.Command("FREQ %f", freq)
+func (ch *Channel) SetFrequency(ctx context.Context, freq float64) error {
+	return ch.inst.Command(ctx, "FREQ %f", freq)
 }
 
 // StartPhase reads the start phase of the standard waveform the function
@@ -106,8 +107,8 @@ func (ch *Channel) SetFrequency(freq float64) error {
 //
 // StartPhase is the getter for the read-write IviFgenStdFunc Attribute Start
 // Phase described in Section 5.2.5 of IVI-4.3: IviFgen Class Specification.
-func (ch *Channel) StartPhase() (float64, error) {
-	return query.Float64(ch.inst, "PHSE?")
+func (ch *Channel) StartPhase(ctx context.Context) (float64, error) {
+	return query.Float64(ctx, ch.inst, "PHSE?")
 }
 
 // SetStartPhase writes the start phase of the standard waveform the function
@@ -117,8 +118,8 @@ func (ch *Channel) StartPhase() (float64, error) {
 // SetStartPhase is the setter for the read-write IviFgenStdFunc Attribute
 // Start Phase described in Section 5.2.5 of IVI-4.3: IviFgen Class
 // Specification.
-func (ch *Channel) SetStartPhase(freq float64) error {
-	return ch.inst.Command("PHSE %f", freq)
+func (ch *Channel) SetStartPhase(ctx context.Context, freq float64) error {
+	return ch.inst.Command(ctx, "PHSE %f", freq)
 }
 
 // StandardWaveform determines if one of the IVI Standard Waveforms is being
@@ -126,10 +127,10 @@ func (ch *Channel) SetStartPhase(freq float64) error {
 //
 // StandardWaveform is the getter for the read-write IviFgenStdFunc Attribute
 // Waveform described in Section 5.2.6 of IVI-4.3: IviFgen Class Specification.
-func (ch *Channel) StandardWaveform() (fgen.StandardWaveform, error) {
+func (ch *Channel) StandardWaveform(ctx context.Context) (fgen.StandardWaveform, error) {
 	var wave fgen.StandardWaveform
 
-	s, err := query.String(ch.inst, "FUNC?")
+	s, err := query.String(ctx, ch.inst, "FUNC?")
 
 	if err != nil {
 		return wave, err
@@ -144,7 +145,7 @@ func (ch *Channel) StandardWaveform() (fgen.StandardWaveform, error) {
 	case "2":
 		return fgen.Triangle, nil
 	case "3":
-		invrt, err := query.String(ch.inst, "INVT?")
+		invrt, err := query.String(ctx, ch.inst, "INVT?")
 		if err != nil {
 			return wave, fmt.Errorf("unable to determine ramp up vs ramp down: %s", err)
 		}
@@ -166,14 +167,14 @@ func (ch *Channel) StandardWaveform() (fgen.StandardWaveform, error) {
 // SetStandardWaveform is the setter for the read-write IviFgenStdFunc
 // Attribute Waveform described in Section 5.2.6 of IVI-4.3: IviFgen Class
 // Specification.
-func (ch *Channel) SetStandardWaveform(wave fgen.StandardWaveform) error {
+func (ch *Channel) SetStandardWaveform(ctx context.Context, wave fgen.StandardWaveform) error {
 	// FIXME(mdr): May need to change the phase offset in order to match the
 	// waveforms shown in Figure 5-1 of IVI-4.3: IviFgen Class Specification.
 	if wave == fgen.DC {
 		return errors.New("dc standard waveform not implemented")
 	}
 
-	return ch.inst.Command(waveformCommand[wave])
+	return ch.inst.Command(ctx, waveformCommand[wave])
 }
 
 var waveformCommand = map[fgen.StandardWaveform]string{
@@ -191,6 +192,7 @@ var waveformCommand = map[fgen.StandardWaveform]string{
 // Standard Waveform function described in Section 5.3.1 of IVI-4.3: IviFgen
 // Class Specification.
 func (ch *Channel) ConfigureStandardWaveform(
+	ctx context.Context,
 	wave fgen.StandardWaveform,
 	amp float64,
 	offset float64,
@@ -201,7 +203,9 @@ func (ch *Channel) ConfigureStandardWaveform(
 		return errors.New("dc standard waveform not implemented")
 	}
 
-	return ch.inst.Command(waveformApplyCommand[wave], freq, amp, offset, phase)
+	return ch.inst.Command(
+		ctx, waveformApplyCommand[wave], freq, amp, offset, phase,
+	)
 }
 
 var waveformApplyCommand = map[fgen.StandardWaveform]string{

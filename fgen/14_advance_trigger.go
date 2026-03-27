@@ -1,11 +1,14 @@
-// Copyright (c) 2017-2025 The ivi developers. All rights reserved.
+// Copyright (c) 2017-2026 The ivi developers. All rights reserved.
 // Project site: https://github.com/gotmc/ivi
 // Use of this source code is governed by a MIT-style license that
 // can be found in the LICENSE.txt file for the project.
 
 package fgen
 
-import "time"
+import (
+	"context"
+	"time"
+)
 
 /*
 
@@ -52,19 +55,19 @@ Below are the .NET functions, since they are the basis for the Go interfaces.
 // AdvanceTrigger provides the interface required for the IviFgenAdvanceTrigger
 // extension group.
 type AdvanceTrigger interface {
-	SendSoftwareAdvanceTrigger() error
+	SendSoftwareAdvanceTrigger(ctx context.Context) error
 }
 
 // AdvanceTriggerChannel provides the interface for the channel repeated
 // capability for the IviFgenAdvanceTrigger extension group.
 type AdvanceTriggerChannel interface {
-	AdvanceTriggerDelay() (time.Duration, error)
-	SetAdvanceTriggerDelay(delay time.Duration) error
-	AdvanceTriggerSlope() (TriggerSlope, error)
-	SetAdvanceTriggerSlope(slope TriggerSlope) error
-	AdvanceTriggerSource() (TriggerSource, error)
-	SetAdvanceTriggerSource(source TriggerSource) error
-	AdvanceTriggerThreshold() (float64, error)
-	SetAdvanceTriggerThreshold(threshold float64) error
-	AdvanceTriggerConfigure(source TriggerSource, slope TriggerSlope) error
+	AdvanceTriggerDelay(ctx context.Context) (time.Duration, error)
+	SetAdvanceTriggerDelay(ctx context.Context, delay time.Duration) error
+	AdvanceTriggerSlope(ctx context.Context) (TriggerSlope, error)
+	SetAdvanceTriggerSlope(ctx context.Context, slope TriggerSlope) error
+	AdvanceTriggerSource(ctx context.Context) (TriggerSource, error)
+	SetAdvanceTriggerSource(ctx context.Context, source TriggerSource) error
+	AdvanceTriggerThreshold(ctx context.Context) (float64, error)
+	SetAdvanceTriggerThreshold(ctx context.Context, threshold float64) error
+	AdvanceTriggerConfigure(ctx context.Context, source TriggerSource, slope TriggerSlope) error
 }

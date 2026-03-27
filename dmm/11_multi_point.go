@@ -1,11 +1,14 @@
-// Copyright (c) 2017-2025 The ivi developers. All rights reserved.
+// Copyright (c) 2017-2026 The ivi developers. All rights reserved.
 // Project site: https://github.com/gotmc/ivi
 // Use of this source code is governed by a MIT-style license that
 // can be found in the LICENSE.txt file for the project.
 
 package dmm
 
-import "time"
+import (
+	"context"
+	"time"
+)
 
 /*
 
@@ -59,17 +62,18 @@ Below are the .NET functions, since they are the basis for the Go interfaces.
 // extension group described in Section 11 of IVI-4.2 IviDmm Class
 // Specification.
 type MultiPointExtension interface {
-	MeasureCompleteDestination() (MeasurementDestination, error)
-	SetMeasureCompleteDestination(dest MeasurementDestination) error
-	SampleCount() (int, error)
-	SetSampleCount(count int) error
-	SampleInterval() (time.Duration, error)
-	SetSampleInterval(interval time.Duration) error
-	SampleTrigger() (TriggerSource, error)
-	SetSampleTrigger(triggerSource TriggerSource) error
-	TriggerCount() (int, error)
-	SetTriggerCount(count int) error
+	MeasureCompleteDestination(ctx context.Context) (MeasurementDestination, error)
+	SetMeasureCompleteDestination(ctx context.Context, dest MeasurementDestination) error
+	SampleCount(ctx context.Context) (int, error)
+	SetSampleCount(ctx context.Context, count int) error
+	SampleInterval(ctx context.Context) (time.Duration, error)
+	SetSampleInterval(ctx context.Context, interval time.Duration) error
+	SampleTrigger(ctx context.Context) (TriggerSource, error)
+	SetSampleTrigger(ctx context.Context, triggerSource TriggerSource) error
+	TriggerCount(ctx context.Context) (int, error)
+	SetTriggerCount(ctx context.Context, count int) error
 	ConfigureMultiPoint(
+		ctx context.Context,
 		triggerCount, sampleCount int,
 		triggerSource TriggerSource,
 		interval time.Duration,

@@ -1,9 +1,11 @@
-// Copyright (c) 2017-2025 The ivi developers. All rights reserved.
+// Copyright (c) 2017-2026 The ivi developers. All rights reserved.
 // Project site: https://github.com/gotmc/ivi
 // Use of this source code is governed by a MIT-style license that
 // can be found in the LICENSE.txt file for the project.
 
 package dmm
+
+import "context"
 
 /*
 
@@ -36,6 +38,6 @@ None.
 // IviDmmFrequencyMeasurement extension group described in Section 6 of IVI-4.2
 // IviDmm Class Specification.
 type FrequencyMeasurementExtension interface {
-	FrequencyVoltageRange() (autoRange bool, rangeValue float64, err error)
-	SetFrequencyVoltageRange(autoRange bool, rangeValue float64) error
+	FrequencyVoltageRange(ctx context.Context) (autoRange bool, rangeValue float64, err error)
+	SetFrequencyVoltageRange(ctx context.Context, autoRange bool, rangeValue float64) error
 }

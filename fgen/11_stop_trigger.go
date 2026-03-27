@@ -1,11 +1,14 @@
-// Copyright (c) 2017-2025 The ivi developers. All rights reserved.
+// Copyright (c) 2017-2026 The ivi developers. All rights reserved.
 // Project site: https://github.com/gotmc/ivi
 // Use of this source code is governed by a MIT-style license that
 // can be found in the LICENSE.txt file for the project.
 
 package fgen
 
-import "time"
+import (
+	"context"
+	"time"
+)
 
 /*
 
@@ -51,19 +54,19 @@ Below are the .NET functions, since they are the basis for the Go interfaces.
 // StopTrigger provides the interface required for the IviFgenStopTrigger
 // extension group.
 type StopTrigger interface {
-	SendSoftwareStopTrigger() error
+	SendSoftwareStopTrigger(ctx context.Context) error
 }
 
 // StopTriggerChannel provides the interface for the channel repeated
 // capability for the IviFgenStopTrigger extension group.
 type StopTriggerChannel interface {
-	StopTriggerDelay() (time.Duration, error)
-	SetStopTriggerDelay(delay time.Duration) error
-	StopTriggerSlope() (TriggerSlope, error)
-	SetStopTriggerSlope(slope TriggerSlope) error
-	StopTriggerSource() (TriggerSource, error)
-	SetStopTriggerSource(source TriggerSource) error
-	StopTriggerThreshold() (float64, error)
-	SetStopTriggerThreshold(threshold float64) error
-	StopTriggerConfigure(source TriggerSource, slope TriggerSlope) error
+	StopTriggerDelay(ctx context.Context) (time.Duration, error)
+	SetStopTriggerDelay(ctx context.Context, delay time.Duration) error
+	StopTriggerSlope(ctx context.Context) (TriggerSlope, error)
+	SetStopTriggerSlope(ctx context.Context, slope TriggerSlope) error
+	StopTriggerSource(ctx context.Context) (TriggerSource, error)
+	SetStopTriggerSource(ctx context.Context, source TriggerSource) error
+	StopTriggerThreshold(ctx context.Context) (float64, error)
+	SetStopTriggerThreshold(ctx context.Context, threshold float64) error
+	StopTriggerConfigure(ctx context.Context, source TriggerSource, slope TriggerSlope) error
 }

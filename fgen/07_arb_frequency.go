@@ -1,9 +1,11 @@
-// Copyright (c) 2017-2025 The ivi developers. All rights reserved.
+// Copyright (c) 2017-2026 The ivi developers. All rights reserved.
 // Project site: https://github.com/gotmc/ivi
 // Use of this source code is governed by a MIT-style license that
 // can be found in the LICENSE.txt file for the project.
 
 package fgen
+
+import "context"
 
 /*
 
@@ -43,6 +45,6 @@ None.
 // ArbFrequencyChannel provides the interface required for the channel repeated
 // capability group for the IviFgenArbFrequency extension group.
 type ArbFrequencyChannel interface {
-	ArbitraryFrequency() (float64, error)
-	SetArbitraryFrequency(freq float64) error
+	ArbitraryFrequency(ctx context.Context) (float64, error)
+	SetArbitraryFrequency(ctx context.Context, freq float64) error
 }

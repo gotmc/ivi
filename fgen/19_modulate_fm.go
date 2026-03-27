@@ -1,9 +1,11 @@
-// Copyright (c) 2017-2025 The ivi developers. All rights reserved.
+// Copyright (c) 2017-2026 The ivi developers. All rights reserved.
 // Project site: https://github.com/gotmc/ivi
 // Use of this source code is governed by a MIT-style license that
 // can be found in the LICENSE.txt file for the project.
 
 package fgen
+
+import "context"
 
 /*
 
@@ -47,20 +49,25 @@ Below are the .NET functions, since they are the basis for the Go interfaces.
 // ModulateFM provides the interface required for the IviFgenModulateFM
 // extension group.
 type ModulateFM interface {
-	FMModulationInternalDeviation() (float64, error)
-	SetFMModulationInternalDeviation(deviation float64) error
-	FMModulationInternalFrequency() (float64, error)
-	SetFMModulationInternalFrequency(freq float64) error
-	FMModulationInternalWaveform() (StandardWaveform, error)
-	SetFMModulationInternalWaveform(StandardWaveform) error
-	ConfigureInternalFM(deviation float64, wave StandardWaveform, freq float64) error
+	FMModulationInternalDeviation(ctx context.Context) (float64, error)
+	SetFMModulationInternalDeviation(ctx context.Context, deviation float64) error
+	FMModulationInternalFrequency(ctx context.Context) (float64, error)
+	SetFMModulationInternalFrequency(ctx context.Context, freq float64) error
+	FMModulationInternalWaveform(ctx context.Context) (StandardWaveform, error)
+	SetFMModulationInternalWaveform(ctx context.Context, wave StandardWaveform) error
+	ConfigureInternalFM(
+		ctx context.Context,
+		deviation float64,
+		wave StandardWaveform,
+		freq float64,
+	) error
 }
 
 // ModulateFMChannel provides the interface for the channel repeated
 // capability for the IviFgenModulateFM extension group.
 type ModulateFMChannel interface {
-	FMModulationEnabled() (bool, error)
-	SetFMModulationEnabled(b bool) error
-	FMModulationSource() (FMSource, error)
-	SetFMModulationSource(FMSource) error
+	FMModulationEnabled(ctx context.Context) (bool, error)
+	SetFMModulationEnabled(ctx context.Context, b bool) error
+	FMModulationSource(ctx context.Context) (FMSource, error)
+	SetFMModulationSource(ctx context.Context, src FMSource) error
 }

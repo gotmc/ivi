@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2025 The ivi developers. All rights reserved.
+// Copyright (c) 2017-2026 The ivi developers. All rights reserved.
 // Project site: https://github.com/gotmc/ivi
 // Use of this source code is governed by a MIT-style license that
 // can be found in the LICENSE.txt file for the project.
@@ -12,6 +12,7 @@ State Caching: Not implemented
 package u2751a
 
 import (
+	"context"
 	"fmt"
 	"time"
 
@@ -101,7 +102,7 @@ func New(inst ivi.Instrument, reset, standalone bool) (U2751A, error) {
 	}
 
 	if reset {
-		err := driver.Reset()
+		err := driver.Reset(context.Background())
 		return driver, err
 	}
 
@@ -137,13 +138,13 @@ type Channel struct {
 }
 
 // Disable causes the switch to disconnect all paths.
-func (d *U2751A) Disable() error {
+func (d *U2751A) Disable(ctx context.Context) error {
 	return ivi.Set(d.inst, "rout:open (@101:408)\n")
 }
 
 // Channel returns the channel based on either the virtual name or the physical
 // name. Virtual names are checked first.
-func (d *U2751A) Channel(name string) (*Channel, error) {
+func (d *U2751A) Channel(ctx context.Context, name string) (*Channel, error) {
 	// See if the given name matches one of the virtual channel names.
 	for _, ch := range d.channels {
 		if name == ch.virtualName {
@@ -160,7 +161,7 @@ func (d *U2751A) Channel(name string) (*Channel, error) {
 }
 
 // ChannelByID returns the channel based on the ID (0-based).
-func (d *U2751A) ChannelByID(id int) (*Channel, error) {
+func (d *U2751A) ChannelByID(ctx context.Context, id int) (*Channel, error) {
 	if id < 0 || id > len(d.channels) {
 		return &Channel{}, fmt.Errorf("channel %d not found", id)
 	}
@@ -169,7 +170,7 @@ func (d *U2751A) ChannelByID(id int) (*Channel, error) {
 }
 
 // Channels returns all channels.
-func (d *U2751A) Channels() ([]Channel, error) {
+func (d *U2751A) Channels(ctx context.Context) ([]Channel, error) {
 	return d.channels, nil
 }
 
@@ -223,7 +224,7 @@ func newChannel(
 // the physical name provided as the key. Each virtual name must be unique and
 // the number of virtual names provided must match the numder of channels
 // otherwise an error is returned.
-func (d *U2751A) SetVirtualNames(names map[string]string) error {
+func (d *U2751A) SetVirtualNames(ctx context.Context, names map[string]string) error {
 	for physicalName, virtualName := range names {
 		for i, ch := range d.channels {
 			if physicalName == ch.name {

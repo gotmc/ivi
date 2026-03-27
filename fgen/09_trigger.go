@@ -1,9 +1,11 @@
-// Copyright (c) 2017-2025 The ivi developers. All rights reserved.
+// Copyright (c) 2017-2026 The ivi developers. All rights reserved.
 // Project site: https://github.com/gotmc/ivi
 // Use of this source code is governed by a MIT-style license that
 // can be found in the LICENSE.txt file for the project.
 
 package fgen
+
+import "context"
 
 /*
 
@@ -44,6 +46,6 @@ There are no .NET functions for Section 9.3.
 // TriggerChannel provides the interface for the channel repeated capability for
 // the IviFgenTrigger extension group.
 type TriggerChannel interface {
-	TriggerSource() (OldTriggerSource, error)
-	SetTriggerSource(OldTriggerSource) error
+	TriggerSource(ctx context.Context) (OldTriggerSource, error)
+	SetTriggerSource(ctx context.Context, src OldTriggerSource) error
 }

@@ -1,11 +1,14 @@
-// Copyright (c) 2017-2025 The ivi developers. All rights reserved.
+// Copyright (c) 2017-2026 The ivi developers. All rights reserved.
 // Project site: https://github.com/gotmc/ivi
 // Use of this source code is governed by a MIT-style license that
 // can be found in the LICENSE.txt file for the project.
 
 package scope
 
-import "time"
+import (
+	"context"
+	"time"
+)
 
 /*
 
@@ -57,16 +60,20 @@ Below are the .NET functions, since they are the basis for the Go interfaces.
 // WaveformMeasurement provides the interface required for the
 // IviScopeWaveformMeasurement extension group.
 type WaveformMeasurer interface {
-	HighReferenceLevel() (float64, error)
-	SetHighReferenceLevel(high float64) error
-	LowReferenceLevel() (float64, error)
-	SetLowReferenceLevel(low float64) error
-	MiddleReferenceLevel() (float64, error)
-	SetMiddleReferenceLevel(mid float64) error
-	ConfigureReferenceLevels(low, mid, high float64) error
+	HighReferenceLevel(ctx context.Context) (float64, error)
+	SetHighReferenceLevel(ctx context.Context, high float64) error
+	LowReferenceLevel(ctx context.Context) (float64, error)
+	SetLowReferenceLevel(ctx context.Context, low float64) error
+	MiddleReferenceLevel(ctx context.Context) (float64, error)
+	SetMiddleReferenceLevel(ctx context.Context, mid float64) error
+	ConfigureReferenceLevels(ctx context.Context, low, mid, high float64) error
 }
 
 type WaveformMeasurerChannel interface {
-	FetchWaveformMeasurement(msrmnt WaveformMeasurement) (float64, error)
-	ReadWaveformMeasurement(msrmnt WaveformMeasurement, maxTime time.Duration) (float64, error)
+	FetchWaveformMeasurement(ctx context.Context, msrmnt WaveformMeasurement) (float64, error)
+	ReadWaveformMeasurement(
+		ctx context.Context,
+		msrmnt WaveformMeasurement,
+		maxTime time.Duration,
+	) (float64, error)
 }

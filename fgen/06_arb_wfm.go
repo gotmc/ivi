@@ -1,9 +1,11 @@
-// Copyright (c) 2017-2025 The ivi developers. All rights reserved.
+// Copyright (c) 2017-2026 The ivi developers. All rights reserved.
 // Project site: https://github.com/gotmc/ivi
 // Use of this source code is governed by a MIT-style license that
 // can be found in the LICENSE.txt file for the project.
 
 package fgen
+
+import "context"
 
 /*
 
@@ -50,8 +52,8 @@ Below are the .NET functions, since they are the basis for the Go interfaces.
 // extension group as described in Section 6 of the IVI-4.3: IviFgen Class
 // Specification.
 type ArbWfm interface {
-	ArbitrarySampleRate() (float64, error)
-	SetArbitrarySampleRate(rate float64) error
+	ArbitrarySampleRate(ctx context.Context) (float64, error)
+	SetArbitrarySampleRate(ctx context.Context, rate float64) error
 	ArbWfmNumberWaveformsMax() int
 	ArbWfmMaxSize() int
 	ArbWfmMinSize() int
@@ -62,10 +64,10 @@ type ArbWfm interface {
 // capability to support the IviFgenArbWfm extension group as
 // described in Section 6 of the IVI-4.3: IviFgen Class Specification.
 type ArbWfmChannel interface {
-	ArbitraryGain() (float64, error)
-	SetArbitraryGain(gain float64) error
-	ArbitraryOffset() (float64, error)
-	SetArbitraryOffset(offset float64) error
-	ArbitraryWaveformHandle() (int, error)
-	SetArbitraryWaveformHandle(handle int) error
+	ArbitraryGain(ctx context.Context) (float64, error)
+	SetArbitraryGain(ctx context.Context, gain float64) error
+	ArbitraryOffset(ctx context.Context) (float64, error)
+	SetArbitraryOffset(ctx context.Context, offset float64) error
+	ArbitraryWaveformHandle(ctx context.Context) (int, error)
+	SetArbitraryWaveformHandle(ctx context.Context, handle int) error
 }

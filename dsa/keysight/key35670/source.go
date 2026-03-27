@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2025 The ivi developers. All rights reserved.
+// Copyright (c) 2017-2026 The ivi developers. All rights reserved.
 // Project site: https://github.com/gotmc/ivi
 // Use of this source code is governed by a MIT-style license that
 // can be found in the LICENSE.txt file for the project.
@@ -6,6 +6,7 @@
 package key35670
 
 import (
+	"context"
 	"fmt"
 	"strings"
 
@@ -26,13 +27,13 @@ func (dev *Key35670) SetSourceOutputLevelUnits(freq float64, unit dsa.AmpUnits) 
 }
 
 // SourceOutputLevel queries the source output level.
-func (dev *Key35670) SourceOutputLevel() (float64, error) {
-	return query.Float64(dev.inst, "sour:volt:lev:imm:amp?")
+func (dev *Key35670) SourceOutputLevel(ctx context.Context) (float64, error) {
+	return query.Float64(ctx, dev.inst, "sour:volt:lev:imm:amp?")
 }
 
 // SourceEnabled determines if the source output is enabled or disabled.
-func (dev *Key35670) SourceEnabled() (bool, error) {
-	return query.Bool(dev.inst, "OUTP?")
+func (dev *Key35670) SourceEnabled(ctx context.Context) (bool, error) {
+	return query.Bool(ctx, dev.inst, "OUTP?")
 }
 
 // SetSourceEnabled sets the source output to enabled or disabled.
@@ -65,8 +66,8 @@ func (dev *Key35670) SetSourceFrequency(f float64) error {
 }
 
 // SourceFrequency queries the source output frequency in Hz.
-func (dev *Key35670) SourceFrequency() (float64, error) {
-	return query.Float64(dev.inst, "sour:freq?")
+func (dev *Key35670) SourceFrequency(ctx context.Context) (float64, error) {
+	return query.Float64(ctx, dev.inst, "sour:freq?")
 }
 
 // SetSourceShape sets the source output shape.
@@ -75,8 +76,8 @@ func (dev *Key35670) SetSourceShape(shape dsa.SourceShape) error {
 }
 
 // SourceShape queries the source output shape.
-func (dev *Key35670) SourceShape() (dsa.SourceShape, error) {
-	s, err := query.String(dev.inst, "sour:func shap?")
+func (dev *Key35670) SourceShape(ctx context.Context) (dsa.SourceShape, error) {
+	s, err := query.String(ctx, dev.inst, "sour:func shap?")
 	if err != nil {
 		return "", err
 	}

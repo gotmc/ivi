@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2025 The ivi developers. All rights reserved.
+// Copyright (c) 2017-2026 The ivi developers. All rights reserved.
 // Project site: https://github.com/gotmc/ivi
 // Use of this source code is governed by a MIT-style license that
 // can be found in the LICENSE.txt file for the project.
@@ -6,23 +6,28 @@
 package infiniivision
 
 import (
+	"context"
+
 	"github.com/gotmc/ivi"
 	"github.com/gotmc/ivi/scope"
 	"github.com/gotmc/query"
 )
 
-func (ch *Channel) FetchWaveformMeasurement(msrmnt scope.WaveformMeasurement) (float64, error) {
+func (ch *Channel) FetchWaveformMeasurement(
+	ctx context.Context,
+	msrmnt scope.WaveformMeasurement,
+) (float64, error) {
 	switch msrmnt {
 	case scope.RiseTime:
-		return query.Float64f(ch.inst, ":MEAS:RIS? %s", ch.name)
+		return query.Float64f(ctx, ch.inst, ":MEAS:RIS? %s", ch.name)
 	case scope.FallTime:
-		return query.Float64f(ch.inst, ":MEAS:FALL? %s", ch.name)
+		return query.Float64f(ctx, ch.inst, ":MEAS:FALL? %s", ch.name)
 	case scope.Frequency:
-		return query.Float64f(ch.inst, ":MEAS:FREQ? %s", ch.name)
+		return query.Float64f(ctx, ch.inst, ":MEAS:FREQ? %s", ch.name)
 	case scope.Period:
-		return query.Float64f(ch.inst, ":MEAS:PER? %s", ch.name)
+		return query.Float64f(ctx, ch.inst, ":MEAS:PER? %s", ch.name)
 	case scope.VoltageRMS:
-		return query.Float64f(ch.inst, ":MEAS:VRMS? %s", ch.name)
+		return query.Float64f(ctx, ch.inst, ":MEAS:VRMS? %s", ch.name)
 	case scope.VoltageCycleRMS:
 		return 0.0, ivi.ErrValueNotSupported
 	case scope.VoltageMax:
@@ -30,7 +35,7 @@ func (ch *Channel) FetchWaveformMeasurement(msrmnt scope.WaveformMeasurement) (f
 	case scope.VoltageMin:
 		return 0.0, ivi.ErrValueNotSupported
 	case scope.VoltagePeakToPeak:
-		return query.Float64f(ch.inst, ":MEAS:VPP? %s", ch.name)
+		return query.Float64f(ctx, ch.inst, ":MEAS:VPP? %s", ch.name)
 	case scope.VoltageHigh:
 		return 0.0, ivi.ErrValueNotSupported
 	case scope.VoltageLow:

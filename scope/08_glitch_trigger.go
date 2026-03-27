@@ -1,11 +1,14 @@
-// Copyright (c) 2017-2025 The ivi developers. All rights reserved.
+// Copyright (c) 2017-2026 The ivi developers. All rights reserved.
 // Project site: https://github.com/gotmc/ivi
 // Use of this source code is governed by a MIT-style license that
 // can be found in the LICENSE.txt file for the project.
 
 package scope
 
-import "time"
+import (
+	"context"
+	"time"
+)
 
 /*
 
@@ -49,15 +52,16 @@ Below are the .NET functions, since they are the basis for the Go interfaces.
 // GlitchTriggerer provides the interface required for the
 // IviScopeGlitchTrigger extension group.
 type GlitchTriggerer interface {
-	GlitchCondition() (GlitchCondition, error)
-	SetGlitchCondition(condition GlitchCondition) error
-	GlitchPolarity() (Polarity, error)
-	SetGlitchPolarity(polarity Polarity) error
-	RuntPolarity() (Polarity, error)
-	SetRuntPolarity(polarity Polarity) error
-	GlitchWidth() (time.Duration, error)
-	SetGlitchWidth(width time.Duration) error
+	GlitchCondition(ctx context.Context) (GlitchCondition, error)
+	SetGlitchCondition(ctx context.Context, condition GlitchCondition) error
+	GlitchPolarity(ctx context.Context) (Polarity, error)
+	SetGlitchPolarity(ctx context.Context, polarity Polarity) error
+	RuntPolarity(ctx context.Context) (Polarity, error)
+	SetRuntPolarity(ctx context.Context, polarity Polarity) error
+	GlitchWidth(ctx context.Context) (time.Duration, error)
+	SetGlitchWidth(ctx context.Context, width time.Duration) error
 	ConfigureGlitchTrigger(
+		ctx context.Context,
 		source TriggerSource,
 		width time.Duration,
 		polarity Polarity,

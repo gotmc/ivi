@@ -1,9 +1,11 @@
-// Copyright (c) 2017-2025 The ivi developers. All rights reserved.
+// Copyright (c) 2017-2026 The ivi developers. All rights reserved.
 // Project site: https://github.com/gotmc/ivi
 // Use of this source code is governed by a MIT-style license that
 // can be found in the LICENSE.txt file for the project.
 
 package dmm
+
+import "context"
 
 /*
 
@@ -36,6 +38,6 @@ None.
 // extension group described in Section 14 of IVI-4.2 IviDmm Class
 // Specification.
 type DeviceInfoExtension interface {
-	ApertureTime() (float64, error)
-	ApertureTimeUnits() (ApertureTimeUnits, error)
+	ApertureTime(ctx context.Context) (float64, error)
+	ApertureTimeUnits(ctx context.Context) (ApertureTimeUnits, error)
 }

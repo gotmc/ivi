@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2025 The ivi developers. All rights reserved.
+// Copyright (c) 2017-2026 The ivi developers. All rights reserved.
 // Project site: https://github.com/gotmc/ivi
 // Use of this source code is governed by a MIT-style license that
 // can be found in the LICENSE.txt file for the project.
@@ -12,6 +12,7 @@ State Caching: Not implemented
 package dp800
 
 import (
+	"context"
 	"fmt"
 	"slices"
 	"time"
@@ -69,7 +70,7 @@ func New(inst ivi.Instrument, reset bool) (*Device, error) {
 	}
 	inherent := ivi.NewInherent(inst, inherentBase)
 
-	model, err := inherent.InstrumentModel()
+	model, err := inherent.InstrumentModel(context.Background())
 	if err != nil {
 		return nil, fmt.Errorf("error determining instrument model: %s", err)
 	}
@@ -146,7 +147,7 @@ func New(inst ivi.Instrument, reset bool) (*Device, error) {
 		Inherent: inherent,
 	}
 	if reset {
-		err := driver.Reset()
+		err := driver.Reset(context.Background())
 		return &driver, err
 	}
 	return &driver, nil

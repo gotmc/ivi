@@ -1,9 +1,11 @@
-// Copyright (c) 2017-2025 The ivi developers. All rights reserved.
+// Copyright (c) 2017-2026 The ivi developers. All rights reserved.
 // Project site: https://github.com/gotmc/ivi
 // Use of this source code is governed by a MIT-style license that
 // can be found in the LICENSE.txt file for the project.
 
 package dcpwr
+
+import "context"
 
 /*
 
@@ -35,17 +37,17 @@ Below are the .NET functions, since they are the basis for the Go interfaces.
 
 // Trigger provides the interface for the IviDCPwrTrigger extension group.
 type Trigger interface {
-	AbortTrigger() error
-	InitiateTrigger() error
+	AbortTrigger(ctx context.Context) error
+	InitiateTrigger(ctx context.Context) error
 }
 
 // TriggerChannel provides the interface for the channel repeated capability
 // for the IviDCPwrTrigger extension group.
 type TriggerChannel interface {
-	TriggerSource() (TriggerSource, error)
-	SetTriggerSource(source TriggerSource) error
-	TriggeredCurrentLimit(float64, error)
-	SetTriggeredCurrentLimit(limit float64) error
-	TriggeredVoltageLevel(float64, error)
-	SetTriggeredVoltageLevel(level float64) error
+	TriggerSource(ctx context.Context) (TriggerSource, error)
+	SetTriggerSource(ctx context.Context, source TriggerSource) error
+	TriggeredCurrentLimit(ctx context.Context) (float64, error)
+	SetTriggeredCurrentLimit(ctx context.Context, limit float64) error
+	TriggeredVoltageLevel(ctx context.Context) (float64, error)
+	SetTriggeredVoltageLevel(ctx context.Context, level float64) error
 }

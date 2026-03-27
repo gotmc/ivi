@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2025 The ivi developers. All rights reserved.
+// Copyright (c) 2017-2026 The ivi developers. All rights reserved.
 // Project site: https://github.com/gotmc/ivi
 // Use of this source code is governed by a MIT-style license that
 // can be found in the LICENSE.txt file for the project.
@@ -6,6 +6,7 @@
 package key33220
 
 import (
+	"context"
 	"fmt"
 	"strings"
 
@@ -19,8 +20,8 @@ import (
 // Amplitude is the getter for the read-write IviFgenStdFunc Attribute
 // Amplitude described in Section 5.2.1 of IVI-4.3: IviFgen Class
 // Specification.
-func (ch *Channel) Amplitude() (float64, error) {
-	return query.Float64(ch.inst, "VOLT?")
+func (ch *Channel) Amplitude(ctx context.Context) (float64, error) {
+	return query.Float64(ctx, ch.inst, "VOLT?")
 }
 
 // SetAmplitude specifies the difference between the maximum and minimum
@@ -29,8 +30,8 @@ func (ch *Channel) Amplitude() (float64, error) {
 // SetAmplitude is the setter for the read-write IviFgenStdFunc Attribute
 // Amplitude described in Section 5.2.1 of IVI-4.3: IviFgen Class
 // Specification.
-func (ch *Channel) SetAmplitude(amp float64) error {
-	return ch.inst.Command("VOLT %f VPP", amp)
+func (ch *Channel) SetAmplitude(ctx context.Context, amp float64) error {
+	return ch.inst.Command(ctx, "VOLT %f VPP", amp)
 }
 
 // DCOffset reads the difference between the average of the maximum and minimum
@@ -38,8 +39,8 @@ func (ch *Channel) SetAmplitude(amp float64) error {
 //
 // DCOffset is the getter for the read-write IviFgenStdFunc Attribute DC Offset
 // described in Section 5.2.2 of IVI-4.3: IviFgen Class Specification.
-func (ch *Channel) DCOffset() (float64, error) {
-	return query.Float64(ch.inst, "VOLT:OFFS?")
+func (ch *Channel) DCOffset(ctx context.Context) (float64, error) {
+	return query.Float64(ctx, ch.inst, "VOLT:OFFS?")
 }
 
 // SetDCOffset sets the difference between the average of the maximum and
@@ -47,8 +48,8 @@ func (ch *Channel) DCOffset() (float64, error) {
 //
 // SetDCOffset is the setter for the read-write IviFgenStdFunc Attribute DC
 // Offset described in Section 5.2.2 of IVI-4.3: IviFgen Class Specification.
-func (ch *Channel) SetDCOffset(offset float64) error {
-	return ch.inst.Command("VOLT:OFFS %f", offset)
+func (ch *Channel) SetDCOffset(ctx context.Context, offset float64) error {
+	return ch.inst.Command(ctx, "VOLT:OFFS %f", offset)
 }
 
 // DutyCycleHigh reads the percentage of time, specified as 0-100, during one
@@ -57,8 +58,8 @@ func (ch *Channel) SetDCOffset(offset float64) error {
 // DutyCycle is the getter for the read-write IviFgenStdFunc Attribute Duty
 // Cycle High described in Section 5.2.3 of IVI-4.3: IviFgen Class
 // Specification.
-func (ch *Channel) DutyCycleHigh() (float64, error) {
-	return query.Float64(ch.inst, "FUNC:SQU:DCYC?")
+func (ch *Channel) DutyCycleHigh(ctx context.Context) (float64, error) {
+	return query.Float64(ctx, ch.inst, "FUNC:SQU:DCYC?")
 }
 
 // SetDutyCycleHigh sets the percentage of time, specified as 0-100, during one
@@ -67,8 +68,8 @@ func (ch *Channel) DutyCycleHigh() (float64, error) {
 // SetDutyCycle is the setter for the read-write IviFgenStdFunc Attribute Duty
 // Cycle High described in Section 5.2.3 of IVI-4.3: IviFgen Class
 // Specification.
-func (ch *Channel) SetDutyCycleHigh(duty float64) error {
-	return ch.inst.Command("FUNC:SQU:DCYC %f", duty)
+func (ch *Channel) SetDutyCycleHigh(ctx context.Context, duty float64) error {
+	return ch.inst.Command(ctx, "FUNC:SQU:DCYC %f", duty)
 }
 
 // Frequency reads the number of waveform cycles generated in one second (i.e.,
@@ -77,8 +78,8 @@ func (ch *Channel) SetDutyCycleHigh(duty float64) error {
 // Frequency is the getter for the read-write IviFgenStdFunc Attribute
 // Frequency described in Section 5.2.4 of IVI-4.3: IviFgen Class
 // Specification.
-func (ch *Channel) Frequency() (float64, error) {
-	return query.Float64(ch.inst, "FREQ?")
+func (ch *Channel) Frequency(ctx context.Context) (float64, error) {
+	return query.Float64(ctx, ch.inst, "FREQ?")
 }
 
 // SetFrequency sets the number of waveform cycles generated in one second
@@ -87,8 +88,8 @@ func (ch *Channel) Frequency() (float64, error) {
 // SetFrequency is the setter for the read-write IviFgenStdFunc Attribute
 // Frequency described in Section 5.2.4 of IVI-4.3: IviFgen Class
 // Specification.
-func (ch *Channel) SetFrequency(freq float64) error {
-	return ch.inst.Command("FREQ %f", freq)
+func (ch *Channel) SetFrequency(ctx context.Context, freq float64) error {
+	return ch.inst.Command(ctx, "FREQ %f", freq)
 }
 
 // StartPhase reads the start phase of the standard waveform the function
@@ -97,8 +98,8 @@ func (ch *Channel) SetFrequency(freq float64) error {
 //
 // StartPhase is the getter for the read-write IviFgenStdFunc Attribute Start
 // Phase described in Section 5.2.5 of IVI-4.3: IviFgen Class Specification.
-func (ch *Channel) StartPhase() (float64, error) {
-	return query.Float64(ch.inst, "PHAS?")
+func (ch *Channel) StartPhase(ctx context.Context) (float64, error) {
+	return query.Float64(ctx, ch.inst, "PHAS?")
 }
 
 // SetStartPhase writes the start phase of the standard waveform the function
@@ -108,8 +109,8 @@ func (ch *Channel) StartPhase() (float64, error) {
 // SetStartPhase is the setter for the read-write IviFgenStdFunc Attribute
 // Start Phase described in Section 5.2.5 of IVI-4.3: IviFgen Class
 // Specification.
-func (ch *Channel) SetStartPhase(freq float64) error {
-	return ch.inst.Command("PHAS %f", freq)
+func (ch *Channel) SetStartPhase(ctx context.Context, freq float64) error {
+	return ch.inst.Command(ctx, "PHAS %f", freq)
 }
 
 // StandardWaveform determines if one of the IVI Standard Waveforms is being output by
@@ -117,10 +118,10 @@ func (ch *Channel) SetStartPhase(freq float64) error {
 //
 // StandardWaveform is the getter for the read-write IviFgenStdFunc Attribute Waveform
 // described in Section 5.2.6 of IVI-4.3: IviFgen Class Specification.
-func (ch *Channel) StandardWaveform() (fgen.StandardWaveform, error) {
+func (ch *Channel) StandardWaveform(ctx context.Context) (fgen.StandardWaveform, error) {
 	var wave fgen.StandardWaveform
 
-	s, err := query.String(ch.inst, "FUNC?")
+	s, err := query.String(ctx, ch.inst, "FUNC?")
 	if err != nil {
 		return wave, err
 	}
@@ -134,7 +135,7 @@ func (ch *Channel) StandardWaveform() (fgen.StandardWaveform, error) {
 	case "DC":
 		return fgen.DC, nil
 	case "RAMP":
-		symm, err := query.Float64(ch.inst, "FUNC:RAMP:SYMM?")
+		symm, err := query.Float64(ctx, ch.inst, "FUNC:RAMP:SYMM?")
 		if err != nil {
 			return wave, fmt.Errorf(
 				"unable to get symmetry to determine standard waveform: %s",
@@ -163,10 +164,10 @@ func (ch *Channel) StandardWaveform() (fgen.StandardWaveform, error) {
 // SetStandardWaveform is the setter for the read-write IviFgenStdFunc
 // Attribute Waveform described in Section 5.2.6 of IVI-4.3: IviFgen Class
 // Specification.
-func (ch *Channel) SetStandardWaveform(wave fgen.StandardWaveform) error {
+func (ch *Channel) SetStandardWaveform(ctx context.Context, wave fgen.StandardWaveform) error {
 	// FIXME(mdr): May need to change the phase offset in order to match the
 	// waveforms shown in Figure 5-1 of IVI-4.3: IviFgen Class Specification.
-	return ch.inst.Command(waveformCommand[wave])
+	return ch.inst.Command(ctx, waveformCommand[wave])
 }
 
 // ConfigureStandardWaveform configures the attributes of the function
@@ -176,17 +177,21 @@ func (ch *Channel) SetStandardWaveform(wave fgen.StandardWaveform) error {
 // Standard Waveform function described in Section 5.3.1 of IVI-4.3: IviFgen
 // Class Specification.
 func (ch *Channel) ConfigureStandardWaveform(
+	ctx context.Context,
 	wave fgen.StandardWaveform,
 	amp float64,
 	offset float64,
 	freq float64,
 	phase float64,
 ) error {
-	if err := ch.inst.Command(waveformApplyCommand[wave], freq, amp, offset); err != nil {
+	err := ch.inst.Command(
+		ctx, waveformApplyCommand[wave], freq, amp, offset,
+	)
+	if err != nil {
 		return err
 	}
 
-	return ch.inst.Command("PHAS %.4f", phase)
+	return ch.inst.Command(ctx, "PHAS %.4f", phase)
 }
 
 var waveformCommand = map[fgen.StandardWaveform]string{

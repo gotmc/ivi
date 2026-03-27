@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2025 The ivi developers. All rights reserved.
+// Copyright (c) 2017-2026 The ivi developers. All rights reserved.
 // Project site: https://github.com/gotmc/ivi
 // Use of this source code is governed by a MIT-style license that
 // can be found in the LICENSE.txt file for the project.
@@ -6,6 +6,7 @@
 package ivi
 
 import (
+	"context"
 	"testing"
 )
 
@@ -29,7 +30,7 @@ func (m *mockInstrumentWithClose) WriteString(s string) (n int, err error) {
 	return len(s), nil
 }
 
-func (m *mockInstrumentWithClose) Command(format string, a ...any) error {
+func (m *mockInstrumentWithClose) Command(_ context.Context, format string, a ...any) error {
 	m.commandsSent = append(m.commandsSent, format)
 
 	if m.shouldError && !m.errorOnFirstOnly {
@@ -43,7 +44,7 @@ func (m *mockInstrumentWithClose) Command(format string, a ...any) error {
 	return nil
 }
 
-func (m *mockInstrumentWithClose) Query(s string) (value string, err error) {
+func (m *mockInstrumentWithClose) Query(_ context.Context, s string) (value string, err error) {
 	return "", nil
 }
 
@@ -56,7 +57,7 @@ func TestInherent_Disable(t *testing.T) {
 	mock := &mockInstrumentWithClose{}
 	inherent := NewInherent(mock, InherentBase{})
 
-	err := inherent.Disable()
+	err := inherent.Disable(context.Background())
 	if err != nil {
 		t.Errorf("Expected no error, got %v", err)
 	}
@@ -75,7 +76,7 @@ func TestInherent_Disable_Fallback(t *testing.T) {
 	mock := &mockInstrumentWithClose{errorOnFirstOnly: true}
 	inherent := NewInherent(mock, InherentBase{})
 
-	err := inherent.Disable()
+	err := inherent.Disable(context.Background())
 	if err != nil {
 		t.Errorf("Expected no error after fallback, got %v", err)
 	}
@@ -149,7 +150,7 @@ func TestInherent_ReturnToLocal_Control(t *testing.T) {
 	}
 
 	// Disable should not send commands when ReturnToLocal is false
-	err := inherent.Disable()
+	err := inherent.Disable(context.Background())
 	if err != nil {
 		t.Errorf("Expected no error, got %v", err)
 	}
@@ -160,7 +161,7 @@ func TestInherent_ReturnToLocal_Control(t *testing.T) {
 
 	// Re-enable and verify it works
 	inherent.SetReturnToLocal(true)
-	err = inherent.Disable()
+	err = inherent.Disable(context.Background())
 	if err != nil {
 		t.Errorf("Expected no error, got %v", err)
 	}

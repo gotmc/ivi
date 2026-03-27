@@ -1,11 +1,14 @@
-// Copyright (c) 2017-2025 The ivi developers. All rights reserved.
+// Copyright (c) 2017-2026 The ivi developers. All rights reserved.
 // Project site: https://github.com/gotmc/ivi
 // Use of this source code is governed by a MIT-style license that
 // can be found in the LICENSE.txt file for the project.
 
 package scope
 
-import "time"
+import (
+	"context"
+	"time"
+)
 
 /*
 
@@ -49,15 +52,16 @@ Below are the .NET functions, since they are the basis for the Go interfaces.
 // WidthTriggerer provides the interface required for the
 // IviScopeWidthTrigger extension group.
 type WidthTriggerer interface {
-	WidthCondition() (WidthCondition, error)
-	SetWidthCondition(condition WidthCondition) error
-	WidthHighThreshold() (time.Duration, error)
-	SetWidthHighThreshold(highTime time.Duration) error
-	WidthLowThreshold() (time.Duration, error)
-	SetWidthLowThreshold(lowTime time.Duration) error
-	WidthPolarity() (Polarity, error)
-	SetWidthPolarity(polarity Polarity) error
+	WidthCondition(ctx context.Context) (WidthCondition, error)
+	SetWidthCondition(ctx context.Context, condition WidthCondition) error
+	WidthHighThreshold(ctx context.Context) (time.Duration, error)
+	SetWidthHighThreshold(ctx context.Context, highTime time.Duration) error
+	WidthLowThreshold(ctx context.Context) (time.Duration, error)
+	SetWidthLowThreshold(ctx context.Context, lowTime time.Duration) error
+	WidthPolarity(ctx context.Context) (Polarity, error)
+	SetWidthPolarity(ctx context.Context, polarity Polarity) error
 	ConfigureWidthTrigger(
+		ctx context.Context,
 		source TriggerSource,
 		lowTime, highTime time.Duration,
 		polarity Polarity,

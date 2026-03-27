@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2025 The ivi developers. All rights reserved.
+// Copyright (c) 2017-2026 The ivi developers. All rights reserved.
 // Project site: https://github.com/gotmc/ivi
 // Use of this source code is governed by a MIT-style license that
 // can be found in the LICENSE.txt file for the project.
@@ -6,6 +6,7 @@
 package scope
 
 import (
+	"context"
 	"time"
 
 	"github.com/gotmc/ivi"
@@ -115,63 +116,70 @@ Below are the .NET functions, since they are the basis for the Go interfaces.
 
 // Base provides the interface required for the IviFgenBase capability group.
 type Base interface {
-	AcquisitionStartTime() (time.Duration, error)
-	SetAcquisitionStartTime(startTime time.Duration) error
-	AcquisitionStatus() (AcquisitionStatus, error)
-	AcquisitionType() (AcquisitionType, error)
-	SetAcquisitionType(acquisitionType AcquisitionType) error
+	AcquisitionStartTime(ctx context.Context) (time.Duration, error)
+	SetAcquisitionStartTime(ctx context.Context, startTime time.Duration) error
+	AcquisitionStatus(ctx context.Context) (AcquisitionStatus, error)
+	AcquisitionType(ctx context.Context) (AcquisitionType, error)
+	SetAcquisitionType(ctx context.Context, acquisitionType AcquisitionType) error
 	ChannelCount() int
-	AcquisitionMinNumPoints() (int, error)
-	SetAcquisitionMinNumPoints(numPoints int) error
-	AcquisitionRecordLength() (int, error)
-	AcquisitionSampleRate() (float64, error)
-	AcquisitionTimePerRecord() (time.Duration, error)
-	SetAcquisitionTimePerRecord(timePerRecord time.Duration) error
-	TriggerHoldoff() (time.Duration, error)
-	SetTriggerHoldoff(holdoff time.Duration) error
-	TriggerLevel() (float64, error)
-	SetTriggerLevel(level float64) error
-	TriggerSlope() (TriggerSlope, error)
-	SetTriggerSlope(slope TriggerSlope) error
-	TriggerSource() (TriggerSource, error)
-	SetTriggerSource(source TriggerSource) error
-	TriggerType() (TriggerType, error)
-	SetTriggerType(triggerType TriggerType) error
-	AbortMeasurement() error
+	AcquisitionMinNumPoints(ctx context.Context) (int, error)
+	SetAcquisitionMinNumPoints(ctx context.Context, numPoints int) error
+	AcquisitionRecordLength(ctx context.Context) (int, error)
+	AcquisitionSampleRate(ctx context.Context) (float64, error)
+	AcquisitionTimePerRecord(ctx context.Context) (time.Duration, error)
+	SetAcquisitionTimePerRecord(ctx context.Context, timePerRecord time.Duration) error
+	TriggerHoldoff(ctx context.Context) (time.Duration, error)
+	SetTriggerHoldoff(ctx context.Context, holdoff time.Duration) error
+	TriggerLevel(ctx context.Context) (float64, error)
+	SetTriggerLevel(ctx context.Context, level float64) error
+	TriggerSlope(ctx context.Context) (TriggerSlope, error)
+	SetTriggerSlope(ctx context.Context, slope TriggerSlope) error
+	TriggerSource(ctx context.Context) (TriggerSource, error)
+	SetTriggerSource(ctx context.Context, source TriggerSource) error
+	TriggerType(ctx context.Context) (TriggerType, error)
+	SetTriggerType(ctx context.Context, triggerType TriggerType) error
+	AbortMeasurement(ctx context.Context) error
 	ConfigureAcquisitionRecord(
+		ctx context.Context,
 		timePerRecord time.Duration,
 		minNumPoints int,
 		acquisitionStartTime time.Duration,
 	) error
-	CreateWaveform(numSamples int) error
-	ConfigureEdgeTrigger(triggerType TriggerType, level float64, slope TriggerSlope) error
-	ConfigureTrigger(triggerType TriggerType, holdoff time.Duration) error
-	InitiateMeasurement() error
+	CreateWaveform(ctx context.Context, numSamples int) error
+	ConfigureEdgeTrigger(
+		ctx context.Context,
+		triggerType TriggerType,
+		level float64,
+		slope TriggerSlope,
+	) error
+	ConfigureTrigger(ctx context.Context, triggerType TriggerType, holdoff time.Duration) error
+	InitiateMeasurement(ctx context.Context) error
 }
 
 // BaseChannel provides the interface required for the channel repeated
 // capability for the IviFgenBase capability group.
 type BaseChannel interface {
-	ChannelEnabled() (bool, error)
-	SetChannelEnabled(b bool) error
+	ChannelEnabled(ctx context.Context) (bool, error)
+	SetChannelEnabled(ctx context.Context, b bool) error
 	Name() string
-	InputImpedance() (float64, error)
-	SetInputImpedance(impedance float64) error
-	MaxInputFrequency() (float64, error)
-	SetMaxInputFrequency(freq float64) error
-	ProbeAttenuation() (float64, error)
-	SetProbeAttenuation(atten float64) error
-	ProbeAttenuationAuto() (bool, error)
-	SetProbeAttenuationAuto(b bool) error
-	TriggerCoupling() (TriggerCoupling, error)
-	SetTriggerCoupling(coupling TriggerCoupling) error
-	VerticalCoupling() (VerticalCoupling, error)
-	SetVerticalCoupling(coupling VerticalCoupling) error
-	VerticalOffset() (float64, error)
-	SetVerticalOffset(offset float64) error
-	VerticalRange() (float64, error)
-	SetVerticalRange(rng float64) error
+	InputImpedance(ctx context.Context) (float64, error)
+	SetInputImpedance(ctx context.Context, impedance float64) error
+	MaxInputFrequency(ctx context.Context) (float64, error)
+	SetMaxInputFrequency(ctx context.Context, freq float64) error
+	ProbeAttenuation(ctx context.Context) (float64, error)
+	SetProbeAttenuation(ctx context.Context, atten float64) error
+	ProbeAttenuationAuto(ctx context.Context) (bool, error)
+	SetProbeAttenuationAuto(ctx context.Context, b bool) error
+	TriggerCoupling(ctx context.Context) (TriggerCoupling, error)
+	SetTriggerCoupling(ctx context.Context, coupling TriggerCoupling) error
+	VerticalCoupling(ctx context.Context) (VerticalCoupling, error)
+	SetVerticalCoupling(ctx context.Context, coupling VerticalCoupling) error
+	VerticalOffset(ctx context.Context) (float64, error)
+	SetVerticalOffset(ctx context.Context, offset float64) error
+	VerticalRange(ctx context.Context) (float64, error)
+	SetVerticalRange(ctx context.Context, rng float64) error
 	Configure(
+		ctx context.Context,
 		rng float64,
 		offset float64,
 		coupling VerticalCoupling,
@@ -179,7 +187,7 @@ type BaseChannel interface {
 		probeAttenuation float64,
 		enabled bool,
 	) error
-	ConfigureCharacteristics(inputImepdance, inputFreqMax float64) error
-	FetchWaveform(waveform *ivi.Waveform) error
-	ReadWaveform(maximumTime time.Duration, waveform *ivi.Waveform) error
+	ConfigureCharacteristics(ctx context.Context, inputImepdance, inputFreqMax float64) error
+	FetchWaveform(ctx context.Context, waveform *ivi.Waveform) error
+	ReadWaveform(ctx context.Context, maximumTime time.Duration, waveform *ivi.Waveform) error
 }

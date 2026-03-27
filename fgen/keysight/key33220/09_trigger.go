@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2025 The ivi developers. All rights reserved.
+// Copyright (c) 2017-2026 The ivi developers. All rights reserved.
 // Project site: https://github.com/gotmc/ivi
 // Use of this source code is governed by a MIT-style license that
 // can be found in the LICENSE.txt file for the project.
@@ -6,6 +6,7 @@
 package key33220
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"strings"
@@ -19,10 +20,10 @@ import (
 // TriggerSource is the getter for the read-write IviFgenTrigger Attribute
 // Trigger Source described in Section 9.2.1 of IVI-4.3: IviFgen Class
 // Specification.
-func (ch *Channel) TriggerSource() (fgen.OldTriggerSource, error) {
+func (ch *Channel) TriggerSource(ctx context.Context) (fgen.OldTriggerSource, error) {
 	var src fgen.OldTriggerSource
 
-	s, err := query.String(ch.inst, "TRIG:SOUR?")
+	s, err := query.String(ctx, ch.inst, "TRIG:SOUR?")
 	if err != nil {
 		return src, err
 	}
@@ -47,7 +48,7 @@ func (ch *Channel) TriggerSource() (fgen.OldTriggerSource, error) {
 // SetTriggerSource is the setter for the read-write IviFgenTrigger Attribute
 // Trigger Source described in Section 9.2.1 of IVI-4.3: IviFgen Class
 // Specification.
-func (ch *Channel) SetTriggerSource(src fgen.OldTriggerSource) error {
+func (ch *Channel) SetTriggerSource(ctx context.Context, src fgen.OldTriggerSource) error {
 	triggers := map[fgen.OldTriggerSource]string{
 		fgen.OldTriggerSourceInternal: "IMM",
 		fgen.OldTriggerSourceExternal: "EXT",
@@ -59,5 +60,5 @@ func (ch *Channel) SetTriggerSource(src fgen.OldTriggerSource) error {
 		return fmt.Errorf("trigger source %s not supported", src)
 	}
 
-	return ch.inst.Command("TRIG:SOUR %s", triggerSource)
+	return ch.inst.Command(ctx, "TRIG:SOUR %s", triggerSource)
 }

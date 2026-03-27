@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2025 The ivi developers. All rights reserved.
+// Copyright (c) 2017-2026 The ivi developers. All rights reserved.
 // Project site: https://github.com/gotmc/ivi
 // Use of this source code is governed by a MIT-style license that
 // can be found in the LICENSE.txt file for the project.
@@ -6,6 +6,7 @@
 package key33220
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"strings"
@@ -22,7 +23,7 @@ import (
 // StartTriggerDelay is the getter for the read-write IviFgenTrigger
 // Attribute Start Trigger Delay described in Section 10.2.1 of IVI-4.3:
 // IviFgen Class Specification.
-func (ch *Channel) StartTriggerDelay() (time.Duration, error) {
+func (ch *Channel) StartTriggerDelay(_ context.Context) (time.Duration, error) {
 	return time.Duration(0), ivi.ErrFunctionNotSupported
 }
 
@@ -32,7 +33,7 @@ func (ch *Channel) StartTriggerDelay() (time.Duration, error) {
 // SetStartTriggerDelay is the setter for the read-write IviFgenTrigger
 // Attribute Start Trigger Delay described in Section 10.2.1 of IVI-4.3:
 // IviFgen Class Specification.
-func (ch *Channel) SetStartTriggerDelay(_ time.Duration) error {
+func (ch *Channel) SetStartTriggerDelay(_ context.Context, _ time.Duration) error {
 	return ivi.ErrFunctionNotSupported
 }
 
@@ -42,10 +43,10 @@ func (ch *Channel) SetStartTriggerDelay(_ time.Duration) error {
 // StartTriggerSlope is the getter for the read-write IviFgenTrigger
 // Attribute Start Trigger Slope described in Section 10.2.2 of IVI-4.3:
 // IviFgen Class Specification.
-func (ch *Channel) StartTriggerSlope() (fgen.TriggerSlope, error) {
+func (ch *Channel) StartTriggerSlope(ctx context.Context) (fgen.TriggerSlope, error) {
 	var slope fgen.TriggerSlope
 
-	s, err := query.String(ch.inst, "TRIG:SLOP?")
+	s, err := query.String(ctx, ch.inst, "TRIG:SLOP?")
 	if err != nil {
 		return slope, err
 	}
@@ -68,7 +69,7 @@ func (ch *Channel) StartTriggerSlope() (fgen.TriggerSlope, error) {
 // StartTriggerSlope is the setter for the read-write IviFgenTrigger
 // Attribute Start Trigger Slope described in Section 10.2.2 of IVI-4.3:
 // IviFgen Class Specification.
-func (ch *Channel) SetStartTriggerSlope(slope fgen.TriggerSlope) error {
+func (ch *Channel) SetStartTriggerSlope(ctx context.Context, slope fgen.TriggerSlope) error {
 	slopes := map[fgen.TriggerSlope]string{
 		fgen.TriggerSlopePositive: "POS",
 		fgen.TriggerSlopeNegative: "NEG",
@@ -79,7 +80,7 @@ func (ch *Channel) SetStartTriggerSlope(slope fgen.TriggerSlope) error {
 		return fmt.Errorf("trigger slope %v not supported", slope)
 	}
 
-	return ch.inst.Command("TRIG:SLOP %s", triggerSlope)
+	return ch.inst.Command(ctx, "TRIG:SLOP %s", triggerSlope)
 }
 
 // StartTriggerSource returns the source of the start trigger.
@@ -87,10 +88,10 @@ func (ch *Channel) SetStartTriggerSlope(slope fgen.TriggerSlope) error {
 // StartTriggerSource is the getter for the read-write IviFgenTrigger
 // Attribute Start Trigger Source described in Section 10.2.3 of IVI-4.3:
 // IviFgen Class Specification.
-func (ch *Channel) StartTriggerSource() (fgen.TriggerSource, error) {
+func (ch *Channel) StartTriggerSource(ctx context.Context) (fgen.TriggerSource, error) {
 	var src fgen.TriggerSource
 
-	s, err := query.String(ch.inst, "TRIG:SOUR?")
+	s, err := query.String(ctx, ch.inst, "TRIG:SOUR?")
 	if err != nil {
 		return src, err
 	}
@@ -115,7 +116,7 @@ func (ch *Channel) StartTriggerSource() (fgen.TriggerSource, error) {
 // SetStartTriggerSource is the setter for the read-write IviFgenTrigger
 // Attribute Start Trigger Source described in Section 10.2.3 of IVI-4.3:
 // IviFgen Class Specification.
-func (ch *Channel) SetStartTriggerSource(src fgen.TriggerSource) error {
+func (ch *Channel) SetStartTriggerSource(ctx context.Context, src fgen.TriggerSource) error {
 	triggers := map[fgen.TriggerSource]string{
 		fgen.TriggerSourceInternal: "IMM",
 		fgen.TriggerSourceExternal: "EXT",
@@ -127,17 +128,21 @@ func (ch *Channel) SetStartTriggerSource(src fgen.TriggerSource) error {
 		return fmt.Errorf("trigger source %v not supported", src)
 	}
 
-	return ch.inst.Command("TRIG:SOUR %s", triggerSource)
+	return ch.inst.Command(ctx, "TRIG:SOUR %s", triggerSource)
 }
 
-func (ch *Channel) StartTriggerThreshold() (float64, error) {
+func (ch *Channel) StartTriggerThreshold(_ context.Context) (float64, error) {
 	return 0.0, ivi.ErrFunctionNotSupported
 }
 
-func (ch *Channel) SetStartTriggerThreshold(_ float64) error {
+func (ch *Channel) SetStartTriggerThreshold(_ context.Context, _ float64) error {
 	return ivi.ErrFunctionNotSupported
 }
 
-func (ch *Channel) StartTriggerConfigure(_ fgen.TriggerSource, _ fgen.TriggerSlope) error {
+func (ch *Channel) StartTriggerConfigure(
+	_ context.Context,
+	_ fgen.TriggerSource,
+	_ fgen.TriggerSlope,
+) error {
 	return ivi.ErrFunctionNotSupported
 }

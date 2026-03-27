@@ -1,9 +1,11 @@
-// Copyright (c) 2017-2025 The ivi developers. All rights reserved.
+// Copyright (c) 2017-2026 The ivi developers. All rights reserved.
 // Project site: https://github.com/gotmc/ivi
 // Use of this source code is governed by a MIT-style license that
 // can be found in the LICENSE.txt file for the project.
 
 package scope
+
+import "context"
 
 /*
 
@@ -45,13 +47,14 @@ Below are the .NET functions, since they are the basis for the Go interfaces.
 // RuntTriggerer provides the interface required for the IviScopeRuntTrigger
 // extension group.
 type RuntTriggerer interface {
-	RuntHighThreshold() (float64, error)
-	SetRuntHighThreshold(float64) error
-	RuntLowThreshold() (float64, error)
-	SetRuntLowThreshold(float64) error
-	RuntPolarity() (Polarity, error)
-	SetRuntPolarity(polarity Polarity) error
+	RuntHighThreshold(ctx context.Context) (float64, error)
+	SetRuntHighThreshold(ctx context.Context, threshold float64) error
+	RuntLowThreshold(ctx context.Context) (float64, error)
+	SetRuntLowThreshold(ctx context.Context, threshold float64) error
+	RuntPolarity(ctx context.Context) (Polarity, error)
+	SetRuntPolarity(ctx context.Context, polarity Polarity) error
 	ConfigureRuntTrigger(
+		ctx context.Context,
 		source TriggerSource,
 		lowThreshold, highThreshold float64,
 		polarity Polarity,

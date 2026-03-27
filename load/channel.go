@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2025 The ivi developers. All rights reserved.
+// Copyright (c) 2017-2026 The ivi developers. All rights reserved.
 // Project site: https://github.com/gotmc/ivi
 // Use of this source code is governed by a MIT-style license that
 // can be found in the LICENSE.txt file for the project.
@@ -6,6 +6,8 @@
 package load
 
 import (
+	"context"
+
 	"github.com/gotmc/ivi"
 	"github.com/gotmc/query"
 )
@@ -44,17 +46,17 @@ func (ch *Channel) Set(format string, a ...interface{}) error {
 }
 
 // QueryBool queries the channel and returns a bool.
-func (ch *Channel) QueryBool(cmd string) (bool, error) {
-	return query.Bool(ch.inst, cmd)
+func (ch *Channel) QueryBool(ctx context.Context, cmd string) (bool, error) {
+	return query.Bool(ctx, ch.inst, cmd)
 }
 
 // QueryFloat64 queries the channel and returns a float64.
-func (ch *Channel) QueryFloat64(cmd string) (float64, error) {
-	return query.Float64(ch.inst, cmd)
+func (ch *Channel) QueryFloat64(ctx context.Context, cmd string) (float64, error) {
+	return query.Float64(ctx, ch.inst, cmd)
 }
 
 // QueryString queries the channel and returns a string.
 // FIXME(mdr): Change to take a format string and ...interface{}
-func (ch *Channel) QueryString(cmd string) (string, error) {
-	return query.String(ch.inst, cmd)
+func (ch *Channel) QueryString(ctx context.Context, cmd string) (string, error) {
+	return query.String(ctx, ch.inst, cmd)
 }

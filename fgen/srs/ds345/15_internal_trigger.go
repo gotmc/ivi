@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2025 The ivi developers. All rights reserved.
+// Copyright (c) 2017-2026 The ivi developers. All rights reserved.
 // Project site: https://github.com/gotmc/ivi
 // Use of this source code is governed by a MIT-style license that
 // can be found in the LICENSE.txt file for the project.
@@ -6,6 +6,8 @@
 package ds345
 
 import (
+	"context"
+
 	"github.com/gotmc/ivi"
 	"github.com/gotmc/query"
 )
@@ -18,8 +20,8 @@ import (
 // InternalTriggerRate is the getter for the read-write IviFgenInternalTrigger
 // Attribute Internal Trigger Rate described in Section 15.2.1 of IVI-4.3:
 // IviFgen Class Specification.
-func (d *Driver) InternalTriggerRate() (float64, error) {
-	return query.Float64(d.inst, "TRAT?")
+func (d *Driver) InternalTriggerRate(ctx context.Context) (float64, error) {
+	return query.Float64(ctx, d.inst, "TRAT?")
 }
 
 // SetInternalTriggerRate specifies the rate at which the function generator's
@@ -30,11 +32,11 @@ func (d *Driver) InternalTriggerRate() (float64, error) {
 // SetInternalTriggerRate is the setter for the read-write
 // IviFgenInternalTrigger Attribute Internal Trigger Rate described in Section
 // 15.2.1 of IVI-4.3: IviFgen Class Specification.
-func (d *Driver) SetInternalTriggerRate(rate float64) error {
+func (d *Driver) SetInternalTriggerRate(ctx context.Context, rate float64) error {
 	// The DS345 supports internal trigger rates from 0.001 Hz to 10 kHz.
 	if rate < 0.001 || rate > 10000 {
 		return ivi.ErrValueNotSupported
 	}
 
-	return d.inst.Command("TRAT %.3f", rate)
+	return d.inst.Command(ctx, "TRAT %.3f", rate)
 }

@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2025 The ivi developers. All rights reserved.
+// Copyright (c) 2017-2026 The ivi developers. All rights reserved.
 // Project site: https://github.com/gotmc/ivi
 // Use of this source code is governed by a MIT-style license that
 // can be found in the LICENSE.txt file for the project.
@@ -6,6 +6,7 @@
 package ds345
 
 import (
+	"context"
 	"errors"
 	"strings"
 
@@ -16,10 +17,10 @@ import (
 // TriggerSource determines the trigger srouce. TriggerSource is the getter for
 // the read-write IviFgenTrigger Attribute Trigger Source described in Section
 // 9.2.1 of IVI-4.3: IviFgen Class Specification.
-func (ch *Channel) TriggerSource() (fgen.OldTriggerSource, error) {
+func (ch *Channel) TriggerSource(ctx context.Context) (fgen.OldTriggerSource, error) {
 	var src fgen.OldTriggerSource
 
-	s, err := query.String(ch.inst, "TSRC?")
+	s, err := query.String(ctx, ch.inst, "TSRC?")
 	if err != nil {
 		return src, err
 	}
@@ -42,7 +43,7 @@ func (ch *Channel) TriggerSource() (fgen.OldTriggerSource, error) {
 // SetTriggerSource is the setter for the read-write IviFgenTrigger Attribute
 // Trigger Source described in Section 9.2.1 of IVI-4.3: IviFgen Class
 // Specification.
-func (ch *Channel) SetTriggerSource(src fgen.OldTriggerSource) error {
+func (ch *Channel) SetTriggerSource(ctx context.Context, src fgen.OldTriggerSource) error {
 	if src == fgen.OldTriggerSourceSoftware {
 		return errors.New("software trigger not supported")
 	}
@@ -52,5 +53,5 @@ func (ch *Channel) SetTriggerSource(src fgen.OldTriggerSource) error {
 		fgen.OldTriggerSourceExternal: "2",
 	}
 
-	return ch.inst.Command("TSRC%s", triggers[src])
+	return ch.inst.Command(ctx, "TSRC%s", triggers[src])
 }

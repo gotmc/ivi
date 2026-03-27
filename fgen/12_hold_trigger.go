@@ -1,11 +1,14 @@
-// Copyright (c) 2017-2025 The ivi developers. All rights reserved.
+// Copyright (c) 2017-2026 The ivi developers. All rights reserved.
 // Project site: https://github.com/gotmc/ivi
 // Use of this source code is governed by a MIT-style license that
 // can be found in the LICENSE.txt file for the project.
 
 package fgen
 
-import "time"
+import (
+	"context"
+	"time"
+)
 
 /*
 
@@ -51,19 +54,19 @@ Below are the .NET functions, since they are the basis for the Go interfaces.
 // HoldTrigger provides the interface required for the IviFgenHoldTrigger
 // extension group.
 type HoldTrigger interface {
-	SendSoftwareHoldTrigger() error
+	SendSoftwareHoldTrigger(ctx context.Context) error
 }
 
 // HoldTriggerChannel provides the interface for the channel repeated
 // capability for the IviFgenHoldTrigger extension group.
 type HoldTriggerChannel interface {
-	HoldTriggerDelay() (time.Duration, error)
-	SetHoldTriggerDelay(delay time.Duration) error
-	HoldTriggerSlope() (TriggerSlope, error)
-	SetHoldTriggerSlope(slope TriggerSlope) error
-	HoldTriggerSource() (TriggerSource, error)
-	SetHoldTriggerSource(source TriggerSource) error
-	HoldTriggerThreshold() (float64, error)
-	SetHoldTriggerThreshold(threshold float64) error
-	HoldTriggerConfigure(source TriggerSource, slope TriggerSlope) error
+	HoldTriggerDelay(ctx context.Context) (time.Duration, error)
+	SetHoldTriggerDelay(ctx context.Context, delay time.Duration) error
+	HoldTriggerSlope(ctx context.Context) (TriggerSlope, error)
+	SetHoldTriggerSlope(ctx context.Context, slope TriggerSlope) error
+	HoldTriggerSource(ctx context.Context) (TriggerSource, error)
+	SetHoldTriggerSource(ctx context.Context, source TriggerSource) error
+	HoldTriggerThreshold(ctx context.Context) (float64, error)
+	SetHoldTriggerThreshold(ctx context.Context, threshold float64) error
+	HoldTriggerConfigure(ctx context.Context, source TriggerSource, slope TriggerSlope) error
 }
