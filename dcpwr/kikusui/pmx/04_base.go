@@ -14,7 +14,7 @@ import (
 	"github.com/gotmc/query"
 )
 
-func (d *Device) OutputChannelCount() int {
+func (d *Driver) OutputChannelCount() int {
 	return 0
 }
 

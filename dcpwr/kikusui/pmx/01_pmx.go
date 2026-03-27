@@ -26,13 +26,13 @@ const (
 )
 
 // Confirm implemented interfaces by the pmx driver.
-var _ dcpwr.Base = (*Device)(nil)
+var _ dcpwr.Base = (*Driver)(nil)
 var _ dcpwr.BaseChannel = (*Channel)(nil)
 var _ dcpwr.MeasurementChannel = (*Channel)(nil)
 
-// Device provides the IVI driver for the Kikusui PMX series of DC power
+// Driver provides the IVI driver for the Kikusui PMX series of DC power
 // supplies.
-type Device struct {
+type Driver struct {
 	inst     ivi.Instrument
 	Channels []Channel
 	ivi.Inherent
@@ -50,7 +50,7 @@ type Channel struct {
 // model is supported, but in the future as other models are added, the New
 // function will query the instrument to determine the model and ensure it is
 // one of the supported models. If reset is true, then the instrument is reset.
-func New(inst ivi.Instrument, reset bool) (*Device, error) {
+func New(inst ivi.Instrument, reset bool) (*Driver, error) {
 	channelNames := []string{
 		"DCOutput",
 	}
@@ -87,7 +87,7 @@ func New(inst ivi.Instrument, reset bool) (*Device, error) {
 		},
 	}
 	inherent := ivi.NewInherent(inst, inherentBase)
-	driver := Device{
+	driver := Driver{
 		inst:     inst,
 		Channels: channels,
 		Inherent: inherent,
@@ -104,6 +104,6 @@ func New(inst ivi.Instrument, reset bool) (*Device, error) {
 // ChannelCount is the getter for the read-only IviDCPwrBase Attribute Output
 // Channel Count described in Section 4.2.7 of IVI-4.4: IviDCPwr Class
 // Specification.
-func (dev *Device) ChannelCount() int {
+func (dev *Driver) ChannelCount() int {
 	return len(dev.Channels)
 }

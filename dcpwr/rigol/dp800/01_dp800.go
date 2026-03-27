@@ -28,13 +28,13 @@ const (
 )
 
 // Confirm that the device driver implements the IviDCPwrBase interface.
-var _ dcpwr.Base = (*Device)(nil)
+var _ dcpwr.Base = (*Driver)(nil)
 var _ dcpwr.BaseChannel = (*Channel)(nil)
 var _ dcpwr.MeasurementChannel = (*Channel)(nil)
 
-// Device provides the IVI driver for the Rigol DP800 series of DC power
+// Driver provides the IVI driver for the Rigol DP800 series of DC power
 // supplies.
-type Device struct {
+type Driver struct {
 	inst     ivi.Instrument
 	model    string
 	Channels []Channel
@@ -44,7 +44,7 @@ type Device struct {
 // New creates a new Rigol DP800 IVI Instrument driver. The New function will
 // query the instrument to determine the model and ensure it is one of the
 // supported models. If reset is true, then the instrument is reset.
-func New(inst ivi.Instrument, reset bool) (*Device, error) {
+func New(inst ivi.Instrument, reset bool) (*Driver, error) {
 	supportedModels := []string{
 		"DP831A",
 		"DP832A",
@@ -141,7 +141,7 @@ func New(inst ivi.Instrument, reset bool) (*Device, error) {
 		}
 		channels[i] = ch
 	}
-	driver := Device{
+	driver := Driver{
 		inst:     inst,
 		Channels: channels,
 		Inherent: inherent,
@@ -216,6 +216,6 @@ func DefaultSerialDataFrame() string {
 // ChannelCount is the getter for the read-only IviDCPwrBase Attribute Output
 // Channel Count described in Section 4.2.7 of IVI-4.4: IviDCPwr Class
 // Specification.
-func (dev *Device) ChannelCount() int {
+func (dev *Driver) ChannelCount() int {
 	return len(dev.Channels)
 }
