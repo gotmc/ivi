@@ -162,10 +162,10 @@ func (d *Driver) ResolutionAbsolute(_ context.Context) (float64, error) {
 func (d *Driver) SetResolutionAbsolute(_ context.Context, resolution float64) error {
 	return ivi.ErrNotImplemented
 }
-func (d *Driver) TriggerDelay(_ context.Context) (bool, float64, error) {
-	return false, 0.0, ivi.ErrNotImplemented
+func (d *Driver) TriggerDelay(_ context.Context) (bool, time.Duration, error) {
+	return false, 0, ivi.ErrNotImplemented
 }
-func (d *Driver) SetTriggerDelay(_ context.Context, autoDelay bool, delay float64) error {
+func (d *Driver) SetTriggerDelay(_ context.Context, autoDelay bool, delay time.Duration) error {
 	return ivi.ErrNotImplemented
 }
 

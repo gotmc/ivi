@@ -78,8 +78,8 @@ type Base interface {
 	SetRange(ctx context.Context, autoRange AutoRange, rangeValue float64) error
 	ResolutionAbsolute(ctx context.Context) (float64, error)
 	SetResolutionAbsolute(ctx context.Context, resolution float64) error
-	TriggerDelay(ctx context.Context) (autoDelay bool, delay float64, err error)
-	SetTriggerDelay(ctx context.Context, autoDelay bool, delay float64) error
+	TriggerDelay(ctx context.Context) (autoDelay bool, delay time.Duration, err error)
+	SetTriggerDelay(ctx context.Context, autoDelay bool, delay time.Duration) error
 	TriggerSource(ctx context.Context) (TriggerSource, error)
 	SetTriggerSource(ctx context.Context, src TriggerSource) error
 	Abort(ctx context.Context) error
