@@ -12,7 +12,7 @@ code in this repository.
 - **Run single package tests**: `just unit ./dmm/...` - run tests in a package
 - **Integration tests**: `just int` - runs integration tests
 - **E2E tests**: `just e2e` - runs end-to-end tests
-- **Linting**: `just lint` - runs golangci-lint with the project's configuration
+- **Linting**: `just lint` - runs golangci-lint v2 with the project's configuration
 - **Coverage report**: `just cover` - generates HTML coverage report
 - **Format and vet**: `just check` - formats and vets code (runs before tests
   automatically)
@@ -143,3 +143,10 @@ var _ dmm.BaseChannel = (*Channel)(nil)
 
 - Package-specific error variables defined in main package files
 - IVI-specific errors like `ErrNotImplemented` for unsupported features
+- Wrap errors with `fmt.Errorf("context: %w", err)` to preserve the error chain
+
+### Formatting
+
+- `golines` is enabled via golangci-lint, so long lines will be wrapped
+  automatically on `just check` or `just lint`
+- `goimports` is enabled, so imports are organized automatically
