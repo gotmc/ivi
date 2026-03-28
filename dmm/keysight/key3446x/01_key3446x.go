@@ -3,17 +3,15 @@
 // Use of this source code is governed by a MIT-style license that
 // can be found in the LICENSE.txt file for the project.
 
-/*
-Package key3446x implements the IVI Instrument driver for the Keysight 3446x
-family of DMM.
-
-The Keysight 3446x family of DMMs use LAN port 5025 for SCPI Telnet sessions
-and port 5025 for SCPI Socket sessions (confirmed for the Keysight 34461A and
-assumed for the others). The default GPIB address for the 34461A is 22 (per p.
-475 of the manual).
-
-State Caching: Not implemented
-*/
+// Package key3446x implements the IVI Instrument driver for the Keysight 3446x
+// family of DMM.
+//
+// The Keysight 3446x family of DMMs use LAN port 5025 for SCPI Telnet sessions
+// and port 5025 for SCPI Socket sessions (confirmed for the Keysight 34461A
+// and assumed for the others). The default GPIB address for the 34461A is 22
+// (per p. 475 of the manual).
+//
+// State Caching: Not implemented
 package key3446x
 
 import (
