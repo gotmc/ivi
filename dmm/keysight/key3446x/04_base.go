@@ -172,29 +172,128 @@ func (d *Driver) SetRange(ctx context.Context, autoRange dmm.AutoRange, rangeVal
 	return d.inst.Command(ctx, "%s:rang %s", scpiFunc, rng)
 }
 
-func (d *Driver) ResolutionAbsolute(_ context.Context) (float64, error) {
-	return 0.0, ivi.ErrNotImplemented
-}
-func (d *Driver) SetResolutionAbsolute(_ context.Context, resolution float64) error {
-	return ivi.ErrNotImplemented
-}
-func (d *Driver) TriggerDelay(_ context.Context) (bool, time.Duration, error) {
-	return false, 0, ivi.ErrNotImplemented
-}
-func (d *Driver) SetTriggerDelay(_ context.Context, autoDelay bool, delay time.Duration) error {
-	return ivi.ErrNotImplemented
+// ResolutionAbsolute returns the measurement resolution in absolute units (e.g.,
+// Volts for voltage measurements).
+//
+// ResolutionAbsolute is the getter for the read-write IviDmmBase Attribute
+// Resolution Absolute described in Section 4.2.3 of IVI-4.2: IviDmm Class
+// Specification.
+func (d *Driver) ResolutionAbsolute(ctx context.Context) (float64, error) {
+	fcn, err := d.MeasurementFunction(ctx)
+	if err != nil {
+		return 0.0, err
+	}
+
+	scpiFunc, err := ivi.LookupSCPI(msrFuncToCmd, fcn)
+	if err != nil {
+		return 0.0, err
+	}
+
+	return query.Float64f(ctx, d.inst, "%s:RES?", scpiFunc)
 }
 
-func (d *Driver) TriggerSource(_ context.Context) (dmm.TriggerSource, error) {
-	return 0, ivi.ErrNotImplemented
+// SetResolutionAbsolute sets the measurement resolution in absolute units.
+//
+// SetResolutionAbsolute is the setter for the read-write IviDmmBase Attribute
+// Resolution Absolute described in Section 4.2.3 of IVI-4.2: IviDmm Class
+// Specification.
+func (d *Driver) SetResolutionAbsolute(
+	ctx context.Context,
+	resolution float64,
+) error {
+	fcn, err := d.MeasurementFunction(ctx)
+	if err != nil {
+		return err
+	}
+
+	scpiFunc, err := ivi.LookupSCPI(msrFuncToCmd, fcn)
+	if err != nil {
+		return err
+	}
+
+	return d.inst.Command(ctx, "%s:RES %g", scpiFunc, resolution)
 }
 
-func (d *Driver) SetTriggerSource(_ context.Context, src dmm.TriggerSource) error {
-	return ivi.ErrNotImplemented
+// TriggerDelay returns whether auto delay is enabled and the trigger delay
+// duration.
+//
+// TriggerDelay is the getter for the read-write IviDmmBase Attribute Trigger
+// Delay described in Section 4.2.5 of IVI-4.2: IviDmm Class Specification.
+func (d *Driver) TriggerDelay(ctx context.Context) (bool, time.Duration, error) {
+	autoDelay, err := query.Bool(ctx, d.inst, "TRIG:DEL:AUTO?")
+	if err != nil {
+		return false, 0, fmt.Errorf("TriggerDelay: %w", err)
+	}
+
+	seconds, err := query.Float64(ctx, d.inst, "TRIG:DEL?")
+	if err != nil {
+		return false, 0, fmt.Errorf("TriggerDelay: %w", err)
+	}
+
+	delay := time.Duration(seconds * float64(time.Second))
+
+	return autoDelay, delay, nil
 }
 
-func (d *Driver) Abort(_ context.Context) error {
-	return ivi.ErrNotImplemented
+// SetTriggerDelay sets the trigger delay. If autoDelay is true, the instrument
+// determines the delay automatically; otherwise, the specified delay is used.
+//
+// SetTriggerDelay is the setter for the read-write IviDmmBase Attribute
+// Trigger Delay described in Section 4.2.5 of IVI-4.2: IviDmm Class
+// Specification.
+func (d *Driver) SetTriggerDelay(
+	ctx context.Context,
+	autoDelay bool,
+	delay time.Duration,
+) error {
+	if autoDelay {
+		return d.inst.Command(ctx, "TRIG:DEL:AUTO ON")
+	}
+
+	seconds := delay.Seconds()
+
+	return d.inst.Command(ctx, "TRIG:DEL %f", seconds)
+}
+
+// TriggerSource returns the current trigger source.
+//
+// TriggerSource is the getter for the read-write IviDmmBase Attribute Trigger
+// Source described in Section 4.2.6 of IVI-4.2: IviDmm Class Specification.
+func (d *Driver) TriggerSource(ctx context.Context) (dmm.TriggerSource, error) {
+	s, err := query.String(ctx, d.inst, "TRIG:SOUR?")
+	if err != nil {
+		return 0, fmt.Errorf("TriggerSource: %w", err)
+	}
+
+	src, err := ivi.ReverseLookup(scpiToTriggerSource, convert.StripDoubleQuotes(s))
+	if err != nil {
+		return 0, fmt.Errorf("TriggerSource: %w", err)
+	}
+
+	return src, nil
+}
+
+// SetTriggerSource sets the trigger source.
+//
+// SetTriggerSource is the setter for the read-write IviDmmBase Attribute
+// Trigger Source described in Section 4.2.6 of IVI-4.2: IviDmm Class
+// Specification.
+func (d *Driver) SetTriggerSource(ctx context.Context, src dmm.TriggerSource) error {
+	cmd, err := ivi.LookupSCPI(triggerSourceToSCPI, src)
+	if err != nil {
+		return fmt.Errorf("SetTriggerSource: %w", err)
+	}
+
+	return d.inst.Command(ctx, "TRIG:SOUR %s", cmd)
+}
+
+// Abort aborts a measurement in progress, returning the instrument to the
+// trigger idle state.
+//
+// Abort implements the IviDmmBase function described in Section 4.3.1 of
+// IVI-4.2: IviDmm Class Specification.
+func (d *Driver) Abort(ctx context.Context) error {
+	return d.inst.Command(ctx, "ABOR")
 }
 
 func (d *Driver) ConfigureMeasurement(
@@ -212,12 +311,21 @@ func (d *Driver) ConfigureMeasurement(
 	return d.inst.Command(ctx, cmd)
 }
 
+// ConfigureTrigger configures the trigger source and trigger delay for the
+// DMM.
+//
+// ConfigureTrigger implements the IviDmmBase function described in Section
+// 4.3.3 of IVI-4.2: IviDmm Class Specification.
 func (d *Driver) ConfigureTrigger(
-	_ context.Context,
+	ctx context.Context,
 	src dmm.TriggerSource,
 	delay time.Duration,
 ) error {
-	return ivi.ErrNotImplemented
+	if err := d.SetTriggerSource(ctx, src); err != nil {
+		return err
+	}
+
+	return d.SetTriggerDelay(ctx, false, delay)
 }
 
 // FetchMeasurement returns the measured value from a measurement that the
@@ -294,6 +402,18 @@ var msrFuncToCmd = map[dmm.MeasurementFunction]string{
 	dmm.Frequency:          "FREQ",
 	dmm.Period:             "PER",
 	dmm.Temperature:        "TEMP",
+}
+
+var scpiToTriggerSource = map[string]dmm.TriggerSource{
+	"IMM": dmm.Immediate,
+	"EXT": dmm.External,
+	"BUS": dmm.SoftwareTrigger,
+}
+
+var triggerSourceToSCPI = map[dmm.TriggerSource]string{
+	dmm.Immediate:       "IMM",
+	dmm.External:        "EXT",
+	dmm.SoftwareTrigger: "BUS",
 }
 
 func createConfigureVoltageDCCommand(
