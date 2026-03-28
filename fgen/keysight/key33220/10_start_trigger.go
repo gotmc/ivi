@@ -7,7 +7,6 @@ package key33220
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"strings"
 	"time"
@@ -16,6 +15,28 @@ import (
 	"github.com/gotmc/ivi/fgen"
 	"github.com/gotmc/query"
 )
+
+var triggerSlopeToSCPI = map[fgen.TriggerSlope]string{
+	fgen.TriggerSlopePositive: "POS",
+	fgen.TriggerSlopeNegative: "NEG",
+}
+
+var scpiToTriggerSlope = map[string]fgen.TriggerSlope{
+	"POS": fgen.TriggerSlopePositive,
+	"NEG": fgen.TriggerSlopeNegative,
+}
+
+var triggerSourceToSCPI = map[fgen.TriggerSource]string{
+	fgen.TriggerSourceInternal: "IMM",
+	fgen.TriggerSourceExternal: "EXT",
+	fgen.TriggerSourceSoftware: "BUS",
+}
+
+var scpiToTriggerSource = map[string]fgen.TriggerSource{
+	"IMM": fgen.TriggerSourceInternal,
+	"EXT": fgen.TriggerSourceExternal,
+	"BUS": fgen.TriggerSourceSoftware,
+}
 
 // StartTriggerDelay returns the delay from the start trigger to the first
 // point in the waveform generation.
@@ -52,13 +73,10 @@ func (ch *Channel) StartTriggerSlope(ctx context.Context) (fgen.TriggerSlope, er
 	}
 
 	s = strings.TrimSpace(strings.ToUpper(s))
-	switch s {
-	case "POS":
-		slope = fgen.TriggerSlopePositive
-	case "NEG":
-		slope = fgen.TriggerSlopeNegative
-	default:
-		return slope, errors.New("error determining start trigger slope")
+
+	slope, err = ivi.ReverseLookup(scpiToTriggerSlope, s)
+	if err != nil {
+		return slope, fmt.Errorf("error determining start trigger slope: %w", err)
 	}
 
 	return slope, nil
@@ -70,14 +88,9 @@ func (ch *Channel) StartTriggerSlope(ctx context.Context) (fgen.TriggerSlope, er
 // Attribute Start Trigger Slope described in Section 10.2.2 of IVI-4.3:
 // IviFgen Class Specification.
 func (ch *Channel) SetStartTriggerSlope(ctx context.Context, slope fgen.TriggerSlope) error {
-	slopes := map[fgen.TriggerSlope]string{
-		fgen.TriggerSlopePositive: "POS",
-		fgen.TriggerSlopeNegative: "NEG",
-	}
-
-	triggerSlope, ok := slopes[slope]
-	if !ok {
-		return fmt.Errorf("trigger slope %v not supported", slope)
+	triggerSlope, err := ivi.LookupSCPI(triggerSlopeToSCPI, slope)
+	if err != nil {
+		return fmt.Errorf("trigger slope %v not supported: %w", slope, err)
 	}
 
 	return ch.inst.Command(ctx, "TRIG:SLOP %s", triggerSlope)
@@ -97,15 +110,10 @@ func (ch *Channel) StartTriggerSource(ctx context.Context) (fgen.TriggerSource, 
 	}
 
 	s = strings.TrimSpace(strings.ToUpper(s))
-	switch s {
-	case "IMM":
-		src = fgen.TriggerSourceInternal
-	case "EXT":
-		src = fgen.TriggerSourceExternal
-	case "BUS":
-		src = fgen.TriggerSourceSoftware
-	default:
-		return src, errors.New("error determining trigger source")
+
+	src, err = ivi.ReverseLookup(scpiToTriggerSource, s)
+	if err != nil {
+		return src, fmt.Errorf("error determining trigger source: %w", err)
 	}
 
 	return src, nil
@@ -117,15 +125,9 @@ func (ch *Channel) StartTriggerSource(ctx context.Context) (fgen.TriggerSource, 
 // Attribute Start Trigger Source described in Section 10.2.3 of IVI-4.3:
 // IviFgen Class Specification.
 func (ch *Channel) SetStartTriggerSource(ctx context.Context, src fgen.TriggerSource) error {
-	triggers := map[fgen.TriggerSource]string{
-		fgen.TriggerSourceInternal: "IMM",
-		fgen.TriggerSourceExternal: "EXT",
-		fgen.TriggerSourceSoftware: "BUS",
-	}
-
-	triggerSource, ok := triggers[src]
-	if !ok {
-		return fmt.Errorf("trigger source %v not supported", src)
+	triggerSource, err := ivi.LookupSCPI(triggerSourceToSCPI, src)
+	if err != nil {
+		return fmt.Errorf("trigger source %v not supported: %w", src, err)
 	}
 
 	return ch.inst.Command(ctx, "TRIG:SOUR %s", triggerSource)

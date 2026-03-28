@@ -7,58 +7,30 @@ package infiniivision
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/gotmc/ivi"
 	"github.com/gotmc/ivi/scope"
 	"github.com/gotmc/query"
 )
 
+var waveformMeasurementToSCPI = map[scope.WaveformMeasurement]string{
+	scope.RiseTime:          ":MEAS:RIS?",
+	scope.FallTime:          ":MEAS:FALL?",
+	scope.Frequency:         ":MEAS:FREQ?",
+	scope.Period:            ":MEAS:PER?",
+	scope.VoltageRMS:        ":MEAS:VRMS?",
+	scope.VoltagePeakToPeak: ":MEAS:VPP?",
+}
+
 func (ch *Channel) FetchWaveformMeasurement(
 	ctx context.Context,
 	msrmnt scope.WaveformMeasurement,
 ) (float64, error) {
-	switch msrmnt {
-	case scope.RiseTime:
-		return query.Float64f(ctx, ch.inst, ":MEAS:RIS? %s", ch.name)
-	case scope.FallTime:
-		return query.Float64f(ctx, ch.inst, ":MEAS:FALL? %s", ch.name)
-	case scope.Frequency:
-		return query.Float64f(ctx, ch.inst, ":MEAS:FREQ? %s", ch.name)
-	case scope.Period:
-		return query.Float64f(ctx, ch.inst, ":MEAS:PER? %s", ch.name)
-	case scope.VoltageRMS:
-		return query.Float64f(ctx, ch.inst, ":MEAS:VRMS? %s", ch.name)
-	case scope.VoltageCycleRMS:
-		return 0.0, ivi.ErrValueNotSupported
-	case scope.VoltageMax:
-		return 0.0, ivi.ErrValueNotSupported
-	case scope.VoltageMin:
-		return 0.0, ivi.ErrValueNotSupported
-	case scope.VoltagePeakToPeak:
-		return query.Float64f(ctx, ch.inst, ":MEAS:VPP? %s", ch.name)
-	case scope.VoltageHigh:
-		return 0.0, ivi.ErrValueNotSupported
-	case scope.VoltageLow:
-		return 0.0, ivi.ErrValueNotSupported
-	case scope.VoltageAverage:
-		return 0.0, ivi.ErrValueNotSupported
-	case scope.VoltageCycleAverage:
-		return 0.0, ivi.ErrValueNotSupported
-	case scope.WidthNegative:
-		return 0.0, ivi.ErrValueNotSupported
-	case scope.WidthPositive:
-		return 0.0, ivi.ErrValueNotSupported
-	case scope.DutyCycleNegative:
-		return 0.0, ivi.ErrValueNotSupported
-	case scope.DutyCyclePositive:
-		return 0.0, ivi.ErrValueNotSupported
-	case scope.Amplitude:
-		return 0.0, ivi.ErrValueNotSupported
-	case scope.Overshoot:
-		return 0.0, ivi.ErrValueNotSupported
-	case scope.Preshoot:
-		return 0.0, ivi.ErrValueNotSupported
+	scpiCmd, err := ivi.LookupSCPI(waveformMeasurementToSCPI, msrmnt)
+	if err != nil {
+		return 0.0, fmt.Errorf("waveform measurement %v not supported: %w", msrmnt, err)
 	}
 
-	return 0.0, ivi.ErrValueNotSupported
+	return query.Float64f(ctx, ch.inst, "%s %s", scpiCmd, ch.name)
 }

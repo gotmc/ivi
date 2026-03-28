@@ -7,7 +7,7 @@ package ds345
 
 import (
 	"context"
-	"errors"
+	"fmt"
 	"strings"
 	"time"
 
@@ -15,6 +15,18 @@ import (
 	"github.com/gotmc/ivi/fgen"
 	"github.com/gotmc/query"
 )
+
+var triggerSourceToSCPI = map[fgen.TriggerSource]string{
+	fgen.TriggerSourceInternal: "1",
+	fgen.TriggerSourceExternal: "2",
+}
+
+var scpiToTriggerSource = map[string]fgen.TriggerSource{
+	"0": fgen.TriggerSourceSoftware,
+	"1": fgen.TriggerSourceInternal,
+	"2": fgen.TriggerSourceExternal,
+	"3": fgen.TriggerSourceExternal,
+}
 
 func (ch *Channel) StartTriggerDelay(_ context.Context) (time.Duration, error) {
 	return time.Duration(0), ivi.ErrFunctionNotSupported
@@ -41,31 +53,22 @@ func (ch *Channel) StartTriggerSource(ctx context.Context) (fgen.TriggerSource, 
 	}
 
 	s = strings.TrimSpace(strings.ToUpper(s))
-	switch s {
-	case "0":
-		src = fgen.TriggerSourceSoftware
-	case "1":
-		src = fgen.TriggerSourceInternal
-	case "2", "3":
-		src = fgen.TriggerSourceExternal
-	default:
-		return src, errors.New("error determining trigger source")
+
+	src, err = ivi.ReverseLookup(scpiToTriggerSource, s)
+	if err != nil {
+		return src, fmt.Errorf("error determining trigger source: %w", err)
 	}
 
 	return src, nil
 }
 
 func (ch *Channel) SetStartTriggerSource(ctx context.Context, src fgen.TriggerSource) error {
-	if src == fgen.TriggerSourceSoftware {
-		return errors.New("software trigger not supported")
+	triggerSource, err := ivi.LookupSCPI(triggerSourceToSCPI, src)
+	if err != nil {
+		return fmt.Errorf("trigger source %s not supported: %w", src, err)
 	}
 
-	triggers := map[fgen.TriggerSource]string{
-		fgen.TriggerSourceInternal: "1",
-		fgen.TriggerSourceExternal: "2",
-	}
-
-	return ch.inst.Command(ctx, "TSRC%s", triggers[src])
+	return ch.inst.Command(ctx, "TSRC%s", triggerSource)
 }
 
 func (ch *Channel) StartTriggerThreshold(_ context.Context) (float64, error) {

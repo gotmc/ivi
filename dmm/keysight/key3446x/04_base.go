@@ -27,10 +27,10 @@ func (d *Driver) MeasurementFunction(ctx context.Context) (dmm.MeasurementFuncti
 	}
 
 	response = convert.StripDoubleQuotes(response)
-	fcn, ok := cmdToMsrFunc[response]
 
-	if !ok {
-		return 0, fmt.Errorf("%s is not a valid measurement function", response)
+	fcn, err := ivi.ReverseLookup(cmdToMsrFunc, response)
+	if err != nil {
+		return 0, fmt.Errorf("invalid measurement function %q: %w", response, err)
 	}
 
 	return fcn, nil
@@ -44,8 +44,14 @@ func (d *Driver) SetMeasurementFunction(
 	ctx context.Context,
 	msrFunc dmm.MeasurementFunction,
 ) error {
+	scpiCmd, err := ivi.LookupSCPI(msrFuncToCmd, msrFunc)
+	if err != nil {
+		return fmt.Errorf("measurement function %v not supported: %w", msrFunc, err)
+	}
+
 	// Need to return a quoted string, so use %q in the fmt.Sprintf
-	cmd := fmt.Sprintf("FUNC %q", msrFuncToCmd[msrFunc])
+	cmd := fmt.Sprintf("FUNC %q", scpiCmd)
+
 	return d.inst.Command(ctx, cmd)
 }
 
@@ -88,8 +94,13 @@ func (d *Driver) Range(ctx context.Context) (dmm.AutoRange, float64, error) {
 		return 0, 0.0, err
 	}
 
+	scpiFunc, err := ivi.LookupSCPI(msrFuncToCmd, fcn)
+	if err != nil {
+		return 0, 0.0, err
+	}
+
 	isAutoRange, err := query.Boolf(
-		ctx, d.inst, "%s:rang:auto?", msrFuncToCmd[fcn],
+		ctx, d.inst, "%s:rang:auto?", scpiFunc,
 	)
 	if err != nil {
 		return 0, 0.0, err
@@ -100,7 +111,7 @@ func (d *Driver) Range(ctx context.Context) (dmm.AutoRange, float64, error) {
 		autoRange = dmm.AutoOff
 	}
 
-	rng, err := query.Float64f(ctx, d.inst, "%s:rang?", msrFuncToCmd[fcn])
+	rng, err := query.Float64f(ctx, d.inst, "%s:rang?", scpiFunc)
 	if err != nil {
 		return 0, 0.0, err
 	}
@@ -122,9 +133,14 @@ func (d *Driver) SetRange(ctx context.Context, autoRange dmm.AutoRange, rangeVal
 		return err
 	}
 
+	scpiFunc, err := ivi.LookupSCPI(msrFuncToCmd, fcn)
+	if err != nil {
+		return err
+	}
+
 	// Set the range to auto if appropriate.
 	if autoRange == dmm.AutoOn {
-		return d.inst.Command(ctx, "%s:rang:auto on", msrFuncToCmd[fcn])
+		return d.inst.Command(ctx, "%s:rang:auto on", scpiFunc)
 	}
 
 	// Not auto ranging, so  we need to determine the appropriate SCPI range
@@ -153,7 +169,7 @@ func (d *Driver) SetRange(ctx context.Context, autoRange dmm.AutoRange, rangeVal
 	case dmm.Temperature:
 	}
 
-	return d.inst.Command(ctx, "%s:rang %s", msrFuncToCmd[fcn], rng)
+	return d.inst.Command(ctx, "%s:rang %s", scpiFunc, rng)
 }
 
 func (d *Driver) ResolutionAbsolute(_ context.Context) (float64, error) {

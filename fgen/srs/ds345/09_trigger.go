@@ -7,51 +7,44 @@ package ds345
 
 import (
 	"context"
-	"errors"
-	"strings"
+	"fmt"
 
 	"github.com/gotmc/ivi/fgen"
-	"github.com/gotmc/query"
 )
 
-// TriggerSource determines the trigger srouce. TriggerSource is the getter for
-// the read-write IviFgenTrigger Attribute Trigger Source described in Section
-// 9.2.1 of IVI-4.3: IviFgen Class Specification.
+// TriggerSource determines the trigger source.
+//
+// TriggerSource is the getter for the read-write IviFgenTrigger Attribute
+// Trigger Source described in Section 9.2.1 of IVI-4.3: IviFgen Class
+// Specification.
+//
+// Deprecated: Use StartTriggerSource instead (Section 10).
 func (ch *Channel) TriggerSource(ctx context.Context) (fgen.OldTriggerSource, error) {
-	var src fgen.OldTriggerSource
-
-	s, err := query.String(ctx, ch.inst, "TSRC?")
+	src, err := ch.StartTriggerSource(ctx)
 	if err != nil {
-		return src, err
+		return 0, err
 	}
 
-	s = strings.TrimSpace(strings.ToUpper(s))
-	switch s {
-	case "1":
-		src = fgen.OldTriggerSourceInternal
-	case "2", "3":
-		src = fgen.OldTriggerSourceExternal
-	default:
-		return src, errors.New("error determining trigger source")
+	old, ok := fgen.NewToOldTriggerSource(src)
+	if !ok {
+		return 0, fmt.Errorf("trigger source %s has no deprecated equivalent", src)
 	}
 
-	return src, nil
+	return old, nil
 }
 
-// SetTriggerSource specifies the trigger srouce.
+// SetTriggerSource specifies the trigger source.
 //
 // SetTriggerSource is the setter for the read-write IviFgenTrigger Attribute
 // Trigger Source described in Section 9.2.1 of IVI-4.3: IviFgen Class
 // Specification.
+//
+// Deprecated: Use SetStartTriggerSource instead (Section 10).
 func (ch *Channel) SetTriggerSource(ctx context.Context, src fgen.OldTriggerSource) error {
-	if src == fgen.OldTriggerSourceSoftware {
-		return errors.New("software trigger not supported")
+	ts, ok := fgen.OldToNewTriggerSource(src)
+	if !ok {
+		return fmt.Errorf("trigger source %s not supported", src)
 	}
 
-	triggers := map[fgen.OldTriggerSource]string{
-		fgen.OldTriggerSourceInternal: "1",
-		fgen.OldTriggerSourceExternal: "2",
-	}
-
-	return ch.inst.Command(ctx, "TSRC%s", triggers[src])
+	return ch.SetStartTriggerSource(ctx, ts)
 }

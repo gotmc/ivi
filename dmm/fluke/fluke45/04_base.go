@@ -26,24 +26,12 @@ func (d *Driver) MeasurementFunction(ctx context.Context) (dmm.MeasurementFuncti
 		return 0, err
 	}
 
-	switch strings.TrimSpace(fcn) {
-	case "VDC":
-		return dmm.DCVolts, nil
-	case "VAC":
-		return dmm.ACVolts, nil
-	case "ADC":
-		return dmm.DCCurrent, nil
-	case "AAC":
-		return dmm.ACCurrent, nil
-	case "OHMS":
-		return dmm.TwoWireResistance, nil
-	case "VACDC":
-		return dmm.ACPlusDCVolts, nil
-	case "AACDC":
-		return dmm.ACPlusDCCurrent, nil
-	default:
-		return 0, fmt.Errorf("%s is not a valid measurement function", fcn)
+	msrFunc, err := ivi.ReverseLookup(cmdToMsrFunc, strings.TrimSpace(fcn))
+	if err != nil {
+		return 0, fmt.Errorf("invalid measurement function %q: %w", fcn, err)
 	}
+
+	return msrFunc, nil
 }
 
 // SetMeasurementFunction specifies the measurement function.
@@ -54,8 +42,14 @@ func (d *Driver) SetMeasurementFunction(
 	ctx context.Context,
 	msrFunc dmm.MeasurementFunction,
 ) error {
+	scpiCmd, err := ivi.LookupSCPI(msrFuncToCmd, msrFunc)
+	if err != nil {
+		return fmt.Errorf("measurement function %v not supported: %w", msrFunc, err)
+	}
+
 	// Need to return a quoted string, so use %q in the fmt.Sprintf
-	cmd := fmt.Sprintf("%q", msrFuncToCmd[msrFunc])
+	cmd := fmt.Sprintf("%q", scpiCmd)
+
 	return d.inst.Command(ctx, cmd)
 }
 

@@ -7,58 +7,44 @@ package key33220
 
 import (
 	"context"
-	"errors"
 	"fmt"
-	"strings"
 
 	"github.com/gotmc/ivi/fgen"
-	"github.com/gotmc/query"
 )
 
-// TriggerSource determines the trigger srouce.
+// TriggerSource determines the trigger source.
 //
 // TriggerSource is the getter for the read-write IviFgenTrigger Attribute
 // Trigger Source described in Section 9.2.1 of IVI-4.3: IviFgen Class
 // Specification.
+//
+// Deprecated: Use StartTriggerSource instead (Section 10).
 func (ch *Channel) TriggerSource(ctx context.Context) (fgen.OldTriggerSource, error) {
-	var src fgen.OldTriggerSource
-
-	s, err := query.String(ctx, ch.inst, "TRIG:SOUR?")
+	src, err := ch.StartTriggerSource(ctx)
 	if err != nil {
-		return src, err
+		return 0, err
 	}
 
-	s = strings.TrimSpace(strings.ToUpper(s))
-	switch s {
-	case "IMM":
-		src = fgen.OldTriggerSourceInternal
-	case "EXT":
-		src = fgen.OldTriggerSourceExternal
-	case "BUS":
-		src = fgen.OldTriggerSourceSoftware
-	default:
-		return src, errors.New("error determining trigger source")
+	old, ok := fgen.NewToOldTriggerSource(src)
+	if !ok {
+		return 0, fmt.Errorf("trigger source %s has no deprecated equivalent", src)
 	}
 
-	return src, nil
+	return old, nil
 }
 
-// SetTriggerSource specifies the trigger srouce.
+// SetTriggerSource specifies the trigger source.
 //
 // SetTriggerSource is the setter for the read-write IviFgenTrigger Attribute
 // Trigger Source described in Section 9.2.1 of IVI-4.3: IviFgen Class
 // Specification.
+//
+// Deprecated: Use SetStartTriggerSource instead (Section 10).
 func (ch *Channel) SetTriggerSource(ctx context.Context, src fgen.OldTriggerSource) error {
-	triggers := map[fgen.OldTriggerSource]string{
-		fgen.OldTriggerSourceInternal: "IMM",
-		fgen.OldTriggerSourceExternal: "EXT",
-		fgen.OldTriggerSourceSoftware: "BUS",
-	}
-
-	triggerSource, ok := triggers[src]
+	ts, ok := fgen.OldToNewTriggerSource(src)
 	if !ok {
 		return fmt.Errorf("trigger source %s not supported", src)
 	}
 
-	return ch.inst.Command(ctx, "TRIG:SOUR %s", triggerSource)
+	return ch.SetStartTriggerSource(ctx, ts)
 }

@@ -22,6 +22,46 @@ const (
 	fiftyOhms = 50.0
 )
 
+var acquisitionTypeToSCPI = map[scope.AcquisitionType]string{
+	scope.NormalAcquisition:         "NORM",
+	scope.AverageAcquisition:        "AVER",
+	scope.HighResolutionAcquisition: "HRES",
+	scope.PeakDetectAcquisition:     "PEAK",
+}
+
+var scpiToAcquisitionType = map[string]scope.AcquisitionType{
+	"NORM": scope.NormalAcquisition,
+	"AVER": scope.AverageAcquisition,
+	"HRES": scope.HighResolutionAcquisition,
+	"PEAK": scope.PeakDetectAcquisition,
+}
+
+var triggerTypeToSCPI = map[scope.TriggerType]string{
+	scope.EdgeTrigger:   "EDGE",
+	scope.GlitchTrigger: "GLIT",
+	scope.WidthTrigger:  "PATT",
+	scope.TVTrigger:     "TV",
+	scope.RuntTrigger:   "RUNT",
+}
+
+var scpiToTriggerType = map[string]scope.TriggerType{
+	"EDGE": scope.EdgeTrigger,
+	"GLIT": scope.GlitchTrigger,
+	"PATT": scope.WidthTrigger,
+	"TV":   scope.TVTrigger,
+	"RUNT": scope.RuntTrigger,
+}
+
+var verticalCouplingToSCPI = map[scope.VerticalCoupling]string{
+	scope.ACVerticalCoupling: "AC",
+	scope.DCVerticalCoupling: "DC",
+}
+
+var scpiToVerticalCoupling = map[string]scope.VerticalCoupling{
+	"AC": scope.ACVerticalCoupling,
+	"DC": scope.DCVerticalCoupling,
+}
+
 // AcquisitionStartTime, also referred to as the Horizontal Time Per Record in
 // the IVI specification, queries the length of time from the trigger event to
 // the first point in the waveform record. If the value is positive, the first
@@ -99,14 +139,9 @@ func (d *Driver) AcquisitionType(ctx context.Context) (scope.AcquisitionType, er
 		return 0, err
 	}
 
-	acType, ok := map[string]scope.AcquisitionType{
-		"NORM": scope.NormalAcquisition,
-		"AVER": scope.AverageAcquisition,
-		"HRES": scope.HighResolutionAcquisition,
-		"PEAK": scope.PeakDetectAcquisition,
-	}[strings.TrimSpace(s)]
-	if !ok {
-		return 0, fmt.Errorf("%w: %s", ivi.ErrValueNotSupported, s)
+	acType, err := ivi.ReverseLookup(scpiToAcquisitionType, strings.TrimSpace(s))
+	if err != nil {
+		return 0, fmt.Errorf("invalid acquisition type %q: %w", s, err)
 	}
 
 	return acType, nil
@@ -119,21 +154,9 @@ func (d *Driver) AcquisitionType(ctx context.Context) (scope.AcquisitionType, er
 // Type described in Section 4.2.3 of the IVI-4.1: IviScope Class
 // Specification.
 func (d *Driver) SetAcquisitionType(ctx context.Context, acType scope.AcquisitionType) error {
-	var cmd string
-
-	switch acType {
-	case scope.NormalAcquisition:
-		cmd = "NORM"
-	case scope.AverageAcquisition:
-		cmd = "AVER"
-	case scope.HighResolutionAcquisition:
-		cmd = "HRES"
-	case scope.PeakDetectAcquisition:
-		cmd = "PEAK"
-	case scope.EnvelopeAcquisition:
-		return ivi.ErrNotImplemented
-	default:
-		return ivi.ErrNotImplemented
+	cmd, err := ivi.LookupSCPI(acquisitionTypeToSCPI, acType)
+	if err != nil {
+		return fmt.Errorf("acquisition type %v not supported: %w", acType, err)
 	}
 
 	return d.inst.Command(ctx, ":ACQ:TYPE %s", cmd)
@@ -299,44 +322,29 @@ func (d *Driver) SetTriggerSource(ctx context.Context, source scope.TriggerSourc
 func (d *Driver) TriggerType(ctx context.Context) (scope.TriggerType, error) {
 	mode, err := query.String(ctx, d.inst, ":TRIG:MODE?")
 	if err != nil {
-		return 0, ivi.ErrValueNotSupported
+		return 0, err
 	}
 
-	switch strings.TrimSpace(mode) {
-	case "EDGE":
-		return scope.EdgeTrigger, nil
-	case "GLIT":
-		return scope.GlitchTrigger, nil
-	case "PATT":
-		return scope.WidthTrigger, nil
-	case "TV":
-		return scope.TVTrigger, nil
-	case "RUNT":
-		return scope.RuntTrigger, nil
-	default:
-		return 0, ivi.ErrValueNotSupported
+	trigType, err := ivi.ReverseLookup(scpiToTriggerType, strings.TrimSpace(mode))
+	if err != nil {
+		return 0, fmt.Errorf("invalid trigger type %q: %w", mode, err)
 	}
+
+	return trigType, nil
 }
 
 func (d *Driver) SetTriggerType(ctx context.Context, triggerType scope.TriggerType) error {
-	switch triggerType {
-	case scope.EdgeTrigger:
-		return d.inst.Command(ctx, ":TRIG:MODE EDGE")
-	case scope.WidthTrigger:
-		return d.inst.Command(ctx, ":TRIG:MODE PATT")
-	case scope.RuntTrigger:
-		return d.inst.Command(ctx, ":TRIG:MODE RUNT")
-	case scope.GlitchTrigger:
-		return d.inst.Command(ctx, ":TRIG:MODE GLIT")
-	case scope.TVTrigger:
-		return d.inst.Command(ctx, ":TRIG:MODE TV")
-	case scope.ImmediateTrigger:
+	// ImmediateTrigger uses a different command pattern.
+	if triggerType == scope.ImmediateTrigger {
 		return d.inst.Command(ctx, ":TRIG:FORC")
-	case scope.ACLineTrigger:
-		return fmt.Errorf("%s not supported: %w", scope.TVTrigger, ivi.ErrValueNotSupported)
-	default:
-		return fmt.Errorf("%s not supported: %w", triggerType, ivi.ErrValueNotSupported)
 	}
+
+	cmd, err := ivi.LookupSCPI(triggerTypeToSCPI, triggerType)
+	if err != nil {
+		return fmt.Errorf("%s not supported: %w", triggerType, err)
+	}
+
+	return d.inst.Command(ctx, ":TRIG:MODE %s", cmd)
 }
 
 func (d *Driver) AbortMeasurement(ctx context.Context) error {
@@ -542,27 +550,21 @@ func (ch *Channel) VerticalCoupling(ctx context.Context) (scope.VerticalCoupling
 		return 0, err
 	}
 
-	switch coupling {
-	case "AC":
-		return scope.ACVerticalCoupling, nil
-	case "DC":
-		return scope.DCVerticalCoupling, nil
-	default:
-		return 0, ivi.ErrValueNotSupported
+	vc, err := ivi.ReverseLookup(scpiToVerticalCoupling, coupling)
+	if err != nil {
+		return 0, fmt.Errorf("invalid vertical coupling %q: %w", coupling, err)
 	}
+
+	return vc, nil
 }
 
 func (ch *Channel) SetVerticalCoupling(ctx context.Context, coupling scope.VerticalCoupling) error {
-	switch coupling {
-	case scope.ACVerticalCoupling:
-		return ch.inst.Command(ctx, ":CHAN%d:COUP AC", ch.num)
-	case scope.DCVerticalCoupling:
-		return ch.inst.Command(ctx, ":CHAN%d:COUP DC", ch.num)
-	case scope.GndVerticalCoupling:
-		return ivi.ErrValueNotSupported
-	default:
-		return ivi.ErrValueNotSupported
+	cmd, err := ivi.LookupSCPI(verticalCouplingToSCPI, coupling)
+	if err != nil {
+		return fmt.Errorf("vertical coupling %v not supported: %w", coupling, err)
 	}
+
+	return ch.inst.Command(ctx, ":CHAN%d:COUP %s", ch.num, cmd)
 }
 
 // VerticalOffset queries the location of the center of the range that the

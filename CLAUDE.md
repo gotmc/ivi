@@ -13,6 +13,7 @@ code in this repository.
 - **Integration tests**: `just int` - runs integration tests
 - **E2E tests**: `just e2e` - runs end-to-end tests
 - **Linting**: `just lint` - runs golangci-lint v2 with the project's configuration
+  (includes `gosec`, `bodyclose`, `contextcheck` among enabled linters)
 - **Coverage report**: `just cover` - generates HTML coverage report
 - **Format and vet**: `just check` - formats and vets code (runs before tests
   automatically)
@@ -41,7 +42,8 @@ function generators) can be programmed identically.
 
 - `Instrument` interface: Core abstraction requiring Read, Write, WriteString,
   Command, and Query methods. Command and Query take `context.Context` as their
-  first parameter.
+  first parameter. Sub-interfaces `Commander`, `Querier`, and `StringWriter`
+  allow accepting narrower types.
 - `Inherent` struct: Base capabilities common to all IVI instruments (reset,
   clear, identification, timeout, local control). All methods that communicate
   with instruments take `context.Context`.
