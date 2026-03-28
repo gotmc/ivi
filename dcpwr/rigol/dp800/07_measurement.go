@@ -7,13 +7,14 @@ package dp800
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/gotmc/ivi"
 	"github.com/gotmc/ivi/dcpwr"
 )
 
 func (ch *Channel) Measure(ctx context.Context, msrType dcpwr.MeasurementType) (float64, error) {
-	return 0.0, ivi.ErrNotImplemented
+	return 0.0, fmt.Errorf("Measure: %w", ivi.ErrNotImplemented)
 }
 
 // MeasureVoltage takes a measurement on the output signal and returns the
@@ -23,7 +24,7 @@ func (ch *Channel) Measure(ctx context.Context, msrType dcpwr.MeasurementType) (
 // Voltage MeasurementType parameter described in Section 7.2.1 of IVI-4.4:
 // IviDCPwr Class Specification.
 func (ch *Channel) MeasureVoltage(ctx context.Context) (float64, error) {
-	return 0.0, dcpwr.ErrNotImplemented
+	return 0.0, fmt.Errorf("MeasureVoltage: %w", ivi.ErrNotImplemented)
 }
 
 // MeasureCurrent takes a measurement on the output signal and returns the
@@ -33,5 +34,5 @@ func (ch *Channel) MeasureVoltage(ctx context.Context) (float64, error) {
 // Current MeasurementType parameter described in Section 7.2.1 of IVI-4.4:
 // IviDCPwr Class Specification.
 func (ch *Channel) MeasureCurrent(ctx context.Context) (float64, error) {
-	return 0.0, dcpwr.ErrNotImplemented
+	return 0.0, fmt.Errorf("MeasureCurrent: %w", ivi.ErrNotImplemented)
 }

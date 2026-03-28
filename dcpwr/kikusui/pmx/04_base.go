@@ -7,7 +7,7 @@ package pmx
 
 import (
 	"context"
-	"errors"
+	"fmt"
 
 	"github.com/gotmc/ivi"
 	"github.com/gotmc/ivi/dcpwr"
@@ -43,7 +43,7 @@ func (ch *Channel) SetCurrentLimit(ctx context.Context, limit float64) error {
 	case dcpwr.CurrentTrip:
 		return ch.inst.Command(ctx, "CURR %f;:CURR:PROT %f", limit, limit)
 	default:
-		return errors.New("current limit behavior not set")
+		return fmt.Errorf("SetCurrentLimit: %w", ivi.ErrValueNotSupported)
 	}
 }
 
@@ -84,7 +84,7 @@ func (ch *Channel) SetCurrentLimitBehavior(
 		}
 		return ch.inst.Command(ctx, "CURR:PROT %f", limit)
 	default:
-		return errors.New("unknown current limit behavior")
+		return fmt.Errorf("SetCurrentLimitBehavior: %w", ivi.ErrValueNotSupported)
 	}
 }
 
@@ -158,13 +158,13 @@ func (ch *Channel) SetOVPEnabled(ctx context.Context, v bool) error {
 // DisableOVP is a convenience function for disabling Over-Voltage Protection
 // (OVP).
 func (ch *Channel) DisableOVP(ctx context.Context) error {
-	return dcpwr.ErrNotImplemented
+	return fmt.Errorf("DisableOVP: %w", ivi.ErrNotImplemented)
 }
 
 // EnableOVP is a convenience function for enabling Over-Voltage Protection
 // (OVP).
 func (ch *Channel) EnableOVP(ctx context.Context) error {
-	return dcpwr.ErrNotImplemented
+	return fmt.Errorf("EnableOVP: %w", ivi.ErrNotImplemented)
 }
 
 // OVPLimit returns the current Over-Voltage Protection (OVP) value.
@@ -226,7 +226,7 @@ func (ch *Channel) ConfigureCurrentLimit(
 		ch.currentLimitBehavior = dcpwr.CurrentTrip
 		return ch.inst.Command(ctx, "CURR %f;:CURR:PROT %f", limit, limit)
 	default:
-		return errors.New("unknown current limit behavior")
+		return fmt.Errorf("ConfigureCurrentLimit: %w", ivi.ErrValueNotSupported)
 	}
 
 }
@@ -251,7 +251,7 @@ func (ch *Channel) ConfigureOutputRange(
 	rt dcpwr.RangeType,
 	rng float64,
 ) error {
-	return dcpwr.ErrNotImplemented
+	return fmt.Errorf("ConfigureOutputRange: %w", ivi.ErrNotImplemented)
 }
 
 // ConfigureOVP specifies the over-voltage limit and the behavior of the power
@@ -272,7 +272,7 @@ func (ch *Channel) ConfigureOVP(ctx context.Context, enabled bool, limit float64
 // QueryCurrentLimitMax implements the IviDCPwrBase function described in
 // Section 4.3.7 of IVI-4.4: IviDCPwr Class Specification.
 func (ch *Channel) QueryCurrentLimitMax(ctx context.Context, voltage float64) (float64, error) {
-	return 0.0, dcpwr.ErrNotImplemented
+	return 0.0, fmt.Errorf("QueryCurrentLimitMax: %w", ivi.ErrNotImplemented)
 }
 
 // QueryVoltageLevelMax returns the maximum programmable voltage level that the
@@ -284,7 +284,7 @@ func (ch *Channel) QueryVoltageLevelMax(
 	ctx context.Context,
 	currentLimit float64,
 ) (float64, error) {
-	return 0.0, dcpwr.ErrNotImplemented
+	return 0.0, fmt.Errorf("QueryVoltageLevelMax: %w", ivi.ErrNotImplemented)
 }
 
 // QueryOutputState returns whether the power supply is in a particular output
@@ -293,7 +293,7 @@ func (ch *Channel) QueryVoltageLevelMax(
 // QueryOutputState implements the IviDCPwrBase function described in Section
 // 4.3.9 of IVI-4.4: IviDCPwr Class Specification.
 func (ch *Channel) QueryOutputState(ctx context.Context, os dcpwr.OutputState) (bool, error) {
-	return false, dcpwr.ErrNotImplemented
+	return false, fmt.Errorf("QueryOutputState: %w", ivi.ErrNotImplemented)
 }
 
 // ResetOutputProtection resets the power supply output protection after an
@@ -302,5 +302,5 @@ func (ch *Channel) QueryOutputState(ctx context.Context, os dcpwr.OutputState) (
 // ResetOutputProtection implements the IviDCPwrBase function described in
 // Section 4.3.10 of IVI-4.4: IviDCPwr Class Specification.
 func (ch *Channel) ResetOutputProtection(ctx context.Context) error {
-	return dcpwr.ErrNotImplemented
+	return fmt.Errorf("ResetOutputProtection: %w", ivi.ErrNotImplemented)
 }
