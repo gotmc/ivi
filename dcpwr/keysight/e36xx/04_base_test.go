@@ -121,9 +121,9 @@ func TestChannel_CurrentLimitBehavior(t *testing.T) {
 
 func TestChannel_SetCurrentLimitBehavior(t *testing.T) {
 	tests := []struct {
-		name    string
+		name     string
 		behavior dcpwr.CurrentLimitBehavior
-		wantErr bool
+		wantErr  bool
 	}{
 		{"regulate", dcpwr.CurrentRegulate, false},
 		{"trip", dcpwr.CurrentTrip, true},
