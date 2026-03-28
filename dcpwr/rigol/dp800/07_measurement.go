@@ -11,10 +11,23 @@ import (
 
 	"github.com/gotmc/ivi"
 	"github.com/gotmc/ivi/dcpwr"
+	"github.com/gotmc/query"
 )
 
+// Measure takes a measurement on the output signal and returns the measured
+// value for the given MeasurementType.
+//
+// Measure implements the IviDCPwrMeasurement function described in Section
+// 7.2.1 of IVI-4.4: IviDCPwr Class Specification.
 func (ch *Channel) Measure(ctx context.Context, msrType dcpwr.MeasurementType) (float64, error) {
-	return 0.0, fmt.Errorf("Measure: %w", ivi.ErrNotImplemented)
+	switch msrType {
+	case dcpwr.CurrentMeasurement:
+		return ch.MeasureCurrent(ctx)
+	case dcpwr.VoltageMeasurement:
+		return ch.MeasureVoltage(ctx)
+	}
+
+	return 0.0, fmt.Errorf("Measure: %w: %v", ivi.ErrValueNotSupported, msrType)
 }
 
 // MeasureVoltage takes a measurement on the output signal and returns the
@@ -24,7 +37,7 @@ func (ch *Channel) Measure(ctx context.Context, msrType dcpwr.MeasurementType) (
 // Voltage MeasurementType parameter described in Section 7.2.1 of IVI-4.4:
 // IviDCPwr Class Specification.
 func (ch *Channel) MeasureVoltage(ctx context.Context) (float64, error) {
-	return 0.0, fmt.Errorf("MeasureVoltage: %w", ivi.ErrNotImplemented)
+	return query.Float64f(ctx, ch.inst, ":MEAS? %s", ch.name)
 }
 
 // MeasureCurrent takes a measurement on the output signal and returns the
@@ -34,5 +47,5 @@ func (ch *Channel) MeasureVoltage(ctx context.Context) (float64, error) {
 // Current MeasurementType parameter described in Section 7.2.1 of IVI-4.4:
 // IviDCPwr Class Specification.
 func (ch *Channel) MeasureCurrent(ctx context.Context) (float64, error) {
-	return 0.0, fmt.Errorf("MeasureCurrent: %w", ivi.ErrNotImplemented)
+	return query.Float64f(ctx, ch.inst, ":MEAS:CURR? %s", ch.name)
 }

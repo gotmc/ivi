@@ -36,7 +36,6 @@ var _ dcpwr.MeasurementChannel = (*Channel)(nil)
 // supplies.
 type Driver struct {
 	inst     ivi.Instrument
-	model    string
 	Channels []Channel
 	ivi.Inherent
 }
@@ -134,6 +133,7 @@ func New(inst ivi.Instrument, reset bool) (*Driver, error) {
 	for i, genericChannel := range genericChannels {
 		ch := Channel{
 			name:       genericChannel.name,
+			idx:        i + 1, // 1-based channel index
 			inst:       inst,
 			minVoltage: genericChannel.minVoltage,
 			maxVoltage: genericChannel.maxVoltage,
@@ -157,13 +157,13 @@ func New(inst ivi.Instrument, reset bool) (*Driver, error) {
 // Channel models the output channel repeated capability for the DC power
 // supply output channel.
 type Channel struct {
-	name                 string
-	inst                 ivi.Instrument
-	currentLimitBehavior dcpwr.CurrentLimitBehavior
-	minVoltage           float64
-	maxVoltage           float64
-	minCurrent           float64
-	maxCurrent           float64
+	name       string
+	idx        int // 1-based channel index for :SOURce[<n>] commands
+	inst       ivi.Instrument
+	minVoltage float64
+	maxVoltage float64
+	minCurrent float64
+	maxCurrent float64
 }
 
 // AvailableCOMPorts lists the available COM ports, including optional ports.

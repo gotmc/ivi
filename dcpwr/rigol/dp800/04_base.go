@@ -8,6 +8,7 @@ package dp800
 import (
 	"context"
 	"fmt"
+	"strings"
 
 	"github.com/gotmc/ivi"
 	"github.com/gotmc/ivi/dcpwr"
@@ -28,7 +29,7 @@ func (ch *Channel) Name() string {
 // Current Limit described in Section 4.2.1 of IVI-4.4: IviDCPwr Class
 // Specification.
 func (ch *Channel) CurrentLimit(ctx context.Context) (float64, error) {
-	return 0.0, fmt.Errorf("CurrentLimit: %w", ivi.ErrNotImplemented)
+	return query.Float64f(ctx, ch.inst, ":SOUR%d:CURR?", ch.idx)
 }
 
 // SetCurrentLimit specifies the output current limit in Amperes.
@@ -37,39 +38,54 @@ func (ch *Channel) CurrentLimit(ctx context.Context) (float64, error) {
 // Attribute Current Limit described in Section 4.2.1 of IVI-4.4: IviDCPwr
 // Class Specification.
 func (ch *Channel) SetCurrentLimit(ctx context.Context, limit float64) error {
-	return fmt.Errorf("SetCurrentLimit: %w", ivi.ErrNotImplemented)
+	return ch.inst.Command(ctx, ":SOUR%d:CURR %f", ch.idx, limit)
 }
 
 // CurrentLimitBehavior determines the behavior of the power supply when the
 // output current is equal to or greater than the value of the Current Limit
-// attribute. The E3631A only supports the CurrentRegulate behavior.
+// attribute. The DP800 supports both CurrentRegulate and CurrentTrip via the
+// OCP feature.
 //
 // CurrentLimitBehavior implements the getter for the read-write IviDCPwrBase
 // Attribute Current Limit Behavior described in Section 4.2.2 of IVI-4.4:
 // IviDCPwr Class Specification.
-func (ch *Channel) CurrentLimitBehavior(ctx context.Context) (dcpwr.CurrentLimitBehavior, error) {
-	return dcpwr.CurrentRegulate, fmt.Errorf("CurrentLimitBehavior: %w", ivi.ErrNotImplemented)
+func (ch *Channel) CurrentLimitBehavior(
+	ctx context.Context,
+) (dcpwr.CurrentLimitBehavior, error) {
+	ocpEnabled, err := query.Boolf(ctx, ch.inst, ":OUTP:OCP? %s", ch.name)
+	if err != nil {
+		return 0, fmt.Errorf("CurrentLimitBehavior: %w", err)
+	}
+
+	if ocpEnabled {
+		return dcpwr.CurrentTrip, nil
+	}
+
+	return dcpwr.CurrentRegulate, nil
 }
 
 // SetCurrentLimitBehavior specifies the behavior of the power supply when the
 // output current is equal to or greater than the value of the current limit
-// attribute. The E3631A only supports the CurrentRegulate behavior, so
-// attempting to set CurrentTrip will result in an error.
+// attribute. When set to CurrentTrip, the DP800 enables OCP on the channel;
+// when set to CurrentRegulate, OCP is disabled.
 //
-// CurrentLimitBehavior implements the getter for the read-write IviDCPwrBase
+// SetCurrentLimitBehavior implements the setter for the read-write IviDCPwrBase
 // Attribute Current Limit Behavior described in Section 4.2.2 of IVI-4.4:
 // IviDCPwr Class Specification.
 func (ch *Channel) SetCurrentLimitBehavior(
 	ctx context.Context,
 	behavior dcpwr.CurrentLimitBehavior,
 ) error {
-	if behavior == dcpwr.CurrentTrip {
+	switch behavior {
+	case dcpwr.CurrentRegulate:
+		return ch.inst.Command(ctx, ":OUTP:OCP %s,OFF", ch.name)
+	case dcpwr.CurrentTrip:
+		return ch.inst.Command(ctx, ":OUTP:OCP %s,ON", ch.name)
+	default:
 		return fmt.Errorf(
-			"SetCurrentLimitBehavior: CurrentTrip not supported. %w",
-			ivi.ErrValueNotSupported,
+			"SetCurrentLimitBehavior: %w", ivi.ErrValueNotSupported,
 		)
 	}
-	return nil
 }
 
 // OutputEnabled determines if the given output channel is enabled or disabled.
@@ -80,7 +96,7 @@ func (ch *Channel) OutputEnabled(ctx context.Context) (bool, error) {
 	return query.Boolf(ctx, ch.inst, ":OUTP? %s", ch.name)
 }
 
-// SetOutputEnabled sets all three output channels to enabled or disabled.
+// SetOutputEnabled sets the specified output channel to enabled or disabled.
 //
 // SetOutputEnabled is the setter for the read-write IviDCPwrBase Attribute
 // Output Enabled described in Section 4.2.3 of IVI-4.4: IviDCPwr Class
@@ -89,6 +105,7 @@ func (ch *Channel) SetOutputEnabled(ctx context.Context, v bool) error {
 	if v {
 		return ivi.Set(ch.inst, ":OUTP %s,ON", ch.name)
 	}
+
 	return ivi.Set(ch.inst, ":OUTP %s,OFF", ch.name)
 }
 
@@ -104,51 +121,54 @@ func (ch *Channel) EnableOutput(ctx context.Context) error {
 	return ch.SetOutputEnabled(ctx, true)
 }
 
-// OVPEnabled always returns false for the E3631A since it doesn't have OVP.
+// OVPEnabled determines whether Over-Voltage Protection (OVP) is enabled on
+// the specified channel.
 //
-// OVPEnabled is the getter for the read-write IviFgenBase Attribute OVP
+// OVPEnabled is the getter for the read-write IviDCPwrBase Attribute OVP
 // Enabled described in Section 4.2.4 of IVI-4.4: IviDCPwr Class Specification.
 func (ch *Channel) OVPEnabled(ctx context.Context) (bool, error) {
-	return false, nil
+	return query.Boolf(ctx, ch.inst, ":OUTP:OVP? %s", ch.name)
 }
 
-// SetOVPEnabled always returns an error for the E3631A since it doesn't have
-// Over-Voltage Protection (OVP).
+// SetOVPEnabled enables or disables Over-Voltage Protection (OVP) on the
+// specified channel.
 //
-// SetOVPEnabled is the setter for the read-write IviFgenBase Attribute OVP
+// SetOVPEnabled is the setter for the read-write IviDCPwrBase Attribute OVP
 // Enabled described in Section 4.2.4 of IVI-4.4: IviDCPwr Class Specification.
 func (ch *Channel) SetOVPEnabled(ctx context.Context, v bool) error {
-	return fmt.Errorf("SetOVPEnabled: %w", dcpwr.ErrOVPUnsupported)
+	if v {
+		return ch.inst.Command(ctx, ":OUTP:OVP %s,ON", ch.name)
+	}
+
+	return ch.inst.Command(ctx, ":OUTP:OVP %s,OFF", ch.name)
 }
 
 // DisableOVP is a convenience function for disabling Over-Voltage Protection
-// (OVP). DisableOVP always returns nil for the E3631A since support OVP.
+// (OVP).
 func (ch *Channel) DisableOVP(ctx context.Context) error {
-	return nil
+	return ch.SetOVPEnabled(ctx, false)
 }
 
 // EnableOVP is a convenience function for enabling Over-Voltage Protection
-// (OVP). EnableOVP always returns an error for the E3631A since support OVP.
+// (OVP).
 func (ch *Channel) EnableOVP(ctx context.Context) error {
-	return fmt.Errorf("EnableOVP: %w", dcpwr.ErrOVPUnsupported)
+	return ch.SetOVPEnabled(ctx, true)
 }
 
-// OVPLimit returns an error, since the E3631A doesn't support Over-Voltage
-// Protection (OVP).
+// OVPLimit returns the Over-Voltage Protection (OVP) value in Volts.
 //
-// OVPLimit is the getter for the read-write IviDWPwrBase Attribute OVP Limit
+// OVPLimit is the getter for the read-write IviDCPwrBase Attribute OVP Limit
 // described in Section 4.2.5 of IVI-4.4: IviDCPwr Class Specification.
 func (ch *Channel) OVPLimit(ctx context.Context) (float64, error) {
-	return 0, fmt.Errorf("OVPLimit: %w", dcpwr.ErrOVPUnsupported)
+	return query.Float64f(ctx, ch.inst, ":OUTP:OVP:VAL? %s", ch.name)
 }
 
-// SetOVPLimit returns an error since the E3631A doesn't support Over-Voltage
-// Protection (OVP).
+// SetOVPLimit specifies the Over-Voltage Protection (OVP) value in Volts.
 //
 // SetOVPLimit is the setter for the read-write IviDCPwrBase Attribute OVP
 // Limit described in Section 4.2.5 of IVI-4.4: IviDCPwr Class Specification.
 func (ch *Channel) SetOVPLimit(ctx context.Context, limit float64) error {
-	return fmt.Errorf("SetOVPLimit: %w", dcpwr.ErrOVPUnsupported)
+	return ch.inst.Command(ctx, ":OUTP:OVP:VAL %s,%f", ch.name, limit)
 }
 
 // VoltageLevel reads the specified voltage level the DC power supply attempts
@@ -157,7 +177,7 @@ func (ch *Channel) SetOVPLimit(ctx context.Context, limit float64) error {
 // VoltageLevel is the getter for the read-write IviDCPwrBase Attribute Voltage
 // Level described in Section 4.2.6 of IVI-4.4: IviDCPwr Class Specification.
 func (ch *Channel) VoltageLevel(ctx context.Context) (float64, error) {
-	return query.Float64f(ctx, ch.inst, ":APPL? %s,VOLT", ch.name)
+	return query.Float64f(ctx, ch.inst, ":SOUR%d:VOLT?", ch.idx)
 }
 
 // SetVoltageLevel specifies the voltage level the DC power supply attempts
@@ -166,8 +186,8 @@ func (ch *Channel) VoltageLevel(ctx context.Context) (float64, error) {
 // SetVoltageLevel is the setter for the read-write IviDCPwrBase Attribute
 // Voltage Level described in Section 4.2.6 of IVI-4.4: IviDCPwr Class
 // Specification.
-func (ch *Channel) SetVoltageLevel(ctx context.Context, amp float64) error {
-	return ch.inst.Command(ctx, ":APPL %s,%f", ch.name, amp)
+func (ch *Channel) SetVoltageLevel(ctx context.Context, level float64) error {
+	return ch.inst.Command(ctx, ":SOUR%d:VOLT %f", ch.idx, level)
 }
 
 // ConfigureCurrentLimit configures the current limit. It specifies the output
@@ -181,21 +201,17 @@ func (ch *Channel) ConfigureCurrentLimit(
 	behavior dcpwr.CurrentLimitBehavior,
 	limit float64,
 ) error {
-	return fmt.Errorf("ConfigureCurrentLimit: %w", ivi.ErrNotImplemented)
+	if err := ch.SetCurrentLimit(ctx, limit); err != nil {
+		return err
+	}
+
+	return ch.SetCurrentLimitBehavior(ctx, behavior)
 }
 
-// ConfigureOutputRange configures either the power supply’s output voltage or
-// current range on an output. Setting a voltage range can invalidate a
-// previously configured current range. Setting a current range can invalidate
-// a previously configured voltage range.
-//
-// Some DC power supplies do not allow the user to explicitly specify an
-// output’s range. Instead, they automatically change the range based on the
-// values the user requests for the voltage level, OVP limit, and current
-// limit. For instruments that automatically change the range, the
-// ConfigureOutputRange function should perform range checking to verify that
-// its input parameters are valid, but should not perform any communication
-// with the instrument or set any attributes.
+// ConfigureOutputRange configures either the power supply's output voltage or
+// current range on an output. The DP800 series automatically changes the range
+// based on the values the user requests, so this function performs no
+// communication with the instrument.
 //
 // ConfigureOutputRange implements the IviDCPwrBase function described in
 // Section 4.3.3 of IVI-4.4: IviDCPwr Class Specification.
@@ -204,19 +220,27 @@ func (ch *Channel) ConfigureOutputRange(
 	rt dcpwr.RangeType,
 	rng float64,
 ) error {
-	return fmt.Errorf("ConfigureOutputRange: %w", ivi.ErrNotImplemented)
+	return nil
 }
 
 // ConfigureOVP configures the Over-Voltage Protection (OVP). It specifies the
 // over-voltage limit and the behavior of the power supply when the output
 // voltage is greater than or equal to that value. When the Enabled parameter
-// is False, the Limit parameter does not affect the instrument’s behavior, and
+// is False, the Limit parameter does not affect the instrument's behavior, and
 // the driver does not set the OVP Limit attribute.
 //
 // ConfigureOVP implements the IviDCPwrBase function described in Section 4.3.4
 // of IVI-4.4: IviDCPwr Class Specification.
-func (ch *Channel) ConfigureOVP(ctx context.Context, b bool, limit float64) error {
-	return fmt.Errorf("ConfigureOVP: %w", ivi.ErrNotImplemented)
+func (ch *Channel) ConfigureOVP(ctx context.Context, enabled bool, limit float64) error {
+	if err := ch.SetOVPEnabled(ctx, enabled); err != nil {
+		return err
+	}
+
+	if enabled {
+		return ch.SetOVPLimit(ctx, limit)
+	}
+
+	return nil
 }
 
 // QueryCurrentLimitMax returns the maximum programmable current limit that the
@@ -224,8 +248,11 @@ func (ch *Channel) ConfigureOVP(ctx context.Context, b bool, limit float64) erro
 //
 // QueryCurrentLimitMax implements the IviDCPwrBase function described in
 // Section 4.3.7 of IVI-4.4: IviDCPwr Class Specification.
-func (ch *Channel) QueryCurrentLimitMax(ctx context.Context, voltage float64) (float64, error) {
-	return 0.0, fmt.Errorf("QueryCurrentLimitMax: %w", ivi.ErrNotImplemented)
+func (ch *Channel) QueryCurrentLimitMax(
+	ctx context.Context,
+	voltage float64,
+) (float64, error) {
+	return ch.maxCurrent, nil
 }
 
 // QueryVoltageLevelMax returns the maximum programmable voltage level that the
@@ -237,16 +264,63 @@ func (ch *Channel) QueryVoltageLevelMax(
 	ctx context.Context,
 	currentLimit float64,
 ) (float64, error) {
-	return 0.0, fmt.Errorf("QueryVoltageLevelMax: %w", ivi.ErrNotImplemented)
+	return ch.maxVoltage, nil
 }
 
 // QueryOutputState returns whether the power supply is in a particular output
-// state.
+// state. Uses the :OUTPut:CVCC? command which returns CV, CC, or UR.
 //
 // QueryOutputState implements the IviDCPwrBase function described in Section
 // 4.3.9 of IVI-4.4: IviDCPwr Class Specification.
-func (ch *Channel) QueryOutputState(ctx context.Context, os dcpwr.OutputState) (bool, error) {
-	return false, fmt.Errorf("QueryOutputState: %w", ivi.ErrNotImplemented)
+func (ch *Channel) QueryOutputState(
+	ctx context.Context,
+	os dcpwr.OutputState,
+) (bool, error) {
+	switch os {
+	case dcpwr.ConstantVoltage:
+		mode, err := query.Stringf(ctx, ch.inst, ":OUTP:CVCC? %s", ch.name)
+		if err != nil {
+			return false, fmt.Errorf("QueryOutputState: %w", err)
+		}
+
+		return strings.TrimSpace(mode) == "CV", nil
+	case dcpwr.ConstantCurrent:
+		mode, err := query.Stringf(ctx, ch.inst, ":OUTP:CVCC? %s", ch.name)
+		if err != nil {
+			return false, fmt.Errorf("QueryOutputState: %w", err)
+		}
+
+		return strings.TrimSpace(mode) == "CC", nil
+	case dcpwr.Unregulated:
+		mode, err := query.Stringf(ctx, ch.inst, ":OUTP:CVCC? %s", ch.name)
+		if err != nil {
+			return false, fmt.Errorf("QueryOutputState: %w", err)
+		}
+
+		return strings.TrimSpace(mode) == "UR", nil
+	case dcpwr.OverVoltage:
+		resp, err := query.Stringf(
+			ctx, ch.inst, ":OUTP:OVP:QUES? %s", ch.name,
+		)
+		if err != nil {
+			return false, fmt.Errorf("QueryOutputState: %w", err)
+		}
+
+		return strings.TrimSpace(resp) == "YES", nil
+	case dcpwr.OverCurrent:
+		resp, err := query.Stringf(
+			ctx, ch.inst, ":OUTP:OCP:QUES? %s", ch.name,
+		)
+		if err != nil {
+			return false, fmt.Errorf("QueryOutputState: %w", err)
+		}
+
+		return strings.TrimSpace(resp) == "YES", nil
+	default:
+		return false, fmt.Errorf(
+			"QueryOutputState: %w: %v", ivi.ErrValueNotSupported, os,
+		)
+	}
 }
 
 // ResetOutputProtection resets the power supply output protection after an
@@ -255,5 +329,13 @@ func (ch *Channel) QueryOutputState(ctx context.Context, os dcpwr.OutputState) (
 // ResetOutputProtection implements the IviDCPwrBase function described in
 // Section 4.3.10 of IVI-4.4: IviDCPwr Class Specification.
 func (ch *Channel) ResetOutputProtection(ctx context.Context) error {
-	return fmt.Errorf("ResetOutputProtection: %w", ivi.ErrNotImplemented)
+	if err := ch.inst.Command(ctx, ":OUTP:OVP:CLEAR %s", ch.name); err != nil {
+		return fmt.Errorf("ResetOutputProtection (OVP): %w", err)
+	}
+
+	if err := ch.inst.Command(ctx, ":OUTP:OCP:CLEAR %s", ch.name); err != nil {
+		return fmt.Errorf("ResetOutputProtection (OCP): %w", err)
+	}
+
+	return nil
 }
