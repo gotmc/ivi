@@ -357,16 +357,36 @@ func (d *Driver) InitiateMeasurement(ctx context.Context) error {
 	return d.inst.Command(ctx, "init")
 }
 
-func (d *Driver) IsOutOfRange(_ context.Context, _ float64) (bool, error) {
-	return true, ivi.ErrNotImplemented
+// overRangeValue is the value returned by Keysight 3446x DMMs when a
+// measurement exceeds the selected range. Positive for over-range, negative
+// for under-range.
+const overRangeValue = 9.9e37
+
+// IsOutOfRange returns true if the given value indicates an over-range or
+// under-range condition.
+//
+// IsOutOfRange implements the IviDmmBase function described in Section 4.3.6
+// of IVI-4.2: IviDmm Class Specification.
+func (d *Driver) IsOutOfRange(_ context.Context, value float64) (bool, error) {
+	return value >= overRangeValue || value <= -overRangeValue, nil
 }
 
-func (d *Driver) IsOverRange(_ context.Context, _ float64) (bool, error) {
-	return true, ivi.ErrNotImplemented
+// IsOverRange returns true if the given value indicates a positive over-range
+// condition.
+//
+// IsOverRange implements the IviDmmBase function described in Section 4.3.7
+// of IVI-4.2: IviDmm Class Specification.
+func (d *Driver) IsOverRange(_ context.Context, value float64) (bool, error) {
+	return value >= overRangeValue, nil
 }
 
-func (d *Driver) IsUnderRange(_ context.Context, _ float64) (bool, error) {
-	return true, ivi.ErrNotImplemented
+// IsUnderRange returns true if the given value indicates a negative
+// under-range condition.
+//
+// IsUnderRange implements the IviDmmBase function described in Section 4.3.8
+// of IVI-4.2: IviDmm Class Specification.
+func (d *Driver) IsUnderRange(_ context.Context, value float64) (bool, error) {
+	return value <= -overRangeValue, nil
 }
 
 func (d *Driver) ReadMeasurement(ctx context.Context, _ time.Duration) (float64, error) {
