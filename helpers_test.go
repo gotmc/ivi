@@ -33,7 +33,12 @@ func TestSet(t *testing.T) {
 		{"no args", "OUTP ON", nil, "OUTP ON"},
 		{"with float", "VOLT %f", []any{1.5}, "VOLT 1.500000"},
 		{"with string", "INST %s", []any{"P6V"}, "INST P6V"},
-		{"with multiple args", "CURR %f;:CURR:PROT %f", []any{0.5, 0.5}, "CURR 0.500000;:CURR:PROT 0.500000"},
+		{
+			"with multiple args",
+			"CURR %f;:CURR:PROT %f",
+			[]any{0.5, 0.5},
+			"CURR 0.500000;:CURR:PROT 0.500000",
+		},
 	}
 
 	for _, tt := range tests {

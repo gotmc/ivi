@@ -64,7 +64,10 @@ func (ch *Channel) SetCurrentLimitBehavior(
 	behavior dcpwr.CurrentLimitBehavior,
 ) error {
 	if behavior == dcpwr.CurrentTrip {
-		return fmt.Errorf("SetCurrentLimitBehavior: CurrentTrip not supported. %w", ivi.ErrValueNotSupported)
+		return fmt.Errorf(
+			"SetCurrentLimitBehavior: CurrentTrip not supported. %w",
+			ivi.ErrValueNotSupported,
+		)
 	}
 	return nil
 }
