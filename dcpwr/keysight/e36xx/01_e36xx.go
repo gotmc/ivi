@@ -73,6 +73,7 @@ func New(inst ivi.Instrument, reset bool) (*Driver, error) {
 		ClassSpecRevision:     specRevision,
 		ResetDelay:            700 * time.Millisecond,
 		ClearDelay:            700 * time.Millisecond,
+		ReturnToLocal:         true,
 		GroupCapabilities: []string{
 			"IviDCPwrBase",
 			"IviDCPwrMeasurement",

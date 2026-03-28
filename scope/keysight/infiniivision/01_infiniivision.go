@@ -76,6 +76,7 @@ func New(inst ivi.Instrument, reset bool) (*Driver, error) {
 		ClassSpecRevision:     specRevision,
 		ResetDelay:            defaultResetDelay,
 		ClearDelay:            defaultClearDelay,
+		ReturnToLocal:         true,
 		GroupCapabilities: []string{
 			"IviScopeBase",
 			"IviScopeWaveformMeasurement",

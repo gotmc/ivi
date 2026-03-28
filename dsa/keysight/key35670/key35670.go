@@ -52,6 +52,7 @@ func New(inst ivi.Instrument, reset bool) (*Key35670, error) {
 		ClassSpecRevision:     specRevision,
 		ResetDelay:            500 * time.Millisecond,
 		ClearDelay:            500 * time.Millisecond,
+		ReturnToLocal:         true,
 		GroupCapabilities: []string{
 			"IviDSABase",
 		},

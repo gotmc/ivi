@@ -7,18 +7,26 @@ package pmx
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/gotmc/ivi"
 	"github.com/gotmc/ivi/dcpwr"
 	"github.com/gotmc/query"
 )
 
-// MeasureVoltage takes a measurement on the output signal and returns the
-// measured voltage.  MeasureVoltage implements the IviDCPwrMeasurement
-// function Measure for the Voltage MeasurementType parameter described in
-// Section 7.2.1 of IVI-4.4: IviDCPwr Class Specification.
+// Measure takes a measurement on the output signal and returns the measured
+// value for the given MeasurementType. Measure implements the
+// IviDCPwrMeasurement function described in Section 7.2.1 of IVI-4.4:
+// IviDCPwr Class Specification.
 func (ch *Channel) Measure(ctx context.Context, msrType dcpwr.MeasurementType) (float64, error) {
-	return 0.0, ivi.ErrNotImplemented
+	switch msrType {
+	case dcpwr.CurrentMeasurement:
+		return ch.MeasureCurrent(ctx)
+	case dcpwr.VoltageMeasurement:
+		return ch.MeasureVoltage(ctx)
+	}
+
+	return 0.0, fmt.Errorf("Measure: %w: %v", ivi.ErrValueNotSupported, msrType)
 }
 
 // MeasureVoltage takes a measurement on the output signal and returns the

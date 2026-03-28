@@ -52,6 +52,7 @@ func New(inst ivi.Instrument, reset bool) (*SDL10xx, error) {
 		ClassSpecRevision:     specRevision,
 		ResetDelay:            500 * time.Millisecond,
 		ClearDelay:            500 * time.Millisecond,
+		ReturnToLocal:         true,
 		GroupCapabilities:     []string{},
 		SupportedInstrumentModels: []string{
 			"SDL1000X",

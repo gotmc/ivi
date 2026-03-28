@@ -14,7 +14,7 @@ import (
 // string to the given StringWriter interface.
 func Set(sw StringWriter, format string, a ...any) error {
 	cmd := format
-	if a != nil {
+	if len(a) > 0 {
 		cmd = fmt.Sprintf(format, a...)
 	}
 

@@ -36,6 +36,7 @@ func New(inst ivi.Instrument, reset bool) (*E4411B, error) {
 		ClassSpecMajorVersion: specMajorVersion,
 		ClassSpecMinorVersion: specMinorVersion,
 		ClassSpecRevision:     specRevision,
+		ReturnToLocal:         true,
 		GroupCapabilities: []string{
 			"IviSpecAnBase",
 		},

@@ -6,7 +6,6 @@
 package ivi
 
 import (
-	"errors"
 	"testing"
 )
 
@@ -52,23 +51,25 @@ func TestParseIdentification(t *testing.T) {
 
 func TestParseIdentificationErrors(t *testing.T) {
 	testCases := map[string]struct {
-		given         string
-		expectedError error
+		given       string
+		expectedMsg string
 	}{
 		"empty_idn": {
 			"",
-			errors.New("idn string (``) could not be split in four"),
+			"idn string (``) could not be split in four",
 		},
 		"partial_idn": {
 			"HEWLETT-PACKARD,E3631A",
-			errors.New("idn string (``) could not be split in four"),
+			"idn string (`HEWLETT-PACKARD,E3631A`) could not be split in four",
 		},
 	}
 	for name, testCase := range testCases {
 		t.Run(name, func(t *testing.T) {
 			_, err := parseIdentification(testCase.given, fwrID)
-			if errors.Is(err, testCase.expectedError) && testCase.expectedError != nil {
-				t.Errorf("got error %s / expected %s", err, testCase.expectedError)
+			if err == nil {
+				t.Errorf("expected error, got nil")
+			} else if err.Error() != testCase.expectedMsg {
+				t.Errorf("got error %q / expected %q", err.Error(), testCase.expectedMsg)
 			}
 		})
 	}

@@ -45,12 +45,9 @@ type InherentBase struct {
 }
 
 // NewInherent creates a new Inherent struct using the given Instrument
-// interface and the InherentBase struct.
+// interface and the InherentBase struct. Note: callers should explicitly set
+// ReturnToLocal in InherentBase (default Go zero value is false).
 func NewInherent(inst Instrument, base InherentBase) Inherent {
-	// Default to returning to local control.
-	if !base.ReturnToLocal {
-		base.ReturnToLocal = true // Default to true if not explicitly set
-	}
 	return Inherent{
 		inst:         inst,
 		InherentBase: base,

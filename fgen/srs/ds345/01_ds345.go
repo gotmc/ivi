@@ -74,6 +74,7 @@ func New(inst ivi.Instrument, reset bool) (*Driver, error) {
 		ClassSpecRevision:     specRevision,
 		ResetDelay:            defaultResetDelay,
 		ClearDelay:            defaultClearDelay,
+		ReturnToLocal:         true,
 		// Commented out GroupCapabilities still need to be added.
 		GroupCapabilities: []string{
 			// "IviFgenArbFrequency",

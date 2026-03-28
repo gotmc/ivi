@@ -203,7 +203,7 @@ func (d *Driver) SetReferenceClockSource(_ context.Context, src fgen.ClockSource
 }
 
 func (ch *Channel) Name() string {
-	return "output"
+	return ch.name
 }
 
 const (

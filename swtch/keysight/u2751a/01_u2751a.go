@@ -85,6 +85,7 @@ func New(inst ivi.Instrument, reset, standalone bool) (U2751A, error) {
 		ClassSpecMajorVersion: specMajorVersion,
 		ClassSpecMinorVersion: specMinorVersion,
 		ClassSpecRevision:     specRevision,
+		ReturnToLocal:         true,
 		GroupCapabilities: []string{
 			"IviSwtchBase",
 			"IviSwtchScanner",

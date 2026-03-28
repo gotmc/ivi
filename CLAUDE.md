@@ -89,6 +89,37 @@ When `reset` is true, the constructor uses `context.Background()` internally.
 Channel structs hold an `ivi.Instrument` reference and a channel `name` string,
 implementing per-channel capability interfaces.
 
+#### SCPI Command Mapping Pattern
+
+Drivers use dual maps for bidirectional enum↔SCPI conversion, paired with
+generic helpers from the root `ivi` package:
+
+```go
+// Forward map: Go enum → SCPI command string (for setting values)
+var outputModeToSCPI = map[fgen.OutputMode]string{
+    fgen.OutputModeFunction: "FUNC SIN",
+    fgen.OutputModeNoise:    "FUNC NOIS",
+}
+
+// Reverse map: SCPI response string → Go enum (for querying values)
+var scpiToOutputMode = map[string]fgen.OutputMode{
+    "SIN":  fgen.OutputModeFunction,
+    "NOIS": fgen.OutputModeNoise,
+}
+
+// Usage via generic helpers:
+cmd, err := ivi.LookupSCPI(outputModeToSCPI, outputMode)   // returns ErrValueNotSupported on miss
+mode, err := ivi.ReverseLookup(scpiToOutputMode, scpiStr)   // returns ErrUnexpectedResponse on miss
+```
+
+#### Core Helpers and Errors (`helpers.go`, `errors.go`)
+
+- `ivi.Set(sw, format, args...)` — convenience for sending formatted SCPI
+  command strings
+- `ivi.QueryID(ctx, q)` — standard `*IDN?` query
+- Error sentinels: `ErrNotImplemented`, `ErrFunctionNotSupported`,
+  `ErrValueNotSupported`, `ErrUnexpectedResponse`
+
 ### Design Philosophy
 
 - **Idiomatic Go over strict IVI compliance**: Uses Go enums and type safety

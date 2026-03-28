@@ -55,7 +55,7 @@ func (m *mockInstrumentWithClose) Close() error {
 
 func TestInherent_Disable(t *testing.T) {
 	mock := &mockInstrumentWithClose{}
-	inherent := NewInherent(mock, InherentBase{})
+	inherent := NewInherent(mock, InherentBase{ReturnToLocal: true})
 
 	err := inherent.Disable(context.Background())
 	if err != nil {
@@ -74,7 +74,7 @@ func TestInherent_Disable(t *testing.T) {
 
 func TestInherent_Disable_Fallback(t *testing.T) {
 	mock := &mockInstrumentWithClose{errorOnFirstOnly: true}
-	inherent := NewInherent(mock, InherentBase{})
+	inherent := NewInherent(mock, InherentBase{ReturnToLocal: true})
 
 	err := inherent.Disable(context.Background())
 	if err != nil {
@@ -98,7 +98,7 @@ func TestInherent_Disable_Fallback(t *testing.T) {
 
 func TestInherent_Close(t *testing.T) {
 	mock := &mockInstrumentWithClose{}
-	inherent := NewInherent(mock, InherentBase{})
+	inherent := NewInherent(mock, InherentBase{ReturnToLocal: true})
 
 	err := inherent.Close()
 	if err != nil {
@@ -123,7 +123,7 @@ func TestInherent_Close(t *testing.T) {
 func TestInherent_Close_WithoutCloser(t *testing.T) {
 	// Use the regular mock that doesn't implement Close()
 	mock := &mockInstrument{}
-	inherent := NewInherent(mock, InherentBase{})
+	inherent := NewInherent(mock, InherentBase{ReturnToLocal: true})
 
 	err := inherent.Close()
 	if err != nil {
@@ -136,11 +136,11 @@ func TestInherent_Close_WithoutCloser(t *testing.T) {
 
 func TestInherent_ReturnToLocal_Control(t *testing.T) {
 	mock := &mockInstrumentWithClose{}
-	inherent := NewInherent(mock, InherentBase{})
+	inherent := NewInherent(mock, InherentBase{ReturnToLocal: true})
 
-	// Should default to true
+	// Should be true when explicitly set
 	if !inherent.IsReturnToLocal() {
-		t.Error("Expected ReturnToLocal to default to true")
+		t.Error("Expected ReturnToLocal to be true")
 	}
 
 	// Test disabling return to local

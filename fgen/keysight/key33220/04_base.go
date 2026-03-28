@@ -122,7 +122,7 @@ func (d *Driver) SetReferenceClockSource(_ context.Context, _ fgen.ClockSource) 
 }
 
 func (ch *Channel) Name() string {
-	return "output"
+	return ch.name
 }
 
 // OperationMode determines whether the function generator should produce a
