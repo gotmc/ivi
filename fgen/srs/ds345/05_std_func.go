@@ -170,11 +170,12 @@ func (ch *Channel) StandardWaveform(ctx context.Context) (fgen.StandardWaveform,
 func (ch *Channel) SetStandardWaveform(ctx context.Context, wave fgen.StandardWaveform) error {
 	// FIXME(mdr): May need to change the phase offset in order to match the
 	// waveforms shown in Figure 5-1 of IVI-4.3: IviFgen Class Specification.
-	if wave == fgen.DC {
-		return ivi.ErrNotImplemented
+	cmd, err := ivi.LookupSCPI(waveformCommand, wave)
+	if err != nil {
+		return fmt.Errorf("SetStandardWaveform: %w", err)
 	}
 
-	return ch.inst.Command(ctx, waveformCommand[wave])
+	return ch.inst.Command(ctx, cmd)
 }
 
 var waveformCommand = map[fgen.StandardWaveform]string{
@@ -199,13 +200,12 @@ func (ch *Channel) ConfigureStandardWaveform(
 	freq float64,
 	phase float64,
 ) error {
-	if wave == fgen.DC {
-		return ivi.ErrNotImplemented
+	format, err := ivi.LookupSCPI(waveformApplyCommand, wave)
+	if err != nil {
+		return fmt.Errorf("ConfigureStandardWaveform: %w", err)
 	}
 
-	return ch.inst.Command(
-		ctx, waveformApplyCommand[wave], freq, amp, offset, phase,
-	)
+	return ch.inst.Command(ctx, format, freq, amp, offset, phase)
 }
 
 var waveformApplyCommand = map[fgen.StandardWaveform]string{

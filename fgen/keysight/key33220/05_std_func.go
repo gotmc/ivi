@@ -10,6 +10,7 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/gotmc/ivi"
 	"github.com/gotmc/ivi/fgen"
 	"github.com/gotmc/query"
 )
@@ -167,7 +168,12 @@ func (ch *Channel) StandardWaveform(ctx context.Context) (fgen.StandardWaveform,
 func (ch *Channel) SetStandardWaveform(ctx context.Context, wave fgen.StandardWaveform) error {
 	// FIXME(mdr): May need to change the phase offset in order to match the
 	// waveforms shown in Figure 5-1 of IVI-4.3: IviFgen Class Specification.
-	return ch.inst.Command(ctx, waveformCommand[wave])
+	cmd, err := ivi.LookupSCPI(waveformCommand, wave)
+	if err != nil {
+		return fmt.Errorf("SetStandardWaveform: %w", err)
+	}
+
+	return ch.inst.Command(ctx, cmd)
 }
 
 // ConfigureStandardWaveform configures the attributes of the function
@@ -184,10 +190,12 @@ func (ch *Channel) ConfigureStandardWaveform(
 	freq float64,
 	phase float64,
 ) error {
-	err := ch.inst.Command(
-		ctx, waveformApplyCommand[wave], freq, amp, offset,
-	)
+	format, err := ivi.LookupSCPI(waveformApplyCommand, wave)
 	if err != nil {
+		return fmt.Errorf("ConfigureStandardWaveform: %w", err)
+	}
+
+	if err := ch.inst.Command(ctx, format, freq, amp, offset); err != nil {
 		return err
 	}
 

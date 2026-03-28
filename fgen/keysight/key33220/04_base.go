@@ -7,13 +7,37 @@ package key33220
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"strings"
 
+	"github.com/gotmc/ivi"
 	"github.com/gotmc/ivi/fgen"
 	"github.com/gotmc/query"
 )
+
+var scpiToOutputMode = map[string]fgen.OutputMode{
+	"SIN":  fgen.OutputModeFunction,
+	"SQU":  fgen.OutputModeFunction,
+	"RAMP": fgen.OutputModeFunction,
+	"NOIS": fgen.OutputModeNoise,
+	"USER": fgen.OutputModeArbitrary,
+}
+
+var outputModeToSCPI = map[fgen.OutputMode]string{
+	fgen.OutputModeFunction:  "FUNC SIN",
+	fgen.OutputModeArbitrary: "FUNC USER",
+	fgen.OutputModeNoise:     "FUNC NOIS",
+}
+
+var scpiToOperationMode = map[string]fgen.OperationMode{
+	"0": fgen.ContinuousMode,
+	"1": fgen.BurstMode,
+}
+
+var operationModeToSCPI = map[fgen.OperationMode]string{
+	fgen.BurstMode:      "BURS:MODE TRIG;STAT ON",
+	fgen.ContinuousMode: "BURS:STAT OFF",
+}
 
 // OutputCount returns the number of available output channels.
 //
@@ -31,23 +55,17 @@ func (d *Driver) OutputCount() int {
 // OutputMode is the getter for the read-only IviFgenBase Attribute Output
 // Mode described in Section 4.2.5 of IVI-4.3: IviFgen Class Specification.
 func (d *Driver) OutputMode(ctx context.Context) (fgen.OutputMode, error) {
-	var outputMode fgen.OutputMode
-
-	funcType, err := query.String(ctx, d.inst, "FUNC?")
+	s, err := query.String(ctx, d.inst, "FUNC?")
 	if err != nil {
-		return outputMode, fmt.Errorf("error determining the output function type: %w", err)
+		return 0, fmt.Errorf("error determining the output function type: %w", err)
 	}
 
-	switch funcType {
-	case "SIN", "SQU", "RAMP":
-		return fgen.OutputModeFunction, nil
-	case "NOIS":
-		return fgen.OutputModeNoise, nil
-	case "USER":
-		return fgen.OutputModeArbitrary, nil
+	mode, err := ivi.ReverseLookup(scpiToOutputMode, s)
+	if err != nil {
+		return 0, fmt.Errorf("OutputMode: %w", err)
 	}
 
-	return 0, fmt.Errorf("unknown output mode type")
+	return mode, nil
 }
 
 // SetOutputMode sets how the function generator produces waveforms. This
@@ -57,18 +75,12 @@ func (d *Driver) OutputMode(ctx context.Context) (fgen.OutputMode, error) {
 // OutputMode is the setter for the read-only IviFgenBase Attribute Output
 // Mode described in Section 4.2.5 of IVI-4.3: IviFgen Class Specification.
 func (d *Driver) SetOutputMode(ctx context.Context, outputMode fgen.OutputMode) error {
-	switch outputMode {
-	case fgen.OutputModeFunction:
-		return d.inst.Command(ctx, "FUNC SIN")
-	case fgen.OutputModeArbitrary:
-		return d.inst.Command(ctx, "FUNC USER")
-	case fgen.OutputModeSequence:
-		return fmt.Errorf("function generator does not support output mode sequency")
-	case fgen.OutputModeNoise:
-		return d.inst.Command(ctx, "FUNC NOIS")
+	cmd, err := ivi.LookupSCPI(outputModeToSCPI, outputMode)
+	if err != nil {
+		return fmt.Errorf("SetOutputMode: %w", err)
 	}
 
-	return fmt.Errorf("error setting output mode")
+	return d.inst.Command(ctx, cmd)
 }
 
 // InitiateGeneration initiates signal generation by enabling all outputs.
@@ -120,21 +132,17 @@ func (ch *Channel) Name() string {
 // Operation Mode described in Section 4.2.2 of IVI-4.3: IviFgen Class
 // Specification.
 func (ch *Channel) OperationMode(ctx context.Context) (fgen.OperationMode, error) {
-	var mode fgen.OperationMode
-
 	s, err := query.String(ctx, ch.inst, "BURS:STAT?")
 	if err != nil {
-		return mode, fmt.Errorf("error getting operation mode: %w", err)
+		return 0, fmt.Errorf("error getting operation mode: %w", err)
 	}
 
-	switch strings.TrimSpace(s) {
-	case "0":
-		return fgen.ContinuousMode, nil
-	case "1":
-		return fgen.BurstMode, nil
-	default:
-		return mode, fmt.Errorf("error determining operation mode; received: %s", s)
+	mode, err := ivi.ReverseLookup(scpiToOperationMode, strings.TrimSpace(s))
+	if err != nil {
+		return 0, fmt.Errorf("OperationMode: %w", err)
 	}
+
+	return mode, nil
 }
 
 // SetOperationMode specifies whether the function generator should produce a
@@ -142,14 +150,12 @@ func (ch *Channel) OperationMode(ctx context.Context) (fgen.OperationMode, error
 // setter for the read-write IviFgenBase Attribute Operation Mode described in
 // Section 4.2.2 of IVI-4.3: IviFgen Class Specification.
 func (ch *Channel) SetOperationMode(ctx context.Context, mode fgen.OperationMode) error {
-	switch mode {
-	case fgen.BurstMode:
-		return ch.inst.Command(ctx, "BURS:MODE TRIG;STAT ON")
-	case fgen.ContinuousMode:
-		return ch.inst.Command(ctx, "BURS:STAT OFF")
+	cmd, err := ivi.LookupSCPI(operationModeToSCPI, mode)
+	if err != nil {
+		return fmt.Errorf("SetOperationMode: %w", err)
 	}
 
-	return errors.New("bad fgen operation mode")
+	return ch.inst.Command(ctx, cmd)
 }
 
 // OutputEnabled determines if the output channel is enabled or disabled.

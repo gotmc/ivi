@@ -7,13 +7,23 @@ package ds345
 
 import (
 	"context"
-	"errors"
 	"fmt"
 
 	"github.com/gotmc/ivi"
 	"github.com/gotmc/ivi/fgen"
 	"github.com/gotmc/query"
 )
+
+var outputModeToSCPI = map[fgen.OutputMode]string{
+	fgen.OutputModeFunction:  "FUNC0",
+	fgen.OutputModeArbitrary: "FUNC5",
+	fgen.OutputModeNoise:     "FUNC4",
+}
+
+var operationModeToSCPI = map[fgen.OperationMode]string{
+	fgen.BurstMode:      "MTYP5;MENA1",
+	fgen.ContinuousMode: "MENA0",
+}
 
 const (
 	outputImpedance = 50.0
@@ -61,18 +71,12 @@ func (d *Driver) OutputMode(ctx context.Context) (fgen.OutputMode, error) {
 // OutputMode is the setter for the read-only IviFgenBase Attribute Output
 // Mode described in Section 4.2.5 of IVI-4.3: IviFgen Class Specification.
 func (d *Driver) SetOutputMode(ctx context.Context, outputMode fgen.OutputMode) error {
-	switch outputMode {
-	case fgen.OutputModeFunction:
-		return d.inst.Command(ctx, "FUNC0")
-	case fgen.OutputModeArbitrary:
-		return d.inst.Command(ctx, "FUNC5")
-	case fgen.OutputModeSequence:
-		return fmt.Errorf("function generator does not support output mode sequency")
-	case fgen.OutputModeNoise:
-		return d.inst.Command(ctx, "FUNC4")
+	cmd, err := ivi.LookupSCPI(outputModeToSCPI, outputMode)
+	if err != nil {
+		return fmt.Errorf("SetOutputMode: %w", err)
 	}
 
-	return fmt.Errorf("error setting output mode")
+	return d.inst.Command(ctx, cmd)
 }
 
 // OperationMode determines whether the function generator should produce a
@@ -111,16 +115,12 @@ func (ch *Channel) OperationMode(ctx context.Context) (fgen.OperationMode, error
 // Attribute Operation Mode described in Section 4.2.2 of IVI-4.3: IviFgen
 // Class Specification.
 func (ch *Channel) SetOperationMode(ctx context.Context, mode fgen.OperationMode) error {
-	switch mode {
-	case fgen.BurstMode:
-		// Set the modulation type to burst (MTYP5) and enable modulation (MENA1).
-		return ch.inst.Command(ctx, "MTYP5;MENA1")
-	case fgen.ContinuousMode:
-		// Disable modulation (MENA0).
-		return ch.inst.Command(ctx, "MENA0")
+	cmd, err := ivi.LookupSCPI(operationModeToSCPI, mode)
+	if err != nil {
+		return fmt.Errorf("SetOperationMode: %w", err)
 	}
 
-	return errors.New("bad fgen operation mode")
+	return ch.inst.Command(ctx, cmd)
 }
 
 // OutputEnabled determines if the output channel is enabled or disabled.
