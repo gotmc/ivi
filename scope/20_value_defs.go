@@ -86,10 +86,8 @@ func (ts TriggerSlope) String() string {
 	return triggerSlopes[ts]
 }
 
-// TriggerSource models the defined values for the Start Trigger Source, Stop
-// Trigger Source, Hold Trigger Source, Resume Trigger Source, Advanced Trigger
-// Source, Data Marker Destination, and Sparse Marker Destination defined in
-// Section 30 IviFgen Attribute Value Definitions of IVI-4.3: IviFgenClass
+// TriggerSource models the defined values for the Trigger Source defined in
+// Section 20 IviScope Attribute Value Definitions of IVI-4.1: IviScope Class
 // Specification.
 type TriggerSource int
 
