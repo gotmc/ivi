@@ -114,7 +114,7 @@ Below are the .NET functions, since they are the basis for the Go interfaces.
 
 */
 
-// Base provides the interface required for the IviFgenBase capability group.
+// Base provides the interface required for the IviScopeBase capability group.
 type Base interface {
 	AcquisitionStartTime(ctx context.Context) (time.Duration, error)
 	SetAcquisitionStartTime(ctx context.Context, startTime time.Duration) error
@@ -157,7 +157,7 @@ type Base interface {
 }
 
 // BaseChannel provides the interface required for the channel repeated
-// capability for the IviFgenBase capability group.
+// capability for the IviScopeBase capability group.
 type BaseChannel interface {
 	ChannelEnabled(ctx context.Context) (bool, error)
 	SetChannelEnabled(ctx context.Context, b bool) error
@@ -187,7 +187,7 @@ type BaseChannel interface {
 		probeAttenuation float64,
 		enabled bool,
 	) error
-	ConfigureCharacteristics(ctx context.Context, inputImepdance, inputFreqMax float64) error
+	ConfigureCharacteristics(ctx context.Context, inputImpedance, inputFreqMax float64) error
 	FetchWaveform(ctx context.Context, waveform *ivi.Waveform) error
 	ReadWaveform(ctx context.Context, maximumTime time.Duration, waveform *ivi.Waveform) error
 }

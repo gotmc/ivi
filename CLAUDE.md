@@ -60,6 +60,10 @@ Each directory defines interfaces for an IVI instrument class:
 - `dcpwr/` — IVI-4.4 IviDCPwr Class (DC Power Supply)
 - `scope/` — IVI-4.1 IviScope Class (Oscilloscope)
 
+Additional class packages exist with varying levels of implementation:
+`acpwr`, `counter`, `digitizer`, `downcnvrtr`, `dsa`, `lcr`, `load`,
+`pwrmeter`, `rfsiggen`, `specan`, `swtch`, `upcnvrtr`.
+
 Each class package defines Go interfaces for capability groups (Base,
 StdFunc, Trigger, etc.) that drivers must implement. All interface methods
 that communicate with instruments take `context.Context` as first parameter.
@@ -69,8 +73,11 @@ that communicate with instruments take `context.Context` as first parameter.
 Drivers live under `<class>/<manufacturer>/<model>/` (e.g.,
 `fgen/keysight/key33220/`). All drivers follow this structure:
 
-- `01_<model>.go`: Package doc, Driver struct, Channel struct, `New()` constructor
-- `04_base.go` and subsequent numbered files: One file per IVI capability group
+- `01_<model>.go`: Package doc, Driver struct, Channel struct, `New()` constructor,
+  `Close()` method
+- `04_base.go`: Base capability group
+- `05_*.go` onwards: Additional capability groups (StdFunc, AC Measurements,
+  Triggers, etc.) — one file per IVI specification section
 
 The Driver struct always follows this pattern:
 
@@ -88,6 +95,14 @@ When `reset` is true, the constructor uses `context.Background()` internally.
 
 Channel structs hold an `ivi.Instrument` reference and a channel `name` string,
 implementing per-channel capability interfaces.
+
+Drivers implement a `Close()` method that delegates to the embedded Inherent:
+
+```go
+func (d *Driver) Close() error {
+    return d.Inherent.Close()
+}
+```
 
 #### SCPI Command Mapping Pattern
 
@@ -119,6 +134,8 @@ mode, err := ivi.ReverseLookup(scpiToOutputMode, scpiStr)   // returns ErrUnexpe
 - `ivi.QueryID(ctx, q)` — standard `*IDN?` query
 - Error sentinels: `ErrNotImplemented`, `ErrFunctionNotSupported`,
   `ErrValueNotSupported`, `ErrUnexpectedResponse`
+- Class packages may define additional error sentinels (e.g., `dcpwr` defines
+  `ErrOVPUnsupported` and `ErrTriggerNotSoftware`)
 
 ### Design Philosophy
 

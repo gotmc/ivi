@@ -70,7 +70,7 @@ Below are the .NET functions, since they are the basis for the Go interfaces.
 
 */
 
-// Base provides the interface required for the IviDCPwrBase capability group.
+// Base provides the interface required for the IviDmmBase capability group.
 type Base interface {
 	MeasurementFunction(ctx context.Context) (MeasurementFunction, error)
 	SetMeasurementFunction(ctx context.Context, msrFunc MeasurementFunction) error
