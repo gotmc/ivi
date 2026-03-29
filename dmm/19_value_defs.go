@@ -12,6 +12,16 @@ const (
 	PowerLineCycles
 )
 
+var apertureTimeUnits = map[ApertureTimeUnits]string{
+	Seconds:         "seconds",
+	PowerLineCycles: "power line cycles",
+}
+
+// String implements the Stringer interface for ApertureTimeUnits.
+func (atu ApertureTimeUnits) String() string {
+	return apertureTimeUnits[atu]
+}
+
 // AutoRange provides the defined values for the AutoRange function defined in
 // Section 4.2.3 and Section 19 of IVI-4.2: IviDmm Class Specification.
 type AutoRange int
@@ -41,6 +51,17 @@ const (
 	AutoZeroOn
 	AutoZeroOnce
 )
+
+var autoZeros = map[AutoZero]string{
+	AutoZeroOff:  "auto zero off",
+	AutoZeroOn:   "auto zero on",
+	AutoZeroOnce: "auto zero once",
+}
+
+// String implements the Stringer interface for AutoZero.
+func (az AutoZero) String() string {
+	return autoZeros[az]
+}
 
 // MeasurementFunction provides the defined values for the Measurement Function
 // defined in Section 4.2.1 and Section 19 of IVI-4.2: IviDmm Class
@@ -111,6 +132,36 @@ const (
 	RTSI6
 )
 
+var triggerSources = map[TriggerSource]string{
+	Immediate:       "immediate",
+	External:        "external",
+	SoftwareTrigger: "software trigger",
+	Interval:        "interval",
+	TTL0:            "ttl0",
+	TTL1:            "ttl1",
+	TTL2:            "ttl2",
+	TTL3:            "ttl3",
+	TTL4:            "ttl4",
+	TTL5:            "ttl5",
+	TTL6:            "ttl6",
+	TTL7:            "ttl7",
+	ECL0:            "ecl0",
+	ECL1:            "ecl1",
+	PXIStar:         "pxi star",
+	RTSI0:           "rtsi0",
+	RTSI1:           "rtsi1",
+	RTSI2:           "rtsi2",
+	RTSI3:           "rtsi3",
+	RTSI4:           "rtsi4",
+	RTSI5:           "rtsi5",
+	RTSI6:           "rtsi6",
+}
+
+// String implements the Stringer interface for TriggerSource.
+func (ts TriggerSource) String() string {
+	return triggerSources[ts]
+}
+
 type TempTransducerType int
 
 const (
@@ -120,12 +171,34 @@ const (
 	FourWireRTD
 )
 
+var tempTransducerTypes = map[TempTransducerType]string{
+	Thermocouple: "thermocouple",
+	Thermistor:   "thermistor",
+	TwoWireRTD:   "2-wire RTD",
+	FourWireRTD:  "4-wire RTD",
+}
+
+// String implements the Stringer interface for TempTransducerType.
+func (ttt TempTransducerType) String() string {
+	return tempTransducerTypes[ttt]
+}
+
 type ReferenceJunctionType int
 
 const (
 	InternalReferenceJunction ReferenceJunctionType = iota
 	FixedReferenceJunction
 )
+
+var referenceJunctionTypes = map[ReferenceJunctionType]string{
+	InternalReferenceJunction: "internal",
+	FixedReferenceJunction:    "fixed",
+}
+
+// String implements the Stringer interface for ReferenceJunctionType.
+func (rjt ReferenceJunctionType) String() string {
+	return referenceJunctionTypes[rjt]
+}
 
 type ThermocoupleType int
 
@@ -144,6 +217,27 @@ const (
 	ThermocoupleU
 	ThermocoupleV
 )
+
+var thermocoupleTypes = map[ThermocoupleType]string{
+	ThermocoupleB: "B",
+	ThermocoupleC: "C",
+	ThermocoupleD: "D",
+	ThermocoupleE: "E",
+	ThermocoupleG: "G",
+	ThermocoupleJ: "J",
+	ThermocoupleK: "K",
+	ThermocoupleN: "N",
+	ThermocoupleR: "R",
+	ThermocoupleS: "S",
+	ThermocoupleT: "T",
+	ThermocoupleU: "U",
+	ThermocoupleV: "V",
+}
+
+// String implements the Stringer interface for ThermocoupleType.
+func (tt ThermocoupleType) String() string {
+	return thermocoupleTypes[tt]
+}
 
 type MeasurementDestination int
 
@@ -170,9 +264,47 @@ const (
 	MsrDestinationRTSI6
 )
 
+var measurementDestinations = map[MeasurementDestination]string{
+	MsrDestinationNone:     "none",
+	MsrDestinationExternal: "external",
+	MsrDestinationTTL0:     "ttl0",
+	MsrDestinationTTL1:     "ttl1",
+	MsrDestinationTTL2:     "ttl2",
+	MsrDestinationTTL3:     "ttl3",
+	MsrDestinationTTL4:     "ttl4",
+	MsrDestinationTTL5:     "ttl5",
+	MsrDestinationTTL6:     "ttl6",
+	MsrDestinationTTL7:     "ttl7",
+	MsrDestinationECL0:     "ecl0",
+	MsrDestinationECL1:     "ecl1",
+	MsrDestinationPXIStar:  "pxi star",
+	MsrDestinationRTSI0:    "rtsi0",
+	MsrDestinationRTSI1:    "rtsi1",
+	MsrDestinationRTSI2:    "rtsi2",
+	MsrDestinationRTSI3:    "rtsi3",
+	MsrDestinationRTSI4:    "rtsi4",
+	MsrDestinationRTSI5:    "rtsi5",
+	MsrDestinationRTSI6:    "rtsi6",
+}
+
+// String implements the Stringer interface for MeasurementDestination.
+func (md MeasurementDestination) String() string {
+	return measurementDestinations[md]
+}
+
 type TriggerSlope int
 
 const (
 	PositiveTriggerSlope TriggerSlope = iota
 	NegativeTriggerSlope
 )
+
+var triggerSlopes = map[TriggerSlope]string{
+	PositiveTriggerSlope: "positive",
+	NegativeTriggerSlope: "negative",
+}
+
+// String implements the Stringer interface for TriggerSlope.
+func (ts TriggerSlope) String() string {
+	return triggerSlopes[ts]
+}

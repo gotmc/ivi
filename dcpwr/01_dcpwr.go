@@ -33,3 +33,15 @@ const (
 	USB
 	LAN
 )
+
+var commTypes = map[CommType]string{
+	GPIB:  "GPIB",
+	RS232: "RS-232",
+	USB:   "USB",
+	LAN:   "LAN",
+}
+
+// String implements the Stringer interface for CommType.
+func (ct CommType) String() string {
+	return commTypes[ct]
+}

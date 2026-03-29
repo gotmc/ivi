@@ -19,6 +19,16 @@ const (
 	VoltageRange
 )
 
+var rangeTypes = map[RangeType]string{
+	CurrentRange: "current range",
+	VoltageRange: "voltage range",
+}
+
+// String implements the Stringer interface for RangeType.
+func (rt RangeType) String() string {
+	return rangeTypes[rt]
+}
+
 // OutputState provides the defined values for the state of the output defined
 // in Section 4.3.9 and 10 of IVI-4.4: IviDCPwr Class Specification.
 type OutputState int
@@ -34,6 +44,19 @@ const (
 	Unregulated
 )
 
+var outputStates = map[OutputState]string{
+	ConstantVoltage: "constant voltage",
+	ConstantCurrent: "constant current",
+	OverVoltage:     "over voltage",
+	OverCurrent:     "over current",
+	Unregulated:     "unregulated",
+}
+
+// String implements the Stringer interface for OutputState.
+func (os OutputState) String() string {
+	return outputStates[os]
+}
+
 // MeasurementType provides the defined values for the type of measurement
 // defined in Section 7.2.1 and 10 of IVI-4.4: IviDCPwr Class Specification.
 type MeasurementType int
@@ -45,3 +68,13 @@ const (
 	CurrentMeasurement MeasurementType = iota
 	VoltageMeasurement
 )
+
+var measurementTypes = map[MeasurementType]string{
+	CurrentMeasurement: "current",
+	VoltageMeasurement: "voltage",
+}
+
+// String implements the Stringer interface for MeasurementType.
+func (mt MeasurementType) String() string {
+	return measurementTypes[mt]
+}

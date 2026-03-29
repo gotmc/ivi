@@ -35,6 +35,17 @@ const (
 	GndVerticalCoupling
 )
 
+var verticalCouplings = map[VerticalCoupling]string{
+	ACVerticalCoupling:  "AC",
+	DCVerticalCoupling:  "DC",
+	GndVerticalCoupling: "GND",
+}
+
+// String implements the Stringer interface for VerticalCoupling.
+func (vc VerticalCoupling) String() string {
+	return verticalCouplings[vc]
+}
+
 type TriggerCoupling int
 
 const (
@@ -45,12 +56,35 @@ const (
 	NoiseRejectTriggerCoupling
 )
 
+var triggerCouplings = map[TriggerCoupling]string{
+	ACTriggerCoupling:          "AC",
+	DCTriggerCoupling:          "DC",
+	HFRejectTriggerCoupling:    "HF reject",
+	LFRejectTriggerCoupling:    "LF reject",
+	NoiseRejectTriggerCoupling: "noise reject",
+}
+
+// String implements the Stringer interface for TriggerCoupling.
+func (tc TriggerCoupling) String() string {
+	return triggerCouplings[tc]
+}
+
 type TriggerSlope int
 
 const (
 	PositiveTriggerSlope TriggerSlope = iota
 	NegativeTriggerSlope
 )
+
+var triggerSlopes = map[TriggerSlope]string{
+	PositiveTriggerSlope: "positive",
+	NegativeTriggerSlope: "negative",
+}
+
+// String implements the Stringer interface for TriggerSlope.
+func (ts TriggerSlope) String() string {
+	return triggerSlopes[ts]
+}
 
 // TriggerSource models the defined values for the Start Trigger Source, Stop
 // Trigger Source, Hold Trigger Source, Resume Trigger Source, Advanced Trigger
@@ -146,6 +180,17 @@ const (
 	LinearInterpolation
 )
 
+var interpolationMethods = map[InterpolationMethod]string{
+	NoInterpolation:        "none",
+	SineXOverXInterpolation: "sinc",
+	LinearInterpolation:    "linear",
+}
+
+// String implements the Stringer interface for InterpolationMethod.
+func (im InterpolationMethod) String() string {
+	return interpolationMethods[im]
+}
+
 // TVTriggerEvent models the defined values for the available events on which
 // the oscilloscope triggers defined in Section 20 IviScope Attribute Value
 // Definitions and used in the TV Trigger Event attribute in Section 6.2.1 of
@@ -160,6 +205,19 @@ const (
 	TVTriggerEventLineNumber
 )
 
+var tvTriggerEvents = map[TVTriggerEvent]string{
+	TVTriggerEventField1:    "field 1",
+	TVTriggerEventField2:    "field 2",
+	TVTriggerEventAnyField:  "any field",
+	TVTriggerEventAnyLine:   "any line",
+	TVTriggerEventLineNumber: "line number",
+}
+
+// String implements the Stringer interface for TVTriggerEvent.
+func (te TVTriggerEvent) String() string {
+	return tvTriggerEvents[te]
+}
+
 type TVTriggerSignalFormat int
 
 const (
@@ -168,12 +226,33 @@ const (
 	TVSignalFormatSECAM
 )
 
+var tvTriggerSignalFormats = map[TVTriggerSignalFormat]string{
+	TVSignalFormatNTSC:  "NTSC",
+	TVSignalFormatPAL:   "PAL",
+	TVSignalFormatSECAM: "SECAM",
+}
+
+// String implements the Stringer interface for TVTriggerSignalFormat.
+func (sf TVTriggerSignalFormat) String() string {
+	return tvTriggerSignalFormats[sf]
+}
+
 type TVTriggerPolarity int
 
 const (
 	TVTriggerPositive TVTriggerPolarity = iota
 	TVTriggerNegative
 )
+
+var tvTriggerPolarities = map[TVTriggerPolarity]string{
+	TVTriggerPositive: "positive",
+	TVTriggerNegative: "negative",
+}
+
+// String implements the Stringer interface for TVTriggerPolarity.
+func (tp TVTriggerPolarity) String() string {
+	return tvTriggerPolarities[tp]
+}
 
 type Polarity int
 
@@ -183,6 +262,17 @@ const (
 	EitherPolarity
 )
 
+var polarities = map[Polarity]string{
+	PositivePolarity: "positive",
+	NegativePolarity: "negative",
+	EitherPolarity:   "either",
+}
+
+// String implements the Stringer interface for Polarity.
+func (p Polarity) String() string {
+	return polarities[p]
+}
+
 type GlitchCondition int
 
 const (
@@ -190,12 +280,32 @@ const (
 	GlitchGreaterThan
 )
 
+var glitchConditions = map[GlitchCondition]string{
+	GlitchLessThan:    "less than",
+	GlitchGreaterThan: "greater than",
+}
+
+// String implements the Stringer interface for GlitchCondition.
+func (gc GlitchCondition) String() string {
+	return glitchConditions[gc]
+}
+
 type WidthCondition int
 
 const (
 	WidthWithin WidthCondition = iota
 	WidthOutside
 )
+
+var widthConditions = map[WidthCondition]string{
+	WidthWithin:  "within",
+	WidthOutside: "outside",
+}
+
+// String implements the Stringer interface for WidthCondition.
+func (wc WidthCondition) String() string {
+	return widthConditions[wc]
+}
 
 type ACLineTriggerSlope int
 
@@ -205,12 +315,33 @@ const (
 	ACLineEither
 )
 
+var acLineTriggerSlopes = map[ACLineTriggerSlope]string{
+	ACLinePositive: "positive",
+	ACLineNegative: "negative",
+	ACLineEither:   "either",
+}
+
+// String implements the Stringer interface for ACLineTriggerSlope.
+func (s ACLineTriggerSlope) String() string {
+	return acLineTriggerSlopes[s]
+}
+
 type SampleMode int
 
 const (
 	RealTimeSampleMode SampleMode = iota
 	EquivalentTimeSampleMode
 )
+
+var sampleModes = map[SampleMode]string{
+	RealTimeSampleMode:       "real time",
+	EquivalentTimeSampleMode: "equivalent time",
+}
+
+// String implements the Stringer interface for SampleMode.
+func (sm SampleMode) String() string {
+	return sampleModes[sm]
+}
 
 type TriggerModifier int
 
@@ -220,12 +351,33 @@ const (
 	TriggerModifierAutoLevel
 )
 
+var triggerModifiers = map[TriggerModifier]string{
+	TriggerModifierNone:      "none",
+	TriggerModifierAuto:      "auto",
+	TriggerModifierAutoLevel: "auto level",
+}
+
+// String implements the Stringer interface for TriggerModifier.
+func (tm TriggerModifier) String() string {
+	return triggerModifiers[tm]
+}
+
 type MaximumTime int
 
 const (
 	Zero MaximumTime = iota
 	MaxTimeValue
 )
+
+var maximumTimes = map[MaximumTime]string{
+	Zero:         "zero",
+	MaxTimeValue: "max time value",
+}
+
+// String implements the Stringer interface for MaximumTime.
+func (mt MaximumTime) String() string {
+	return maximumTimes[mt]
+}
 
 type WaveformMeasurement int
 
@@ -251,3 +403,31 @@ const (
 	Overshoot
 	Preshoot
 )
+
+var waveformMeasurements = map[WaveformMeasurement]string{
+	RiseTime:            "rise time",
+	FallTime:            "fall time",
+	Frequency:           "frequency",
+	Period:              "period",
+	VoltageRMS:          "voltage RMS",
+	VoltageCycleRMS:     "voltage cycle RMS",
+	VoltageMax:          "voltage max",
+	VoltageMin:          "voltage min",
+	VoltagePeakToPeak:   "voltage peak-to-peak",
+	VoltageHigh:         "voltage high",
+	VoltageLow:          "voltage low",
+	VoltageAverage:      "voltage average",
+	VoltageCycleAverage: "voltage cycle average",
+	WidthNegative:       "width negative",
+	WidthPositive:       "width positive",
+	DutyCycleNegative:   "duty cycle negative",
+	DutyCyclePositive:   "duty cycle positive",
+	Amplitude:           "amplitude",
+	Overshoot:           "overshoot",
+	Preshoot:            "preshoot",
+}
+
+// String implements the Stringer interface for WaveformMeasurement.
+func (wm WaveformMeasurement) String() string {
+	return waveformMeasurements[wm]
+}

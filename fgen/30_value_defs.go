@@ -46,6 +46,17 @@ const (
 	RefClockRTSIClock
 )
 
+var clockSources = map[ClockSource]string{
+	RefClockInternal:  "internal",
+	RefClockExternal:  "external",
+	RefClockRTSIClock: "RTSI clock",
+}
+
+// String implements the Stringer interface for ClockSource.
+func (cs ClockSource) String() string {
+	return clockSources[cs]
+}
+
 // OperationMode provides the defined values for the Operation Mode defined in
 // Section 4.2.2 and Section 30 of IVI-4.3: IviFgen Class Specification.
 type OperationMode int
@@ -277,6 +288,16 @@ const (
 	SampleClockExternal
 )
 
+var sampleClockSources = map[SampleClockSource]string{
+	SampleClockInternal: "internal",
+	SampleClockExternal: "external",
+}
+
+// String implements the Stringer interface for SampleClockSource.
+func (scs SampleClockSource) String() string {
+	return sampleClockSources[scs]
+}
+
 type MarkerPolarity int
 
 const (
@@ -284,12 +305,32 @@ const (
 	MarkerActiveLow
 )
 
+var markerPolarities = map[MarkerPolarity]string{
+	MarkerActiveHigh: "active high",
+	MarkerActiveLow:  "active low",
+}
+
+// String implements the Stringer interface for MarkerPolarity.
+func (mp MarkerPolarity) String() string {
+	return markerPolarities[mp]
+}
+
 type AMSource int
 
 const (
 	AMSourceInternal AMSource = iota
 	AMSourceExternal
 )
+
+var amSources = map[AMSource]string{
+	AMSourceInternal: "internal",
+	AMSourceExternal: "external",
+}
+
+// String implements the Stringer interface for AMSource.
+func (ams AMSource) String() string {
+	return amSources[ams]
+}
 
 // FIXME: I'm going to try to use the StandardWaveform instead, since that's
 // what the standard calls for. However, the AM Modulation doesn't allow a DC
@@ -304,12 +345,35 @@ const (
 	AMInternalRampDown
 )
 
+var amWaveforms = map[AMWaveform]string{
+	AMInternalSine:     "sine",
+	AMInternalSquare:   "square",
+	AMInternalTriangle: "triangle",
+	AMInternalRampUp:   "ramp up",
+	AMInternalRampDown: "ramp down",
+}
+
+// String implements the Stringer interface for AMWaveform.
+func (amw AMWaveform) String() string {
+	return amWaveforms[amw]
+}
+
 type FMSource int
 
 const (
 	FMSourceInternal FMSource = iota
 	FMSourceExternal
 )
+
+var fmSources = map[FMSource]string{
+	FMSourceInternal: "internal",
+	FMSourceExternal: "external",
+}
+
+// String implements the Stringer interface for FMSource.
+func (fms FMSource) String() string {
+	return fmSources[fms]
+}
 
 type BinaryAlignment int
 
@@ -318,12 +382,32 @@ const (
 	BinaryAlignmentRight
 )
 
+var binaryAlignments = map[BinaryAlignment]string{
+	BinaryAlignmentLeft:  "left",
+	BinaryAlignmentRight: "right",
+}
+
+// String implements the Stringer interface for BinaryAlignment.
+func (ba BinaryAlignment) String() string {
+	return binaryAlignments[ba]
+}
+
 type TerminalConfigurationType int
 
 const (
 	TerminalConfigurationSingleEnded TerminalConfigurationType = iota
 	TerminalConfigurationDifferential
 )
+
+var terminalConfigurationTypes = map[TerminalConfigurationType]string{
+	TerminalConfigurationSingleEnded:  "single-ended",
+	TerminalConfigurationDifferential: "differential",
+}
+
+// String implements the Stringer interface for TerminalConfigurationType.
+func (tct TerminalConfigurationType) String() string {
+	return terminalConfigurationTypes[tct]
+}
 
 // TriggerSlope models the defined values for the Trigger Slope defined in
 // Section 10.2.2 and Section 30 of IVI-4.3: IviFgenClass Specification.

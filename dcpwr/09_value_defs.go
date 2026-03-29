@@ -21,6 +21,16 @@ const (
 	CurrentRegulate
 )
 
+var currentLimitBehaviors = map[CurrentLimitBehavior]string{
+	CurrentTrip:     "current trip",
+	CurrentRegulate: "current regulate",
+}
+
+// String implements the Stringer interface for CurrentLimitBehavior.
+func (clb CurrentLimitBehavior) String() string {
+	return currentLimitBehaviors[clb]
+}
+
 // TriggerSource models the defined values for the Trigger Source defined in
 // Section 9 IviDCPwr Attribute Value Definitions of IVI-4.4: IviDCPwrClass
 // Specification.
