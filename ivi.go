@@ -27,7 +27,9 @@ type Instrument interface {
 	Read(p []byte) (n int, err error)
 	Write(p []byte) (n int, err error)
 	WriteString(s string) (n int, err error)
-	Command(ctx context.Context, format string, a ...any) error
+	ReadContext(ctx context.Context, p []byte) (n int, err error)
+	WriteContext(ctx context.Context, p []byte) (n int, err error)
+	Command(ctx context.Context, cmd string, a ...any) error
 	Query(ctx context.Context, s string) (value string, err error)
 }
 
@@ -36,14 +38,14 @@ type StringWriter interface {
 	WriteString(s string) (n int, err error)
 }
 
-// Commander provides the interface to send a formatted command to an
-// instrument.
+// Commander provides the interface to send a command to an instrument that is
+// optionally formatted according to a format specifier.
 type Commander interface {
-	Command(ctx context.Context, format string, a ...any) error
+	Command(ctx context.Context, cmd string, a ...any) error
 }
 
-// Querier provides the interface to query using a given string and provide the
-// resultant string.
+// Querier provides the interface to query an instrument using a given command
+// and then provide the resultant string.
 type Querier interface {
 	Query(ctx context.Context, s string) (value string, err error)
 }
