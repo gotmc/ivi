@@ -19,11 +19,13 @@ const (
 	AcquisitionStatusUnknown
 )
 
-// String implements the stringer interface for AcquisitionStatus.
+var acquisitionStatuses = map[AcquisitionStatus]string{
+	AcquisitionComplete:      "acquisition complete",
+	AcquisitionInprogress:    "acquisition in progress",
+	AcquisitionStatusUnknown: "acquisition status unknown",
+}
+
+// String implements the Stringer interface for AcquisitionStatus.
 func (as AcquisitionStatus) String() string {
-	return map[AcquisitionStatus]string{
-		AcquisitionComplete:      "acquisition complete",
-		AcquisitionInprogress:    "acquisition in progress",
-		AcquisitionStatusUnknown: "acquisition status unknown",
-	}[as]
+	return acquisitionStatuses[as]
 }

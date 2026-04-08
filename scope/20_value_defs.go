@@ -179,9 +179,9 @@ const (
 )
 
 var interpolationMethods = map[InterpolationMethod]string{
-	NoInterpolation:        "none",
+	NoInterpolation:         "none",
 	SineXOverXInterpolation: "sinc",
-	LinearInterpolation:    "linear",
+	LinearInterpolation:     "linear",
 }
 
 // String implements the Stringer interface for InterpolationMethod.
@@ -204,10 +204,10 @@ const (
 )
 
 var tvTriggerEvents = map[TVTriggerEvent]string{
-	TVTriggerEventField1:    "field 1",
-	TVTriggerEventField2:    "field 2",
-	TVTriggerEventAnyField:  "any field",
-	TVTriggerEventAnyLine:   "any line",
+	TVTriggerEventField1:     "field 1",
+	TVTriggerEventField2:     "field 2",
+	TVTriggerEventAnyField:   "any field",
+	TVTriggerEventAnyLine:    "any line",
 	TVTriggerEventLineNumber: "line number",
 }
 
