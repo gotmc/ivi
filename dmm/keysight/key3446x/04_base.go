@@ -120,7 +120,7 @@ func (d *Driver) Range(ctx context.Context) (dmm.AutoRange, float64, error) {
 }
 
 // SetRange sets the range corresponding to the maximum input value based on
-// the rest of hte instrument configuration (the same as the IVI.NET behavior).
+// the rest of the instrument configuration (the same as the IVI.NET behavior).
 // Setting this property sets AutoRange to Auto.Off If the property is set to a
 // negative value and that negative value is valid for the current function
 // (for instance DC Volts) the instrument will configure to measure that value.

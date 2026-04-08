@@ -17,6 +17,8 @@ code in this repository.
 - **Coverage report**: `just cover` - generates HTML coverage report
 - **Format and vet**: `just check` - formats and vets code (runs before tests
   automatically)
+- **Lines of code**: `just loc` - count lines of code using scc
+- **Local docs**: `just docs` - browse documentation locally using pkgsite
 
 ### Dependencies
 
@@ -41,9 +43,10 @@ function generators) can be programmed identically.
 #### Core Interface Layer (`ivi.go`, `inherent.go`)
 
 - `Instrument` interface: Core abstraction requiring Read, Write, WriteString,
-  Command, and Query methods. Command and Query take `context.Context` as their
-  first parameter. Sub-interfaces `Commander`, `Querier`, and `StringWriter`
-  allow accepting narrower types.
+  ReadContext, WriteContext, Command, and Query methods. ReadContext, WriteContext,
+  Command, and Query take `context.Context` as their first parameter.
+  Sub-interfaces `Commander`, `Querier`, and `StringWriter` allow accepting
+  narrower types.
 - `Inherent` struct: Base capabilities common to all IVI instruments (reset,
   clear, identification, timeout, local control). All methods that communicate
   with instruments take `context.Context`.
@@ -64,9 +67,13 @@ Additional class packages exist with varying levels of implementation:
 `acpwr`, `counter`, `digitizer`, `downcnvrtr`, `dsa`, `lcr`, `load`,
 `pwrmeter`, `rfsiggen`, `specan`, `swtch`, `upcnvrtr`.
 
+The `com/` package provides communication port types (serial modes, data frames,
+parity, equipment class) used by transport layers.
+
 Each class package defines Go interfaces for capability groups (Base,
 StdFunc, Trigger, etc.) that drivers must implement. All interface methods
 that communicate with instruments take `context.Context` as first parameter.
+All enum types implement the `Stringer` interface with `String()` methods.
 
 #### Driver Implementation Pattern
 
@@ -96,7 +103,9 @@ When `reset` is true, the constructor uses `context.Background()` internally.
 Channel structs hold an `ivi.Instrument` reference and a channel `name` string,
 implementing per-channel capability interfaces.
 
-Drivers implement a `Close()` method that delegates to the embedded Inherent:
+Drivers implement a `Close()` method that delegates to the embedded Inherent.
+`Inherent.Close()` calls `Disable()` then closes the underlying connection if
+it implements `io.Closer`:
 
 ```go
 func (d *Driver) Close() error {

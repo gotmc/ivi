@@ -124,7 +124,7 @@ func (d *Driver) SetRange(ctx context.Context, autoRange dmm.AutoRange, rangeVal
 
 	// The Fluke 45 has three sampling rates—slow (2.5 readings/sec), medium (5.0
 	// readings/sec), and fast (20 readings/sec). The ranges differ based on the
-	// selected sampling rate, so we needf to query the rate first.
+	// selected sampling rate, so we need to query the rate first.
 	rate, err := query.String(ctx, d.inst, "RATE?")
 	if err != nil {
 		return err
@@ -140,7 +140,7 @@ func (d *Driver) SetRange(ctx context.Context, autoRange dmm.AutoRange, rangeVal
 		return err
 	}
 
-	return d.inst.Command(ctx, "RANG %d", rangeCmd)
+	return d.inst.Command(ctx, "RANG %s", rangeCmd)
 }
 
 func determineRangeCommand(
