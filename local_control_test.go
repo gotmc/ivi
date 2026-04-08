@@ -30,6 +30,14 @@ func (m *mockInstrumentWithClose) WriteString(s string) (n int, err error) {
 	return len(s), nil
 }
 
+func (m *mockInstrumentWithClose) ReadContext(_ context.Context, p []byte) (int, error) {
+	return m.Read(p)
+}
+
+func (m *mockInstrumentWithClose) WriteContext(_ context.Context, p []byte) (int, error) {
+	return m.Write(p)
+}
+
 func (m *mockInstrumentWithClose) Command(_ context.Context, format string, a ...any) error {
 	m.commandsSent = append(m.commandsSent, format)
 

@@ -35,6 +35,14 @@ func (m *mockInst) WriteString(s string) (int, error) {
 	return len(s), nil
 }
 
+func (m *mockInst) ReadContext(_ context.Context, p []byte) (int, error) {
+	return m.Read(p)
+}
+
+func (m *mockInst) WriteContext(_ context.Context, p []byte) (int, error) {
+	return m.Write(p)
+}
+
 func (m *mockInst) Command(_ context.Context, format string, a ...any) error {
 	if m.shouldError {
 		return errors.New("mock command error")

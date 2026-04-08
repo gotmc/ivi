@@ -34,6 +34,14 @@ func (m *mockIDNInstrument) WriteString(s string) (int, error) {
 	return len(s), nil
 }
 
+func (m *mockIDNInstrument) ReadContext(_ context.Context, p []byte) (int, error) {
+	return m.Read(p)
+}
+
+func (m *mockIDNInstrument) WriteContext(_ context.Context, p []byte) (int, error) {
+	return m.Write(p)
+}
+
 func (m *mockIDNInstrument) Command(_ context.Context, _ string, _ ...any) error {
 	return nil
 }
