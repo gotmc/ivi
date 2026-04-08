@@ -117,6 +117,12 @@ func New(inst ivi.Instrument, reset bool) (*Driver, error) {
 	return &driver, nil
 }
 
+// Close properly shuts down the function generator by returning it to local
+// control.
+func (d *Driver) Close() error {
+	return d.Inherent.Close()
+}
+
 // DefaultGPIBAddress lists the default GPIB interface address.
 func DefaultGPIBAddress() int {
 	return defaultGPIBAddress

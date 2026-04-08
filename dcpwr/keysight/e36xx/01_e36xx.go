@@ -101,6 +101,11 @@ func New(inst ivi.Instrument, reset bool) (*Driver, error) {
 	return &driver, nil
 }
 
+// Close properly shuts down the power supply by returning it to local control.
+func (d *Driver) Close() error {
+	return d.Inherent.Close()
+}
+
 // AvailableCOMPorts lists the available COM ports, including optional ports.
 func AvailableCOMPorts() []string {
 	return []string{"GPIB", "RS232"}

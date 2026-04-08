@@ -138,6 +138,12 @@ type Channel struct {
 	numWires              int
 }
 
+// Close properly shuts down the switch matrix by returning it to local
+// control.
+func (d *U2751A) Close() error {
+	return d.Inherent.Close()
+}
+
 // Disable causes the switch to disconnect all paths.
 func (d *U2751A) Disable(ctx context.Context) error {
 	return ivi.Set(d.inst, "rout:open (@101:408)\n")

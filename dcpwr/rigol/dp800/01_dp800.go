@@ -154,6 +154,11 @@ func New(inst ivi.Instrument, reset bool) (*Driver, error) {
 	return &driver, nil
 }
 
+// Close properly shuts down the power supply by returning it to local control.
+func (d *Driver) Close() error {
+	return d.Inherent.Close()
+}
+
 // Channel models the output channel repeated capability for the DC power
 // supply output channel.
 type Channel struct {

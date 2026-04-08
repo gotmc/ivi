@@ -55,3 +55,9 @@ func New(inst ivi.Instrument, reset bool) (*E4411B, error) {
 	}
 	return &driver, nil
 }
+
+// Close properly shuts down the spectrum analyzer by returning it to local
+// control.
+func (d *E4411B) Close() error {
+	return d.Inherent.Close()
+}

@@ -37,5 +37,6 @@ None.
 // Interpolation provides the interface required for the IviScopeInterpolation
 // extension group.
 type Interpolation interface {
-	AcquisitionInterpolation(ctx context.Context, interp InterpolationMethod) error
+	AcquisitionInterpolation(ctx context.Context) (InterpolationMethod, error)
+	SetAcquisitionInterpolation(ctx context.Context, interp InterpolationMethod) error
 }

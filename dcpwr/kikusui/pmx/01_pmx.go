@@ -100,6 +100,11 @@ func New(inst ivi.Instrument, reset bool) (*Driver, error) {
 	return &driver, nil
 }
 
+// Close properly shuts down the power supply by returning it to local control.
+func (d *Driver) Close() error {
+	return d.Inherent.Close()
+}
+
 // ChannelCount returns the number of available output channels.
 //
 // ChannelCount is the getter for the read-only IviDCPwrBase Attribute Output
