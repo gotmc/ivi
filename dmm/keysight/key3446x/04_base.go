@@ -148,25 +148,39 @@ func (d *Driver) SetRange(ctx context.Context, autoRange dmm.AutoRange, rangeVal
 	var rng string
 
 	switch fcn {
-	case dmm.DCVolts, dmm.ACVolts:
+	case dmm.DCVolts, dmm.ACVolts, dmm.ACPlusDCVolts:
 		// 100 mV|1 V|10 V|100 V|1000 V
 		rng, err = determineManualVoltageRange(rangeValue)
 		if err != nil {
 			return err
 		}
-	case dmm.DCCurrent:
+	case dmm.DCCurrent, dmm.ACPlusDCCurrent:
+		// 1 µA|10 µA|100 µA|1 mA|10 mA|100 mA|1 A|3 A
+		rng, err = determineManualDCCurrentRange(rangeValue)
+		if err != nil {
+			return err
+		}
 	case dmm.ACCurrent:
-	case dmm.TwoWireResistance:
+		// 100 µA|1 mA|10 mA|100 mA|1 A|3 A
+		rng, err = determineManualACCurrentRange(rangeValue)
+		if err != nil {
+			return err
+		}
+	case dmm.TwoWireResistance, dmm.FourWireResistance:
+		// 100 Ω|1 kΩ|10 kΩ|100 kΩ|1 MΩ|10 MΩ|100 MΩ|1 GΩ
 		rng, err = determineManualResistanceRange(rangeValue)
 		if err != nil {
 			return err
 		}
-	case dmm.FourWireResistance:
-	case dmm.ACPlusDCVolts:
-	case dmm.ACPlusDCCurrent:
-	case dmm.Frequency:
-	case dmm.Period:
+	case dmm.Frequency, dmm.Period:
+		// Frequency/period range is a voltage range: 100 mV|1 V|10 V|100 V|750 V
+		rng, err = determineManualFrequencyVoltageRange(rangeValue)
+		if err != nil {
+			return err
+		}
 	case dmm.Temperature:
+		// Temperature has no user-selectable range; it is determined by probe type.
+		return fmt.Errorf("SetRange: %w: temperature range is probe-determined", ivi.ErrFunctionNotSupported)
 	}
 
 	return d.inst.Command(ctx, "%s:rang %s", scpiFunc, rng)
@@ -515,7 +529,66 @@ func determineManualResistanceRange(rangeValue float64) (string, error) {
 		return "1e9", nil
 	}
 
-	return "", ivi.ErrNotImplemented
+	return "", ivi.ErrValueNotSupported
+}
+
+func determineManualDCCurrentRange(rangeValue float64) (string, error) {
+	switch {
+	case rangeValue <= 1e-6:
+		return "1e-6", nil
+	case rangeValue <= 10e-6:
+		return "10e-6", nil
+	case rangeValue <= 100e-6:
+		return "100e-6", nil
+	case rangeValue <= 1e-3:
+		return "1e-3", nil
+	case rangeValue <= 10e-3:
+		return "10e-3", nil
+	case rangeValue <= 100e-3:
+		return "100e-3", nil
+	case rangeValue <= 1.0:
+		return "1", nil
+	case rangeValue <= 3.0:
+		return "3", nil
+	}
+
+	return "", ivi.ErrValueNotSupported
+}
+
+func determineManualACCurrentRange(rangeValue float64) (string, error) {
+	switch {
+	case rangeValue <= 100e-6:
+		return "100e-6", nil
+	case rangeValue <= 1e-3:
+		return "1e-3", nil
+	case rangeValue <= 10e-3:
+		return "10e-3", nil
+	case rangeValue <= 100e-3:
+		return "100e-3", nil
+	case rangeValue <= 1.0:
+		return "1", nil
+	case rangeValue <= 3.0:
+		return "3", nil
+	}
+
+	return "", ivi.ErrValueNotSupported
+}
+
+func determineManualFrequencyVoltageRange(rangeValue float64) (string, error) {
+	switch {
+	case rangeValue <= 0.1:
+		return "0.1", nil
+	case rangeValue <= 1.0:
+		return "1", nil
+	case rangeValue <= 10.0:
+		return "10", nil
+	case rangeValue <= 100.0:
+		return "100", nil
+	case rangeValue <= 750.0:
+		return "750", nil
+	}
+
+	return "", ivi.ErrValueNotSupported
 }
 
 func createConfigureMeasurementCommand(

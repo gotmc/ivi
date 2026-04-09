@@ -44,6 +44,100 @@ func TestCreateConfigureVoltageACCommand(t *testing.T) {
 	}
 }
 
+func TestDetermineManualDCCurrentRange(t *testing.T) {
+	testCases := []struct {
+		rangeValue  float64
+		expected    string
+		expectedErr error
+	}{
+		{0.5e-6, "1e-6", nil},
+		{1e-6, "1e-6", nil},
+		{5e-6, "10e-6", nil},
+		{50e-6, "100e-6", nil},
+		{500e-6, "1e-3", nil},
+		{5e-3, "10e-3", nil},
+		{50e-3, "100e-3", nil},
+		{0.5, "1", nil},
+		{2.0, "3", nil},
+		{3.0, "3", nil},
+		{3.01, "", ivi.ErrValueNotSupported},
+	}
+	for _, tc := range testCases {
+		got, err := determineManualDCCurrentRange(tc.rangeValue)
+		if err != tc.expectedErr {
+			t.Errorf(
+				"rangeValue=%g: wanted err %v / got err %v",
+				tc.rangeValue, tc.expectedErr, err,
+			)
+		}
+
+		if got != tc.expected {
+			t.Errorf("rangeValue=%g: wanted %v / got %v", tc.rangeValue, tc.expected, got)
+		}
+	}
+}
+
+func TestDetermineManualACCurrentRange(t *testing.T) {
+	testCases := []struct {
+		rangeValue  float64
+		expected    string
+		expectedErr error
+	}{
+		{50e-6, "100e-6", nil},
+		{100e-6, "100e-6", nil},
+		{500e-6, "1e-3", nil},
+		{5e-3, "10e-3", nil},
+		{50e-3, "100e-3", nil},
+		{0.5, "1", nil},
+		{2.0, "3", nil},
+		{3.0, "3", nil},
+		{3.01, "", ivi.ErrValueNotSupported},
+	}
+	for _, tc := range testCases {
+		got, err := determineManualACCurrentRange(tc.rangeValue)
+		if err != tc.expectedErr {
+			t.Errorf(
+				"rangeValue=%g: wanted err %v / got err %v",
+				tc.rangeValue, tc.expectedErr, err,
+			)
+		}
+
+		if got != tc.expected {
+			t.Errorf("rangeValue=%g: wanted %v / got %v", tc.rangeValue, tc.expected, got)
+		}
+	}
+}
+
+func TestDetermineManualFrequencyVoltageRange(t *testing.T) {
+	testCases := []struct {
+		rangeValue  float64
+		expected    string
+		expectedErr error
+	}{
+		{0.05, "0.1", nil},
+		{0.1, "0.1", nil},
+		{0.5, "1", nil},
+		{5.0, "10", nil},
+		{50.0, "100", nil},
+		{500.0, "750", nil},
+		{750.0, "750", nil},
+		{751.0, "", ivi.ErrValueNotSupported},
+	}
+	for _, tc := range testCases {
+		got, err := determineManualFrequencyVoltageRange(tc.rangeValue)
+		if err != tc.expectedErr {
+			t.Errorf(
+				"rangeValue=%g: wanted err %v / got err %v",
+				tc.rangeValue, tc.expectedErr, err,
+			)
+		}
+
+		if got != tc.expected {
+			t.Errorf("rangeValue=%g: wanted %v / got %v", tc.rangeValue, tc.expected, got)
+		}
+	}
+}
+
 func TestDetermineVoltageRange(t *testing.T) {
 	testCases := []struct {
 		autoRange   dmm.AutoRange
