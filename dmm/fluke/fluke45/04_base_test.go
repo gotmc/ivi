@@ -10,6 +10,7 @@ import (
 	"errors"
 	"fmt"
 	"testing"
+	"time"
 
 	"github.com/gotmc/ivi"
 	"github.com/gotmc/ivi/dmm"
@@ -344,5 +345,79 @@ func TestDriver_IsOutOfRange_NotSupported(t *testing.T) {
 	_, err = d.IsUnderRange(context.Background(), 1.0)
 	if !errors.Is(err, ivi.ErrFunctionNotSupported) {
 		t.Errorf("IsUnderRange() = %v, want ErrFunctionNotSupported", err)
+	}
+}
+
+func TestDriver_TriggerDelay(t *testing.T) {
+	tests := []struct {
+		name         string
+		resp         string
+		wantHasDelay bool
+		wantDuration time.Duration
+		wantErr      bool
+	}{
+		{"internal no delay", "1", false, 0, false},
+		{"external no delay", "2", false, 0, false},
+		{"external with delay", "3", true, 0, false},
+		{"external with delay type 5", "5", true, 0, false},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			mock := &mockInst{queryResp: tt.resp}
+			d, err := New(mock, false)
+			if err != nil {
+				t.Fatalf("New() error: %v", err)
+			}
+
+			hasDelay, dur, err := d.TriggerDelay(context.Background())
+			if tt.wantErr {
+				if err == nil {
+					t.Error("expected error, got nil")
+				}
+				return
+			}
+			if err != nil {
+				t.Errorf("unexpected error: %v", err)
+			}
+			if hasDelay != tt.wantHasDelay {
+				t.Errorf("hasDelay = %v, want %v", hasDelay, tt.wantHasDelay)
+			}
+			if dur != tt.wantDuration {
+				t.Errorf("duration = %v, want %v", dur, tt.wantDuration)
+			}
+		})
+	}
+}
+
+func TestDriver_FetchMeasurement(t *testing.T) {
+	mock := &mockInst{queryResp: "1.234"}
+	d, err := New(mock, false)
+	if err != nil {
+		t.Fatalf("New() error: %v", err)
+	}
+
+	got, err := d.FetchMeasurement(context.Background(), 0)
+	if err != nil {
+		t.Errorf("FetchMeasurement() error: %v", err)
+	}
+	if got != 1.234 {
+		t.Errorf("FetchMeasurement() = %f, want 1.234", got)
+	}
+}
+
+func TestDriver_ReadMeasurement(t *testing.T) {
+	mock := &mockInst{queryResp: "5.678"}
+	d, err := New(mock, false)
+	if err != nil {
+		t.Fatalf("New() error: %v", err)
+	}
+
+	got, err := d.ReadMeasurement(context.Background(), 0)
+	if err != nil {
+		t.Errorf("ReadMeasurement() error: %v", err)
+	}
+	if got != 5.678 {
+		t.Errorf("ReadMeasurement() = %f, want 5.678", got)
 	}
 }

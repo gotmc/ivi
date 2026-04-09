@@ -330,3 +330,320 @@ func TestChannel_SetOutputImpedance(t *testing.T) {
 		t.Errorf("sent %v, want OUTP:LOAD command", mock.commandsSent)
 	}
 }
+
+func TestChannel_OutputEnabled(t *testing.T) {
+	tests := []struct {
+		name     string
+		response string
+		want     bool
+		wantErr  bool
+	}{
+		{"enabled", "1", true, false},
+		{"disabled", "0", false, false},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			mock := &mockInst{queryResp: tt.response}
+			ch := Channel{inst: mock, name: "Output"}
+			got, err := ch.OutputEnabled(context.Background())
+			if tt.wantErr {
+				if err == nil {
+					t.Error("expected error, got nil")
+				}
+				return
+			}
+			if err != nil {
+				t.Errorf("OutputEnabled() error: %v", err)
+			}
+			if got != tt.want {
+				t.Errorf("OutputEnabled() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestChannel_OutputImpedance(t *testing.T) {
+	tests := []struct {
+		name     string
+		response string
+		want     float64
+	}{
+		{"50 ohm", "50.0", 50.0},
+		{"high-z", "9.9E+37", 9.9e+37},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			mock := &mockInst{queryResp: tt.response}
+			ch := Channel{inst: mock, name: "Output"}
+			got, err := ch.OutputImpedance(context.Background())
+			if err != nil {
+				t.Errorf("OutputImpedance() error: %v", err)
+			}
+			if got != tt.want {
+				t.Errorf("OutputImpedance() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestChannel_Amplitude(t *testing.T) {
+	tests := []struct {
+		name     string
+		response string
+		want     float64
+	}{
+		{"2.5 vpp", "2.500000", 2.5},
+		{"0.1 vpp", "0.100000", 0.1},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			mock := &mockInst{queryResp: tt.response}
+			ch := Channel{inst: mock, name: "Output"}
+			got, err := ch.Amplitude(context.Background())
+			if err != nil {
+				t.Errorf("Amplitude() error: %v", err)
+			}
+			if got != tt.want {
+				t.Errorf("Amplitude() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestChannel_DCOffset(t *testing.T) {
+	tests := []struct {
+		name     string
+		response string
+		want     float64
+	}{
+		{"positive", "0.500000", 0.5},
+		{"zero", "0.000000", 0.0},
+		{"negative", "-1.250000", -1.25},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			mock := &mockInst{queryResp: tt.response}
+			ch := Channel{inst: mock, name: "Output"}
+			got, err := ch.DCOffset(context.Background())
+			if err != nil {
+				t.Errorf("DCOffset() error: %v", err)
+			}
+			if got != tt.want {
+				t.Errorf("DCOffset() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestChannel_Frequency(t *testing.T) {
+	tests := []struct {
+		name     string
+		response string
+		want     float64
+	}{
+		{"1 kHz", "1000.0", 1000.0},
+		{"1 MHz", "1000000.0", 1000000.0},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			mock := &mockInst{queryResp: tt.response}
+			ch := Channel{inst: mock, name: "Output"}
+			got, err := ch.Frequency(context.Background())
+			if err != nil {
+				t.Errorf("Frequency() error: %v", err)
+			}
+			if got != tt.want {
+				t.Errorf("Frequency() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestChannel_StandardWaveform(t *testing.T) {
+	tests := []struct {
+		name     string
+		response string
+		want     fgen.StandardWaveform
+		wantErr  bool
+	}{
+		{"sine", "SIN", fgen.Sine, false},
+		{"square", "SQU", fgen.Square, false},
+		{"dc", "DC", fgen.DC, false},
+		{"unknown", "PULS", 0, true},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			mock := &mockInst{queryResp: tt.response}
+			ch := Channel{inst: mock, name: "Output"}
+			got, err := ch.StandardWaveform(context.Background())
+			if tt.wantErr {
+				if err == nil {
+					t.Error("expected error, got nil")
+				}
+				return
+			}
+			if err != nil {
+				t.Errorf("StandardWaveform() error: %v", err)
+			}
+			if got != tt.want {
+				t.Errorf("StandardWaveform() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestChannel_DisableOutput(t *testing.T) {
+	mock := &mockInst{}
+	ch := Channel{inst: mock, name: "Output"}
+	err := ch.DisableOutput(context.Background())
+	if err != nil {
+		t.Errorf("DisableOutput() error: %v", err)
+	}
+	if len(mock.commandsSent) != 1 || mock.commandsSent[0] != "OUTP OFF" {
+		t.Errorf("DisableOutput() sent %v, want [%q]", mock.commandsSent, "OUTP OFF")
+	}
+}
+
+func TestChannel_EnableOutput(t *testing.T) {
+	mock := &mockInst{}
+	ch := Channel{inst: mock, name: "Output"}
+	err := ch.EnableOutput(context.Background())
+	if err != nil {
+		t.Errorf("EnableOutput() error: %v", err)
+	}
+	if len(mock.commandsSent) != 1 || mock.commandsSent[0] != "OUTP ON" {
+		t.Errorf("EnableOutput() sent %v, want [%q]", mock.commandsSent, "OUTP ON")
+	}
+}
+
+func TestChannel_BurstCount(t *testing.T) {
+	tests := []struct {
+		name     string
+		response string
+		want     int
+	}{
+		{"5 cycles", "5", 5},
+		{"1 cycle", "1", 1},
+		{"100 cycles", "100", 100},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			mock := &mockInst{queryResp: tt.response}
+			ch := Channel{inst: mock, name: "Output"}
+			got, err := ch.BurstCount(context.Background())
+			if err != nil {
+				t.Errorf("BurstCount() error: %v", err)
+			}
+			if got != tt.want {
+				t.Errorf("BurstCount() = %d, want %d", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestChannel_SetBurstCount(t *testing.T) {
+	mock := &mockInst{}
+	ch := Channel{inst: mock, name: "Output"}
+	err := ch.SetBurstCount(context.Background(), 5)
+	if err != nil {
+		t.Errorf("SetBurstCount() error: %v", err)
+	}
+	if len(mock.commandsSent) != 1 || mock.commandsSent[0] != "BURS:NCYC 5" {
+		t.Errorf("SetBurstCount() sent %v, want [%q]", mock.commandsSent, "BURS:NCYC 5")
+	}
+}
+
+func TestDriver_InternalTriggerRate(t *testing.T) {
+	tests := []struct {
+		name     string
+		response string
+		want     float64
+	}{
+		{"1000 Hz", "0.001", 1000.0},
+		{"100 Hz", "0.01", 100.0},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			mock := &mockInst{queryResp: tt.response}
+			d, err := New(mock, false)
+			if err != nil {
+				t.Fatalf("New() error: %v", err)
+			}
+			got, err := d.InternalTriggerRate(context.Background())
+			if err != nil {
+				t.Errorf("InternalTriggerRate() error: %v", err)
+			}
+			if got != tt.want {
+				t.Errorf("InternalTriggerRate() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestDriver_SetInternalTriggerRate(t *testing.T) {
+	mock := &mockInst{queryResp: "KEYSIGHT,33220A,0,1.0"}
+	d, err := New(mock, false)
+	if err != nil {
+		t.Fatalf("New() error: %v", err)
+	}
+	err = d.SetInternalTriggerRate(context.Background(), 1000.0)
+	if err != nil {
+		t.Errorf("SetInternalTriggerRate() error: %v", err)
+	}
+	if len(mock.commandsSent) != 1 || mock.commandsSent[0] != "BURS:INT:PER 0.001" {
+		t.Errorf("SetInternalTriggerRate() sent %v, want [%q]", mock.commandsSent, "BURS:INT:PER 0.001")
+	}
+}
+
+func TestDriver_ReferenceClockSource(t *testing.T) {
+	mock := &mockInst{queryResp: "KEYSIGHT,33220A,0,1.0"}
+	d, err := New(mock, false)
+	if err != nil {
+		t.Fatalf("New() error: %v", err)
+	}
+	got, err := d.ReferenceClockSource(context.Background())
+	if err != nil {
+		t.Errorf("ReferenceClockSource() error: %v", err)
+	}
+	if got != fgen.RefClockInternal {
+		t.Errorf("ReferenceClockSource() = %v, want %v", got, fgen.RefClockInternal)
+	}
+}
+
+func TestDriver_InitiateGeneration(t *testing.T) {
+	mock := &mockInst{queryResp: "KEYSIGHT,33220A,0,1.0"}
+	d, err := New(mock, false)
+	if err != nil {
+		t.Fatalf("New() error: %v", err)
+	}
+	err = d.InitiateGeneration(context.Background())
+	if err != nil {
+		t.Errorf("InitiateGeneration() error: %v", err)
+	}
+	if len(mock.commandsSent) != 1 || mock.commandsSent[0] != "OUTP ON" {
+		t.Errorf("InitiateGeneration() sent %v, want [%q]", mock.commandsSent, "OUTP ON")
+	}
+}
+
+func TestDriver_AbortGeneration(t *testing.T) {
+	mock := &mockInst{queryResp: "KEYSIGHT,33220A,0,1.0"}
+	d, err := New(mock, false)
+	if err != nil {
+		t.Fatalf("New() error: %v", err)
+	}
+	err = d.AbortGeneration(context.Background())
+	if err != nil {
+		t.Errorf("AbortGeneration() error: %v", err)
+	}
+	if len(mock.commandsSent) != 1 || mock.commandsSent[0] != "OUTP OFF" {
+		t.Errorf("AbortGeneration() sent %v, want [%q]", mock.commandsSent, "OUTP OFF")
+	}
+}

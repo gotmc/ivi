@@ -6,6 +6,9 @@
 package key3446x
 
 import (
+	"context"
+	"errors"
+	"fmt"
 	"testing"
 
 	"github.com/gotmc/ivi"
@@ -168,4 +171,296 @@ func TestDetermineVoltageRange(t *testing.T) {
 			t.Errorf("wanted %v / got %v", tc.expected, got)
 		}
 	}
+}
+
+// mockInst implements the ivi.Instrument interface for unit testing.
+type mockInst struct {
+	commandsSent []string
+	queryResp    string
+	shouldError  bool
+}
+
+func (m *mockInst) Read(p []byte) (int, error)        { return 0, nil }
+func (m *mockInst) Write(p []byte) (int, error)       { return len(p), nil }
+func (m *mockInst) WriteString(s string) (int, error) { return len(s), nil }
+
+func (m *mockInst) ReadContext(_ context.Context, p []byte) (int, error) {
+	return m.Read(p)
+}
+
+func (m *mockInst) WriteContext(_ context.Context, p []byte) (int, error) {
+	return m.Write(p)
+}
+
+func (m *mockInst) Command(_ context.Context, format string, a ...any) error {
+	if m.shouldError {
+		return errors.New("mock command error")
+	}
+
+	cmd := fmt.Sprintf(format, a...)
+	m.commandsSent = append(m.commandsSent, cmd)
+
+	return nil
+}
+
+func (m *mockInst) Query(_ context.Context, _ string) (string, error) {
+	if m.shouldError {
+		return "", errors.New("mock query error")
+	}
+
+	return m.queryResp, nil
+}
+
+// newTestDriver creates a Driver with the given mock instrument for testing.
+func newTestDriver(t *testing.T, mock *mockInst) *Driver {
+	t.Helper()
+
+	d, err := New(mock, false)
+	if err != nil {
+		t.Fatalf("New() returned unexpected error: %v", err)
+	}
+
+	return d
+}
+
+func TestMeasurementFunction(t *testing.T) {
+	testCases := []struct {
+		name        string
+		queryResp   string
+		shouldError bool
+		expected    dmm.MeasurementFunction
+		expectErr   bool
+	}{
+		{"dc volts", "VOLT", false, dmm.DCVolts, false},
+		{"ac volts", "VOLT:AC", false, dmm.ACVolts, false},
+		{"dc current", "CURR", false, dmm.DCCurrent, false},
+		{"ac current", "CURR:AC", false, dmm.ACCurrent, false},
+		{"two wire resistance", "RES", false, dmm.TwoWireResistance, false},
+		{"four wire resistance", "FRES", false, dmm.FourWireResistance, false},
+		{"frequency", "FREQ", false, dmm.Frequency, false},
+		{"period", "PER", false, dmm.Period, false},
+		{"temperature", "TEMP", false, dmm.Temperature, false},
+		{"dc volts alternate", "VOLT:DC", false, dmm.DCVolts, false},
+		{"dc current alternate", "CURR:DC", false, dmm.DCCurrent, false},
+		{"unknown function", "INVALID", false, 0, true},
+		{"query error", "", true, 0, true},
+	}
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			mock := &mockInst{
+				queryResp:   tc.queryResp,
+				shouldError: tc.shouldError,
+			}
+			d := newTestDriver(t, mock)
+			ctx := context.Background()
+
+			got, err := d.MeasurementFunction(ctx)
+
+			if tc.expectErr && err == nil {
+				t.Fatal("expected error, got nil")
+			}
+
+			if !tc.expectErr && err != nil {
+				t.Fatalf("unexpected error: %v", err)
+			}
+
+			if !tc.expectErr && got != tc.expected {
+				t.Errorf("wanted %v, got %v", tc.expected, got)
+			}
+		})
+	}
+}
+
+func TestSetMeasurementFunction(t *testing.T) {
+	testCases := []struct {
+		name        string
+		msrFunc     dmm.MeasurementFunction
+		shouldError bool
+		expectedCmd string
+		expectErr   bool
+	}{
+		{"dc volts", dmm.DCVolts, false, `FUNC "VOLT"`, false},
+		{"ac volts", dmm.ACVolts, false, `FUNC "VOLT:AC"`, false},
+		{"dc current", dmm.DCCurrent, false, `FUNC "CURR"`, false},
+		{"ac current", dmm.ACCurrent, false, `FUNC "CURR:AC"`, false},
+		{"two wire resistance", dmm.TwoWireResistance, false, `FUNC "RES"`, false},
+		{"four wire resistance", dmm.FourWireResistance, false, `FUNC "FRES"`, false},
+		{"frequency", dmm.Frequency, false, `FUNC "FREQ"`, false},
+		{"period", dmm.Period, false, `FUNC "PER"`, false},
+		{"temperature", dmm.Temperature, false, `FUNC "TEMP"`, false},
+		{"command error", dmm.DCVolts, true, "", true},
+	}
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			mock := &mockInst{shouldError: tc.shouldError}
+			d := newTestDriver(t, mock)
+			ctx := context.Background()
+
+			err := d.SetMeasurementFunction(ctx, tc.msrFunc)
+
+			if tc.expectErr && err == nil {
+				t.Fatal("expected error, got nil")
+			}
+
+			if !tc.expectErr && err != nil {
+				t.Fatalf("unexpected error: %v", err)
+			}
+
+			if !tc.expectErr {
+				if len(mock.commandsSent) != 1 {
+					t.Fatalf("expected 1 command sent, got %d", len(mock.commandsSent))
+				}
+
+				if mock.commandsSent[0] != tc.expectedCmd {
+					t.Errorf("wanted command %q, got %q", tc.expectedCmd, mock.commandsSent[0])
+				}
+			}
+		})
+	}
+}
+
+func TestTriggerSource(t *testing.T) {
+	testCases := []struct {
+		name        string
+		queryResp   string
+		shouldError bool
+		expected    dmm.TriggerSource
+		expectErr   bool
+	}{
+		{"immediate", "IMM", false, dmm.Immediate, false},
+		{"external", "EXT", false, dmm.External, false},
+		{"software trigger", "BUS", false, dmm.SoftwareTrigger, false},
+		{"unknown source", "UNKNOWN", false, 0, true},
+		{"query error", "", true, 0, true},
+	}
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			mock := &mockInst{
+				queryResp:   tc.queryResp,
+				shouldError: tc.shouldError,
+			}
+			d := newTestDriver(t, mock)
+			ctx := context.Background()
+
+			got, err := d.TriggerSource(ctx)
+
+			if tc.expectErr && err == nil {
+				t.Fatal("expected error, got nil")
+			}
+
+			if !tc.expectErr && err != nil {
+				t.Fatalf("unexpected error: %v", err)
+			}
+
+			if !tc.expectErr && got != tc.expected {
+				t.Errorf("wanted %v, got %v", tc.expected, got)
+			}
+		})
+	}
+}
+
+func TestSetTriggerSource(t *testing.T) {
+	testCases := []struct {
+		name        string
+		src         dmm.TriggerSource
+		shouldError bool
+		expectedCmd string
+		expectErr   bool
+	}{
+		{"immediate", dmm.Immediate, false, "TRIG:SOUR IMM", false},
+		{"external", dmm.External, false, "TRIG:SOUR EXT", false},
+		{"software trigger", dmm.SoftwareTrigger, false, "TRIG:SOUR BUS", false},
+		{"command error", dmm.Immediate, true, "", true},
+	}
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			mock := &mockInst{shouldError: tc.shouldError}
+			d := newTestDriver(t, mock)
+			ctx := context.Background()
+
+			err := d.SetTriggerSource(ctx, tc.src)
+
+			if tc.expectErr && err == nil {
+				t.Fatal("expected error, got nil")
+			}
+
+			if !tc.expectErr && err != nil {
+				t.Fatalf("unexpected error: %v", err)
+			}
+
+			if !tc.expectErr {
+				if len(mock.commandsSent) != 1 {
+					t.Fatalf("expected 1 command sent, got %d", len(mock.commandsSent))
+				}
+
+				if mock.commandsSent[0] != tc.expectedCmd {
+					t.Errorf("wanted command %q, got %q", tc.expectedCmd, mock.commandsSent[0])
+				}
+			}
+		})
+	}
+}
+
+func TestAbort(t *testing.T) {
+	t.Run("success", func(t *testing.T) {
+		mock := &mockInst{}
+		d := newTestDriver(t, mock)
+		ctx := context.Background()
+
+		err := d.Abort(ctx)
+		if err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
+
+		if len(mock.commandsSent) != 1 {
+			t.Fatalf("expected 1 command sent, got %d", len(mock.commandsSent))
+		}
+
+		if mock.commandsSent[0] != "ABOR" {
+			t.Errorf("wanted command %q, got %q", "ABOR", mock.commandsSent[0])
+		}
+	})
+
+	t.Run("error", func(t *testing.T) {
+		mock := &mockInst{shouldError: true}
+		d := newTestDriver(t, mock)
+		ctx := context.Background()
+
+		err := d.Abort(ctx)
+		if err == nil {
+			t.Fatal("expected error, got nil")
+		}
+	})
+}
+
+func TestInitiateMeasurement(t *testing.T) {
+	t.Run("success", func(t *testing.T) {
+		mock := &mockInst{}
+		d := newTestDriver(t, mock)
+		ctx := context.Background()
+
+		err := d.InitiateMeasurement(ctx)
+		if err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
+
+		if len(mock.commandsSent) != 1 {
+			t.Fatalf("expected 1 command sent, got %d", len(mock.commandsSent))
+		}
+
+		if mock.commandsSent[0] != "init" {
+			t.Errorf("wanted command %q, got %q", "init", mock.commandsSent[0])
+		}
+	})
+
+	t.Run("error", func(t *testing.T) {
+		mock := &mockInst{shouldError: true}
+		d := newTestDriver(t, mock)
+		ctx := context.Background()
+
+		err := d.InitiateMeasurement(ctx)
+		if err == nil {
+			t.Fatal("expected error, got nil")
+		}
+	})
 }

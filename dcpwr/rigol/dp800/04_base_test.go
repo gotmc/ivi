@@ -288,3 +288,76 @@ func TestChannel_ConfigureOVP(t *testing.T) {
 		})
 	}
 }
+
+func TestChannel_DisableOutput(t *testing.T) {
+	mock := &mockInst{}
+	ch := Channel{name: "CH1", idx: 1, inst: mock}
+	err := ch.DisableOutput(context.Background())
+	if err != nil {
+		t.Errorf("DisableOutput() error: %v", err)
+	}
+	if len(mock.commandsSent) != 1 || mock.commandsSent[0] != ":OUTP CH1,OFF" {
+		t.Errorf("sent %v, want [\":OUTP CH1,OFF\"]", mock.commandsSent)
+	}
+}
+
+func TestChannel_EnableOutput(t *testing.T) {
+	mock := &mockInst{}
+	ch := Channel{name: "CH1", idx: 1, inst: mock}
+	err := ch.EnableOutput(context.Background())
+	if err != nil {
+		t.Errorf("EnableOutput() error: %v", err)
+	}
+	if len(mock.commandsSent) != 1 || mock.commandsSent[0] != ":OUTP CH1,ON" {
+		t.Errorf("sent %v, want [\":OUTP CH1,ON\"]", mock.commandsSent)
+	}
+}
+
+func TestChannel_DisableOVP(t *testing.T) {
+	mock := &mockInst{}
+	ch := Channel{name: "CH1", idx: 1, inst: mock}
+	err := ch.DisableOVP(context.Background())
+	if err != nil {
+		t.Errorf("DisableOVP() error: %v", err)
+	}
+	if len(mock.commandsSent) != 1 || mock.commandsSent[0] != ":OUTP:OVP CH1,OFF" {
+		t.Errorf("sent %v, want [\":OUTP:OVP CH1,OFF\"]", mock.commandsSent)
+	}
+}
+
+func TestChannel_EnableOVP(t *testing.T) {
+	mock := &mockInst{}
+	ch := Channel{name: "CH1", idx: 1, inst: mock}
+	err := ch.EnableOVP(context.Background())
+	if err != nil {
+		t.Errorf("EnableOVP() error: %v", err)
+	}
+	if len(mock.commandsSent) != 1 || mock.commandsSent[0] != ":OUTP:OVP CH1,ON" {
+		t.Errorf("sent %v, want [\":OUTP:OVP CH1,ON\"]", mock.commandsSent)
+	}
+}
+
+func TestChannel_ConfigureCurrentLimit(t *testing.T) {
+	mock := &mockInst{}
+	ch := Channel{name: "CH1", idx: 1, inst: mock}
+	err := ch.ConfigureCurrentLimit(context.Background(), dcpwr.CurrentRegulate, 0.5)
+	if err != nil {
+		t.Errorf("ConfigureCurrentLimit() error: %v", err)
+	}
+	if len(mock.commandsSent) != 2 {
+		t.Fatalf("expected 2 commands, got %d", len(mock.commandsSent))
+	}
+	if !strings.Contains(mock.commandsSent[0], ":SOUR1:CURR") {
+		t.Errorf("first command = %q, want :SOUR1:CURR", mock.commandsSent[0])
+	}
+	if !strings.Contains(mock.commandsSent[1], ":OUTP:OCP") {
+		t.Errorf("second command = %q, want :OUTP:OCP", mock.commandsSent[1])
+	}
+}
+
+func TestDriver_ChannelCount(t *testing.T) {
+	d := newTestDriver(&mockInst{})
+	if got := len(d.Channels); got != 3 {
+		t.Errorf("len(Channels) = %d, want 3", got)
+	}
+}

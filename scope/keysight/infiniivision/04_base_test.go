@@ -542,3 +542,54 @@ func TestDriver_NotImplemented(t *testing.T) {
 		t.Errorf("InitiateMeasurement() = %v, want ErrNotImplemented", err)
 	}
 }
+
+func TestDriver_SetAcquisitionStartTime_NotSupported(t *testing.T) {
+	mock := &mockInst{}
+	d := newTestDriver(mock)
+	err := d.SetAcquisitionStartTime(context.Background(), 100*time.Microsecond)
+	if !errors.Is(err, ivi.ErrFunctionNotSupported) {
+		t.Errorf("SetAcquisitionStartTime() = %v, want ErrFunctionNotSupported", err)
+	}
+}
+
+func TestChannel_SetVerticalOffset(t *testing.T) {
+	mock := &mockInst{}
+	ch := Channel{inst: mock, name: "CHAN1", num: 1}
+	err := ch.SetVerticalOffset(context.Background(), 2.5)
+	if err != nil {
+		t.Errorf("SetVerticalOffset() error: %v", err)
+	}
+	if len(mock.commandsSent) != 1 || !strings.HasPrefix(mock.commandsSent[0], ":CHAN1:OFFS") {
+		t.Errorf("sent %v, want :CHAN1:OFFS command", mock.commandsSent)
+	}
+}
+
+func TestDriver_ConfigureTrigger(t *testing.T) {
+	mock := &mockInst{}
+	d := newTestDriver(mock)
+	err := d.ConfigureTrigger(context.Background(), scope.EdgeTrigger, 100*time.Microsecond)
+	if err != nil {
+		t.Errorf("ConfigureTrigger() error: %v", err)
+	}
+	if len(mock.commandsSent) != 2 {
+		t.Fatalf("expected 2 commands, got %d", len(mock.commandsSent))
+	}
+	if mock.commandsSent[0] != ":TRIG:MODE EDGE" {
+		t.Errorf("first command = %q, want \":TRIG:MODE EDGE\"", mock.commandsSent[0])
+	}
+	if !strings.HasPrefix(mock.commandsSent[1], ":TRIG:HOLD") {
+		t.Errorf("second command = %q, want :TRIG:HOLD command", mock.commandsSent[1])
+	}
+}
+
+func TestDriver_SetAcquisitionTimePerRecord(t *testing.T) {
+	mock := &mockInst{}
+	d := newTestDriver(mock)
+	err := d.SetAcquisitionTimePerRecord(context.Background(), 1*time.Millisecond)
+	if err != nil {
+		t.Errorf("SetAcquisitionTimePerRecord() error: %v", err)
+	}
+	if len(mock.commandsSent) != 1 || !strings.HasPrefix(mock.commandsSent[0], ":TIM:RANG") {
+		t.Errorf("sent %v, want :TIM:RANG command", mock.commandsSent)
+	}
+}

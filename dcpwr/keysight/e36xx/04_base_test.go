@@ -251,3 +251,27 @@ func TestChannel_NotImplemented_WrapsCorrectError(t *testing.T) {
 		t.Errorf("QueryOutputState() = %v, want ErrNotImplemented", err)
 	}
 }
+
+func TestChannel_DisableOutput(t *testing.T) {
+	mock := &mockInst{}
+	ch := Channel{inst: mock, name: "P6V"}
+	err := ch.DisableOutput(context.Background())
+	if err != nil {
+		t.Errorf("DisableOutput() error: %v", err)
+	}
+	if len(mock.commandsSent) != 1 || mock.commandsSent[0] != "OUTP OFF" {
+		t.Errorf("sent %v, want [\"OUTP OFF\"]", mock.commandsSent)
+	}
+}
+
+func TestChannel_EnableOutput(t *testing.T) {
+	mock := &mockInst{}
+	ch := Channel{inst: mock, name: "P6V"}
+	err := ch.EnableOutput(context.Background())
+	if err != nil {
+		t.Errorf("EnableOutput() error: %v", err)
+	}
+	if len(mock.commandsSent) != 1 || mock.commandsSent[0] != "OUTP ON" {
+		t.Errorf("sent %v, want [\"OUTP ON\"]", mock.commandsSent)
+	}
+}
