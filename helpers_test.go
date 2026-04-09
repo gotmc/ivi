@@ -7,20 +7,23 @@ package ivi
 
 import (
 	"context"
+	"errors"
+	"fmt"
 	"testing"
 )
 
-type mockStringWriter struct {
-	written string
-	err     error
+type mockCommander struct {
+	commandsSent []string
+	err          error
 }
 
-func (m *mockStringWriter) WriteString(s string) (int, error) {
+func (m *mockCommander) Command(_ context.Context, format string, a ...any) error {
 	if m.err != nil {
-		return 0, m.err
+		return m.err
 	}
-	m.written = s
-	return len(s), nil
+	cmd := fmt.Sprintf(format, a...)
+	m.commandsSent = append(m.commandsSent, cmd)
+	return nil
 }
 
 func TestSet(t *testing.T) {
@@ -41,23 +44,25 @@ func TestSet(t *testing.T) {
 		},
 	}
 
+	ctx := context.Background()
+
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			mock := &mockStringWriter{}
-			err := Set(mock, tt.format, tt.args...)
+			mock := &mockCommander{}
+			err := Set(ctx, mock, tt.format, tt.args...)
 			if err != nil {
 				t.Errorf("Set() unexpected error: %v", err)
 			}
-			if mock.written != tt.expected {
-				t.Errorf("Set() wrote %q, want %q", mock.written, tt.expected)
+			if len(mock.commandsSent) != 1 || mock.commandsSent[0] != tt.expected {
+				t.Errorf("Set() sent %v, want [%q]", mock.commandsSent, tt.expected)
 			}
 		})
 	}
 }
 
 func TestSet_Error(t *testing.T) {
-	mock := &mockStringWriter{err: ErrUnexpectedResponse}
-	err := Set(mock, "VOLT %f", 1.0)
+	mock := &mockCommander{err: errors.New("mock error")}
+	err := Set(context.Background(), mock, "VOLT %f", 1.0)
 	if err == nil {
 		t.Error("Set() expected error, got nil")
 	}

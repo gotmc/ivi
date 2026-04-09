@@ -203,7 +203,7 @@ func (ch *Channel) VoltageLevel(ctx context.Context) (float64, error) {
 // Voltage Level described in Section 4.2.6 of IVI-4.4: IviDCPwr Class
 // Specification.
 func (ch *Channel) SetVoltageLevel(ctx context.Context, level float64) error {
-	return ivi.Set(ch.inst, "VOLT %f", level)
+	return ivi.Set(ctx, ch.inst, "VOLT %f", level)
 }
 
 // ConfigureCurrentLimit specifies the output current limit value and the

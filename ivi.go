@@ -24,18 +24,10 @@ import "context"
 
 // Instrument provides the interface required for all IVI Instruments.
 type Instrument interface {
-	Read(p []byte) (n int, err error)
-	Write(p []byte) (n int, err error)
-	WriteString(s string) (n int, err error)
 	ReadContext(ctx context.Context, p []byte) (n int, err error)
 	WriteContext(ctx context.Context, p []byte) (n int, err error)
 	Command(ctx context.Context, cmd string, a ...any) error
 	Query(ctx context.Context, s string) (value string, err error)
-}
-
-// StringWriter provides the interface to write a string.
-type StringWriter interface {
-	WriteString(s string) (n int, err error)
 }
 
 // Commander provides the interface to send a command to an instrument that is

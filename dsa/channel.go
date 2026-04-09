@@ -24,9 +24,9 @@ func NewChannel(id int, name string, inst ivi.Instrument) Channel {
 	return Channel{id, name, inst}
 }
 
-// Set writes the format string, using the given paarameters to the channel.
-func (ch *Channel) Set(format string, a ...interface{}) error {
-	return ivi.Set(ch.inst, format, a...)
+// Set writes the format string, using the given parameters to the channel.
+func (ch *Channel) Set(ctx context.Context, format string, a ...interface{}) error {
+	return ivi.Set(ctx, ch.inst, format, a...)
 }
 
 // QueryBool queries the channel and returns a bool.

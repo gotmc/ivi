@@ -41,8 +41,8 @@ func (ch *Channel) String() string {
 
 // Set takes the same inputs as fmt.Sprintf() and writes the resultant command
 // to the IVI device.
-func (ch *Channel) Set(format string, a ...interface{}) error {
-	return ivi.Set(ch.inst, format, a...)
+func (ch *Channel) Set(ctx context.Context, format string, a ...interface{}) error {
+	return ivi.Set(ctx, ch.inst, format, a...)
 }
 
 // QueryBool queries the channel and returns a bool.

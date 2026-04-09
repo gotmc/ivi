@@ -12,8 +12,9 @@ code in this repository.
 - **Run single package tests**: `just unit ./dmm/...` - run tests in a package
 - **Integration tests**: `just int` - runs integration tests
 - **E2E tests**: `just e2e` - runs end-to-end tests
-- **Linting**: `just lint` - runs golangci-lint v2 with the project's configuration
-  (includes `gosec`, `bodyclose`, `contextcheck` among enabled linters)
+- **Linting**: `just lint` - runs golangci-lint v2 with `.golangci.yaml` config
+  (staticcheck, govet, errcheck, ineffassign, unused, gosec, misspell,
+  bodyclose, contextcheck)
 - **Coverage report**: `just cover` - generates HTML coverage report
 - **Format and vet**: `just check` - formats and vets code (runs before tests
   automatically)
@@ -42,11 +43,10 @@ function generators) can be programmed identically.
 
 #### Core Interface Layer (`ivi.go`, `inherent.go`)
 
-- `Instrument` interface: Core abstraction requiring Read, Write, WriteString,
-  ReadContext, WriteContext, Command, and Query methods. ReadContext, WriteContext,
-  Command, and Query take `context.Context` as their first parameter.
-  Sub-interfaces `Commander`, `Querier`, and `StringWriter` allow accepting
-  narrower types.
+- `Instrument` interface: Core abstraction requiring ReadContext, WriteContext,
+  Command, and Query methods — all take `context.Context` as their first
+  parameter. Sub-interfaces `Commander` and `Querier` allow accepting narrower
+  types.
 - `Inherent` struct: Base capabilities common to all IVI instruments (reset,
   clear, identification, timeout, local control). All methods that communicate
   with instruments take `context.Context`.
@@ -138,8 +138,8 @@ mode, err := ivi.ReverseLookup(scpiToOutputMode, scpiStr)   // returns ErrUnexpe
 
 #### Core Helpers and Errors (`helpers.go`, `errors.go`)
 
-- `ivi.Set(sw, format, args...)` — convenience for sending formatted SCPI
-  command strings
+- `ivi.Set(ctx, cmdr, format, args...)` — convenience for sending formatted SCPI
+  command strings via the Commander interface
 - `ivi.QueryID(ctx, q)` — standard `*IDN?` query
 - Error sentinels: `ErrNotImplemented`, `ErrFunctionNotSupported`,
   `ErrValueNotSupported`, `ErrUnexpectedResponse`

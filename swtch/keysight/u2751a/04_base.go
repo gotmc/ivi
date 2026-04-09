@@ -335,7 +335,7 @@ func (d *U2751A) Connect(ctx context.Context, ch1name, ch2name string) error {
 		return fmt.Errorf("expected a row and a col got: %s and %s", ch1.chType, ch2.chType)
 	}
 
-	err = ivi.Set(d.inst, "ROUT:CLOS (@%1d%02d)\n", row, col)
+	err = ivi.Set(ctx, d.inst, "ROUT:CLOS (@%1d%02d)\n", row, col)
 	if err != nil {
 		return err
 	}

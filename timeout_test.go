@@ -21,7 +21,7 @@ type mockInstrument struct {
 	shouldError bool
 }
 
-func (m *mockInstrument) Read(p []byte) (n int, err error) {
+func (m *mockInstrument) ReadContext(_ context.Context, p []byte) (int, error) {
 	if m.shouldError {
 		return 0, errors.New("mock error")
 	}
@@ -30,28 +30,12 @@ func (m *mockInstrument) Read(p []byte) (n int, err error) {
 	return len("test response"), nil
 }
 
-func (m *mockInstrument) Write(p []byte) (n int, err error) {
+func (m *mockInstrument) WriteContext(_ context.Context, p []byte) (int, error) {
 	if m.shouldError {
 		return 0, errors.New("mock error")
 	}
 	time.Sleep(m.writeDelay)
 	return len(p), nil
-}
-
-func (m *mockInstrument) WriteString(s string) (n int, err error) {
-	if m.shouldError {
-		return 0, errors.New("mock error")
-	}
-	time.Sleep(m.writeDelay)
-	return len(s), nil
-}
-
-func (m *mockInstrument) ReadContext(_ context.Context, p []byte) (int, error) {
-	return m.Read(p)
-}
-
-func (m *mockInstrument) WriteContext(_ context.Context, p []byte) (int, error) {
-	return m.Write(p)
 }
 
 func (m *mockInstrument) Command(ctx context.Context, format string, a ...any) error {

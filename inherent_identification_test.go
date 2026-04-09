@@ -18,7 +18,7 @@ type mockIDNInstrument struct {
 	shouldError bool
 }
 
-func (m *mockIDNInstrument) Read(p []byte) (int, error) {
+func (m *mockIDNInstrument) ReadContext(_ context.Context, p []byte) (int, error) {
 	if m.shouldError {
 		return 0, errors.New("mock read error")
 	}
@@ -26,20 +26,8 @@ func (m *mockIDNInstrument) Read(p []byte) (int, error) {
 	return n, nil
 }
 
-func (m *mockIDNInstrument) Write(p []byte) (int, error) {
-	return len(p), nil
-}
-
-func (m *mockIDNInstrument) WriteString(s string) (int, error) {
-	return len(s), nil
-}
-
-func (m *mockIDNInstrument) ReadContext(_ context.Context, p []byte) (int, error) {
-	return m.Read(p)
-}
-
 func (m *mockIDNInstrument) WriteContext(_ context.Context, p []byte) (int, error) {
-	return m.Write(p)
+	return len(p), nil
 }
 
 func (m *mockIDNInstrument) Command(_ context.Context, _ string, _ ...any) error {

@@ -17,8 +17,7 @@ func (dev *Key35670) SetStartFreq(ctx context.Context, freq float64) error {
 	if freq < 0.0 || freq > 114999.9023 {
 		return fmt.Errorf("start frequency of %f out of range", freq)
 	}
-	_, err := fmt.Fprintf(dev.inst, "sens:freq:star %f", freq)
-	return err
+	return dev.inst.Command(ctx, "sens:freq:star %f", freq)
 }
 
 // StartFreq queries the start frequency in Hertz.

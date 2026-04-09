@@ -146,7 +146,7 @@ func (d *U2751A) Close() error {
 
 // Disable causes the switch to disconnect all paths.
 func (d *U2751A) Disable(ctx context.Context) error {
-	return ivi.Set(d.inst, "rout:open (@101:408)\n")
+	return ivi.Set(ctx, d.inst, "rout:open (@101:408)\n")
 }
 
 // Channel returns the channel based on either the virtual name or the physical

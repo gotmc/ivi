@@ -16,14 +16,16 @@ import (
 )
 
 // SetSourceOutputLevel sets the source output level.
-func (dev *Key35670) SetSourceOutputLevel(freq float64) error {
-	return ivi.Set(dev.inst, "sour:volt:lev:imm:amp %f", freq)
+func (dev *Key35670) SetSourceOutputLevel(ctx context.Context, freq float64) error {
+	return ivi.Set(ctx, dev.inst, "sour:volt:lev:imm:amp %f", freq)
 }
 
 // SetSourceOutputLevelUnits sets the source output level and the units for the
 // source output.
-func (dev *Key35670) SetSourceOutputLevelUnits(freq float64, unit dsa.AmpUnits) error {
-	return ivi.Set(dev.inst, "sour:volt:lev:imm:amp %f %s", freq, unit)
+func (dev *Key35670) SetSourceOutputLevelUnits(
+	ctx context.Context, freq float64, unit dsa.AmpUnits,
+) error {
+	return ivi.Set(ctx, dev.inst, "sour:volt:lev:imm:amp %f %s", freq, unit)
 }
 
 // SourceOutputLevel queries the source output level.
@@ -37,32 +39,32 @@ func (dev *Key35670) SourceEnabled(ctx context.Context) (bool, error) {
 }
 
 // SetSourceEnabled sets the source output to enabled or disabled.
-func (dev *Key35670) SetSourceEnabled(v bool) error {
+func (dev *Key35670) SetSourceEnabled(ctx context.Context, v bool) error {
 	if v {
-		return ivi.Set(dev.inst, "OUTP ON")
+		return ivi.Set(ctx, dev.inst, "OUTP ON")
 	}
-	return ivi.Set(dev.inst, "OUTP OFF")
+	return ivi.Set(ctx, dev.inst, "OUTP OFF")
 }
 
 // DisableSource is a convenience function for setting the Source Enabled
 // attribute to false.
-func (dev *Key35670) DisableSource() error {
-	return dev.SetSourceEnabled(false)
+func (dev *Key35670) DisableSource(ctx context.Context) error {
+	return dev.SetSourceEnabled(ctx, false)
 }
 
 // EnableSource is a convenience function for setting the Source Enabled
 // attribute to true.
-func (dev *Key35670) EnableSource() error {
-	return dev.SetSourceEnabled(true)
+func (dev *Key35670) EnableSource(ctx context.Context) error {
+	return dev.SetSourceEnabled(ctx, true)
 }
 
 // SetSourceFrequency sets the source output frequency of the sine source type
 // in Hz. Allowable range is 0 to 115 kHz in 15.625 mHz increments.
-func (dev *Key35670) SetSourceFrequency(f float64) error {
+func (dev *Key35670) SetSourceFrequency(ctx context.Context, f float64) error {
 	if f < 0 || f > 115000 {
 		return fmt.Errorf("frequency out of allowable range: %f", f)
 	}
-	return ivi.Set(dev.inst, "sour:freq %f", f)
+	return ivi.Set(ctx, dev.inst, "sour:freq %f", f)
 }
 
 // SourceFrequency queries the source output frequency in Hz.
@@ -71,8 +73,8 @@ func (dev *Key35670) SourceFrequency(ctx context.Context) (float64, error) {
 }
 
 // SetSourceShape sets the source output shape.
-func (dev *Key35670) SetSourceShape(shape dsa.SourceShape) error {
-	return ivi.Set(dev.inst, "sour:func:shap %s", shape)
+func (dev *Key35670) SetSourceShape(ctx context.Context, shape dsa.SourceShape) error {
+	return ivi.Set(ctx, dev.inst, "sour:func:shap %s", shape)
 }
 
 // SourceShape queries the source output shape.

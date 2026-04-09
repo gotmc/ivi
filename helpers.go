@@ -5,22 +5,12 @@
 
 package ivi
 
-import (
-	"context"
-	"fmt"
-)
+import "context"
 
-// Set formats according to a format specifier and then writes the resulting
-// string to the given StringWriter interface.
-func Set(sw StringWriter, format string, a ...any) error {
-	cmd := format
-	if len(a) > 0 {
-		cmd = fmt.Sprintf(format, a...)
-	}
-
-	_, err := sw.WriteString(cmd)
-
-	return err
+// Set formats according to a format specifier and then sends the resulting
+// command to the given Commander interface.
+func Set(ctx context.Context, cmdr Commander, format string, a ...any) error {
+	return cmdr.Command(ctx, format, a...)
 }
 
 // QueryID queries the identity of the instrument.

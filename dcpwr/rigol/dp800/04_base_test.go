@@ -23,25 +23,12 @@ type mockInst struct {
 	shouldError  bool
 }
 
-func (m *mockInst) Read(p []byte) (int, error) {
+func (m *mockInst) ReadContext(_ context.Context, p []byte) (int, error) {
 	return 0, nil
 }
 
-func (m *mockInst) Write(p []byte) (int, error) {
-	return len(p), nil
-}
-
-func (m *mockInst) WriteString(s string) (int, error) {
-	m.commandsSent = append(m.commandsSent, s)
-	return len(s), nil
-}
-
-func (m *mockInst) ReadContext(_ context.Context, p []byte) (int, error) {
-	return m.Read(p)
-}
-
 func (m *mockInst) WriteContext(_ context.Context, p []byte) (int, error) {
-	return m.Write(p)
+	return len(p), nil
 }
 
 func (m *mockInst) Command(_ context.Context, format string, a ...any) error {
@@ -133,7 +120,6 @@ func TestChannel_SetOutputEnabled(t *testing.T) {
 			if err != nil {
 				t.Errorf("SetOutputEnabled() error: %v", err)
 			}
-			// SetOutputEnabled uses ivi.Set which calls WriteString
 			if len(mock.commandsSent) != 1 || mock.commandsSent[0] != tt.wantCmd {
 				t.Errorf("sent %v, want [%q]", mock.commandsSent, tt.wantCmd)
 			}

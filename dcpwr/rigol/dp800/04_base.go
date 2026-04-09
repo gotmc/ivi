@@ -103,10 +103,10 @@ func (ch *Channel) OutputEnabled(ctx context.Context) (bool, error) {
 // Specification.
 func (ch *Channel) SetOutputEnabled(ctx context.Context, v bool) error {
 	if v {
-		return ivi.Set(ch.inst, ":OUTP %s,ON", ch.name)
+		return ivi.Set(ctx, ch.inst, ":OUTP %s,ON", ch.name)
 	}
 
-	return ivi.Set(ch.inst, ":OUTP %s,OFF", ch.name)
+	return ivi.Set(ctx, ch.inst, ":OUTP %s,OFF", ch.name)
 }
 
 // DisableOutput is a convenience function for setting the Output Enabled
