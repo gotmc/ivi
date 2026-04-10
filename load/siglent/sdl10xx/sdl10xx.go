@@ -3,12 +3,10 @@
 // Use of this source code is governed by a MIT-style license that
 // can be found in the LICENSE.txt file for the project.
 
-/*
-Package sdl10xx implements the IVI driver for the Signlent SDL1000X and
-SDL1030X DC electronic loads.
-
-State Caching: Not implemented
-*/
+// Package sdl10xx implements the IVI driver for the Signlent SDL1000X and
+// SDL1030X DC electronic loads.
+//
+// State Caching: Not implemented
 package sdl10xx
 
 import (

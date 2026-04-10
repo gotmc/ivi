@@ -3,12 +3,10 @@
 // Use of this source code is governed by a MIT-style license that
 // can be found in the LICENSE.txt file for the project.
 
-/*
-Package e36xx implements the IVI driver for the Keysight/Agilent E3600 series
-of power supplies.
-
-State Caching: Not implemented
-*/
+// Package e36xx implements the IVI driver for the Keysight/Agilent E3600
+// series of power supplies.
+//
+// State Caching: Not implemented
 package e36xx
 
 import (

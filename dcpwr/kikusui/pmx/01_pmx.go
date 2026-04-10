@@ -3,12 +3,10 @@
 // Use of this source code is governed by a MIT-style license that
 // can be found in the LICENSE.txt file for the project.
 
-/*
-Package pmx implements the IVI driver for the KIKUSUI PMX series of
-regulated DC power supplies.
-
-State Caching: Not implemented
-*/
+// Package pmx implements the IVI driver for the KIKUSUI PMX series of
+// regulated DC power supplies.
+//
+// State Caching: Not implemented
 package pmx
 
 import (

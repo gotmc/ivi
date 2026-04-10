@@ -3,11 +3,9 @@
 // Use of this source code is governed by a MIT-style license that
 // can be found in the LICENSE.txt file for the project.
 
-/*
-Package fluke45 implements the IVI driver for the Fluke 45 DMM.
-
-State Caching: Not implemented
-*/
+// Package fluke45 implements the IVI driver for the Fluke 45 DMM.
+//
+// State Caching: Not implemented
 package fluke45
 
 import (

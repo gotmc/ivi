@@ -3,10 +3,8 @@
 // Use of this source code is governed by a MIT-style license that
 // can be found in the LICENSE.txt file for the project.
 
-/*
-Package com provides information about communication ports (Ethernet, serial,
-etc.) for various IVI devices.
-*/
+// Package com provides information about communication ports (Ethernet,
+// serial, etc.) for various IVI devices.
 package com
 
 // SerialModes returns the allowed serial communication modes for a device.

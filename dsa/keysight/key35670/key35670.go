@@ -3,6 +3,12 @@
 // Use of this source code is governed by a MIT-style license that
 // can be found in the LICENSE.txt file for the project.
 
+// Package key35670 implements the IVI Instrument driver for the Keysight 35670
+// dynamic signal analyzer.
+//
+// Note: Dynamic Signal Analyzers are not part of the IVI Specification.
+//
+// State Caching: Not implemented
 package key35670
 
 import (

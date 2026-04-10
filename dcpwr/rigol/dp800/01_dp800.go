@@ -3,12 +3,10 @@
 // Use of this source code is governed by a MIT-style license that
 // can be found in the LICENSE.txt file for the project.
 
-/*
-Package dp800 implements the IVI driver for the Rigol DP800 series
-of programmable linear DC power supplies.
-
-State Caching: Not implemented
-*/
+// Package dp800 implements the IVI driver for the Rigol DP800 series of
+// programmable linear DC power supplies.
+//
+// State Caching: Not implemented
 package dp800
 
 import (

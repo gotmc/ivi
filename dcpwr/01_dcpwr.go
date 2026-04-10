@@ -3,14 +3,12 @@
 // Use of this source code is governed by a MIT-style license that
 // can be found in the LICENSE.txt file for the project.
 
-/*
-Package dcpwr provides the defined values, interfaces, structs, methods, and
-enums that are common among all intstruments meeting the IVI-4.4: IviDCPwr
-Class Specification, Revision 3.0 dated September 24, 2015.
-
-Files are split based on the class capability groups listed in Table 2-1
-IviDCPwr Group Names in the IVI-4.4 IviDCPwr Class Specification.
-*/
+// Package dcpwr provides the defined values, interfaces, structs, methods, and
+// enums that are common among all intstruments meeting the IVI-4.4: IviDCPwr
+// Class Specification, Revision 3.0 dated September 24, 2015.
+//
+// Files are split based on the class capability groups listed in Table 2-1
+// IviDCPwr Group Names in the IVI-4.4 IviDCPwr Class Specification.
 package dcpwr
 
 import "errors"

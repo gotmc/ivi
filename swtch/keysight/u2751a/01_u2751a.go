@@ -3,12 +3,10 @@
 // Use of this source code is governed by a MIT-style license that
 // can be found in the LICENSE.txt file for the project.
 
-/*
-Package u2751a implements the IVI driver for the Keysight U2751A 4x8 2-wire
-switch matrix.
-
-State Caching: Not implemented
-*/
+// Package u2751a implements the IVI driver for the Keysight U2751A 4x8 2-wire
+// switch matrix.
+//
+// State Caching: Not implemented
 package u2751a
 
 import (

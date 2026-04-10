@@ -3,12 +3,10 @@
 // Use of this source code is governed by a MIT-style license that
 // can be found in the LICENSE.txt file for the project.
 
-/*
-Package infiniivision implements the IVI driver for various Keysight
-oscilloscopes.
-
-State Caching: Not implemented
-*/
+// Package infiniivision implements the IVI driver for various Keysight
+// oscilloscopes.
+//
+// State Caching: Not implemented
 package infiniivision
 
 import (
