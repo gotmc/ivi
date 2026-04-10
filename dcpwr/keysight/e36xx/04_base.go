@@ -126,7 +126,7 @@ func (ch *Channel) OVPEnabled(ctx context.Context) (bool, error) {
 // SetOVPEnabled is the setter for the read-write IviFgenBase Attribute OVP
 // Enabled described in Section 4.2.4 of IVI-4.4: IviDCPwr Class Specification.
 func (ch *Channel) SetOVPEnabled(ctx context.Context, _ bool) error {
-	return fmt.Errorf("SetOVPEnabled: %w", ivi.ErrFunctionNotSupported)
+	return fmt.Errorf("SetOVPEnabled: %w", dcpwr.ErrOVPUnsupported)
 }
 
 // DisableOVP is a convenience function for disabling Over-Voltage Protection
@@ -138,7 +138,7 @@ func (ch *Channel) DisableOVP(ctx context.Context) error {
 // EnableOVP is a convenience function for enabling Over-Voltage Protection
 // (OVP). EnableOVP always returns an error for the E3631A since support OVP.
 func (ch *Channel) EnableOVP(ctx context.Context) error {
-	return fmt.Errorf("EnableOVP: %w", ivi.ErrFunctionNotSupported)
+	return fmt.Errorf("EnableOVP: %w", dcpwr.ErrOVPUnsupported)
 }
 
 // OVPLimit returns an error, since the E3631A doesn't support Over-Voltage
@@ -147,7 +147,7 @@ func (ch *Channel) EnableOVP(ctx context.Context) error {
 // OVPLimit is the getter for the read-write IviDWPwrBase Attribute OVP Limit
 // described in Section 4.2.5 of IVI-4.4: IviDCPwr Class Specification.
 func (ch *Channel) OVPLimit(ctx context.Context) (float64, error) {
-	return 0, fmt.Errorf("OVPLimit: %w", ivi.ErrFunctionNotSupported)
+	return 0, fmt.Errorf("OVPLimit: %w", dcpwr.ErrOVPUnsupported)
 }
 
 // SetOVPLimit returns an error since the E3631A doesn't support Over-Voltage
@@ -156,7 +156,7 @@ func (ch *Channel) OVPLimit(ctx context.Context) (float64, error) {
 // SetOVPLimit is the setter for the read-write IviDCPwrBase Attribute OVP
 // Limit described in Section 4.2.5 of IVI-4.4: IviDCPwr Class Specification.
 func (ch *Channel) SetOVPLimit(ctx context.Context, _ float64) error {
-	return fmt.Errorf("SetOVPLimit: %w", ivi.ErrFunctionNotSupported)
+	return fmt.Errorf("SetOVPLimit: %w", dcpwr.ErrOVPUnsupported)
 }
 
 // VoltageLevel reads the specified voltage level the DC power supply attempts
@@ -222,7 +222,7 @@ func (ch *Channel) ConfigureOutputRange(ctx context.Context, _ dcpwr.RangeType, 
 // ConfigureOVP implements the IviDCPwrBase function described in Section 4.3.4
 // of IVI-4.4: IviDCPwr Class Specification.
 func (ch *Channel) ConfigureOVP(ctx context.Context, _ bool, _ float64) error {
-	return fmt.Errorf("ConfigureOVP: %w", ivi.ErrNotImplemented)
+	return fmt.Errorf("ConfigureOVP: %w", dcpwr.ErrOVPUnsupported)
 }
 
 // QueryCurrentLimitMax returns the maximum programmable current limit that the

@@ -189,28 +189,28 @@ func TestChannel_OVP_NotSupported(t *testing.T) {
 		t.Error("OVPEnabled() = true, want false")
 	}
 
-	// SetOVPEnabled should return ErrFunctionNotSupported
+	// SetOVPEnabled should return ErrOVPUnsupported
 	err = ch.SetOVPEnabled(context.Background(), true)
-	if !errors.Is(err, ivi.ErrFunctionNotSupported) {
-		t.Errorf("SetOVPEnabled() = %v, want ErrFunctionNotSupported", err)
+	if !errors.Is(err, dcpwr.ErrOVPUnsupported) {
+		t.Errorf("SetOVPEnabled() = %v, want ErrOVPUnsupported", err)
 	}
 
-	// EnableOVP should return ErrFunctionNotSupported
+	// EnableOVP should return ErrOVPUnsupported
 	err = ch.EnableOVP(context.Background())
-	if !errors.Is(err, ivi.ErrFunctionNotSupported) {
-		t.Errorf("EnableOVP() = %v, want ErrFunctionNotSupported", err)
+	if !errors.Is(err, dcpwr.ErrOVPUnsupported) {
+		t.Errorf("EnableOVP() = %v, want ErrOVPUnsupported", err)
 	}
 
-	// OVPLimit should return ErrFunctionNotSupported
+	// OVPLimit should return ErrOVPUnsupported
 	_, err = ch.OVPLimit(context.Background())
-	if !errors.Is(err, ivi.ErrFunctionNotSupported) {
-		t.Errorf("OVPLimit() = %v, want ErrFunctionNotSupported", err)
+	if !errors.Is(err, dcpwr.ErrOVPUnsupported) {
+		t.Errorf("OVPLimit() = %v, want ErrOVPUnsupported", err)
 	}
 
-	// SetOVPLimit should return ErrFunctionNotSupported
+	// SetOVPLimit should return ErrOVPUnsupported
 	err = ch.SetOVPLimit(context.Background(), 10.0)
-	if !errors.Is(err, ivi.ErrFunctionNotSupported) {
-		t.Errorf("SetOVPLimit() = %v, want ErrFunctionNotSupported", err)
+	if !errors.Is(err, dcpwr.ErrOVPUnsupported) {
+		t.Errorf("SetOVPLimit() = %v, want ErrOVPUnsupported", err)
 	}
 }
 
