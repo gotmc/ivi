@@ -37,8 +37,11 @@ type Driver struct {
 	ivi.Inherent
 }
 
-// New creates a new IVI driver for the Keysight 3446x series of DMMs.
-func New(inst ivi.Instrument, idQuery, reset bool) (*Driver, error) {
+// New creates a new IVI driver for the Keysight 3446x series of DMMs. Use
+// [ivi.WithIDQuery] to verify the instrument model and [ivi.WithReset] to
+// reset on creation.
+func New(inst ivi.Instrument, opts ...ivi.DriverOption) (*Driver, error) {
+	cfg := ivi.ApplyOptions(opts)
 	inherentBase := ivi.InherentBase{
 		ClassSpecMajorVersion: specMajorVersion,
 		ClassSpecMinorVersion: specMinorVersion,
@@ -75,7 +78,7 @@ func New(inst ivi.Instrument, idQuery, reset bool) (*Driver, error) {
 	}
 	inherent := ivi.NewInherent(inst, inherentBase)
 
-	if idQuery {
+	if cfg.IDQuery {
 		if _, err := inherent.CheckID(context.Background()); err != nil {
 			return nil, err
 		}
@@ -86,7 +89,7 @@ func New(inst ivi.Instrument, idQuery, reset bool) (*Driver, error) {
 		Inherent: inherent,
 	}
 
-	if reset {
+	if cfg.Reset {
 		if err := driver.Reset(context.Background()); err != nil {
 			return &driver, err
 		}

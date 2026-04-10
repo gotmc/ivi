@@ -45,11 +45,10 @@ type Channel struct {
 	currentLimitBehavior dcpwr.CurrentLimitBehavior
 }
 
-// New creates a new PMX IVI Instrument. Currently, only the E3631A
-// model is supported, but in the future as other models are added, the New
-// function will query the instrument to determine the model and ensure it is
-// one of the supported models. If reset is true, then the instrument is reset.
-func New(inst ivi.Instrument, idQuery, reset bool) (*Driver, error) {
+// New creates a new PMX IVI Instrument. Use [ivi.WithIDQuery] to verify the
+// instrument model and [ivi.WithReset] to reset on creation.
+func New(inst ivi.Instrument, opts ...ivi.DriverOption) (*Driver, error) {
+	cfg := ivi.ApplyOptions(opts)
 	channelNames := []string{
 		"DCOutput",
 	}
@@ -88,7 +87,7 @@ func New(inst ivi.Instrument, idQuery, reset bool) (*Driver, error) {
 	}
 	inherent := ivi.NewInherent(inst, inherentBase)
 
-	if idQuery {
+	if cfg.IDQuery {
 		if _, err := inherent.CheckID(context.Background()); err != nil {
 			return nil, err
 		}
@@ -100,7 +99,7 @@ func New(inst ivi.Instrument, idQuery, reset bool) (*Driver, error) {
 		Inherent: inherent,
 	}
 
-	if reset {
+	if cfg.Reset {
 		if err := driver.Reset(context.Background()); err != nil {
 			return &driver, err
 		}

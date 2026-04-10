@@ -15,7 +15,8 @@ code in this repository.
 - **Linting**: `just lint` - runs golangci-lint v2 with `.golangci.yaml` config
   (staticcheck, govet, errcheck, ineffassign, unused, gosec, misspell,
   bodyclose, contextcheck)
-- **Coverage report**: `just cover` - generates HTML coverage report
+- **Coverage report**: `just cover` - generates HTML coverage report (also
+  accepts `just cover int`, `just cover e2e`, or `just cover all`)
 - **Format and vet**: `just check` - formats and vets code (runs before tests
   automatically)
 - **Lines of code**: `just loc` - count lines of code using scc
@@ -142,6 +143,12 @@ var scpiToOutputMode = map[string]fgen.OutputMode{
 cmd, err := ivi.LookupSCPI(outputModeToSCPI, outputMode)   // returns ErrValueNotSupported on miss
 mode, err := ivi.ReverseLookup(scpiToOutputMode, scpiStr)   // returns ErrUnexpectedResponse on miss
 ```
+
+#### Timeout Support (`timeout.go`)
+
+`ivi.DefaultTimeout` (10 seconds) is a convenience constant for creating
+timeout contexts. All instrument I/O uses `context.Context` for per-operation
+timeout and cancellation control.
 
 #### Core Helpers and Errors (`helpers.go`, `errors.go`)
 

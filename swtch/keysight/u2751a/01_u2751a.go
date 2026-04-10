@@ -52,8 +52,11 @@ type U2751A struct {
 
 type path []string
 
-// New creates a new U2751A IVI Instrument.
-func New(inst ivi.Instrument, idQuery, reset, standalone bool) (U2751A, error) {
+// New creates a new U2751A IVI Instrument. Use [ivi.WithIDQuery] to verify the
+// instrument model, [ivi.WithReset] to reset on creation, and
+// [ivi.WithStandalone] to configure standalone voltage ratings.
+func New(inst ivi.Instrument, opts ...ivi.DriverOption) (U2751A, error) {
+	cfg := ivi.ApplyOptions(opts)
 	infoChannels := []struct {
 		name     string
 		chType   ChannelType
@@ -76,7 +79,7 @@ func New(inst ivi.Instrument, idQuery, reset, standalone bool) (U2751A, error) {
 
 	channels := make([]Channel, outputCount)
 	for i, ch := range infoChannels {
-		channels[i] = newChannel(i, ch.name, ch.chType, ch.switchID, inst, standalone)
+		channels[i] = newChannel(i, ch.name, ch.chType, ch.switchID, inst, cfg.Standalone)
 	}
 
 	inherentBase := ivi.InherentBase{
@@ -95,7 +98,7 @@ func New(inst ivi.Instrument, idQuery, reset, standalone bool) (U2751A, error) {
 	}
 	inherent := ivi.NewInherent(inst, inherentBase)
 
-	if idQuery {
+	if cfg.IDQuery {
 		if _, err := inherent.CheckID(context.Background()); err != nil {
 			return U2751A{}, err
 		}
@@ -107,7 +110,7 @@ func New(inst ivi.Instrument, idQuery, reset, standalone bool) (U2751A, error) {
 		Inherent: inherent,
 	}
 
-	if reset {
+	if cfg.Reset {
 		if err := driver.Reset(context.Background()); err != nil {
 			return driver, err
 		}

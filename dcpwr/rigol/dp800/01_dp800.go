@@ -38,10 +38,11 @@ type Driver struct {
 }
 
 // New creates a new Rigol DP800 IVI Instrument driver. The New function always
-// queries the instrument to determine the model for channel configuration. If
-// idQuery is true, the model is also validated against the supported models
-// list. If reset is true, the instrument is reset.
-func New(inst ivi.Instrument, idQuery, reset bool) (*Driver, error) {
+// queries the instrument to determine the model for channel configuration. Use
+// [ivi.WithIDQuery] to also validate the model against the supported models
+// list. Use [ivi.WithReset] to reset the instrument on creation.
+func New(inst ivi.Instrument, opts ...ivi.DriverOption) (*Driver, error) {
+	cfg := ivi.ApplyOptions(opts)
 	inherentBase := ivi.InherentBase{
 		ClassSpecMajorVersion: specMajorVersion,
 		ClassSpecMinorVersion: specMinorVersion,
@@ -69,7 +70,7 @@ func New(inst ivi.Instrument, idQuery, reset bool) (*Driver, error) {
 
 	// Always query the model since channel configuration depends on it.
 	model, err := inherent.CheckID(context.Background())
-	if err != nil && idQuery {
+	if err != nil && cfg.IDQuery {
 		return nil, err
 	} else if err != nil {
 		// Without idQuery, still need the model for channel config.
@@ -149,7 +150,7 @@ func New(inst ivi.Instrument, idQuery, reset bool) (*Driver, error) {
 		Inherent: inherent,
 	}
 
-	if reset {
+	if cfg.Reset {
 		if err := driver.Reset(context.Background()); err != nil {
 			return &driver, err
 		}

@@ -50,7 +50,7 @@ func (m *mockInst) Query(_ context.Context, s string) (string, error) {
 
 func TestDriver_OutputCount(t *testing.T) {
 	mock := &mockInst{queryResp: "KEYSIGHT,33220A,0,1.0"}
-	d, err := New(mock, false, false)
+	d, err := New(mock)
 	if err != nil {
 		t.Fatalf("New() error: %v", err)
 	}
@@ -61,7 +61,7 @@ func TestDriver_OutputCount(t *testing.T) {
 
 func TestChannel_Name(t *testing.T) {
 	mock := &mockInst{queryResp: "KEYSIGHT,33220A,0,1.0"}
-	d, err := New(mock, false, false)
+	d, err := New(mock)
 	if err != nil {
 		t.Fatalf("New() error: %v", err)
 	}
@@ -91,7 +91,7 @@ func TestDriver_OutputMode(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			mock := &mockInst{queryResp: tt.response}
-			d, err := New(mock, false, false)
+			d, err := New(mock)
 			if err != nil {
 				t.Fatalf("New() error: %v", err)
 			}
@@ -129,7 +129,7 @@ func TestDriver_SetOutputMode(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			mock := &mockInst{queryResp: "KEYSIGHT,33220A,0,1.0"}
-			d, err := New(mock, false, false)
+			d, err := New(mock)
 			if err != nil {
 				t.Fatalf("New() error: %v", err)
 			}
@@ -567,7 +567,7 @@ func TestDriver_InternalTriggerRate(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			mock := &mockInst{queryResp: tt.response}
-			d, err := New(mock, false, false)
+			d, err := New(mock)
 			if err != nil {
 				t.Fatalf("New() error: %v", err)
 			}
@@ -584,7 +584,7 @@ func TestDriver_InternalTriggerRate(t *testing.T) {
 
 func TestDriver_SetInternalTriggerRate(t *testing.T) {
 	mock := &mockInst{queryResp: "KEYSIGHT,33220A,0,1.0"}
-	d, err := New(mock, false, false)
+	d, err := New(mock)
 	if err != nil {
 		t.Fatalf("New() error: %v", err)
 	}
@@ -599,7 +599,7 @@ func TestDriver_SetInternalTriggerRate(t *testing.T) {
 
 func TestDriver_ReferenceClockSource(t *testing.T) {
 	mock := &mockInst{queryResp: "KEYSIGHT,33220A,0,1.0"}
-	d, err := New(mock, false, false)
+	d, err := New(mock)
 	if err != nil {
 		t.Fatalf("New() error: %v", err)
 	}
@@ -614,7 +614,7 @@ func TestDriver_ReferenceClockSource(t *testing.T) {
 
 func TestDriver_InitiateGeneration(t *testing.T) {
 	mock := &mockInst{queryResp: "KEYSIGHT,33220A,0,1.0"}
-	d, err := New(mock, false, false)
+	d, err := New(mock)
 	if err != nil {
 		t.Fatalf("New() error: %v", err)
 	}
@@ -629,7 +629,7 @@ func TestDriver_InitiateGeneration(t *testing.T) {
 
 func TestDriver_AbortGeneration(t *testing.T) {
 	mock := &mockInst{queryResp: "KEYSIGHT,33220A,0,1.0"}
-	d, err := New(mock, false, false)
+	d, err := New(mock)
 	if err != nil {
 		t.Fatalf("New() error: %v", err)
 	}
