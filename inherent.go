@@ -86,11 +86,13 @@ func (inherent *Inherent) InstrumentSerialNumber(ctx context.Context) (string, e
 
 // Reset resets the instrument.
 func (inherent *Inherent) Reset(ctx context.Context) error {
-	err := inherent.inst.Command(ctx, "*rst")
-	// Need to wait until the device resets.
+	if err := inherent.inst.Command(ctx, "*rst"); err != nil {
+		return err
+	}
+	// Wait for the device to finish resetting.
 	select {
 	case <-time.After(inherent.ResetDelay):
-		return err
+		return nil
 	case <-ctx.Done():
 		return ctx.Err()
 	}
@@ -98,10 +100,13 @@ func (inherent *Inherent) Reset(ctx context.Context) error {
 
 // Clear clears the instrument.
 func (inherent *Inherent) Clear(ctx context.Context) error {
-	err := inherent.inst.Command(ctx, "*cls")
+	if err := inherent.inst.Command(ctx, "*cls"); err != nil {
+		return err
+	}
+	// Wait for the device to finish clearing.
 	select {
 	case <-time.After(inherent.ClearDelay):
-		return err
+		return nil
 	case <-ctx.Done():
 		return ctx.Err()
 	}
