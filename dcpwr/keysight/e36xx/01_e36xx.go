@@ -47,27 +47,11 @@ type Channel struct {
 }
 
 // New creates a new IVI driver for the Keysight/Agilent E3600 series of DC
-// power supplies. Currently, only the E3631A model is supported, but in the
-// future as other models are added, the New function will query the instrument
-// to determine the model and ensure it is one of the supported models. If
-// reset is true, then the instrument is reset.
+// power supplies. The New function always queries the instrument to determine
+// the model for channel configuration. If idQuery is true, the model is also
+// validated against the supported models list. If reset is true, the instrument
+// is reset.
 func New(inst ivi.Instrument, idQuery, reset bool) (*Driver, error) {
-	channelNames := []string{
-		"P6V",
-		"P25V",
-		"N25V",
-	}
-	outputCount := len(channelNames)
-	channels := make([]Channel, outputCount)
-
-	for i, channelName := range channelNames {
-		ch := Channel{
-			name: channelName,
-			inst: inst,
-		}
-		channels[i] = ch
-	}
-
 	inherentBase := ivi.InherentBase{
 		ClassSpecMajorVersion: specMajorVersion,
 		ClassSpecMinorVersion: specMinorVersion,
@@ -81,6 +65,9 @@ func New(inst ivi.Instrument, idQuery, reset bool) (*Driver, error) {
 		},
 		SupportedInstrumentModels: []string{
 			"E3631A",
+			"E3632A",
+			"E3633A",
+			"E3634A",
 		},
 		SupportedBusInterfaces: []string{
 			"GPIB",
@@ -89,9 +76,25 @@ func New(inst ivi.Instrument, idQuery, reset bool) (*Driver, error) {
 	}
 	inherent := ivi.NewInherent(inst, inherentBase)
 
-	if idQuery {
-		if _, err := inherent.CheckID(context.Background()); err != nil {
-			return nil, err
+	// Always query the model since channel configuration depends on it.
+	model, err := inherent.CheckID(context.Background())
+	if err != nil && idQuery {
+		return nil, err
+	} else if err != nil {
+		// Without idQuery, still need the model for channel config.
+		model, err = inherent.InstrumentModel(context.Background())
+		if err != nil {
+			return nil, fmt.Errorf("error determining instrument model: %w", err)
+		}
+	}
+
+	channelNames := availableChannels[model]
+	channels := make([]Channel, len(channelNames))
+
+	for i, channelName := range channelNames {
+		channels[i] = Channel{
+			name: channelName,
+			inst: inst,
 		}
 	}
 
@@ -108,6 +111,14 @@ func New(inst ivi.Instrument, idQuery, reset bool) (*Driver, error) {
 	}
 
 	return &driver, nil
+}
+
+// availableChannels maps instrument models to their output channel names.
+var availableChannels = map[string][]string{
+	"E3631A": {"P6V", "P25V", "N25V"},
+	"E3632A": {"Output"},
+	"E3633A": {"Output"},
+	"E3634A": {"Output"},
 }
 
 // Channel returns the Channel at the given index, with bounds checking.
