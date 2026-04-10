@@ -50,7 +50,7 @@ type Channel struct {
 }
 
 // New creates a new InfiniiVision IVI Instrument.
-func New(inst ivi.Instrument, reset bool) (*Driver, error) {
+func New(inst ivi.Instrument, idQuery, reset bool) (*Driver, error) {
 	// FIXME: Need to query the instrument for the model and then determine the
 	// number of channels based on the model returned.
 	channelNames := []string{
@@ -95,6 +95,13 @@ func New(inst ivi.Instrument, reset bool) (*Driver, error) {
 		},
 	}
 	inherent := ivi.NewInherent(inst, inherentBase)
+
+	if idQuery {
+		if _, err := inherent.CheckID(context.Background()); err != nil {
+			return nil, err
+		}
+	}
+
 	driver := Driver{
 		inst:     inst,
 		channels: channels,

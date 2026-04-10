@@ -96,9 +96,11 @@ type Driver struct {
 }
 ```
 
-The `New(inst ivi.Instrument, reset bool) (*Driver, error)` constructor creates
-channels, populates `InherentBase` metadata, and calls `ivi.NewInherent()`.
-When `reset` is true, the constructor uses `context.Background()` internally.
+The `New(inst ivi.Instrument, idQuery, reset bool) (*Driver, error)` constructor
+creates channels, populates `InherentBase` metadata, and calls
+`ivi.NewInherent()`. When `idQuery` is true, the constructor queries `*IDN?`
+and validates the instrument model against the driver's supported models list
+via `Inherent.CheckID()`. When `reset` is true, the instrument is reset.
 
 Channel structs hold an `ivi.Instrument` reference and a channel `name` string,
 implementing per-channel capability interfaces. Channels are accessed via a
@@ -147,7 +149,8 @@ mode, err := ivi.ReverseLookup(scpiToOutputMode, scpiStr)   // returns ErrUnexpe
   command strings via the Commander interface
 - `ivi.QueryID(ctx, q)` — standard `*IDN?` query
 - Error sentinels: `ErrNotImplemented`, `ErrFunctionNotSupported`,
-  `ErrValueNotSupported`, `ErrUnexpectedResponse`, `ErrChannelNotFound`
+  `ErrValueNotSupported`, `ErrUnexpectedResponse`, `ErrChannelNotFound`,
+  `ErrUnsupportedModel`
 - Class packages may define additional error sentinels (e.g., `dcpwr` defines
   `ErrOVPUnsupported` and `ErrTriggerNotSoftware`)
 

@@ -34,7 +34,7 @@ type Key35670 struct {
 }
 
 // New creates a new Key35670 IVI Instrument driver.
-func New(inst ivi.Instrument, reset bool) (*Key35670, error) {
+func New(inst ivi.Instrument, idQuery, reset bool) (*Key35670, error) {
 	channelNames := []string{
 		"CH1",
 		"CH2",
@@ -62,15 +62,25 @@ func New(inst ivi.Instrument, reset bool) (*Key35670, error) {
 		},
 	}
 	inherent := ivi.NewInherent(inst, inherentBase)
+
+	if idQuery {
+		if _, err := inherent.CheckID(context.Background()); err != nil {
+			return nil, err
+		}
+	}
+
 	driver := Key35670{
 		inst:     inst,
 		channels: channels,
 		Inherent: inherent,
 	}
+
 	if reset {
-		err := driver.Reset(context.Background())
-		return &driver, err
+		if err := driver.Reset(context.Background()); err != nil {
+			return &driver, err
+		}
 	}
+
 	return &driver, nil
 }
 

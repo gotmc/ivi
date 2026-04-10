@@ -14,7 +14,6 @@ package dp800
 import (
 	"context"
 	"fmt"
-	"slices"
 	"time"
 
 	"github.com/gotmc/ivi"
@@ -40,20 +39,11 @@ type Driver struct {
 	ivi.Inherent
 }
 
-// New creates a new Rigol DP800 IVI Instrument driver. The New function will
-// query the instrument to determine the model and ensure it is one of the
-// supported models. If reset is true, then the instrument is reset.
-func New(inst ivi.Instrument, reset bool) (*Driver, error) {
-	supportedModels := []string{
-		"DP831A",
-		"DP832A",
-		"DP821A",
-		"DP811A",
-		"DP831",
-		"DP832",
-		"DP821",
-		"DP811",
-	}
+// New creates a new Rigol DP800 IVI Instrument driver. The New function always
+// queries the instrument to determine the model for channel configuration. If
+// idQuery is true, the model is also validated against the supported models
+// list. If reset is true, the instrument is reset.
+func New(inst ivi.Instrument, idQuery, reset bool) (*Driver, error) {
 	inherentBase := ivi.InherentBase{
 		ClassSpecMajorVersion: specMajorVersion,
 		ClassSpecMinorVersion: specMinorVersion,
@@ -66,17 +56,30 @@ func New(inst ivi.Instrument, reset bool) (*Driver, error) {
 			"IviDCPwrMeasurement",
 			"IviDCPwrTrigger",
 		},
-		SupportedInstrumentModels: supportedModels,
+		SupportedInstrumentModels: []string{
+			"DP831A",
+			"DP832A",
+			"DP821A",
+			"DP811A",
+			"DP831",
+			"DP832",
+			"DP821",
+			"DP811",
+		},
 	}
 	inherent := ivi.NewInherent(inst, inherentBase)
 
-	model, err := inherent.InstrumentModel(context.Background())
-	if err != nil {
-		return nil, fmt.Errorf("error determining instrument model: %s", err)
-	}
-
-	if !slices.Contains(supportedModels, model) {
-		return nil, fmt.Errorf("model %s not supported by this driver", model)
+	// Always query the model since channel configuration depends on it.
+	model, err := inherent.CheckID(context.Background())
+	if err != nil && idQuery {
+		return nil, err
+	} else if err != nil {
+		// Without idQuery, still need the model for channel config.
+		// Try to get it directly.
+		model, err = inherent.InstrumentModel(context.Background())
+		if err != nil {
+			return nil, fmt.Errorf("error determining instrument model: %w", err)
+		}
 	}
 
 	type genericChannel struct {
@@ -147,10 +150,13 @@ func New(inst ivi.Instrument, reset bool) (*Driver, error) {
 		channels: channels,
 		Inherent: inherent,
 	}
+
 	if reset {
-		err := driver.Reset(context.Background())
-		return &driver, err
+		if err := driver.Reset(context.Background()); err != nil {
+			return &driver, err
+		}
 	}
+
 	return &driver, nil
 }
 

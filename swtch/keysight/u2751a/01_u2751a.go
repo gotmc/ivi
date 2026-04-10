@@ -55,7 +55,7 @@ type U2751A struct {
 type path []string
 
 // New creates a new U2751A IVI Instrument.
-func New(inst ivi.Instrument, reset, standalone bool) (U2751A, error) {
+func New(inst ivi.Instrument, idQuery, reset, standalone bool) (U2751A, error) {
 	infoChannels := []struct {
 		name     string
 		chType   ChannelType
@@ -96,6 +96,13 @@ func New(inst ivi.Instrument, reset, standalone bool) (U2751A, error) {
 		},
 	}
 	inherent := ivi.NewInherent(inst, inherentBase)
+
+	if idQuery {
+		if _, err := inherent.CheckID(context.Background()); err != nil {
+			return U2751A{}, err
+		}
+	}
+
 	driver := U2751A{
 		inst:     inst,
 		channels: channels,
@@ -103,8 +110,9 @@ func New(inst ivi.Instrument, reset, standalone bool) (U2751A, error) {
 	}
 
 	if reset {
-		err := driver.Reset(context.Background())
-		return driver, err
+		if err := driver.Reset(context.Background()); err != nil {
+			return driver, err
+		}
 	}
 
 	return driver, nil

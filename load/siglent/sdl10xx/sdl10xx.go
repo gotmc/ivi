@@ -35,7 +35,7 @@ type SDL10xx struct {
 }
 
 // New creates a new Siglent SDL10xx IVI Instrument driver.
-func New(inst ivi.Instrument, reset bool) (*SDL10xx, error) {
+func New(inst ivi.Instrument, idQuery, reset bool) (*SDL10xx, error) {
 	// FIXME(mdr): Need to query the instrument to determine the model and then
 	// set any model specific attributes, such as quantity and names of channels.
 	channelNames := []string{
@@ -61,15 +61,25 @@ func New(inst ivi.Instrument, reset bool) (*SDL10xx, error) {
 		},
 	}
 	inherent := ivi.NewInherent(inst, inherentBase)
+
+	if idQuery {
+		if _, err := inherent.CheckID(context.Background()); err != nil {
+			return nil, err
+		}
+	}
+
 	driver := SDL10xx{
 		inst:     inst,
 		channels: channels,
 		Inherent: inherent,
 	}
+
 	if reset {
-		err := driver.Reset(context.Background())
-		return &driver, err
+		if err := driver.Reset(context.Background()); err != nil {
+			return &driver, err
+		}
 	}
+
 	return &driver, nil
 }
 

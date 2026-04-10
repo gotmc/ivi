@@ -47,7 +47,7 @@ type Driver struct {
 
 // New creates a new IVI driver for the Keysight 33210A and 33220A
 // function/arbitrary waveform generators.
-func New(inst ivi.Instrument, reset bool) (*Driver, error) {
+func New(inst ivi.Instrument, idQuery, reset bool) (*Driver, error) {
 	channelNames := []string{
 		"Output",
 	}
@@ -92,6 +92,13 @@ func New(inst ivi.Instrument, reset bool) (*Driver, error) {
 		},
 	}
 	inherent := ivi.NewInherent(inst, inherentBase)
+
+	if idQuery {
+		if _, err := inherent.CheckID(context.Background()); err != nil {
+			return nil, err
+		}
+	}
+
 	driver := Driver{
 		inst:     inst,
 		channels: channels,
@@ -99,8 +106,9 @@ func New(inst ivi.Instrument, reset bool) (*Driver, error) {
 	}
 
 	if reset {
-		err := driver.Reset(context.Background())
-		return &driver, err
+		if err := driver.Reset(context.Background()); err != nil {
+			return &driver, err
+		}
 	}
 
 	return &driver, nil

@@ -8,6 +8,7 @@ package ivi
 import (
 	"context"
 	"fmt"
+	"slices"
 	"strings"
 	"time"
 
@@ -52,6 +53,37 @@ func NewInherent(inst Instrument, base InherentBase) Inherent {
 		inst:         inst,
 		InherentBase: base,
 	}
+}
+
+// CheckID queries the instrument for its identification string (*IDN?) and
+// verifies that the instrument model is in the list of SupportedInstrumentModels.
+// On success, the IDNString field is populated with the full *IDN? response and
+// the trimmed model string is returned. CheckID implements the IdQuery behavior
+// described in Section 6.16 of IVI-3.2: Inherent Capabilities Specification.
+func (inherent *Inherent) CheckID(ctx context.Context) (string, error) {
+	idn, err := query.String(ctx, inherent.inst, "*IDN?")
+	if err != nil {
+		return "", fmt.Errorf("error querying instrument identity: %w", err)
+	}
+
+	inherent.IDNString = strings.TrimSpace(idn)
+
+	model, err := parseIdentification(inherent.IDNString, modelID)
+	if err != nil {
+		return "", err
+	}
+
+	model = strings.TrimSpace(model)
+
+	if !slices.Contains(inherent.SupportedInstrumentModels, model) {
+		return model, fmt.Errorf(
+			"%w: %q is not supported by this driver",
+			ErrUnsupportedModel,
+			model,
+		)
+	}
+
+	return model, nil
 }
 
 // FirmwareRevision queries the instrument and returns the firmware revision of

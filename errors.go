@@ -13,4 +13,5 @@ var (
 	ErrValueNotSupported    = errors.New("value not supported")
 	ErrUnexpectedResponse   = errors.New("unexpected response from instrument")
 	ErrChannelNotFound      = errors.New("channel index out of range")
+	ErrUnsupportedModel     = errors.New("unsupported instrument model")
 )

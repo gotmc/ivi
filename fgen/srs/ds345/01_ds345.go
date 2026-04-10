@@ -54,7 +54,7 @@ type Channel struct {
 }
 
 // New creates a new DS345 IVI Instrument.
-func New(inst ivi.Instrument, reset bool) (*Driver, error) {
+func New(inst ivi.Instrument, idQuery, reset bool) (*Driver, error) {
 	channelNames := []string{
 		"Output",
 	}
@@ -99,6 +99,13 @@ func New(inst ivi.Instrument, reset bool) (*Driver, error) {
 		},
 	}
 	inherent := ivi.NewInherent(inst, inherentBase)
+
+	if idQuery {
+		if _, err := inherent.CheckID(context.Background()); err != nil {
+			return nil, err
+		}
+	}
+
 	driver := Driver{
 		inst:     inst,
 		channels: channels,

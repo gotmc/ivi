@@ -34,7 +34,7 @@ type Driver struct {
 }
 
 // New creates a new Agilent3446x IVI Instrument.
-func New(inst ivi.Instrument, reset bool) (*Driver, error) {
+func New(inst ivi.Instrument, idQuery, reset bool) (*Driver, error) {
 	inherentBase := ivi.InherentBase{
 		ClassSpecMajorVersion: specMajorVersion,
 		ClassSpecMinorVersion: specMinorVersion,
@@ -57,14 +57,24 @@ func New(inst ivi.Instrument, reset bool) (*Driver, error) {
 		},
 	}
 	inherent := ivi.NewInherent(inst, inherentBase)
+
+	if idQuery {
+		if _, err := inherent.CheckID(context.Background()); err != nil {
+			return nil, err
+		}
+	}
+
 	driver := Driver{
 		inst:     inst,
 		Inherent: inherent,
 	}
+
 	if reset {
-		err := driver.Reset(context.Background())
-		return &driver, err
+		if err := driver.Reset(context.Background()); err != nil {
+			return &driver, err
+		}
 	}
+
 	return &driver, nil
 }
 

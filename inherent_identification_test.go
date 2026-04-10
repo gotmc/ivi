@@ -118,6 +118,58 @@ func TestInherent_Identification_QueryError(t *testing.T) {
 	}
 }
 
+func TestInherent_CheckID(t *testing.T) {
+	mock := &mockIDNInstrument{
+		idnResponse: "KEYSIGHT TECHNOLOGIES,34465A,MY54505281,A.03.01",
+	}
+	inherent := NewInherent(mock, InherentBase{
+		SupportedInstrumentModels: []string{"34460A", "34461A", "34465A", "34470A"},
+	})
+	ctx := context.Background()
+
+	model, err := inherent.CheckID(ctx)
+	if err != nil {
+		t.Fatalf("CheckID() error: %v", err)
+	}
+	if model != "34465A" {
+		t.Errorf("CheckID() model = %q, want %q", model, "34465A")
+	}
+	if inherent.IDNString == "" {
+		t.Error("CheckID() did not populate IDNString")
+	}
+}
+
+func TestInherent_CheckID_UnsupportedModel(t *testing.T) {
+	mock := &mockIDNInstrument{
+		idnResponse: "KEYSIGHT TECHNOLOGIES,34465A,MY54505281,A.03.01",
+	}
+	inherent := NewInherent(mock, InherentBase{
+		SupportedInstrumentModels: []string{"33220A"},
+	})
+	ctx := context.Background()
+
+	_, err := inherent.CheckID(ctx)
+	if err == nil {
+		t.Fatal("CheckID() expected error for unsupported model, got nil")
+	}
+	if !errors.Is(err, ErrUnsupportedModel) {
+		t.Errorf("CheckID() error = %v, want ErrUnsupportedModel", err)
+	}
+}
+
+func TestInherent_CheckID_QueryError(t *testing.T) {
+	mock := &mockIDNInstrument{shouldError: true}
+	inherent := NewInherent(mock, InherentBase{
+		SupportedInstrumentModels: []string{"34465A"},
+	})
+	ctx := context.Background()
+
+	_, err := inherent.CheckID(ctx)
+	if err == nil {
+		t.Error("CheckID() expected error from query failure, got nil")
+	}
+}
+
 func TestInherent_Reset(t *testing.T) {
 	mock := &mockInstrumentWithClose{}
 	inherent := NewInherent(mock, InherentBase{

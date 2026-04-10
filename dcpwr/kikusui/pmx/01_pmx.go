@@ -51,7 +51,7 @@ type Channel struct {
 // model is supported, but in the future as other models are added, the New
 // function will query the instrument to determine the model and ensure it is
 // one of the supported models. If reset is true, then the instrument is reset.
-func New(inst ivi.Instrument, reset bool) (*Driver, error) {
+func New(inst ivi.Instrument, idQuery, reset bool) (*Driver, error) {
 	channelNames := []string{
 		"DCOutput",
 	}
@@ -89,15 +89,25 @@ func New(inst ivi.Instrument, reset bool) (*Driver, error) {
 		},
 	}
 	inherent := ivi.NewInherent(inst, inherentBase)
+
+	if idQuery {
+		if _, err := inherent.CheckID(context.Background()); err != nil {
+			return nil, err
+		}
+	}
+
 	driver := Driver{
 		inst:     inst,
 		channels: channels,
 		Inherent: inherent,
 	}
+
 	if reset {
-		err := driver.Reset(context.Background())
-		return &driver, err
+		if err := driver.Reset(context.Background()); err != nil {
+			return &driver, err
+		}
 	}
+
 	return &driver, nil
 }
 
