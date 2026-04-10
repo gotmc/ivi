@@ -35,7 +35,7 @@ Below are the .NET attributes, since they are the basis for the Go interfaces.
 Below are the .NET functions, since they are the basis for the Go interfaces.
 
 4.3.1 void AbortGeneration();
-4.3.7 String Output.GetChannelNamne (Int32 index);
+4.3.7 String Output.GetChannelName (Int32 index);
 4.3.8 void InitiateGeneration()
 
 */

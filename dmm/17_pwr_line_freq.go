@@ -55,7 +55,7 @@ None.
 */
 
 // PowerLineFrequencyExtension provides the interface required for the
-// IviDmmowerLineFrequencyAutoZero extension group described in Section 17 of
+// IviDmmPowerLineFrequency extension group described in Section 17 of
 // IVI-4.2 IviDmm Class Specification.
 type PowerLineFrequencyExtension interface {
 	PowerLineFrequency(ctx context.Context) (float64, error)

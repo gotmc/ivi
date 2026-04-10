@@ -15,7 +15,7 @@ import (
 The following information is from the IVI-4.3: IviFgen Class Specification date
 October 14, 2016, revision 5.2.
 
-# Section 10 IviFgenHoldTrigger Extension Group
+# Section 12 IviFgenHoldTrigger Extension Group
 
 ## Section 12.1 IviFgenHoldTrigger Overview
 
@@ -28,7 +28,7 @@ Setting the Hold Trigger Source attribute to a value other than None enables
 the hold trigger. To disable the hold trigger, set the Hold Trigger Source to
 None.
 
-## Section 11.2 IviFgenHoldTrigger Attributes
+## Section 12.2 IviFgenHoldTrigger Attributes
 
 Below are the .NET attributes, since they are the basis for the Go interfaces.
 
@@ -40,7 +40,7 @@ Below are the .NET attributes, since they are the basis for the Go interfaces.
 |  12.2.4 | Hold Trigger Threshold  | Real64   | R/W    | Channel   |
 
 
-## Section 11.3 IviFgenHoldTrigger Functions
+## Section 12.3 IviFgenHoldTrigger Functions
 
 Below are the .NET functions, since they are the basis for the Go interfaces.
 

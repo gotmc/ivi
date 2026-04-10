@@ -51,7 +51,7 @@ Below are the .NET functions, since they are the basis for the Go interfaces.
 
 */
 
-// ResumeTrigger provides the interface required for the IviFgenHoldTrigger
+// ResumeTrigger provides the interface required for the IviFgenResumeTrigger
 // extension group.
 type ResumeTrigger interface {
 	SendSoftwareResumeTrigger(ctx context.Context) error

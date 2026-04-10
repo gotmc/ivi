@@ -32,11 +32,7 @@ Below are the .NET attributes, since they are the basis for the Go interfaces.
 
 ## Section 21.3 IviFgenTerminalConfiguration Functions
 
-Below are the .NET functions, since they are the basis for the Go interfaces.
-
-21.3.2 void AM.ConfigureInternal (Double depth,
-                                  StandardWaveform waveformFunction,
-                                  Double frequency);
+None.
 
 */
 
