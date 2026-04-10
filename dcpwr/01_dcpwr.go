@@ -17,7 +17,6 @@ import "errors"
 
 // Error codes related to the IviDCPwr Class Specification.
 var (
-	ErrNotImplemented     = errors.New("not implemented in ivi driver")
 	ErrOVPUnsupported     = errors.New("ovp not supported")
 	ErrTriggerNotSoftware = errors.New("trigger source is not set to software trigger")
 )
