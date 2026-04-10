@@ -12,10 +12,9 @@ import (
 
 // mockInstrumentWithClose simulates an instrument that implements Close()
 type mockInstrumentWithClose struct {
-	commandsSent     []string
-	closeCalled      bool
-	shouldError      bool
-	errorOnFirstOnly bool // Only error on first command, succeed on second
+	commandsSent []string
+	closeCalled  bool
+	shouldError  bool
 }
 
 func (m *mockInstrumentWithClose) ReadContext(_ context.Context, p []byte) (int, error) {
@@ -29,11 +28,7 @@ func (m *mockInstrumentWithClose) WriteContext(_ context.Context, p []byte) (int
 func (m *mockInstrumentWithClose) Command(_ context.Context, format string, a ...any) error {
 	m.commandsSent = append(m.commandsSent, format)
 
-	if m.shouldError && !m.errorOnFirstOnly {
-		return ErrUnexpectedResponse
-	}
-
-	if m.errorOnFirstOnly && len(m.commandsSent) == 1 {
+	if m.shouldError {
 		return ErrUnexpectedResponse
 	}
 
@@ -68,27 +63,18 @@ func TestInherent_Disable(t *testing.T) {
 	}
 }
 
-func TestInherent_Disable_Fallback(t *testing.T) {
-	mock := &mockInstrumentWithClose{errorOnFirstOnly: true}
+func TestInherent_Disable_ErrorIgnored(t *testing.T) {
+	mock := &mockInstrumentWithClose{shouldError: true}
 	inherent := NewInherent(mock, InherentBase{ReturnToLocal: true})
 
 	err := inherent.Disable(context.Background())
 	if err != nil {
-		t.Errorf("Expected no error after fallback, got %v", err)
+		t.Errorf("Expected no error (best-effort), got %v", err)
 	}
 
-	// Should have tried both SYST:LOC and SYSTem:LOCal
-	if len(mock.commandsSent) != 2 {
-		t.Errorf("Expected 2 commands (with fallback), got %d", len(mock.commandsSent))
-		return
-	}
-
-	if mock.commandsSent[0] != "SYST:LOC" {
-		t.Errorf("Expected SYST:LOC as first command, got %s", mock.commandsSent[0])
-	}
-
-	if mock.commandsSent[1] != "SYSTem:LOCal" {
-		t.Errorf("Expected SYSTem:LOCal as fallback command, got %s", mock.commandsSent[1])
+	// Should have attempted SYST:LOC even though it failed
+	if len(mock.commandsSent) != 1 {
+		t.Errorf("Expected 1 command attempt, got %d", len(mock.commandsSent))
 	}
 }
 

@@ -117,28 +117,19 @@ func (inherent *Inherent) Clear(ctx context.Context) error {
 // control by sending the SYST:LOC command, allowing the front panel to regain
 // control. Disable provides the method described in Section 6.4 of IVI-3.2:
 // Inherent Capabilities Specification.
+//
+// Errors from the local control command are intentionally ignored because not
+// all instruments support SYST:LOC, and a failure to return to local should
+// not prevent the instrument from being closed.
 func (inherent *Inherent) Disable(ctx context.Context) error {
 	if !inherent.ReturnToLocal {
-		// Skip sending local control command if not requested
 		return nil
 	}
 
-	// Send the system local command to return control to the front panel
-	// This addresses the issue where instruments remain in remote mode
-	// after the program terminates.
-	err := inherent.inst.Command(ctx, "SYST:LOC")
-	if err != nil {
-		// If SYST:LOC fails, try the alternative SCPI command
-		fallbackErr := inherent.inst.Command(ctx, "SYSTem:LOCal")
-		if fallbackErr != nil {
-			// Return the original error if both fail
-			return err
-		}
-		// Fallback succeeded
-		return nil
-	}
+	// Best-effort return to local control so the front panel regains control.
+	_ = inherent.inst.Command(ctx, "SYST:LOC")
 
-	return err
+	return nil
 }
 
 func (inherent *Inherent) queryIdentification(
