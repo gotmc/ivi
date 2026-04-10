@@ -170,13 +170,13 @@ func (d *U2751A) Channel(ctx context.Context, name string) (*Channel, error) {
 			return &d.channels[ch.id], nil
 		}
 	}
-	return &Channel{}, fmt.Errorf("channel %s not found", name)
+	return nil, fmt.Errorf("channel %s not found", name)
 }
 
 // ChannelByID returns the channel based on the ID (0-based).
 func (d *U2751A) ChannelByID(ctx context.Context, id int) (*Channel, error) {
-	if id < 0 || id > len(d.channels) {
-		return &Channel{}, fmt.Errorf("channel %d not found", id)
+	if id < 0 || id >= len(d.channels) {
+		return nil, fmt.Errorf("channel %d not found", id)
 	}
 
 	return &d.channels[id], nil
