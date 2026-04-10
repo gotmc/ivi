@@ -200,9 +200,9 @@ func TestDriver_TriggerSource(t *testing.T) {
 		want    dmm.TriggerSource
 		wantErr bool
 	}{
-		{"internal", "1", dmm.Immediate, false},
-		{"external", "2", dmm.External, false},
-		{"external with delay", "3", dmm.External, false},
+		{"internal", "1", dmm.TriggerSourceImmediate, false},
+		{"external", "2", dmm.TriggerSourceExternal, false},
+		{"external with delay", "3", dmm.TriggerSourceExternal, false},
 	}
 
 	for _, tt := range tests {
@@ -237,9 +237,9 @@ func TestDriver_SetTriggerSource(t *testing.T) {
 		wantCmd string
 		wantErr bool
 	}{
-		{"immediate", dmm.Immediate, "TRIGGER 1", false},
-		{"external", dmm.External, "TRIGGER 2", false},
-		{"software", dmm.SoftwareTrigger, "TRIGGER 2", false},
+		{"immediate", dmm.TriggerSourceImmediate, "TRIGGER 1", false},
+		{"external", dmm.TriggerSourceExternal, "TRIGGER 2", false},
+		{"software", dmm.TriggerSourceSoftware, "TRIGGER 2", false},
 		{"unsupported", dmm.TriggerSource(99), "", true},
 	}
 

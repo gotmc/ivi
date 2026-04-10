@@ -342,10 +342,10 @@ func (d *Driver) TriggerSource(
 	}
 
 	if trigType == 1 {
-		return dmm.Immediate, nil
+		return dmm.TriggerSourceImmediate, nil
 	}
 
-	return dmm.External, nil
+	return dmm.TriggerSourceExternal, nil
 }
 
 // SetTriggerSource sets the trigger source. The Fluke 45 supports internal
@@ -359,11 +359,11 @@ func (d *Driver) SetTriggerSource(
 	src dmm.TriggerSource,
 ) error {
 	switch src {
-	case dmm.Immediate:
+	case dmm.TriggerSourceImmediate:
 		return d.inst.Command(ctx, "TRIGGER 1")
-	case dmm.External:
+	case dmm.TriggerSourceExternal:
 		return d.inst.Command(ctx, "TRIGGER 2")
-	case dmm.SoftwareTrigger:
+	case dmm.TriggerSourceSoftware:
 		// External trigger with *TRG for software-initiated triggers.
 		return d.inst.Command(ctx, "TRIGGER 2")
 	default:

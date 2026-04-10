@@ -439,15 +439,15 @@ var msrFuncToCmd = map[dmm.MeasurementFunction]string{
 }
 
 var scpiToTriggerSource = map[string]dmm.TriggerSource{
-	"IMM": dmm.Immediate,
-	"EXT": dmm.External,
-	"BUS": dmm.SoftwareTrigger,
+	"IMM": dmm.TriggerSourceImmediate,
+	"EXT": dmm.TriggerSourceExternal,
+	"BUS": dmm.TriggerSourceSoftware,
 }
 
 var triggerSourceToSCPI = map[dmm.TriggerSource]string{
-	dmm.Immediate:       "IMM",
-	dmm.External:        "EXT",
-	dmm.SoftwareTrigger: "BUS",
+	dmm.TriggerSourceImmediate: "IMM",
+	dmm.TriggerSourceExternal:  "EXT",
+	dmm.TriggerSourceSoftware:  "BUS",
 }
 
 func createConfigureVoltageDCCommand(

@@ -108,53 +108,53 @@ type TriggerSource int
 
 // The TriggerSource defined values are the available trigger sources.
 const (
-	Immediate TriggerSource = iota
-	External
-	SoftwareTrigger
-	Interval
-	TTL0
-	TTL1
-	TTL2
-	TTL3
-	TTL4
-	TTL5
-	TTL6
-	TTL7
-	ECL0
-	ECL1
-	PXIStar
-	RTSI0
-	RTSI1
-	RTSI2
-	RTSI3
-	RTSI4
-	RTSI5
-	RTSI6
+	TriggerSourceImmediate TriggerSource = iota
+	TriggerSourceExternal
+	TriggerSourceSoftware
+	TriggerSourceInterval
+	TriggerSourceTTL0
+	TriggerSourceTTL1
+	TriggerSourceTTL2
+	TriggerSourceTTL3
+	TriggerSourceTTL4
+	TriggerSourceTTL5
+	TriggerSourceTTL6
+	TriggerSourceTTL7
+	TriggerSourceECL0
+	TriggerSourceECL1
+	TriggerSourcePXIStar
+	TriggerSourceRTSI0
+	TriggerSourceRTSI1
+	TriggerSourceRTSI2
+	TriggerSourceRTSI3
+	TriggerSourceRTSI4
+	TriggerSourceRTSI5
+	TriggerSourceRTSI6
 )
 
 var triggerSources = map[TriggerSource]string{
-	Immediate:       "immediate",
-	External:        "external",
-	SoftwareTrigger: "software trigger",
-	Interval:        "interval",
-	TTL0:            "ttl0",
-	TTL1:            "ttl1",
-	TTL2:            "ttl2",
-	TTL3:            "ttl3",
-	TTL4:            "ttl4",
-	TTL5:            "ttl5",
-	TTL6:            "ttl6",
-	TTL7:            "ttl7",
-	ECL0:            "ecl0",
-	ECL1:            "ecl1",
-	PXIStar:         "pxi star",
-	RTSI0:           "rtsi0",
-	RTSI1:           "rtsi1",
-	RTSI2:           "rtsi2",
-	RTSI3:           "rtsi3",
-	RTSI4:           "rtsi4",
-	RTSI5:           "rtsi5",
-	RTSI6:           "rtsi6",
+	TriggerSourceImmediate: "immediate",
+	TriggerSourceExternal:  "external",
+	TriggerSourceSoftware:  "software trigger",
+	TriggerSourceInterval:  "interval",
+	TriggerSourceTTL0:      "ttl0",
+	TriggerSourceTTL1:      "ttl1",
+	TriggerSourceTTL2:      "ttl2",
+	TriggerSourceTTL3:      "ttl3",
+	TriggerSourceTTL4:      "ttl4",
+	TriggerSourceTTL5:      "ttl5",
+	TriggerSourceTTL6:      "ttl6",
+	TriggerSourceTTL7:      "ttl7",
+	TriggerSourceECL0:      "ecl0",
+	TriggerSourceECL1:      "ecl1",
+	TriggerSourcePXIStar:   "pxi star",
+	TriggerSourceRTSI0:     "rtsi0",
+	TriggerSourceRTSI1:     "rtsi1",
+	TriggerSourceRTSI2:     "rtsi2",
+	TriggerSourceRTSI3:     "rtsi3",
+	TriggerSourceRTSI4:     "rtsi4",
+	TriggerSourceRTSI5:     "rtsi5",
+	TriggerSourceRTSI6:     "rtsi6",
 }
 
 // String implements the Stringer interface for TriggerSource.

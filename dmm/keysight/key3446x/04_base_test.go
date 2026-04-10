@@ -325,9 +325,9 @@ func TestTriggerSource(t *testing.T) {
 		expected    dmm.TriggerSource
 		expectErr   bool
 	}{
-		{"immediate", "IMM", false, dmm.Immediate, false},
-		{"external", "EXT", false, dmm.External, false},
-		{"software trigger", "BUS", false, dmm.SoftwareTrigger, false},
+		{"immediate", "IMM", false, dmm.TriggerSourceImmediate, false},
+		{"external", "EXT", false, dmm.TriggerSourceExternal, false},
+		{"software trigger", "BUS", false, dmm.TriggerSourceSoftware, false},
 		{"unknown source", "UNKNOWN", false, 0, true},
 		{"query error", "", true, 0, true},
 	}
@@ -365,10 +365,10 @@ func TestSetTriggerSource(t *testing.T) {
 		expectedCmd string
 		expectErr   bool
 	}{
-		{"immediate", dmm.Immediate, false, "TRIG:SOUR IMM", false},
-		{"external", dmm.External, false, "TRIG:SOUR EXT", false},
-		{"software trigger", dmm.SoftwareTrigger, false, "TRIG:SOUR BUS", false},
-		{"command error", dmm.Immediate, true, "", true},
+		{"immediate", dmm.TriggerSourceImmediate, false, "TRIG:SOUR IMM", false},
+		{"external", dmm.TriggerSourceExternal, false, "TRIG:SOUR EXT", false},
+		{"software trigger", dmm.TriggerSourceSoftware, false, "TRIG:SOUR BUS", false},
+		{"command error", dmm.TriggerSourceImmediate, true, "", true},
 	}
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
