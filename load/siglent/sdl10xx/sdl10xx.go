@@ -13,6 +13,7 @@ package sdl10xx
 
 import (
 	"context"
+	"fmt"
 	"time"
 
 	"github.com/gotmc/ivi"
@@ -29,7 +30,7 @@ const (
 // Electronic Loads.
 type SDL10xx struct {
 	inst     ivi.Instrument
-	Channels []Channel
+	channels []Channel
 	ivi.Inherent
 }
 
@@ -62,7 +63,7 @@ func New(inst ivi.Instrument, reset bool) (*SDL10xx, error) {
 	inherent := ivi.NewInherent(inst, inherentBase)
 	driver := SDL10xx{
 		inst:     inst,
-		Channels: channels,
+		channels: channels,
 		Inherent: inherent,
 	}
 	if reset {
@@ -70,6 +71,15 @@ func New(inst ivi.Instrument, reset bool) (*SDL10xx, error) {
 		return &driver, err
 	}
 	return &driver, nil
+}
+
+// Channel returns the Channel at the given index, with bounds checking.
+func (d *SDL10xx) Channel(index int) (*Channel, error) {
+	if index < 0 || index >= len(d.channels) {
+		return nil, fmt.Errorf("channel %d: %w", index, ivi.ErrChannelNotFound)
+	}
+
+	return &d.channels[index], nil
 }
 
 // AvailableCOMPorts lists the available COM ports, including optional ports.

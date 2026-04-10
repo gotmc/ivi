@@ -58,7 +58,7 @@ func newTestDriver(mock *mockInst) *Driver {
 	inherent := ivi.NewInherent(mock, ivi.InherentBase{ReturnToLocal: true})
 	return &Driver{
 		inst:     mock,
-		Channels: channels,
+		channels: channels,
 		Inherent: inherent,
 	}
 }
@@ -74,8 +74,12 @@ func TestChannel_Name(t *testing.T) {
 	d := newTestDriver(&mockInst{})
 	want := []string{"CH1", "CH2", "CH3", "CH4"}
 	for i, w := range want {
-		if got := d.Channels[i].Name(); got != w {
-			t.Errorf("Channel[%d].Name() = %q, want %q", i, got, w)
+		ch, err := d.Channel(i)
+		if err != nil {
+			t.Fatalf("Channel(%d) error: %v", i, err)
+		}
+		if got := ch.Name(); got != w {
+			t.Errorf("Channel(%d).Name() = %q, want %q", i, got, w)
 		}
 	}
 }

@@ -16,7 +16,7 @@ import (
 )
 
 func (d *Driver) OutputChannelCount() int {
-	return len(d.Channels)
+	return len(d.channels)
 }
 
 func (ch *Channel) Name() string {

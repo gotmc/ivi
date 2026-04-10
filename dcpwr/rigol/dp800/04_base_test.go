@@ -56,7 +56,7 @@ func newTestDriver(mock *mockInst) *Driver {
 	inherent := ivi.NewInherent(mock, ivi.InherentBase{ReturnToLocal: true})
 	return &Driver{
 		inst:     mock,
-		Channels: channels,
+		channels: channels,
 		Inherent: inherent,
 	}
 }
@@ -72,8 +72,12 @@ func TestChannel_Name(t *testing.T) {
 	d := newTestDriver(&mockInst{})
 	names := []string{"CH1", "CH2", "CH3"}
 	for i, want := range names {
-		if got := d.Channels[i].Name(); got != want {
-			t.Errorf("Channel[%d].Name() = %q, want %q", i, got, want)
+		ch, err := d.Channel(i)
+		if err != nil {
+			t.Fatalf("Channel(%d) error: %v", i, err)
+		}
+		if got := ch.Name(); got != want {
+			t.Errorf("Channel(%d).Name() = %q, want %q", i, got, want)
 		}
 	}
 }
@@ -199,7 +203,11 @@ func TestChannel_SetOVPLimit(t *testing.T) {
 
 func TestChannel_QueryCurrentLimitMax(t *testing.T) {
 	d := newTestDriver(&mockInst{})
-	got, err := d.Channels[0].QueryCurrentLimitMax(context.Background(), 5.0)
+	ch, err := d.Channel(0)
+	if err != nil {
+		t.Fatalf("Channel(0) error: %v", err)
+	}
+	got, err := ch.QueryCurrentLimitMax(context.Background(), 5.0)
 	if err != nil {
 		t.Errorf("QueryCurrentLimitMax() error: %v", err)
 	}
@@ -210,7 +218,11 @@ func TestChannel_QueryCurrentLimitMax(t *testing.T) {
 
 func TestChannel_QueryVoltageLevelMax(t *testing.T) {
 	d := newTestDriver(&mockInst{})
-	got, err := d.Channels[0].QueryVoltageLevelMax(context.Background(), 1.0)
+	ch, err := d.Channel(0)
+	if err != nil {
+		t.Fatalf("Channel(0) error: %v", err)
+	}
+	got, err := ch.QueryVoltageLevelMax(context.Background(), 1.0)
 	if err != nil {
 		t.Errorf("QueryVoltageLevelMax() error: %v", err)
 	}
@@ -343,7 +355,7 @@ func TestChannel_ConfigureCurrentLimit(t *testing.T) {
 
 func TestDriver_ChannelCount(t *testing.T) {
 	d := newTestDriver(&mockInst{})
-	if got := len(d.Channels); got != 3 {
-		t.Errorf("len(Channels) = %d, want 3", got)
+	if got := d.ChannelCount(); got != 3 {
+		t.Errorf("ChannelCount() = %d, want 3", got)
 	}
 }

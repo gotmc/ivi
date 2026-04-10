@@ -34,7 +34,7 @@ const (
 // OutputCount is the getter for the read-only IviFgenBase Attribute Output
 // Count described in Section 4.2.1 of IVI-4.3: IviFgen Class Specification.
 func (d *Driver) OutputCount() int {
-	return len(d.Channels)
+	return len(d.channels)
 }
 
 // OutputMode returns the determines how the function generator produces

@@ -7,6 +7,7 @@ package key35670
 
 import (
 	"context"
+	"fmt"
 	"time"
 
 	"github.com/gotmc/ivi"
@@ -28,7 +29,7 @@ const (
 // Analyzer.
 type Key35670 struct {
 	inst     ivi.Instrument
-	Channels []Channel
+	channels []Channel
 	ivi.Inherent
 }
 
@@ -63,7 +64,7 @@ func New(inst ivi.Instrument, reset bool) (*Key35670, error) {
 	inherent := ivi.NewInherent(inst, inherentBase)
 	driver := Key35670{
 		inst:     inst,
-		Channels: channels,
+		channels: channels,
 		Inherent: inherent,
 	}
 	if reset {
@@ -73,8 +74,17 @@ func New(inst ivi.Instrument, reset bool) (*Key35670, error) {
 	return &driver, nil
 }
 
-// Channel represents a repeated capability of an input channel for the Dynamic
-// Signal Analyzer (DSA).
+// Channel returns the Channel at the given index, with bounds checking.
+func (d *Key35670) Channel(index int) (*Channel, error) {
+	if index < 0 || index >= len(d.channels) {
+		return nil, fmt.Errorf("channel %d: %w", index, ivi.ErrChannelNotFound)
+	}
+
+	return &d.channels[index], nil
+}
+
+// InputChannel represents a repeated capability of an input channel for the
+// Dynamic Signal Analyzer (DSA).
 type Channel struct {
 	dsa.Channel
 }

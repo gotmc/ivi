@@ -63,7 +63,11 @@ func TestChannel_Name(t *testing.T) {
 	if err != nil {
 		t.Fatalf("New() error: %v", err)
 	}
-	if got := d.Channels[0].Name(); got != "Output" {
+	ch, err := d.Channel(0)
+	if err != nil {
+		t.Fatalf("Channel(0) error: %v", err)
+	}
+	if got := ch.Name(); got != "Output" {
 		t.Errorf("Name() = %q, want %q", got, "Output")
 	}
 }

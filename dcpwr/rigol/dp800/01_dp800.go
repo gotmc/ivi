@@ -36,7 +36,7 @@ var _ dcpwr.MeasurementChannel = (*Channel)(nil)
 // supplies.
 type Driver struct {
 	inst     ivi.Instrument
-	Channels []Channel
+	channels []Channel
 	ivi.Inherent
 }
 
@@ -144,7 +144,7 @@ func New(inst ivi.Instrument, reset bool) (*Driver, error) {
 	}
 	driver := Driver{
 		inst:     inst,
-		Channels: channels,
+		channels: channels,
 		Inherent: inherent,
 	}
 	if reset {
@@ -152,6 +152,15 @@ func New(inst ivi.Instrument, reset bool) (*Driver, error) {
 		return &driver, err
 	}
 	return &driver, nil
+}
+
+// Channel returns the Channel at the given index, with bounds checking.
+func (d *Driver) Channel(index int) (*Channel, error) {
+	if index < 0 || index >= len(d.channels) {
+		return nil, fmt.Errorf("channel %d: %w", index, ivi.ErrChannelNotFound)
+	}
+
+	return &d.channels[index], nil
 }
 
 // Close properly shuts down the power supply by returning it to local control.
@@ -223,5 +232,5 @@ func DefaultSerialDataFrame() string {
 // Channel Count described in Section 4.2.7 of IVI-4.4: IviDCPwr Class
 // Specification.
 func (dev *Driver) ChannelCount() int {
-	return len(dev.Channels)
+	return len(dev.channels)
 }

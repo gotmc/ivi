@@ -13,6 +13,7 @@ package e36xx
 
 import (
 	"context"
+	"fmt"
 	"time"
 
 	"github.com/gotmc/ivi"
@@ -34,7 +35,7 @@ var _ dcpwr.MeasurementChannel = (*Channel)(nil)
 // power supplies.
 type Driver struct {
 	inst     ivi.Instrument
-	Channels []Channel
+	channels []Channel
 	ivi.Inherent
 }
 
@@ -89,7 +90,7 @@ func New(inst ivi.Instrument, reset bool) (*Driver, error) {
 	inherent := ivi.NewInherent(inst, inherentBase)
 	driver := Driver{
 		inst:     inst,
-		Channels: channels,
+		channels: channels,
 		Inherent: inherent,
 	}
 
@@ -99,6 +100,15 @@ func New(inst ivi.Instrument, reset bool) (*Driver, error) {
 	}
 
 	return &driver, nil
+}
+
+// Channel returns the Channel at the given index, with bounds checking.
+func (d *Driver) Channel(index int) (*Channel, error) {
+	if index < 0 || index >= len(d.channels) {
+		return nil, fmt.Errorf("channel %d: %w", index, ivi.ErrChannelNotFound)
+	}
+
+	return &d.channels[index], nil
 }
 
 // Close properly shuts down the power supply by returning it to local control.

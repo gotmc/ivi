@@ -170,7 +170,7 @@ func (d *Driver) SetAcquisitionType(ctx context.Context, acType scope.Acquisitio
 // ChannelCount is the getter for the read-only IviScopeBase Channel Count
 // described in Section 4.2.4 of the IVI-4.1: IviScope Class Specification.
 func (d *Driver) ChannelCount() int {
-	return len(d.Channels)
+	return len(d.channels)
 }
 
 // AcquisitionMinNumPoints returns the minimum number of points the end-user

@@ -44,7 +44,7 @@ var operationModeToSCPI = map[fgen.OperationMode]string{
 // OutputCount is the getter for the read-only IviFgenBase Attribute Output
 // Count described in Section 4.2.1 of IVI-4.3: IviFgen Class Specification.
 func (d *Driver) OutputCount() int {
-	return len(d.Channels)
+	return len(d.channels)
 }
 
 // OutputMode returns the determines how the function generator produces
@@ -89,7 +89,7 @@ func (d *Driver) SetOutputMode(ctx context.Context, outputMode fgen.OutputMode) 
 // InitiateGeneration implements the IviFgenBase function described in Section
 // 4.3.8 of IVI-4.3: IviFgen Class Specification.
 func (d *Driver) InitiateGeneration(ctx context.Context) error {
-	for _, channel := range d.Channels {
+	for _, channel := range d.channels {
 		if err := channel.EnableOutput(ctx); err != nil {
 			return err
 		}
@@ -104,7 +104,7 @@ func (d *Driver) InitiateGeneration(ctx context.Context) error {
 // AbortGeneration implements the IviFgenBase function described in Section 4.3.1
 // of IVI-4.3: IviFgen Class Specification.
 func (d *Driver) AbortGeneration(ctx context.Context) error {
-	for _, channel := range d.Channels {
+	for _, channel := range d.channels {
 		if err := channel.DisableOutput(ctx); err != nil {
 			return err
 		}

@@ -14,6 +14,7 @@ package ds345
 
 import (
 	"context"
+	"fmt"
 	"time"
 
 	"github.com/gotmc/ivi"
@@ -41,7 +42,7 @@ var _ fgen.TriggerChannel = (*Channel)(nil)
 // Driver provides the IVI driver for a SRS DS345 function generator.
 type Driver struct {
 	inst     ivi.Instrument
-	Channels []Channel
+	channels []Channel
 	ivi.Inherent
 }
 
@@ -100,7 +101,7 @@ func New(inst ivi.Instrument, reset bool) (*Driver, error) {
 	inherent := ivi.NewInherent(inst, inherentBase)
 	driver := Driver{
 		inst:     inst,
-		Channels: channels,
+		channels: channels,
 		Inherent: inherent,
 	}
 
@@ -115,6 +116,15 @@ func New(inst ivi.Instrument, reset bool) (*Driver, error) {
 	}
 
 	return &driver, nil
+}
+
+// Channel returns the Channel at the given index, with bounds checking.
+func (d *Driver) Channel(index int) (*Channel, error) {
+	if index < 0 || index >= len(d.channels) {
+		return nil, fmt.Errorf("channel %d: %w", index, ivi.ErrChannelNotFound)
+	}
+
+	return &d.channels[index], nil
 }
 
 // Close properly shuts down the function generator by returning it to local

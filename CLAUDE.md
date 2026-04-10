@@ -91,8 +91,8 @@ The Driver struct always follows this pattern:
 ```go
 type Driver struct {
     inst     ivi.Instrument
-    Channels []Channel
-    ivi.Inherent  // Embedded for inherent capabilities
+    channels []Channel           // unexported; access via Channel(index)
+    ivi.Inherent                 // Embedded for inherent capabilities
 }
 ```
 
@@ -101,7 +101,12 @@ channels, populates `InherentBase` metadata, and calls `ivi.NewInherent()`.
 When `reset` is true, the constructor uses `context.Background()` internally.
 
 Channel structs hold an `ivi.Instrument` reference and a channel `name` string,
-implementing per-channel capability interfaces.
+implementing per-channel capability interfaces. Channels are accessed via a
+bounds-checked accessor method:
+
+```go
+ch, err := driver.Channel(0)  // returns (*Channel, error)
+```
 
 Drivers implement a `Close()` method that delegates to the embedded Inherent.
 `Inherent.Close()` calls `Disable()` then closes the underlying connection if
@@ -142,7 +147,7 @@ mode, err := ivi.ReverseLookup(scpiToOutputMode, scpiStr)   // returns ErrUnexpe
   command strings via the Commander interface
 - `ivi.QueryID(ctx, q)` — standard `*IDN?` query
 - Error sentinels: `ErrNotImplemented`, `ErrFunctionNotSupported`,
-  `ErrValueNotSupported`, `ErrUnexpectedResponse`
+  `ErrValueNotSupported`, `ErrUnexpectedResponse`, `ErrChannelNotFound`
 - Class packages may define additional error sentinels (e.g., `dcpwr` defines
   `ErrOVPUnsupported` and `ErrTriggerNotSoftware`)
 
