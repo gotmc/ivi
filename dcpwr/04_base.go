@@ -70,6 +70,8 @@ type BaseChannel interface {
 	SetOVPEnabled(ctx context.Context, b bool) error
 	DisableOVP(ctx context.Context) error
 	EnableOVP(ctx context.Context) error
+	OVPLimit(ctx context.Context) (float64, error)
+	SetOVPLimit(ctx context.Context, limit float64) error
 	VoltageLevel(ctx context.Context) (float64, error)
 	SetVoltageLevel(ctx context.Context, level float64) error
 	ConfigureCurrentLimit(ctx context.Context, behavior CurrentLimitBehavior, limit float64) error
