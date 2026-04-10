@@ -38,6 +38,8 @@ func (m *mockInstrument) WriteContext(_ context.Context, p []byte) (int, error) 
 	return len(p), nil
 }
 
+func (m *mockInstrument) Close() error { return nil }
+
 func (m *mockInstrument) Command(ctx context.Context, format string, a ...any) error {
 	if m.shouldError {
 		return errors.New("mock error")

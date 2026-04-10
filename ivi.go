@@ -28,6 +28,7 @@ type Instrument interface {
 	WriteContext(ctx context.Context, p []byte) (n int, err error)
 	Command(ctx context.Context, cmd string, a ...any) error
 	Query(ctx context.Context, s string) (value string, err error)
+	Close() error
 }
 
 // Commander provides the interface to send a command to an instrument that is

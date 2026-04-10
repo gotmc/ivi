@@ -31,6 +31,8 @@ func (m *mockInst) WriteContext(_ context.Context, p []byte) (int, error) {
 	return len(p), nil
 }
 
+func (m *mockInst) Close() error { return nil }
+
 func (m *mockInst) Command(_ context.Context, format string, a ...any) error {
 	if m.shouldError {
 		return errors.New("mock command error")

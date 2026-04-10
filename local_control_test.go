@@ -116,20 +116,6 @@ func TestInherent_Close(t *testing.T) {
 	}
 }
 
-func TestInherent_Close_WithoutCloser(t *testing.T) {
-	// Use the regular mock that doesn't implement Close()
-	mock := &mockInstrument{}
-	inherent := NewInherent(mock, InherentBase{ReturnToLocal: true})
-
-	err := inherent.Close()
-	if err != nil {
-		t.Errorf(
-			"Expected no error when underlying instrument doesn't implement Close(), got %v",
-			err,
-		)
-	}
-}
-
 func TestInherent_ReturnToLocal_Control(t *testing.T) {
 	mock := &mockInstrumentWithClose{}
 	inherent := NewInherent(mock, InherentBase{ReturnToLocal: true})

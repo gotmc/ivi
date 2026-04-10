@@ -30,6 +30,8 @@ func (m *mockIDNInstrument) WriteContext(_ context.Context, p []byte) (int, erro
 	return len(p), nil
 }
 
+func (m *mockIDNInstrument) Close() error { return nil }
+
 func (m *mockIDNInstrument) Command(_ context.Context, _ string, _ ...any) error {
 	return nil
 }
