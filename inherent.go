@@ -26,7 +26,7 @@ const (
 
 // Inherent provides the inherent capabilities for all IVI instruments.
 type Inherent struct {
-	inst Instrument
+	inst Transport
 	InherentBase
 }
 
@@ -45,10 +45,10 @@ type InherentBase struct {
 	ReturnToLocal             bool // Whether to return to local control on Close/Disable
 }
 
-// NewInherent creates a new Inherent struct using the given Instrument
+// NewInherent creates a new Inherent struct using the given Transport
 // interface and the InherentBase struct. Note: callers should explicitly set
 // ReturnToLocal in InherentBase (default Go zero value is false).
-func NewInherent(inst Instrument, base InherentBase) Inherent {
+func NewInherent(inst Transport, base InherentBase) Inherent {
 	return Inherent{
 		inst:         inst,
 		InherentBase: base,

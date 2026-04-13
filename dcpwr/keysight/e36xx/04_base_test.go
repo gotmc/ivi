@@ -23,11 +23,11 @@ type mockInst struct {
 	shouldError  bool
 }
 
-func (m *mockInst) ReadContext(_ context.Context, p []byte) (int, error) {
+func (m *mockInst) ReadBinary(_ context.Context, p []byte) (int, error) {
 	return 0, nil
 }
 
-func (m *mockInst) WriteContext(_ context.Context, p []byte) (int, error) {
+func (m *mockInst) WriteBinary(_ context.Context, p []byte) (int, error) {
 	return len(p), nil
 }
 

@@ -27,14 +27,14 @@ const (
 // SDL10xx provides the IVI driver for the Siglent SDL1000X and SDL1030X DC
 // Electronic Loads.
 type SDL10xx struct {
-	inst     ivi.Instrument
+	inst     ivi.Transport
 	channels []Channel
 	ivi.Inherent
 }
 
 // New creates a new Siglent SDL10xx IVI Instrument driver. Use [ivi.WithIDQuery]
 // to verify the instrument model and [ivi.WithReset] to reset on creation.
-func New(inst ivi.Instrument, opts ...ivi.DriverOption) (*SDL10xx, error) {
+func New(inst ivi.Transport, opts ...ivi.DriverOption) (*SDL10xx, error) {
 	cfg := ivi.ApplyOptions(opts)
 	// FIXME(mdr): Need to query the instrument to determine the model and then
 	// set any model specific attributes, such as quantity and names of channels.

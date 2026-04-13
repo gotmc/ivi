@@ -173,18 +173,18 @@ func TestDetermineVoltageRange(t *testing.T) {
 	}
 }
 
-// mockInst implements the ivi.Instrument interface for unit testing.
+// mockInst implements the ivi.Transport interface for unit testing.
 type mockInst struct {
 	commandsSent []string
 	queryResp    string
 	shouldError  bool
 }
 
-func (m *mockInst) ReadContext(_ context.Context, p []byte) (int, error) {
+func (m *mockInst) ReadBinary(_ context.Context, p []byte) (int, error) {
 	return 0, nil
 }
 
-func (m *mockInst) WriteContext(_ context.Context, p []byte) (int, error) {
+func (m *mockInst) WriteBinary(_ context.Context, p []byte) (int, error) {
 	return len(p), nil
 }
 

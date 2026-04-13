@@ -21,7 +21,7 @@ type mockInstrument struct {
 	shouldError bool
 }
 
-func (m *mockInstrument) ReadContext(_ context.Context, p []byte) (int, error) {
+func (m *mockInstrument) ReadBinary(_ context.Context, p []byte) (int, error) {
 	if m.shouldError {
 		return 0, errors.New("mock error")
 	}
@@ -30,7 +30,7 @@ func (m *mockInstrument) ReadContext(_ context.Context, p []byte) (int, error) {
 	return len("test response"), nil
 }
 
-func (m *mockInstrument) WriteContext(_ context.Context, p []byte) (int, error) {
+func (m *mockInstrument) WriteBinary(_ context.Context, p []byte) (int, error) {
 	if m.shouldError {
 		return 0, errors.New("mock error")
 	}

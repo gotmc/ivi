@@ -83,11 +83,11 @@ var (
 type Channel struct {
 	id   int
 	name string
-	inst ivi.Instrument
+	inst ivi.Transport
 }
 
 // NewChannel returns a Channel for a switch.
-func NewChannel(id int, name string, inst ivi.Instrument) Channel {
+func NewChannel(id int, name string, inst ivi.Transport) Channel {
 	return Channel{id, name, inst}
 }
 

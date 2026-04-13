@@ -44,7 +44,7 @@ func (ct ChannelType) String() string {
 // U2751A provides the IVI driver for a Keysight U2751A 4x8 2-wire switch
 // matrix.
 type U2751A struct {
-	inst     ivi.Instrument
+	inst     ivi.Transport
 	channels []Channel
 	ivi.Inherent
 	paths []path
@@ -55,7 +55,7 @@ type path []string
 // New creates a new U2751A IVI Instrument. Use [ivi.WithIDQuery] to verify the
 // instrument model, [ivi.WithReset] to reset on creation, and
 // [ivi.WithStandalone] to configure standalone voltage ratings.
-func New(inst ivi.Instrument, opts ...ivi.DriverOption) (U2751A, error) {
+func New(inst ivi.Transport, opts ...ivi.DriverOption) (U2751A, error) {
 	cfg := ivi.ApplyOptions(opts)
 	infoChannels := []struct {
 		name     string
@@ -126,7 +126,7 @@ type Channel struct {
 	name                  string
 	virtualName           string
 	switchID              int
-	inst                  ivi.Instrument
+	inst                  ivi.Transport
 	chType                ChannelType
 	acCurrentCarryMax     float64
 	acCurrentSwitchingMax float64
@@ -195,7 +195,7 @@ func newChannel(
 	name string,
 	chType ChannelType,
 	switchID int,
-	inst ivi.Instrument,
+	inst ivi.Transport,
 	standalone bool,
 ) Channel {
 	dcVoltageMax := 42.0

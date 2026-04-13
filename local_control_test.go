@@ -17,11 +17,11 @@ type mockInstrumentWithClose struct {
 	shouldError  bool
 }
 
-func (m *mockInstrumentWithClose) ReadContext(_ context.Context, p []byte) (int, error) {
+func (m *mockInstrumentWithClose) ReadBinary(_ context.Context, p []byte) (int, error) {
 	return 0, nil
 }
 
-func (m *mockInstrumentWithClose) WriteContext(_ context.Context, p []byte) (int, error) {
+func (m *mockInstrumentWithClose) WriteBinary(_ context.Context, p []byte) (int, error) {
 	return len(p), nil
 }
 

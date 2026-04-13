@@ -41,7 +41,7 @@ var _ fgen.TriggerChannel = (*Channel)(nil)
 
 // Driver provides the IVI driver for a SRS DS345 function generator.
 type Driver struct {
-	inst     ivi.Instrument
+	inst     ivi.Transport
 	channels []Channel
 	ivi.Inherent
 }
@@ -49,13 +49,13 @@ type Driver struct {
 // Channel models the output channel repeated capability for the function
 // generator output channel.
 type Channel struct {
-	inst ivi.Instrument
+	inst ivi.Transport
 	name string
 }
 
 // New creates a new DS345 IVI Instrument. Use [ivi.WithIDQuery] to verify the
 // instrument model and [ivi.WithReset] to reset on creation.
-func New(inst ivi.Instrument, opts ...ivi.DriverOption) (*Driver, error) {
+func New(inst ivi.Transport, opts ...ivi.DriverOption) (*Driver, error) {
 	cfg := ivi.ApplyOptions(opts)
 	channelNames := []string{
 		"Output",

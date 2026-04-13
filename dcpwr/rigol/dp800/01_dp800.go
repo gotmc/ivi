@@ -32,7 +32,7 @@ var _ dcpwr.MeasurementChannel = (*Channel)(nil)
 // Driver provides the IVI driver for the Rigol DP800 series of DC power
 // supplies.
 type Driver struct {
-	inst     ivi.Instrument
+	inst     ivi.Transport
 	channels []Channel
 	ivi.Inherent
 }
@@ -41,7 +41,7 @@ type Driver struct {
 // queries the instrument to determine the model for channel configuration. Use
 // [ivi.WithIDQuery] to also validate the model against the supported models
 // list. Use [ivi.WithReset] to reset the instrument on creation.
-func New(inst ivi.Instrument, opts ...ivi.DriverOption) (*Driver, error) {
+func New(inst ivi.Transport, opts ...ivi.DriverOption) (*Driver, error) {
 	cfg := ivi.ApplyOptions(opts)
 	inherentBase := ivi.InherentBase{
 		ClassSpecMajorVersion: specMajorVersion,
@@ -178,7 +178,7 @@ func (d *Driver) Close() error {
 type Channel struct {
 	name       string
 	idx        int // 1-based channel index for :SOURce[<n>] commands
-	inst       ivi.Instrument
+	inst       ivi.Transport
 	minVoltage float64
 	maxVoltage float64
 	minCurrent float64

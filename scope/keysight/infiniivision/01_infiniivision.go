@@ -34,7 +34,7 @@ var _ scope.BaseChannel = (*Channel)(nil)
 // Driver provides the IVI driver for a Keysigh InfiniiVision family of
 // oscilloscopes.
 type Driver struct {
-	inst     ivi.Instrument
+	inst     ivi.Transport
 	channels []Channel
 	ivi.Inherent
 }
@@ -42,14 +42,14 @@ type Driver struct {
 // Channel models the output channel repeated capability for the function
 // generator output channel.
 type Channel struct {
-	inst ivi.Instrument
+	inst ivi.Transport
 	name string
 	num  int
 }
 
 // New creates a new InfiniiVision IVI Instrument. Use [ivi.WithIDQuery] to
 // verify the instrument model and [ivi.WithReset] to reset on creation.
-func New(inst ivi.Instrument, opts ...ivi.DriverOption) (*Driver, error) {
+func New(inst ivi.Transport, opts ...ivi.DriverOption) (*Driver, error) {
 	cfg := ivi.ApplyOptions(opts)
 	// FIXME: Need to query the instrument for the model and then determine the
 	// number of channels based on the model returned.

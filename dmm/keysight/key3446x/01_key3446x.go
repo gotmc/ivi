@@ -33,14 +33,14 @@ var _ dmm.Base = (*Driver)(nil)
 
 // Driver provides the IVI driver for the Keysight 3446x family of DMMs.
 type Driver struct {
-	inst ivi.Instrument
+	inst ivi.Transport
 	ivi.Inherent
 }
 
 // New creates a new IVI driver for the Keysight 3446x series of DMMs. Use
 // [ivi.WithIDQuery] to verify the instrument model and [ivi.WithReset] to
 // reset on creation.
-func New(inst ivi.Instrument, opts ...ivi.DriverOption) (*Driver, error) {
+func New(inst ivi.Transport, opts ...ivi.DriverOption) (*Driver, error) {
 	cfg := ivi.ApplyOptions(opts)
 	inherentBase := ivi.InherentBase{
 		ClassSpecMajorVersion: specMajorVersion,

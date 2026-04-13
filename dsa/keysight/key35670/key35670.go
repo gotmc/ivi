@@ -34,14 +34,14 @@ const (
 // Key35670 provides the IVI driver for a Keysight 35670A Dynamic Signal
 // Analyzer.
 type Key35670 struct {
-	inst     ivi.Instrument
+	inst     ivi.Transport
 	channels []Channel
 	ivi.Inherent
 }
 
 // New creates a new Key35670 IVI Instrument driver. Use [ivi.WithIDQuery] to
 // verify the instrument model and [ivi.WithReset] to reset on creation.
-func New(inst ivi.Instrument, opts ...ivi.DriverOption) (*Key35670, error) {
+func New(inst ivi.Transport, opts ...ivi.DriverOption) (*Key35670, error) {
 	cfg := ivi.ApplyOptions(opts)
 	channelNames := []string{
 		"CH1",

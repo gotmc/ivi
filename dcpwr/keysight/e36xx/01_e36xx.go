@@ -32,7 +32,7 @@ var _ dcpwr.MeasurementChannel = (*Channel)(nil)
 // Driver provides the IVI driver for the Agilent/Keysight E3600 series of DC
 // power supplies.
 type Driver struct {
-	inst     ivi.Instrument
+	inst     ivi.Transport
 	channels []Channel
 	ivi.Inherent
 }
@@ -40,7 +40,7 @@ type Driver struct {
 // Channel models the output channel repeated capability for the DC power
 // supply output channel.
 type Channel struct {
-	inst ivi.Instrument
+	inst ivi.Transport
 	name string
 }
 
@@ -49,7 +49,7 @@ type Channel struct {
 // the model for channel configuration. Use [ivi.WithIDQuery] to also validate
 // the model against the supported models list. Use [ivi.WithReset] to reset
 // the instrument on creation.
-func New(inst ivi.Instrument, opts ...ivi.DriverOption) (*Driver, error) {
+func New(inst ivi.Transport, opts ...ivi.DriverOption) (*Driver, error) {
 	cfg := ivi.ApplyOptions(opts)
 	inherentBase := ivi.InherentBase{
 		ClassSpecMajorVersion: specMajorVersion,

@@ -32,7 +32,7 @@ var _ dcpwr.MeasurementChannel = (*Channel)(nil)
 // Driver provides the IVI driver for the Kikusui PMX series of DC power
 // supplies.
 type Driver struct {
-	inst     ivi.Instrument
+	inst     ivi.Transport
 	channels []Channel
 	ivi.Inherent
 }
@@ -41,13 +41,13 @@ type Driver struct {
 // supply output channel.
 type Channel struct {
 	name                 string
-	inst                 ivi.Instrument
+	inst                 ivi.Transport
 	currentLimitBehavior dcpwr.CurrentLimitBehavior
 }
 
 // New creates a new PMX IVI Instrument. Use [ivi.WithIDQuery] to verify the
 // instrument model and [ivi.WithReset] to reset on creation.
-func New(inst ivi.Instrument, opts ...ivi.DriverOption) (*Driver, error) {
+func New(inst ivi.Transport, opts ...ivi.DriverOption) (*Driver, error) {
 	cfg := ivi.ApplyOptions(opts)
 	channelNames := []string{
 		"DCOutput",

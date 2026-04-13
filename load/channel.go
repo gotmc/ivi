@@ -17,11 +17,11 @@ import (
 type Channel struct {
 	id   int
 	name string
-	inst ivi.Instrument
+	inst ivi.Transport
 }
 
 // NewChannel returns a Channel for an electronic load.
-func NewChannel(id int, name string, inst ivi.Instrument) Channel {
+func NewChannel(id int, name string, inst ivi.Transport) Channel {
 	return Channel{id, name, inst}
 }
 

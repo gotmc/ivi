@@ -40,7 +40,7 @@ var _ fgen.ArbWfmChannel = (*Channel)(nil)
 // Driver provides the IVI driver for a Keysight/Agilent 33220A or 33210A
 // function generator.
 type Driver struct {
-	inst     ivi.Instrument
+	inst     ivi.Transport
 	channels []Channel
 	ivi.Inherent
 }
@@ -48,7 +48,7 @@ type Driver struct {
 // New creates a new IVI driver for the Keysight 33210A and 33220A
 // function/arbitrary waveform generators. Use [ivi.WithIDQuery] to verify the
 // instrument model and [ivi.WithReset] to reset on creation.
-func New(inst ivi.Instrument, opts ...ivi.DriverOption) (*Driver, error) {
+func New(inst ivi.Transport, opts ...ivi.DriverOption) (*Driver, error) {
 	cfg := ivi.ApplyOptions(opts)
 	channelNames := []string{
 		"Output",
@@ -153,6 +153,6 @@ func LANPorts() map[string]int {
 // Channel models the output channel repeated capability for the function
 // generator output channel.
 type Channel struct {
-	inst ivi.Instrument
+	inst ivi.Transport
 	name string
 }

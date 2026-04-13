@@ -24,13 +24,13 @@ const (
 // E4411B provides the IVI driver for an Agilent E4411B ESA spectrum
 // analyzer.
 type E4411B struct {
-	inst ivi.Instrument
+	inst ivi.Transport
 	ivi.Inherent
 }
 
 // New creates a new E4411B IVI Instrument. Use [ivi.WithIDQuery] to verify the
 // instrument model and [ivi.WithReset] to reset on creation.
-func New(inst ivi.Instrument, opts ...ivi.DriverOption) (*E4411B, error) {
+func New(inst ivi.Transport, opts ...ivi.DriverOption) (*E4411B, error) {
 	cfg := ivi.ApplyOptions(opts)
 	inherentBase := ivi.InherentBase{
 		ClassSpecMajorVersion: specMajorVersion,
