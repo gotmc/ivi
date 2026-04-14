@@ -37,11 +37,12 @@ type Driver struct {
 	ivi.Inherent
 }
 
-// New creates a new Rigol DP800 IVI Instrument driver. The New function always
-// queries the instrument to determine the model for channel configuration. Use
+// New creates a new Rigol DP800 IVI Instrument driver. The context is used for
+// any I/O performed during construction. The New function always queries the
+// instrument to determine the model for channel configuration. Use
 // [ivi.WithIDQuery] to also validate the model against the supported models
 // list. Use [ivi.WithReset] to reset the instrument on creation.
-func New(inst ivi.Transport, opts ...ivi.DriverOption) (*Driver, error) {
+func New(ctx context.Context, inst ivi.Transport, opts ...ivi.DriverOption) (*Driver, error) {
 	cfg := ivi.ApplyOptions(opts)
 	inherentBase := ivi.InherentBase{
 		ClassSpecMajorVersion: specMajorVersion,
@@ -69,13 +70,13 @@ func New(inst ivi.Transport, opts ...ivi.DriverOption) (*Driver, error) {
 	inherent := ivi.NewInherent(inst, inherentBase)
 
 	// Always query the model since channel configuration depends on it.
-	model, err := inherent.CheckID(context.Background())
+	model, err := inherent.CheckID(ctx)
 	if err != nil && cfg.IDQuery {
 		return nil, err
 	} else if err != nil {
 		// Without idQuery, still need the model for channel config.
 		// Try to get it directly.
-		model, err = inherent.InstrumentModel(context.Background())
+		model, err = inherent.InstrumentModel(ctx)
 		if err != nil {
 			return nil, fmt.Errorf("error determining instrument model: %w", err)
 		}
@@ -151,7 +152,7 @@ func New(inst ivi.Transport, opts ...ivi.DriverOption) (*Driver, error) {
 	}
 
 	if cfg.Reset {
-		if err := driver.Reset(context.Background()); err != nil {
+		if err := driver.Reset(ctx); err != nil {
 			return &driver, err
 		}
 	}
@@ -231,11 +232,3 @@ func DefaultSerialDataFrame() string {
 	return "8N2"
 }
 
-// ChannelCount returns the number of available output channels.
-//
-// ChannelCount is the getter for the read-only IviDCPwrBase Attribute Output
-// Channel Count described in Section 4.2.7 of IVI-4.4: IviDCPwr Class
-// Specification.
-func (dev *Driver) ChannelCount() int {
-	return len(dev.channels)
-}

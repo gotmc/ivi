@@ -22,7 +22,7 @@ func (ch *Channel) Measure(ctx context.Context, msrType dcpwr.MeasurementType) (
 		return ch.MeasureVoltage(ctx)
 	}
 
-	return 0.0, fmt.Errorf("Measure: %w: %v", ivi.ErrValueNotSupported, msrType)
+	return 0.0, fmt.Errorf("Measure %v: %w", msrType, ivi.ErrValueNotSupported)
 }
 
 // MeasureVoltage takes a measurement on the output signal and returns the

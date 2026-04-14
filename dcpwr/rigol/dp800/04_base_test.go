@@ -355,9 +355,3 @@ func TestChannel_ConfigureCurrentLimit(t *testing.T) {
 	}
 }
 
-func TestDriver_ChannelCount(t *testing.T) {
-	d := newTestDriver(&mockInst{})
-	if got := d.ChannelCount(); got != 3 {
-		t.Errorf("ChannelCount() = %d, want 3", got)
-	}
-}

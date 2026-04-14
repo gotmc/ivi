@@ -368,7 +368,7 @@ func (d *Driver) SetTriggerSource(
 		return d.inst.Command(ctx, "TRIGGER 2")
 	default:
 		return fmt.Errorf(
-			"SetTriggerSource: %w: %v", ivi.ErrValueNotSupported, src,
+			"SetTriggerSource %v: %w", src, ivi.ErrValueNotSupported,
 		)
 	}
 }

@@ -318,7 +318,7 @@ func (ch *Channel) QueryOutputState(
 		return strings.TrimSpace(resp) == "YES", nil
 	default:
 		return false, fmt.Errorf(
-			"QueryOutputState: %w: %v", ivi.ErrValueNotSupported, os,
+			"QueryOutputState %v: %w", os, ivi.ErrValueNotSupported,
 		)
 	}
 }
