@@ -593,7 +593,10 @@ func TestDriver_SetInternalTriggerRate(t *testing.T) {
 		t.Errorf("SetInternalTriggerRate() error: %v", err)
 	}
 	if len(mock.commandsSent) != 1 || mock.commandsSent[0] != "BURS:INT:PER 0.001" {
-		t.Errorf("SetInternalTriggerRate() sent %v, want [%q]", mock.commandsSent, "BURS:INT:PER 0.001")
+		t.Errorf(
+			"SetInternalTriggerRate() sent %v, want [%q]",
+			mock.commandsSent, "BURS:INT:PER 0.001",
+		)
 	}
 }
 

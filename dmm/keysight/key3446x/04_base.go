@@ -180,7 +180,10 @@ func (d *Driver) SetRange(ctx context.Context, autoRange dmm.AutoRange, rangeVal
 		}
 	case dmm.Temperature:
 		// Temperature has no user-selectable range; it is determined by probe type.
-		return fmt.Errorf("SetRange (temperature range is probe-determined): %w", ivi.ErrFunctionNotSupported)
+		return fmt.Errorf(
+			"SetRange (temperature range is probe-determined): %w",
+			ivi.ErrFunctionNotSupported,
+		)
 	}
 
 	return d.inst.Command(ctx, "%s:rang %s", scpiFunc, rng)

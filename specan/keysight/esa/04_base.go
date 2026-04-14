@@ -294,7 +294,9 @@ func (d *Driver) TraceType(ctx context.Context, traceName string) (specan.TraceT
 	return tt, nil
 }
 
-func (d *Driver) SetTraceType(ctx context.Context, traceName string, traceType specan.TraceType) error {
+func (d *Driver) SetTraceType(
+	ctx context.Context, traceName string, traceType specan.TraceType,
+) error {
 	cmd, err := ivi.LookupSCPI(traceTypeToSCPI, traceType)
 	if err != nil {
 		return fmt.Errorf("SetTraceType: %w", err)
@@ -335,7 +337,9 @@ func (d *Driver) DetectorType(ctx context.Context, _ string) (specan.DetectorTyp
 	return dt, nil
 }
 
-func (d *Driver) SetDetectorType(ctx context.Context, _ string, detector specan.DetectorType) error {
+func (d *Driver) SetDetectorType(
+	ctx context.Context, _ string, detector specan.DetectorType,
+) error {
 	cmd, err := ivi.LookupSCPI(detectorTypeToSCPI, detector)
 	if err != nil {
 		return fmt.Errorf("SetDetectorType: %w", err)
@@ -395,7 +399,9 @@ func (d *Driver) ConfigureFrequencyCenterSpan(ctx context.Context, centerFreq, s
 	return d.inst.Command(ctx, "FREQ:SPAN %f", span)
 }
 
-func (d *Driver) ConfigureFrequencyStartStop(ctx context.Context, startFreq, stopFreq float64) error {
+func (d *Driver) ConfigureFrequencyStartStop(
+	ctx context.Context, startFreq, stopFreq float64,
+) error {
 	if err := d.SetFrequencyStart(ctx, startFreq); err != nil {
 		return err
 	}
@@ -403,7 +409,9 @@ func (d *Driver) ConfigureFrequencyStartStop(ctx context.Context, startFreq, sto
 	return d.SetFrequencyStop(ctx, stopFreq)
 }
 
-func (d *Driver) ConfigureLevel(ctx context.Context, units specan.AmplitudeUnits, refLevel float64) error {
+func (d *Driver) ConfigureLevel(
+	ctx context.Context, units specan.AmplitudeUnits, refLevel float64,
+) error {
 	if err := d.SetAmplitudeUnits(ctx, units); err != nil {
 		return err
 	}
@@ -411,7 +419,9 @@ func (d *Driver) ConfigureLevel(ctx context.Context, units specan.AmplitudeUnits
 	return d.SetReferenceLevel(ctx, refLevel)
 }
 
-func (d *Driver) ConfigureSweepCoupling(ctx context.Context, resBW, videoBW, sweepTime float64) error {
+func (d *Driver) ConfigureSweepCoupling(
+	ctx context.Context, resBW, videoBW, sweepTime float64,
+) error {
 	if err := d.SetResolutionBandwidth(ctx, resBW); err != nil {
 		return err
 	}
