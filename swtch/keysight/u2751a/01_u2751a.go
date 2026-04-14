@@ -52,10 +52,11 @@ type U2751A struct {
 
 type path []string
 
-// New creates a new U2751A IVI Instrument. Use [ivi.WithIDQuery] to verify the
-// instrument model, [ivi.WithReset] to reset on creation, and
+// New creates a new U2751A IVI Instrument. The context is used for any I/O
+// performed during construction (e.g., ID query, reset). Use [ivi.WithIDQuery]
+// to verify the instrument model, [ivi.WithReset] to reset on creation, and
 // [ivi.WithStandalone] to configure standalone voltage ratings.
-func New(inst ivi.Transport, opts ...ivi.DriverOption) (U2751A, error) {
+func New(ctx context.Context, inst ivi.Transport, opts ...ivi.DriverOption) (U2751A, error) {
 	cfg := ivi.ApplyOptions(opts)
 	infoChannels := []struct {
 		name     string
@@ -99,7 +100,7 @@ func New(inst ivi.Transport, opts ...ivi.DriverOption) (U2751A, error) {
 	inherent := ivi.NewInherent(inst, inherentBase)
 
 	if cfg.IDQuery {
-		if _, err := inherent.CheckID(context.Background()); err != nil {
+		if _, err := inherent.CheckID(ctx); err != nil {
 			return U2751A{}, err
 		}
 	}
@@ -111,7 +112,7 @@ func New(inst ivi.Transport, opts ...ivi.DriverOption) (U2751A, error) {
 	}
 
 	if cfg.Reset {
-		if err := driver.Reset(context.Background()); err != nil {
+		if err := driver.Reset(ctx); err != nil {
 			return driver, err
 		}
 	}

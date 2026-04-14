@@ -45,11 +45,12 @@ type Channel struct {
 }
 
 // New creates a new IVI driver for the Keysight/Agilent E3600 series of DC
-// power supplies. The New function always queries the instrument to determine
+// power supplies. The context is used for any I/O performed during
+// construction. The New function always queries the instrument to determine
 // the model for channel configuration. Use [ivi.WithIDQuery] to also validate
 // the model against the supported models list. Use [ivi.WithReset] to reset
 // the instrument on creation.
-func New(inst ivi.Transport, opts ...ivi.DriverOption) (*Driver, error) {
+func New(ctx context.Context, inst ivi.Transport, opts ...ivi.DriverOption) (*Driver, error) {
 	cfg := ivi.ApplyOptions(opts)
 	inherentBase := ivi.InherentBase{
 		ClassSpecMajorVersion: specMajorVersion,
@@ -76,12 +77,12 @@ func New(inst ivi.Transport, opts ...ivi.DriverOption) (*Driver, error) {
 	inherent := ivi.NewInherent(inst, inherentBase)
 
 	// Always query the model since channel configuration depends on it.
-	model, err := inherent.CheckID(context.Background())
+	model, err := inherent.CheckID(ctx)
 	if err != nil && cfg.IDQuery {
 		return nil, err
 	} else if err != nil {
 		// Without idQuery, still need the model for channel config.
-		model, err = inherent.InstrumentModel(context.Background())
+		model, err = inherent.InstrumentModel(ctx)
 		if err != nil {
 			return nil, fmt.Errorf("error determining instrument model: %w", err)
 		}
@@ -104,7 +105,7 @@ func New(inst ivi.Transport, opts ...ivi.DriverOption) (*Driver, error) {
 	}
 
 	if cfg.Reset {
-		if err := driver.Reset(context.Background()); err != nil {
+		if err := driver.Reset(ctx); err != nil {
 			return &driver, err
 		}
 	}

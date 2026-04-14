@@ -53,9 +53,10 @@ type Channel struct {
 	name string
 }
 
-// New creates a new DS345 IVI Instrument. Use [ivi.WithIDQuery] to verify the
-// instrument model and [ivi.WithReset] to reset on creation.
-func New(inst ivi.Transport, opts ...ivi.DriverOption) (*Driver, error) {
+// New creates a new DS345 IVI Instrument. The context is used for any I/O
+// performed during construction (e.g., ID query, reset). Use [ivi.WithIDQuery]
+// to verify the instrument model and [ivi.WithReset] to reset on creation.
+func New(ctx context.Context, inst ivi.Transport, opts ...ivi.DriverOption) (*Driver, error) {
 	cfg := ivi.ApplyOptions(opts)
 	channelNames := []string{
 		"Output",
@@ -103,7 +104,7 @@ func New(inst ivi.Transport, opts ...ivi.DriverOption) (*Driver, error) {
 	inherent := ivi.NewInherent(inst, inherentBase)
 
 	if cfg.IDQuery {
-		if _, err := inherent.CheckID(context.Background()); err != nil {
+		if _, err := inherent.CheckID(ctx); err != nil {
 			return nil, err
 		}
 	}
@@ -115,11 +116,11 @@ func New(inst ivi.Transport, opts ...ivi.DriverOption) (*Driver, error) {
 	}
 
 	if cfg.Reset {
-		if err := driver.Reset(context.Background()); err != nil {
+		if err := driver.Reset(ctx); err != nil {
 			return &driver, err
 		}
 		// Default to internal trigger instead of single trigger when reset.
-		if err := driver.inst.Command(context.Background(), "TSRC1"); err != nil {
+		if err := driver.inst.Command(ctx, "TSRC1"); err != nil {
 			return &driver, err
 		}
 	}

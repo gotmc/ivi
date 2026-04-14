@@ -32,9 +32,11 @@ type SDL10xx struct {
 	ivi.Inherent
 }
 
-// New creates a new Siglent SDL10xx IVI Instrument driver. Use [ivi.WithIDQuery]
-// to verify the instrument model and [ivi.WithReset] to reset on creation.
-func New(inst ivi.Transport, opts ...ivi.DriverOption) (*SDL10xx, error) {
+// New creates a new Siglent SDL10xx IVI Instrument driver. The context is used
+// for any I/O performed during construction (e.g., ID query, reset). Use
+// [ivi.WithIDQuery] to verify the instrument model and [ivi.WithReset] to
+// reset on creation.
+func New(ctx context.Context, inst ivi.Transport, opts ...ivi.DriverOption) (*SDL10xx, error) {
 	cfg := ivi.ApplyOptions(opts)
 	// FIXME(mdr): Need to query the instrument to determine the model and then
 	// set any model specific attributes, such as quantity and names of channels.
@@ -63,7 +65,7 @@ func New(inst ivi.Transport, opts ...ivi.DriverOption) (*SDL10xx, error) {
 	inherent := ivi.NewInherent(inst, inherentBase)
 
 	if cfg.IDQuery {
-		if _, err := inherent.CheckID(context.Background()); err != nil {
+		if _, err := inherent.CheckID(ctx); err != nil {
 			return nil, err
 		}
 	}
@@ -75,7 +77,7 @@ func New(inst ivi.Transport, opts ...ivi.DriverOption) (*SDL10xx, error) {
 	}
 
 	if cfg.Reset {
-		if err := driver.Reset(context.Background()); err != nil {
+		if err := driver.Reset(ctx); err != nil {
 			return &driver, err
 		}
 	}

@@ -45,9 +45,10 @@ type Channel struct {
 	currentLimitBehavior dcpwr.CurrentLimitBehavior
 }
 
-// New creates a new PMX IVI Instrument. Use [ivi.WithIDQuery] to verify the
-// instrument model and [ivi.WithReset] to reset on creation.
-func New(inst ivi.Transport, opts ...ivi.DriverOption) (*Driver, error) {
+// New creates a new PMX IVI Instrument. The context is used for any I/O
+// performed during construction (e.g., ID query, reset). Use [ivi.WithIDQuery]
+// to verify the instrument model and [ivi.WithReset] to reset on creation.
+func New(ctx context.Context, inst ivi.Transport, opts ...ivi.DriverOption) (*Driver, error) {
 	cfg := ivi.ApplyOptions(opts)
 	channelNames := []string{
 		"DCOutput",
@@ -88,7 +89,7 @@ func New(inst ivi.Transport, opts ...ivi.DriverOption) (*Driver, error) {
 	inherent := ivi.NewInherent(inst, inherentBase)
 
 	if cfg.IDQuery {
-		if _, err := inherent.CheckID(context.Background()); err != nil {
+		if _, err := inherent.CheckID(ctx); err != nil {
 			return nil, err
 		}
 	}
@@ -100,7 +101,7 @@ func New(inst ivi.Transport, opts ...ivi.DriverOption) (*Driver, error) {
 	}
 
 	if cfg.Reset {
-		if err := driver.Reset(context.Background()); err != nil {
+		if err := driver.Reset(ctx); err != nil {
 			return &driver, err
 		}
 	}
@@ -122,11 +123,3 @@ func (d *Driver) Close() error {
 	return d.Inherent.Close()
 }
 
-// ChannelCount returns the number of available output channels.
-//
-// ChannelCount is the getter for the read-only IviDCPwrBase Attribute Output
-// Channel Count described in Section 4.2.7 of IVI-4.4: IviDCPwr Class
-// Specification.
-func (dev *Driver) ChannelCount() int {
-	return len(dev.channels)
-}

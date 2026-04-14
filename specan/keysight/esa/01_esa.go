@@ -28,9 +28,10 @@ type E4411B struct {
 	ivi.Inherent
 }
 
-// New creates a new E4411B IVI Instrument. Use [ivi.WithIDQuery] to verify the
-// instrument model and [ivi.WithReset] to reset on creation.
-func New(inst ivi.Transport, opts ...ivi.DriverOption) (*E4411B, error) {
+// New creates a new E4411B IVI Instrument. The context is used for any I/O
+// performed during construction (e.g., ID query, reset). Use [ivi.WithIDQuery]
+// to verify the instrument model and [ivi.WithReset] to reset on creation.
+func New(ctx context.Context, inst ivi.Transport, opts ...ivi.DriverOption) (*E4411B, error) {
 	cfg := ivi.ApplyOptions(opts)
 	inherentBase := ivi.InherentBase{
 		ClassSpecMajorVersion: specMajorVersion,
@@ -47,7 +48,7 @@ func New(inst ivi.Transport, opts ...ivi.DriverOption) (*E4411B, error) {
 	inherent := ivi.NewInherent(inst, inherentBase)
 
 	if cfg.IDQuery {
-		if _, err := inherent.CheckID(context.Background()); err != nil {
+		if _, err := inherent.CheckID(ctx); err != nil {
 			return nil, err
 		}
 	}
@@ -58,7 +59,7 @@ func New(inst ivi.Transport, opts ...ivi.DriverOption) (*E4411B, error) {
 	}
 
 	if cfg.Reset {
-		if err := driver.Reset(context.Background()); err != nil {
+		if err := driver.Reset(ctx); err != nil {
 			return &driver, err
 		}
 	}

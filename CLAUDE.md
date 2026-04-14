@@ -44,10 +44,10 @@ function generators) can be programmed identically.
 
 #### Core Interface Layer (`ivi.go`, `inherent.go`)
 
-- `Instrument` interface: Core abstraction requiring ReadContext, WriteContext,
-  Command, Query, and Close methods. The I/O methods all take
-  `context.Context` as their first parameter. Sub-interfaces `Commander` and
-  `Querier` allow accepting narrower types.
+- `Transport` interface: Core abstraction requiring Command, Query, ReadBinary,
+  WriteBinary, and Close methods. The I/O methods all take `context.Context` as
+  their first parameter. Sub-interfaces `Commander`, `Querier`, `BinaryReader`,
+  and `BinaryWriter` allow accepting narrower types.
 - `Inherent` struct: Base capabilities common to all IVI instruments (reset,
   clear, identification, timeout, local control). All methods that communicate
   with instruments take `context.Context`.

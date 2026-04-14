@@ -47,9 +47,11 @@ type Channel struct {
 	num  int
 }
 
-// New creates a new InfiniiVision IVI Instrument. Use [ivi.WithIDQuery] to
-// verify the instrument model and [ivi.WithReset] to reset on creation.
-func New(inst ivi.Transport, opts ...ivi.DriverOption) (*Driver, error) {
+// New creates a new InfiniiVision IVI Instrument. The context is used for any
+// I/O performed during construction (e.g., ID query, reset). Use
+// [ivi.WithIDQuery] to verify the instrument model and [ivi.WithReset] to
+// reset on creation.
+func New(ctx context.Context, inst ivi.Transport, opts ...ivi.DriverOption) (*Driver, error) {
 	cfg := ivi.ApplyOptions(opts)
 	// FIXME: Need to query the instrument for the model and then determine the
 	// number of channels based on the model returned.
@@ -97,7 +99,7 @@ func New(inst ivi.Transport, opts ...ivi.DriverOption) (*Driver, error) {
 	inherent := ivi.NewInherent(inst, inherentBase)
 
 	if cfg.IDQuery {
-		if _, err := inherent.CheckID(context.Background()); err != nil {
+		if _, err := inherent.CheckID(ctx); err != nil {
 			return nil, err
 		}
 	}
@@ -109,7 +111,7 @@ func New(inst ivi.Transport, opts ...ivi.DriverOption) (*Driver, error) {
 	}
 
 	if cfg.Reset {
-		if err := driver.Reset(context.Background()); err != nil {
+		if err := driver.Reset(ctx); err != nil {
 			return &driver, err
 		}
 	}
