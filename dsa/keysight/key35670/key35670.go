@@ -31,6 +31,10 @@ const (
 	specRevision     = "N/A"
 )
 
+// Confirm the interfaces implemented by the driver.
+var _ dsa.Base = (*Key35670)(nil)
+var _ dsa.Source = (*Key35670)(nil)
+
 // Key35670 provides the IVI driver for a Keysight 35670A Dynamic Signal
 // Analyzer.
 type Key35670 struct {

@@ -6,113 +6,102 @@
 package key35670
 
 import (
-	"context"
 	"fmt"
 	"strings"
 
-	"github.com/gotmc/ivi"
 	"github.com/gotmc/ivi/dsa"
 	"github.com/gotmc/query"
 )
 
-// SetSourceOutputLevel sets the source output level.
-func (dev *Key35670) SetSourceOutputLevel(freq float64) error {
-	ctx, cancel := dev.newContext()
-	defer cancel()
-
-	return ivi.Set(ctx, dev.inst, "sour:volt:lev:imm:amp %f", freq)
-}
-
-// SetSourceOutputLevelUnits sets the source output level and the units for the
-// source output.
-func (dev *Key35670) SetSourceOutputLevelUnits(
-	ctx context.Context, freq float64, unit dsa.AmpUnits,
-) error {
-	ctx, cancel := dev.newContext()
-	defer cancel()
-
-	return ivi.Set(ctx, dev.inst, "sour:volt:lev:imm:amp %f %s", freq, unit)
-}
-
-// SourceOutputLevel queries the source output level.
-func (dev *Key35670) SourceOutputLevel() (float64, error) {
-	ctx, cancel := dev.newContext()
-	defer cancel()
-
-	return query.Float64(ctx, dev.inst, "sour:volt:lev:imm:amp?")
-}
-
 // SourceEnabled determines if the source output is enabled or disabled.
-func (dev *Key35670) SourceEnabled() (bool, error) {
-	ctx, cancel := dev.newContext()
+func (d *Key35670) SourceEnabled() (bool, error) {
+	ctx, cancel := d.newContext()
 	defer cancel()
 
-	return query.Bool(ctx, dev.inst, "OUTP?")
+	return query.Bool(ctx, d.inst, "OUTP?")
 }
 
 // SetSourceEnabled sets the source output to enabled or disabled.
-func (dev *Key35670) SetSourceEnabled(v bool) error {
-	ctx, cancel := dev.newContext()
+func (d *Key35670) SetSourceEnabled(v bool) error {
+	ctx, cancel := d.newContext()
 	defer cancel()
 
 	if v {
-		return ivi.Set(ctx, dev.inst, "OUTP ON")
+		return d.inst.Command(ctx, "OUTP ON")
 	}
-	return ivi.Set(ctx, dev.inst, "OUTP OFF")
+
+	return d.inst.Command(ctx, "OUTP OFF")
 }
 
-// DisableSource is a convenience function for setting the Source Enabled
-// attribute to false.
-func (dev *Key35670) DisableSource() error {
-	return dev.SetSourceEnabled(false)
+// DisableSource is a convenience function for disabling the source output.
+func (d *Key35670) DisableSource() error {
+	return d.SetSourceEnabled(false)
 }
 
-// EnableSource is a convenience function for setting the Source Enabled
-// attribute to true.
-func (dev *Key35670) EnableSource() error {
-	return dev.SetSourceEnabled(true)
+// EnableSource is a convenience function for enabling the source output.
+func (d *Key35670) EnableSource() error {
+	return d.SetSourceEnabled(true)
 }
 
-// SetSourceFrequency sets the source output frequency of the sine source type
-// in Hz. Allowable range is 0 to 115 kHz in 15.625 mHz increments.
-func (dev *Key35670) SetSourceFrequency(f float64) error {
-	ctx, cancel := dev.newContext()
+// SourceShape queries the source output waveform shape.
+func (d *Key35670) SourceShape() (dsa.SourceShape, error) {
+	ctx, cancel := d.newContext()
 	defer cancel()
 
-	if f < 0 || f > 115000 {
-		return fmt.Errorf("frequency out of allowable range: %f", f)
-	}
-	return ivi.Set(ctx, dev.inst, "sour:freq %f", f)
-}
-
-// SourceFrequency queries the source output frequency in Hz.
-func (dev *Key35670) SourceFrequency() (float64, error) {
-	ctx, cancel := dev.newContext()
-	defer cancel()
-
-	return query.Float64(ctx, dev.inst, "sour:freq?")
-}
-
-// SetSourceShape sets the source output shape.
-func (dev *Key35670) SetSourceShape(shape dsa.SourceShape) error {
-	ctx, cancel := dev.newContext()
-	defer cancel()
-
-	return ivi.Set(ctx, dev.inst, "sour:func:shap %s", shape)
-}
-
-// SourceShape queries the source output shape.
-func (dev *Key35670) SourceShape() (dsa.SourceShape, error) {
-	ctx, cancel := dev.newContext()
-	defer cancel()
-
-	s, err := query.String(ctx, dev.inst, "sour:func shap?")
+	s, err := query.String(ctx, d.inst, "SOUR:FUNC:SHAP?")
 	if err != nil {
 		return "", err
 	}
+
 	shape, ok := dsa.SourceShapes[strings.TrimSpace(s)]
 	if !ok {
 		return "", fmt.Errorf("invalid source shape: %s", s)
 	}
+
 	return shape, nil
+}
+
+// SetSourceShape sets the source output waveform shape.
+func (d *Key35670) SetSourceShape(shape dsa.SourceShape) error {
+	ctx, cancel := d.newContext()
+	defer cancel()
+
+	return d.inst.Command(ctx, "SOUR:FUNC:SHAP %s", shape)
+}
+
+// SourceFrequency queries the source output frequency in Hz.
+func (d *Key35670) SourceFrequency() (float64, error) {
+	ctx, cancel := d.newContext()
+	defer cancel()
+
+	return query.Float64(ctx, d.inst, "SOUR:FREQ?")
+}
+
+// SetSourceFrequency sets the source output frequency in Hz. Allowable range
+// is 0 to 115 kHz in 15.625 mHz increments.
+func (d *Key35670) SetSourceFrequency(freq float64) error {
+	ctx, cancel := d.newContext()
+	defer cancel()
+
+	if freq < 0 || freq > 115000 {
+		return fmt.Errorf("frequency out of allowable range: %f", freq)
+	}
+
+	return d.inst.Command(ctx, "SOUR:FREQ %f", freq)
+}
+
+// SourceOutputLevel queries the source output level.
+func (d *Key35670) SourceOutputLevel() (float64, error) {
+	ctx, cancel := d.newContext()
+	defer cancel()
+
+	return query.Float64(ctx, d.inst, "SOUR:VOLT:LEV:IMM:AMP?")
+}
+
+// SetSourceOutputLevel sets the source output level.
+func (d *Key35670) SetSourceOutputLevel(level float64) error {
+	ctx, cancel := d.newContext()
+	defer cancel()
+
+	return d.inst.Command(ctx, "SOUR:VOLT:LEV:IMM:AMP %f", level)
 }
