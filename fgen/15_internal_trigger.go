@@ -39,10 +39,15 @@ None.
 
 */
 
-// IntTrigger provides the interface required to support the
-// IviFgenInternalTrigger extension group as described in Section 15 of the
-// IVI-4.3: IviFgen Class Specification.
-type IntTrigger interface {
+// IntTriggerChannel provides the interface for the channel repeated capability
+// to support the IviFgenInternalTrigger extension group.
+//
+// Deviation from IVI-4.3: The IVI specification defines InternalTriggerRate as
+// a driver-level (non-channel) attribute. We place it on the channel because
+// multi-channel function generators (e.g., Keysight 33500B) have independent
+// burst periods per channel. Single-channel instruments are unaffected since
+// they have only one channel.
+type IntTriggerChannel interface {
 	InternalTriggerRate() (float64, error)
 	SetInternalTriggerRate(rate float64) error
 }

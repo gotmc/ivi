@@ -9,13 +9,18 @@ import "github.com/gotmc/query"
 
 // InternalTriggerRate determines the rate at which the function generator's
 // internal trigger source produces a trigger in triggers per second (Hz).
-func (d *Driver) InternalTriggerRate() (float64, error) {
-	ctx, cancel := d.newContext()
+//
+// Deviation from IVI-4.3: The IVI specification (Section 15.2.1) defines
+// InternalTriggerRate as a driver-level attribute. We implement it on the
+// channel to support multi-channel function generators. The 33220A is
+// single-channel, so the behavior is unchanged.
+func (ch *Channel) InternalTriggerRate() (float64, error) {
+	ctx, cancel := ch.newContext()
 	defer cancel()
 
 	// The Agilent 33220A stores burst internal period in seconds; the IVI API
 	// expects triggers per second. Therefore, we need the inverse.
-	per, err := query.Float64(ctx, d.inst, "BURS:INT:PER?")
+	per, err := query.Float64(ctx, ch.inst, "BURS:INT:PER?")
 	if err != nil {
 		return 0.0, err
 	}
@@ -25,10 +30,12 @@ func (d *Driver) InternalTriggerRate() (float64, error) {
 
 // SetInternalTriggerRate specifies the rate at which the function generator's
 // internal trigger source produces a trigger in triggers per second (Hz).
-func (d *Driver) SetInternalTriggerRate(rate float64) error {
-	ctx, cancel := d.newContext()
+//
+// Deviation from IVI-4.3: See InternalTriggerRate.
+func (ch *Channel) SetInternalTriggerRate(rate float64) error {
+	ctx, cancel := ch.newContext()
 	defer cancel()
 
 	// Convert rate (Hz) to period (seconds).
-	return d.inst.Command(ctx, "BURS:INT:PER %v", 1/rate)
+	return ch.inst.Command(ctx, "BURS:INT:PER %v", 1/rate)
 }

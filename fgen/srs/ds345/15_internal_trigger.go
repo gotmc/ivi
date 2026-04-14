@@ -15,14 +15,15 @@ import (
 // rounds the trigger rate to two significant digits and may range from 0.001
 // Hz to 10 kHz.
 //
-// InternalTriggerRate is the getter for the read-write IviFgenInternalTrigger
-// Attribute Internal Trigger Rate described in Section 15.2.1 of IVI-4.3:
-// IviFgen Class Specification.
-func (d *Driver) InternalTriggerRate() (float64, error) {
-	ctx, cancel := d.newContext()
+// Deviation from IVI-4.3: The IVI specification (Section 15.2.1) defines
+// InternalTriggerRate as a driver-level attribute. We implement it on the
+// channel to support multi-channel function generators. The DS345 is
+// single-channel, so the behavior is unchanged.
+func (ch *Channel) InternalTriggerRate() (float64, error) {
+	ctx, cancel := ch.newContext()
 	defer cancel()
 
-	return query.Float64(ctx, d.inst, "TRAT?")
+	return query.Float64(ctx, ch.inst, "TRAT?")
 }
 
 // SetInternalTriggerRate specifies the rate at which the function generator's
@@ -30,11 +31,9 @@ func (d *Driver) InternalTriggerRate() (float64, error) {
 // rounds the trigger rate to two significant digits and may range from 0.001
 // Hz to 10 kHz.
 //
-// SetInternalTriggerRate is the setter for the read-write
-// IviFgenInternalTrigger Attribute Internal Trigger Rate described in Section
-// 15.2.1 of IVI-4.3: IviFgen Class Specification.
-func (d *Driver) SetInternalTriggerRate(rate float64) error {
-	ctx, cancel := d.newContext()
+// Deviation from IVI-4.3: See InternalTriggerRate.
+func (ch *Channel) SetInternalTriggerRate(rate float64) error {
+	ctx, cancel := ch.newContext()
 	defer cancel()
 
 	// The DS345 supports internal trigger rates from 0.001 Hz to 10 kHz.
@@ -42,5 +41,5 @@ func (d *Driver) SetInternalTriggerRate(rate float64) error {
 		return ivi.ErrValueNotSupported
 	}
 
-	return d.inst.Command(ctx, "TRAT %.3f", rate)
+	return ch.inst.Command(ctx, "TRAT %.3f", rate)
 }

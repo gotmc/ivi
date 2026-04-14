@@ -554,7 +554,7 @@ func TestChannel_SetBurstCount(t *testing.T) {
 	}
 }
 
-func TestDriver_InternalTriggerRate(t *testing.T) {
+func TestChannel_InternalTriggerRate(t *testing.T) {
 	tests := []struct {
 		name     string
 		response string
@@ -571,7 +571,11 @@ func TestDriver_InternalTriggerRate(t *testing.T) {
 			if err != nil {
 				t.Fatalf("New() error: %v", err)
 			}
-			got, err := d.InternalTriggerRate()
+			ch, err := d.Channel(0)
+			if err != nil {
+				t.Fatalf("Channel(0) error: %v", err)
+			}
+			got, err := ch.InternalTriggerRate()
 			if err != nil {
 				t.Errorf("InternalTriggerRate() error: %v", err)
 			}
@@ -582,13 +586,17 @@ func TestDriver_InternalTriggerRate(t *testing.T) {
 	}
 }
 
-func TestDriver_SetInternalTriggerRate(t *testing.T) {
+func TestChannel_SetInternalTriggerRate(t *testing.T) {
 	mock := &mockInst{queryResp: "KEYSIGHT,33220A,0,1.0"}
 	d, err := New(mock)
 	if err != nil {
 		t.Fatalf("New() error: %v", err)
 	}
-	err = d.SetInternalTriggerRate(1000.0)
+	ch, err := d.Channel(0)
+	if err != nil {
+		t.Fatalf("Channel(0) error: %v", err)
+	}
+	err = ch.SetInternalTriggerRate(1000.0)
 	if err != nil {
 		t.Errorf("SetInternalTriggerRate() error: %v", err)
 	}

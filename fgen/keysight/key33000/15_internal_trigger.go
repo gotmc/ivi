@@ -12,16 +12,17 @@ import (
 // InternalTriggerRate determines the rate at which the function generator's
 // internal trigger source produces a trigger in triggers per second (Hz).
 //
-// InternalTriggerRate is the getter for the read-write IviFgenInternalTrigger
-// Attribute Internal Trigger Rate described in Section 15.2.1 of IVI-4.3:
-// IviFgen Class Specification.
-func (d *Driver) InternalTriggerRate() (float64, error) {
-	ctx, cancel := d.newContext()
+// Deviation from IVI-4.3: The IVI specification (Section 15.2.1) defines
+// InternalTriggerRate as a driver-level attribute. We implement it on the
+// channel because the 33500B/33600A series have independent burst periods per
+// channel via the SOURce[1|2]:BURSt:INTernal:PERiod command.
+func (ch *Channel) InternalTriggerRate() (float64, error) {
+	ctx, cancel := ch.newContext()
 	defer cancel()
 
 	// The 33500B stores the burst internal period in seconds; the IVI API
 	// expects the number of triggers per second. Therefore, we need the inverse.
-	per, err := query.Float64(ctx, d.inst, d.channels[0].srcPrefix()+"BURS:INT:PER?")
+	per, err := query.Float64(ctx, ch.inst, ch.srcPrefix()+"BURS:INT:PER?")
 	if err != nil {
 		return 0.0, err
 	}
@@ -32,13 +33,11 @@ func (d *Driver) InternalTriggerRate() (float64, error) {
 // SetInternalTriggerRate specifies the rate at which the function generator's
 // internal trigger source produces a trigger in triggers per second (Hz).
 //
-// SetInternalTriggerRate is the setter for the read-write
-// IviFgenInternalTrigger Attribute Internal Trigger Rate described in Section
-// 15.2.1 of IVI-4.3: IviFgen Class Specification.
-func (d *Driver) SetInternalTriggerRate(rate float64) error {
-	ctx, cancel := d.newContext()
+// Deviation from IVI-4.3: See InternalTriggerRate.
+func (ch *Channel) SetInternalTriggerRate(rate float64) error {
+	ctx, cancel := ch.newContext()
 	defer cancel()
 
 	// Convert rate (Hz) to period (seconds).
-	return d.inst.Command(ctx, d.channels[0].srcPrefix()+"BURS:INT:PER %v", 1/rate)
+	return ch.inst.Command(ctx, ch.srcPrefix()+"BURS:INT:PER %v", 1/rate)
 }
