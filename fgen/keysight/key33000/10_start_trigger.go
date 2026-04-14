@@ -48,7 +48,7 @@ func (ch *Channel) StartTriggerDelay() (time.Duration, error) {
 	ctx, cancel := ch.newContext()
 	defer cancel()
 
-	sec, err := query.Float64f(ctx, ch.inst, "TRIG%d:DEL?", ch.num)
+	sec, err := query.Float64f(ctx, ch.inst, "TRIG%d:DEL?", ch.num+1)
 	if err != nil {
 		return 0, fmt.Errorf("StartTriggerDelay: %w", err)
 	}
@@ -81,7 +81,7 @@ func (ch *Channel) StartTriggerSlope() (fgen.TriggerSlope, error) {
 
 	var slope fgen.TriggerSlope
 
-	s, err := query.Stringf(ctx, ch.inst, "TRIG%d:SLOP?", ch.num)
+	s, err := query.Stringf(ctx, ch.inst, "TRIG%d:SLOP?", ch.num+1)
 	if err != nil {
 		return slope, err
 	}
@@ -125,7 +125,7 @@ func (ch *Channel) StartTriggerSource() (fgen.TriggerSource, error) {
 
 	var src fgen.TriggerSource
 
-	s, err := query.Stringf(ctx, ch.inst, "TRIG%d:SOUR?", ch.num)
+	s, err := query.Stringf(ctx, ch.inst, "TRIG%d:SOUR?", ch.num+1)
 	if err != nil {
 		return src, err
 	}

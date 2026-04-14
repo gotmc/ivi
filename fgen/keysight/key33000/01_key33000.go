@@ -75,7 +75,7 @@ func New(inst ivi.Transport, opts ...ivi.DriverOption) (*Driver, error) {
 		ch := Channel{
 			name:    channelName,
 			inst:    inst,
-			num:     i + 1,
+			num:     i,
 			timeout: timeout,
 		}
 		channels[i] = ch
@@ -196,7 +196,7 @@ func LANPorts() map[string]int {
 type Channel struct {
 	inst    ivi.Transport
 	name    string
-	num     int // 1-based channel number for SOURce[1|2]: prefix
+	num     int // 0-based channel index
 	timeout time.Duration
 }
 
@@ -207,5 +207,5 @@ func (ch *Channel) newContext() (context.Context, context.CancelFunc) {
 
 // srcPrefix returns the SCPI source prefix for this channel (e.g., "SOUR1:").
 func (ch *Channel) srcPrefix() string {
-	return fmt.Sprintf("SOUR%d:", ch.num)
+	return fmt.Sprintf("SOUR%d:", ch.num+1)
 }

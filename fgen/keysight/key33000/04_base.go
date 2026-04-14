@@ -181,7 +181,7 @@ func (ch *Channel) OutputEnabled() (bool, error) {
 	ctx, cancel := ch.newContext()
 	defer cancel()
 
-	return query.Boolf(ctx, ch.inst, "OUTP%d?", ch.num)
+	return query.Boolf(ctx, ch.inst, "OUTP%d?", ch.num+1)
 }
 
 // SetOutputEnabled sets the output channel to enabled or disabled.
@@ -194,10 +194,10 @@ func (ch *Channel) SetOutputEnabled(b bool) error {
 	defer cancel()
 
 	if b {
-		return ch.inst.Command(ctx, "OUTP%d ON", ch.num)
+		return ch.inst.Command(ctx, "OUTP%d ON", ch.num+1)
 	}
 
-	return ch.inst.Command(ctx, "OUTP%d OFF", ch.num)
+	return ch.inst.Command(ctx, "OUTP%d OFF", ch.num+1)
 }
 
 // DisableOutput is a convenience function for setting the Output Enabled
@@ -221,7 +221,7 @@ func (ch *Channel) OutputImpedance() (float64, error) {
 	ctx, cancel := ch.newContext()
 	defer cancel()
 
-	return query.Float64f(ctx, ch.inst, "OUTP%d:LOAD?", ch.num)
+	return query.Float64f(ctx, ch.inst, "OUTP%d:LOAD?", ch.num+1)
 }
 
 // SetOutputImpedance sets the output channel's impedance in ohms.
