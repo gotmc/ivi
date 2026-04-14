@@ -5,7 +5,6 @@
 
 package dmm
 
-import "context"
 
 /*
 
@@ -56,6 +55,6 @@ None.
 // extension group described in Section 12 of IVI-4.2 IviDmm Class
 // Specification.
 type TriggerSlopeExtension interface {
-	TriggerSlope(ctx context.Context) (TriggerSlope, error)
-	SetTriggerSlope(ctx context.Context, slope TriggerSlope) error
+	TriggerSlope() (TriggerSlope, error)
+	SetTriggerSlope(slope TriggerSlope) error
 }

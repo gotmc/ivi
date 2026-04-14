@@ -6,7 +6,6 @@
 package e36xx
 
 import (
-	"context"
 	"fmt"
 
 	"github.com/gotmc/ivi"
@@ -32,7 +31,10 @@ func (ch *Channel) Name() string {
 // CurrentLimit implements the getter for the read-write IviDCPwrBase Attribute
 // Current Limit described in Section 4.2.1 of IVI-4.4: IviDCPwr Class
 // Specification.
-func (ch *Channel) CurrentLimit(ctx context.Context) (float64, error) {
+func (ch *Channel) CurrentLimit() (float64, error) {
+	ctx, cancel := ch.newContext()
+	defer cancel()
+
 	return query.Float64f(ctx, ch.inst, "INST %s; CURR?", ch.name)
 }
 
@@ -41,7 +43,10 @@ func (ch *Channel) CurrentLimit(ctx context.Context) (float64, error) {
 // SetCurrentLimit implements the setter for the read-write IviDCPwrBase
 // Attribute Current Limit described in Section 4.2.1 of IVI-4.4: IviDCPwr
 // Class Specification.
-func (ch *Channel) SetCurrentLimit(ctx context.Context, limit float64) error {
+func (ch *Channel) SetCurrentLimit(limit float64) error {
+	ctx, cancel := ch.newContext()
+	defer cancel()
+
 	return ch.inst.Command(ctx, "INST %s; CURR %.4f", ch.name, limit)
 }
 
@@ -52,7 +57,7 @@ func (ch *Channel) SetCurrentLimit(ctx context.Context, limit float64) error {
 // CurrentLimitBehavior implements the getter for the read-write IviDCPwrBase
 // Attribute Current Limit Behavior described in Section 4.2.2 of IVI-4.4:
 // IviDCPwr Class Specification.
-func (ch *Channel) CurrentLimitBehavior(ctx context.Context) (dcpwr.CurrentLimitBehavior, error) {
+func (ch *Channel) CurrentLimitBehavior() (dcpwr.CurrentLimitBehavior, error) {
 	return dcpwr.CurrentRegulate, nil
 }
 
@@ -65,7 +70,6 @@ func (ch *Channel) CurrentLimitBehavior(ctx context.Context) (dcpwr.CurrentLimit
 // Attribute Current Limit Behavior described in Section 4.2.2 of IVI-4.4:
 // IviDCPwr Class Specification.
 func (ch *Channel) SetCurrentLimitBehavior(
-	ctx context.Context,
 	behavior dcpwr.CurrentLimitBehavior,
 ) error {
 	if behavior == dcpwr.CurrentTrip {
@@ -83,7 +87,10 @@ func (ch *Channel) SetCurrentLimitBehavior(
 //
 // OutputEnabled is the getter for the read-write IviDCPwrBase Attribute Output
 // Enabled described in Section 4.2.3 of IVI-4.4: IviDCPwr Class Specification.
-func (ch *Channel) OutputEnabled(ctx context.Context) (bool, error) {
+func (ch *Channel) OutputEnabled() (bool, error) {
+	ctx, cancel := ch.newContext()
+	defer cancel()
+
 	return query.Bool(ctx, ch.inst, "OUTP?")
 }
 
@@ -92,7 +99,10 @@ func (ch *Channel) OutputEnabled(ctx context.Context) (bool, error) {
 // SetOutputEnabled is the setter for the read-write IviDCPwrBase Attribute
 // Output Enabled described in Section 4.2.3 of IVI-4.4: IviDCPwr Class
 // Specification.
-func (ch *Channel) SetOutputEnabled(ctx context.Context, v bool) error {
+func (ch *Channel) SetOutputEnabled(v bool) error {
+	ctx, cancel := ch.newContext()
+	defer cancel()
+
 	if v {
 		return ch.inst.Command(ctx, "OUTP ON")
 	}
@@ -102,21 +112,21 @@ func (ch *Channel) SetOutputEnabled(ctx context.Context, v bool) error {
 
 // DisableOutput is a convenience function for setting the Output Enabled
 // attribute to false.
-func (ch *Channel) DisableOutput(ctx context.Context) error {
-	return ch.SetOutputEnabled(ctx, false)
+func (ch *Channel) DisableOutput() error {
+	return ch.SetOutputEnabled(false)
 }
 
 // EnableOutput is a convenience function for setting the Output Enabled
 // attribute to true.
-func (ch *Channel) EnableOutput(ctx context.Context) error {
-	return ch.SetOutputEnabled(ctx, true)
+func (ch *Channel) EnableOutput() error {
+	return ch.SetOutputEnabled(true)
 }
 
 // OVPEnabled always returns false for the E3631A since it doesn't have OVP.
 //
 // OVPEnabled is the getter for the read-write IviFgenBase Attribute OVP
 // Enabled described in Section 4.2.4 of IVI-4.4: IviDCPwr Class Specification.
-func (ch *Channel) OVPEnabled(ctx context.Context) (bool, error) {
+func (ch *Channel) OVPEnabled() (bool, error) {
 	return false, nil
 }
 
@@ -125,19 +135,19 @@ func (ch *Channel) OVPEnabled(ctx context.Context) (bool, error) {
 //
 // SetOVPEnabled is the setter for the read-write IviFgenBase Attribute OVP
 // Enabled described in Section 4.2.4 of IVI-4.4: IviDCPwr Class Specification.
-func (ch *Channel) SetOVPEnabled(ctx context.Context, _ bool) error {
+func (ch *Channel) SetOVPEnabled(_ bool) error {
 	return fmt.Errorf("SetOVPEnabled: %w", dcpwr.ErrOVPUnsupported)
 }
 
 // DisableOVP is a convenience function for disabling Over-Voltage Protection
 // (OVP). DisableOVP always returns nil for the E3631A since support OVP.
-func (ch *Channel) DisableOVP(ctx context.Context) error {
+func (ch *Channel) DisableOVP() error {
 	return nil
 }
 
 // EnableOVP is a convenience function for enabling Over-Voltage Protection
 // (OVP). EnableOVP always returns an error for the E3631A since support OVP.
-func (ch *Channel) EnableOVP(ctx context.Context) error {
+func (ch *Channel) EnableOVP() error {
 	return fmt.Errorf("EnableOVP: %w", dcpwr.ErrOVPUnsupported)
 }
 
@@ -146,7 +156,7 @@ func (ch *Channel) EnableOVP(ctx context.Context) error {
 //
 // OVPLimit is the getter for the read-write IviDWPwrBase Attribute OVP Limit
 // described in Section 4.2.5 of IVI-4.4: IviDCPwr Class Specification.
-func (ch *Channel) OVPLimit(ctx context.Context) (float64, error) {
+func (ch *Channel) OVPLimit() (float64, error) {
 	return 0, fmt.Errorf("OVPLimit: %w", dcpwr.ErrOVPUnsupported)
 }
 
@@ -155,7 +165,7 @@ func (ch *Channel) OVPLimit(ctx context.Context) (float64, error) {
 //
 // SetOVPLimit is the setter for the read-write IviDCPwrBase Attribute OVP
 // Limit described in Section 4.2.5 of IVI-4.4: IviDCPwr Class Specification.
-func (ch *Channel) SetOVPLimit(ctx context.Context, _ float64) error {
+func (ch *Channel) SetOVPLimit(_ float64) error {
 	return fmt.Errorf("SetOVPLimit: %w", dcpwr.ErrOVPUnsupported)
 }
 
@@ -164,7 +174,10 @@ func (ch *Channel) SetOVPLimit(ctx context.Context, _ float64) error {
 //
 // VoltageLevel is the getter for the read-write IviDCPwrBase Attribute Voltage
 // Level described in Section 4.2.6 of IVI-4.4: IviDCPwr Class Specification.
-func (ch *Channel) VoltageLevel(ctx context.Context) (float64, error) {
+func (ch *Channel) VoltageLevel() (float64, error) {
+	ctx, cancel := ch.newContext()
+	defer cancel()
+
 	return query.Float64f(ctx, ch.inst, "inst %s; volt?", ch.name)
 }
 
@@ -174,7 +187,10 @@ func (ch *Channel) VoltageLevel(ctx context.Context) (float64, error) {
 // SetVoltageLevel is the setter for the read-write IviDCPwrBase Attribute
 // Voltage Level described in Section 4.2.6 of IVI-4.4: IviDCPwr Class
 // Specification.
-func (ch *Channel) SetVoltageLevel(ctx context.Context, amp float64) error {
+func (ch *Channel) SetVoltageLevel(amp float64) error {
+	ctx, cancel := ch.newContext()
+	defer cancel()
+
 	return ch.inst.Command(ctx, "inst %s; volt %.4f", ch.name, amp)
 }
 
@@ -185,7 +201,6 @@ func (ch *Channel) SetVoltageLevel(ctx context.Context, amp float64) error {
 // ConfigureCurrentLimit implements the IviDCPwrBase function described in
 // Section 4.3.1 of IVI-4.4: IviDCPwr Class Specification.
 func (ch *Channel) ConfigureCurrentLimit(
-	ctx context.Context,
 	_ dcpwr.CurrentLimitBehavior,
 	_ float64,
 ) error {
@@ -209,7 +224,7 @@ func (ch *Channel) ConfigureCurrentLimit(
 //
 // ConfigureOutputRange implements the IviDCPwrBase function described in
 // Section 4.3.3 of IVI-4.4: IviDCPwr Class Specification.
-func (ch *Channel) ConfigureOutputRange(ctx context.Context, _ dcpwr.RangeType, _ float64) error {
+func (ch *Channel) ConfigureOutputRange(_ dcpwr.RangeType, _ float64) error {
 	return fmt.Errorf("ConfigureOutputRange: %w", ivi.ErrNotImplemented)
 }
 
@@ -221,7 +236,7 @@ func (ch *Channel) ConfigureOutputRange(ctx context.Context, _ dcpwr.RangeType, 
 //
 // ConfigureOVP implements the IviDCPwrBase function described in Section 4.3.4
 // of IVI-4.4: IviDCPwr Class Specification.
-func (ch *Channel) ConfigureOVP(ctx context.Context, _ bool, _ float64) error {
+func (ch *Channel) ConfigureOVP(_ bool, _ float64) error {
 	return fmt.Errorf("ConfigureOVP: %w", dcpwr.ErrOVPUnsupported)
 }
 
@@ -230,7 +245,7 @@ func (ch *Channel) ConfigureOVP(ctx context.Context, _ bool, _ float64) error {
 //
 // QueryCurrentLimitMax implements the IviDCPwrBase function described in
 // Section 4.3.7 of IVI-4.4: IviDCPwr Class Specification.
-func (ch *Channel) QueryCurrentLimitMax(ctx context.Context, _ float64) (float64, error) {
+func (ch *Channel) QueryCurrentLimitMax(_ float64) (float64, error) {
 	return 0.0, fmt.Errorf("QueryCurrentLimitMax: %w", ivi.ErrNotImplemented)
 }
 
@@ -239,7 +254,7 @@ func (ch *Channel) QueryCurrentLimitMax(ctx context.Context, _ float64) (float64
 //
 // QueryVoltageLevelMax implements the IviDCPwrBase function described in
 // Section 4.3.8 of IVI-4.4: IviDCPwr Class Specification.
-func (ch *Channel) QueryVoltageLevelMax(ctx context.Context, _ float64) (float64, error) {
+func (ch *Channel) QueryVoltageLevelMax(_ float64) (float64, error) {
 	return 0.0, fmt.Errorf("QueryVoltageLevelMax: %w", ivi.ErrNotImplemented)
 }
 
@@ -248,7 +263,7 @@ func (ch *Channel) QueryVoltageLevelMax(ctx context.Context, _ float64) (float64
 //
 // QueryOutputState implements the IviDCPwrBase function described in Section
 // 4.3.9 of IVI-4.4: IviDCPwr Class Specification.
-func (ch *Channel) QueryOutputState(ctx context.Context, _ dcpwr.OutputState) (bool, error) {
+func (ch *Channel) QueryOutputState(_ dcpwr.OutputState) (bool, error) {
 	return false, fmt.Errorf("QueryOutputState: %w", ivi.ErrNotImplemented)
 }
 
@@ -257,6 +272,6 @@ func (ch *Channel) QueryOutputState(ctx context.Context, _ dcpwr.OutputState) (b
 //
 // ResetOutputProtection implements the IviDCPwrBase function described in
 // Section 4.3.10 of IVI-4.4: IviDCPwr Class Specification.
-func (ch *Channel) ResetOutputProtection(ctx context.Context) error {
+func (ch *Channel) ResetOutputProtection() error {
 	return fmt.Errorf("ResetOutputProtection: %w", ivi.ErrNotImplemented)
 }

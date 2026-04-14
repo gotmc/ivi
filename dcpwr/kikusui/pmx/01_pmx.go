@@ -10,6 +10,7 @@
 package pmx
 
 import (
+	"context"
 	"fmt"
 	"time"
 
@@ -33,6 +34,7 @@ var _ dcpwr.MeasurementChannel = (*Channel)(nil)
 type Driver struct {
 	inst     ivi.Transport
 	channels []Channel
+	timeout  time.Duration
 	ivi.Inherent
 }
 
@@ -41,6 +43,7 @@ type Driver struct {
 type Channel struct {
 	name                 string
 	inst                 ivi.Transport
+	timeout              time.Duration
 	currentLimitBehavior dcpwr.CurrentLimitBehavior
 }
 
@@ -62,8 +65,9 @@ func New(inst ivi.Transport, opts ...ivi.DriverOption) (*Driver, error) {
 	channels := make([]Channel, outputCount)
 	for i, channelName := range channelNames {
 		ch := Channel{
-			name: channelName,
-			inst: inst,
+			name:    channelName,
+			inst:    inst,
+			timeout: timeout,
 		}
 		channels[i] = ch
 	}
@@ -102,6 +106,7 @@ func New(inst ivi.Transport, opts ...ivi.DriverOption) (*Driver, error) {
 	driver := Driver{
 		inst:     inst,
 		channels: channels,
+		timeout:  timeout,
 		Inherent: inherent,
 	}
 
@@ -121,6 +126,11 @@ func (d *Driver) Channel(index int) (*Channel, error) {
 	}
 
 	return &d.channels[index], nil
+}
+
+// newContext creates a context with the channel's configured timeout.
+func (ch *Channel) newContext() (context.Context, context.CancelFunc) {
+	return context.WithTimeout(context.Background(), ch.timeout)
 }
 
 // Close properly shuts down the power supply by returning it to local control.

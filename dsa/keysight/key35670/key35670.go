@@ -12,6 +12,7 @@
 package key35670
 
 import (
+	"context"
 	"fmt"
 	"time"
 
@@ -35,6 +36,7 @@ const (
 type Key35670 struct {
 	inst     ivi.Transport
 	channels []Channel
+	timeout  time.Duration
 	ivi.Inherent
 }
 
@@ -86,6 +88,7 @@ func New(inst ivi.Transport, opts ...ivi.DriverOption) (*Key35670, error) {
 	driver := Key35670{
 		inst:     inst,
 		channels: channels,
+		timeout:  timeout,
 		Inherent: inherent,
 	}
 
@@ -96,6 +99,11 @@ func New(inst ivi.Transport, opts ...ivi.DriverOption) (*Key35670, error) {
 	}
 
 	return &driver, nil
+}
+
+// newContext creates a context with the driver's configured timeout.
+func (d *Key35670) newContext() (context.Context, context.CancelFunc) {
+	return context.WithTimeout(context.Background(), d.timeout)
 }
 
 // Channel returns the Channel at the given index, with bounds checking.

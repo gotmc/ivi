@@ -87,7 +87,7 @@ func TestChannel_Name(t *testing.T) {
 func TestChannel_SetCurrentLimit(t *testing.T) {
 	mock := &mockInst{}
 	ch := Channel{name: "CH1", idx: 1, inst: mock}
-	err := ch.SetCurrentLimit(context.Background(), 0.5)
+	err := ch.SetCurrentLimit(0.5)
 	if err != nil {
 		t.Errorf("SetCurrentLimit() error: %v", err)
 	}
@@ -99,7 +99,7 @@ func TestChannel_SetCurrentLimit(t *testing.T) {
 func TestChannel_SetVoltageLevel(t *testing.T) {
 	mock := &mockInst{}
 	ch := Channel{name: "CH1", idx: 1, inst: mock}
-	err := ch.SetVoltageLevel(context.Background(), 5.0)
+	err := ch.SetVoltageLevel(5.0)
 	if err != nil {
 		t.Errorf("SetVoltageLevel() error: %v", err)
 	}
@@ -122,7 +122,7 @@ func TestChannel_SetOutputEnabled(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			mock := &mockInst{}
 			ch := Channel{name: "CH1", idx: 1, inst: mock}
-			err := ch.SetOutputEnabled(context.Background(), tt.enabled)
+			err := ch.SetOutputEnabled(tt.enabled)
 			if err != nil {
 				t.Errorf("SetOutputEnabled() error: %v", err)
 			}
@@ -149,7 +149,7 @@ func TestChannel_SetCurrentLimitBehavior(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			mock := &mockInst{}
 			ch := Channel{name: "CH1", idx: 1, inst: mock}
-			err := ch.SetCurrentLimitBehavior(context.Background(), tt.behavior)
+			err := ch.SetCurrentLimitBehavior(tt.behavior)
 			if tt.wantErr {
 				if err == nil {
 					t.Error("expected error, got nil")
@@ -180,7 +180,7 @@ func TestChannel_SetOVPEnabled(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			mock := &mockInst{}
 			ch := Channel{name: "CH1", idx: 1, inst: mock}
-			err := ch.SetOVPEnabled(context.Background(), tt.enabled)
+			err := ch.SetOVPEnabled(tt.enabled)
 			if err != nil {
 				t.Errorf("SetOVPEnabled() error: %v", err)
 			}
@@ -194,7 +194,7 @@ func TestChannel_SetOVPEnabled(t *testing.T) {
 func TestChannel_SetOVPLimit(t *testing.T) {
 	mock := &mockInst{}
 	ch := Channel{name: "CH1", idx: 1, inst: mock}
-	err := ch.SetOVPLimit(context.Background(), 10.0)
+	err := ch.SetOVPLimit(10.0)
 	if err != nil {
 		t.Errorf("SetOVPLimit() error: %v", err)
 	}
@@ -209,7 +209,7 @@ func TestChannel_QueryCurrentLimitMax(t *testing.T) {
 	if err != nil {
 		t.Fatalf("Channel(0) error: %v", err)
 	}
-	got, err := ch.QueryCurrentLimitMax(context.Background(), 5.0)
+	got, err := ch.QueryCurrentLimitMax(5.0)
 	if err != nil {
 		t.Errorf("QueryCurrentLimitMax() error: %v", err)
 	}
@@ -224,7 +224,7 @@ func TestChannel_QueryVoltageLevelMax(t *testing.T) {
 	if err != nil {
 		t.Fatalf("Channel(0) error: %v", err)
 	}
-	got, err := ch.QueryVoltageLevelMax(context.Background(), 1.0)
+	got, err := ch.QueryVoltageLevelMax(1.0)
 	if err != nil {
 		t.Errorf("QueryVoltageLevelMax() error: %v", err)
 	}
@@ -236,7 +236,7 @@ func TestChannel_QueryVoltageLevelMax(t *testing.T) {
 func TestChannel_ConfigureOutputRange_NoOp(t *testing.T) {
 	mock := &mockInst{}
 	ch := Channel{name: "CH1", idx: 1, inst: mock}
-	err := ch.ConfigureOutputRange(context.Background(), dcpwr.VoltageRange, 10.0)
+	err := ch.ConfigureOutputRange(dcpwr.VoltageRange, 10.0)
 	if err != nil {
 		t.Errorf("ConfigureOutputRange() error: %v", err)
 	}
@@ -248,7 +248,7 @@ func TestChannel_ConfigureOutputRange_NoOp(t *testing.T) {
 func TestChannel_ResetOutputProtection(t *testing.T) {
 	mock := &mockInst{}
 	ch := Channel{name: "CH1", idx: 1, inst: mock}
-	err := ch.ResetOutputProtection(context.Background())
+	err := ch.ResetOutputProtection()
 	if err != nil {
 		t.Errorf("ResetOutputProtection() error: %v", err)
 	}
@@ -278,7 +278,7 @@ func TestChannel_ConfigureOVP(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			mock := &mockInst{}
 			ch := Channel{name: "CH1", idx: 1, inst: mock}
-			err := ch.ConfigureOVP(context.Background(), tt.enabled, tt.limit)
+			err := ch.ConfigureOVP(tt.enabled, tt.limit)
 			if err != nil {
 				t.Errorf("ConfigureOVP() error: %v", err)
 			}
@@ -292,7 +292,7 @@ func TestChannel_ConfigureOVP(t *testing.T) {
 func TestChannel_DisableOutput(t *testing.T) {
 	mock := &mockInst{}
 	ch := Channel{name: "CH1", idx: 1, inst: mock}
-	err := ch.DisableOutput(context.Background())
+	err := ch.DisableOutput()
 	if err != nil {
 		t.Errorf("DisableOutput() error: %v", err)
 	}
@@ -304,7 +304,7 @@ func TestChannel_DisableOutput(t *testing.T) {
 func TestChannel_EnableOutput(t *testing.T) {
 	mock := &mockInst{}
 	ch := Channel{name: "CH1", idx: 1, inst: mock}
-	err := ch.EnableOutput(context.Background())
+	err := ch.EnableOutput()
 	if err != nil {
 		t.Errorf("EnableOutput() error: %v", err)
 	}
@@ -316,7 +316,7 @@ func TestChannel_EnableOutput(t *testing.T) {
 func TestChannel_DisableOVP(t *testing.T) {
 	mock := &mockInst{}
 	ch := Channel{name: "CH1", idx: 1, inst: mock}
-	err := ch.DisableOVP(context.Background())
+	err := ch.DisableOVP()
 	if err != nil {
 		t.Errorf("DisableOVP() error: %v", err)
 	}
@@ -328,7 +328,7 @@ func TestChannel_DisableOVP(t *testing.T) {
 func TestChannel_EnableOVP(t *testing.T) {
 	mock := &mockInst{}
 	ch := Channel{name: "CH1", idx: 1, inst: mock}
-	err := ch.EnableOVP(context.Background())
+	err := ch.EnableOVP()
 	if err != nil {
 		t.Errorf("EnableOVP() error: %v", err)
 	}
@@ -340,7 +340,7 @@ func TestChannel_EnableOVP(t *testing.T) {
 func TestChannel_ConfigureCurrentLimit(t *testing.T) {
 	mock := &mockInst{}
 	ch := Channel{name: "CH1", idx: 1, inst: mock}
-	err := ch.ConfigureCurrentLimit(context.Background(), dcpwr.CurrentRegulate, 0.5)
+	err := ch.ConfigureCurrentLimit(dcpwr.CurrentRegulate, 0.5)
 	if err != nil {
 		t.Errorf("ConfigureCurrentLimit() error: %v", err)
 	}

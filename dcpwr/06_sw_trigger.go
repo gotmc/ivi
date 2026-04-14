@@ -5,7 +5,6 @@
 
 package dcpwr
 
-import "context"
 
 /*
 
@@ -28,5 +27,5 @@ Below are the .NET functions, since they are the basis for the Go interfaces.
 // SoftwareTrigger provides the interface required for the
 // IviDCPwrSoftwareTrigger extension group.
 type SoftwareTrigger interface {
-	SendSoftwareTrigger(ctx context.Context) error
+SendSoftwareTrigger() error
 }

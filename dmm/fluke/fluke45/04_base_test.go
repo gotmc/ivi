@@ -138,7 +138,7 @@ func TestDriver_MeasurementFunction(t *testing.T) {
 				t.Fatalf("New() error: %v", err)
 			}
 
-			got, err := d.MeasurementFunction(context.Background())
+			got, err := d.MeasurementFunction()
 			if tt.wantErr {
 				if err == nil {
 					t.Error("expected error, got nil")
@@ -176,7 +176,7 @@ func TestDriver_SetMeasurementFunction(t *testing.T) {
 				t.Fatalf("New() error: %v", err)
 			}
 
-			err = d.SetMeasurementFunction(context.Background(), tt.fcn)
+			err = d.SetMeasurementFunction(tt.fcn)
 			if tt.wantErr {
 				if err == nil {
 					t.Error("expected error, got nil")
@@ -213,7 +213,7 @@ func TestDriver_TriggerSource(t *testing.T) {
 				t.Fatalf("New() error: %v", err)
 			}
 
-			got, err := d.TriggerSource(context.Background())
+			got, err := d.TriggerSource()
 			if tt.wantErr {
 				if err == nil {
 					t.Error("expected error, got nil")
@@ -251,7 +251,7 @@ func TestDriver_SetTriggerSource(t *testing.T) {
 				t.Fatalf("New() error: %v", err)
 			}
 
-			err = d.SetTriggerSource(context.Background(), tt.src)
+			err = d.SetTriggerSource(tt.src)
 			if tt.wantErr {
 				if err == nil {
 					t.Error("expected error, got nil")
@@ -275,12 +275,12 @@ func TestDriver_ResolutionAbsolute_NotSupported(t *testing.T) {
 		t.Fatalf("New() error: %v", err)
 	}
 
-	_, err = d.ResolutionAbsolute(context.Background())
+	_, err = d.ResolutionAbsolute()
 	if !errors.Is(err, ivi.ErrFunctionNotSupported) {
 		t.Errorf("ResolutionAbsolute() = %v, want ErrFunctionNotSupported", err)
 	}
 
-	err = d.SetResolutionAbsolute(context.Background(), 1.0)
+	err = d.SetResolutionAbsolute(1.0)
 	if !errors.Is(err, ivi.ErrFunctionNotSupported) {
 		t.Errorf("SetResolutionAbsolute() = %v, want ErrFunctionNotSupported", err)
 	}
@@ -293,7 +293,7 @@ func TestDriver_Abort_NotSupported(t *testing.T) {
 		t.Fatalf("New() error: %v", err)
 	}
 
-	err = d.Abort(context.Background())
+	err = d.Abort()
 	if !errors.Is(err, ivi.ErrFunctionNotSupported) {
 		t.Errorf("Abort() = %v, want ErrFunctionNotSupported", err)
 	}
@@ -306,7 +306,7 @@ func TestDriver_InitiateMeasurement(t *testing.T) {
 		t.Fatalf("New() error: %v", err)
 	}
 
-	err = d.InitiateMeasurement(context.Background())
+	err = d.InitiateMeasurement()
 	if err != nil {
 		t.Errorf("InitiateMeasurement() error: %v", err)
 	}
@@ -322,17 +322,17 @@ func TestDriver_IsOutOfRange_NotSupported(t *testing.T) {
 		t.Fatalf("New() error: %v", err)
 	}
 
-	_, err = d.IsOutOfRange(context.Background(), 1.0)
+	_, err = d.IsOutOfRange(1.0)
 	if !errors.Is(err, ivi.ErrFunctionNotSupported) {
 		t.Errorf("IsOutOfRange() = %v, want ErrFunctionNotSupported", err)
 	}
 
-	_, err = d.IsOverRange(context.Background(), 1.0)
+	_, err = d.IsOverRange(1.0)
 	if !errors.Is(err, ivi.ErrFunctionNotSupported) {
 		t.Errorf("IsOverRange() = %v, want ErrFunctionNotSupported", err)
 	}
 
-	_, err = d.IsUnderRange(context.Background(), 1.0)
+	_, err = d.IsUnderRange(1.0)
 	if !errors.Is(err, ivi.ErrFunctionNotSupported) {
 		t.Errorf("IsUnderRange() = %v, want ErrFunctionNotSupported", err)
 	}
@@ -360,7 +360,7 @@ func TestDriver_TriggerDelay(t *testing.T) {
 				t.Fatalf("New() error: %v", err)
 			}
 
-			hasDelay, dur, err := d.TriggerDelay(context.Background())
+			hasDelay, dur, err := d.TriggerDelay()
 			if tt.wantErr {
 				if err == nil {
 					t.Error("expected error, got nil")
@@ -387,7 +387,7 @@ func TestDriver_FetchMeasurement(t *testing.T) {
 		t.Fatalf("New() error: %v", err)
 	}
 
-	got, err := d.FetchMeasurement(context.Background(), 0)
+	got, err := d.FetchMeasurement(0)
 	if err != nil {
 		t.Errorf("FetchMeasurement() error: %v", err)
 	}
@@ -403,7 +403,7 @@ func TestDriver_ReadMeasurement(t *testing.T) {
 		t.Fatalf("New() error: %v", err)
 	}
 
-	got, err := d.ReadMeasurement(context.Background(), 0)
+	got, err := d.ReadMeasurement(0)
 	if err != nil {
 		t.Errorf("ReadMeasurement() error: %v", err)
 	}

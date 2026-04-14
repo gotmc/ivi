@@ -5,7 +5,6 @@
 
 package dmm
 
-import "context"
 
 /*
 
@@ -40,14 +39,13 @@ Below are the .NET functions, since they are the basis for the Go interfaces.
 // IviDmmThermocouple extension group described in Section 8 of IVI-4.2 IviDmm
 // Class Specification.
 type ThermocoupleExtension interface {
-	FixedRefJunctionTemperature(ctx context.Context) (float64, error)
-	SetFixedRefJunctionTemperature(ctx context.Context, temp float64) error
-	RefJunctionType(ctx context.Context) (ReferenceJunctionType, error)
-	SetRefJunctionType(ctx context.Context, refType ReferenceJunctionType) error
-	ThermocoupleType(ctx context.Context) (ThermocoupleType, error)
-	SetThermocoupleType(ctx context.Context, thermoType ThermocoupleType) error
+	FixedRefJunctionTemperature() (float64, error)
+	SetFixedRefJunctionTemperature(temp float64) error
+	RefJunctionType() (ReferenceJunctionType, error)
+	SetRefJunctionType(refType ReferenceJunctionType) error
+	ThermocoupleType() (ThermocoupleType, error)
+	SetThermocoupleType(thermoType ThermocoupleType) error
 	ConfigureThermocouple(
-		ctx context.Context,
 		thermoType ThermocoupleType,
 		refType ReferenceJunctionType,
 	) error

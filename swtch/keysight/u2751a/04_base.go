@@ -6,7 +6,6 @@
 package u2751a
 
 import (
-	"context"
 	"fmt"
 	"time"
 
@@ -146,19 +145,19 @@ func (ch *Channel) IsConfigChannel() bool {
 // connected to another channel. IsConfigChannel is the setter for the
 // read-write IviSwtchBase Attribute IsConfigurationChannel described in
 // Section 4.2.16 of IVI-4.6:IviSwtch Class Specification.
-func (ch *Channel) SetConfigChannel(ctx context.Context, b bool) error {
+func (ch *Channel) SetConfigChannel(b bool) error {
 	ch.isConfigChannel = b
 	return nil
 }
 
 // EnableConfigChannel is a convenience function to SetConfigChannel to true.
-func (ch *Channel) EnableConfigChannel(ctx context.Context) error {
-	return ch.SetConfigChannel(ctx, true)
+func (ch *Channel) EnableConfigChannel() error {
+	return ch.SetConfigChannel(true)
 }
 
 // DisableConfigChannel is a convenience function to SetConfigChannel to false.
-func (ch *Channel) DisableConfigChannel(ctx context.Context) error {
-	return ch.SetConfigChannel(ctx, false)
+func (ch *Channel) DisableConfigChannel() error {
+	return ch.SetConfigChannel(false)
 }
 
 // IsDebounced indicates whether the switch module has settled from the
@@ -188,19 +187,19 @@ func (ch *Channel) IsSourceChannel() bool {
 // is the setter for the read-write IviSwtchBase Attribute
 // IsConfigurationChannel described in Section 4.2.18 of IVI-4.6:IviSwtch Class
 // Specification.
-func (ch *Channel) SetSourceChannel(ctx context.Context, b bool) error {
+func (ch *Channel) SetSourceChannel(b bool) error {
 	ch.isSourceChannel = b
 	return nil
 }
 
 // EnableSourceChannel is a convenience function to SetSourceChannel to true.
-func (ch *Channel) EnableSourceChannel(ctx context.Context) error {
-	return ch.SetSourceChannel(ctx, true)
+func (ch *Channel) EnableSourceChannel() error {
+	return ch.SetSourceChannel(true)
 }
 
 // DisableSourceChannel is a convenience function to SetSourceChannel to false.
-func (ch *Channel) DisableSourceChannel(ctx context.Context) error {
-	return ch.SetSourceChannel(ctx, false)
+func (ch *Channel) DisableSourceChannel() error {
+	return ch.SetSourceChannel(false)
 }
 
 // SettlingTime returns the maximum total settling time for the channel before
@@ -226,13 +225,13 @@ func (ch *Channel) WireMode() int {
 // current paths in existence. CanConnect implements the IviSwtch Base Function
 // Can Connect described in Section 4.3.1 of IVI-4.6: IviSwtch Class
 // Specification.
-func (d *U2751A) CanConnect(ctx context.Context, ch1name, ch2name string) (bool, error) {
-	ch1, err := d.Channel(ctx, ch1name)
+func (d *U2751A) CanConnect(ch1name, ch2name string) (bool, error) {
+	ch1, err := d.Channel(ch1name)
 	if err != nil {
 		return false, err
 	}
 
-	ch2, err := d.Channel(ctx, ch2name)
+	ch2, err := d.Channel(ch2name)
 	if err != nil {
 		return false, err
 	}
@@ -276,14 +275,17 @@ func (d *U2751A) CanConnect(ctx context.Context, ch1name, ch2name string) (bool,
 // Connect takes two channel names and, if possible, creates a path between the
 // two channels.  Connect implements the IviSwtch Base Function Connect
 // described in Section 4.3.2 of IVI-4.6: IviSwtch Class Specification.
-func (d *U2751A) Connect(ctx context.Context, ch1name, ch2name string) error {
-	ch1, err := d.Channel(ctx, ch1name)
+func (d *U2751A) Connect(ch1name, ch2name string) error {
+	ctx, cancel := d.newContext()
+	defer cancel()
+
+	ch1, err := d.Channel(ch1name)
 	if err != nil {
 		// Should I return an Unknown Channel Name per IVI-3.2 Table 9-2?
 		return err
 	}
 
-	ch2, err := d.Channel(ctx, ch2name)
+	ch2, err := d.Channel(ch2name)
 	if err != nil {
 		return err
 	}

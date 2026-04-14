@@ -250,9 +250,8 @@ func TestMeasurementFunction(t *testing.T) {
 				shouldError: tc.shouldError,
 			}
 			d := newTestDriver(t, mock)
-			ctx := context.Background()
 
-			got, err := d.MeasurementFunction(ctx)
+			got, err := d.MeasurementFunction()
 
 			if tc.expectErr && err == nil {
 				t.Fatal("expected error, got nil")
@@ -292,9 +291,8 @@ func TestSetMeasurementFunction(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			mock := &mockInst{shouldError: tc.shouldError}
 			d := newTestDriver(t, mock)
-			ctx := context.Background()
 
-			err := d.SetMeasurementFunction(ctx, tc.msrFunc)
+			err := d.SetMeasurementFunction(tc.msrFunc)
 
 			if tc.expectErr && err == nil {
 				t.Fatal("expected error, got nil")
@@ -338,9 +336,8 @@ func TestTriggerSource(t *testing.T) {
 				shouldError: tc.shouldError,
 			}
 			d := newTestDriver(t, mock)
-			ctx := context.Background()
 
-			got, err := d.TriggerSource(ctx)
+			got, err := d.TriggerSource()
 
 			if tc.expectErr && err == nil {
 				t.Fatal("expected error, got nil")
@@ -374,9 +371,8 @@ func TestSetTriggerSource(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			mock := &mockInst{shouldError: tc.shouldError}
 			d := newTestDriver(t, mock)
-			ctx := context.Background()
 
-			err := d.SetTriggerSource(ctx, tc.src)
+			err := d.SetTriggerSource(tc.src)
 
 			if tc.expectErr && err == nil {
 				t.Fatal("expected error, got nil")
@@ -403,9 +399,8 @@ func TestAbort(t *testing.T) {
 	t.Run("success", func(t *testing.T) {
 		mock := &mockInst{}
 		d := newTestDriver(t, mock)
-		ctx := context.Background()
 
-		err := d.Abort(ctx)
+		err := d.Abort()
 		if err != nil {
 			t.Fatalf("unexpected error: %v", err)
 		}
@@ -422,9 +417,8 @@ func TestAbort(t *testing.T) {
 	t.Run("error", func(t *testing.T) {
 		mock := &mockInst{shouldError: true}
 		d := newTestDriver(t, mock)
-		ctx := context.Background()
 
-		err := d.Abort(ctx)
+		err := d.Abort()
 		if err == nil {
 			t.Fatal("expected error, got nil")
 		}
@@ -435,9 +429,8 @@ func TestInitiateMeasurement(t *testing.T) {
 	t.Run("success", func(t *testing.T) {
 		mock := &mockInst{}
 		d := newTestDriver(t, mock)
-		ctx := context.Background()
 
-		err := d.InitiateMeasurement(ctx)
+		err := d.InitiateMeasurement()
 		if err != nil {
 			t.Fatalf("unexpected error: %v", err)
 		}
@@ -454,9 +447,8 @@ func TestInitiateMeasurement(t *testing.T) {
 	t.Run("error", func(t *testing.T) {
 		mock := &mockInst{shouldError: true}
 		d := newTestDriver(t, mock)
-		ctx := context.Background()
 
-		err := d.InitiateMeasurement(ctx)
+		err := d.InitiateMeasurement()
 		if err == nil {
 			t.Fatal("expected error, got nil")
 		}

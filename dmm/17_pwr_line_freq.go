@@ -5,7 +5,6 @@
 
 package dmm
 
-import "context"
 
 /*
 
@@ -58,6 +57,6 @@ None.
 // IviDmmPowerLineFrequency extension group described in Section 17 of
 // IVI-4.2 IviDmm Class Specification.
 type PowerLineFrequencyExtension interface {
-	PowerLineFrequency(ctx context.Context) (float64, error)
-	SetPowerLineFrequency(ctx context.Context, freq float64) error
+	PowerLineFrequency() (float64, error)
+	SetPowerLineFrequency(freq float64) error
 }

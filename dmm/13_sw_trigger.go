@@ -5,7 +5,6 @@
 
 package dmm
 
-import "context"
 
 /*
 
@@ -29,5 +28,5 @@ Below are the .NET functions, since they are the basis for the Go interfaces.
 // IviDmmSoftwareTrigger extension group described in Section 13 of IVI-4.2
 // IviDmm Class Specification.
 type SoftwareTriggerExtension interface {
-	SendSoftwareTrigger(ctx context.Context) error
+	SendSoftwareTrigger() error
 }

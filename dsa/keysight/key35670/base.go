@@ -6,14 +6,16 @@
 package key35670
 
 import (
-	"context"
 	"fmt"
 
 	"github.com/gotmc/query"
 )
 
 // SetStartFreq sets the start frequency in Hertz.
-func (dev *Key35670) SetStartFreq(ctx context.Context, freq float64) error {
+func (dev *Key35670) SetStartFreq(freq float64) error {
+	ctx, cancel := dev.newContext()
+	defer cancel()
+
 	if freq < 0.0 || freq > 114999.9023 {
 		return fmt.Errorf("start frequency of %f out of range", freq)
 	}
@@ -21,7 +23,10 @@ func (dev *Key35670) SetStartFreq(ctx context.Context, freq float64) error {
 }
 
 // StartFreq queries the start frequency in Hertz.
-func (dev *Key35670) StartFreq(ctx context.Context) (float64, error) {
+func (dev *Key35670) StartFreq() (float64, error) {
+	ctx, cancel := dev.newContext()
+	defer cancel()
+
 	return query.Float64(ctx, dev.inst, "sens:freq:star?")
 }
 

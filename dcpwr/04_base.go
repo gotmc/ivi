@@ -5,7 +5,6 @@
 
 package dcpwr
 
-import "context"
 
 /*
 # Section 4 IviDCPwrBase Capability Group
@@ -58,27 +57,27 @@ type Base interface {
 // the IviDCPwrBase capability group.
 type BaseChannel interface {
 	Name() string
-	CurrentLimit(ctx context.Context) (float64, error)
-	SetCurrentLimit(ctx context.Context, limit float64) error
-	CurrentLimitBehavior(ctx context.Context) (CurrentLimitBehavior, error)
-	SetCurrentLimitBehavior(ctx context.Context, behavior CurrentLimitBehavior) error
-	OutputEnabled(ctx context.Context) (bool, error)
-	SetOutputEnabled(ctx context.Context, b bool) error
-	DisableOutput(ctx context.Context) error
-	EnableOutput(ctx context.Context) error
-	OVPEnabled(ctx context.Context) (bool, error)
-	SetOVPEnabled(ctx context.Context, b bool) error
-	DisableOVP(ctx context.Context) error
-	EnableOVP(ctx context.Context) error
-	OVPLimit(ctx context.Context) (float64, error)
-	SetOVPLimit(ctx context.Context, limit float64) error
-	VoltageLevel(ctx context.Context) (float64, error)
-	SetVoltageLevel(ctx context.Context, level float64) error
-	ConfigureCurrentLimit(ctx context.Context, behavior CurrentLimitBehavior, limit float64) error
-	ConfigureOutputRange(ctx context.Context, rt RangeType, rng float64) error
-	ConfigureOVP(ctx context.Context, b bool, limit float64) error
-	QueryCurrentLimitMax(ctx context.Context, voltage float64) (float64, error)
-	QueryVoltageLevelMax(ctx context.Context, currentLimit float64) (float64, error)
-	QueryOutputState(ctx context.Context, os OutputState) (bool, error)
-	ResetOutputProtection(ctx context.Context) error
+CurrentLimit() (float64, error)
+SetCurrentLimit(limit float64) error
+CurrentLimitBehavior() (CurrentLimitBehavior, error)
+SetCurrentLimitBehavior(behavior CurrentLimitBehavior) error
+OutputEnabled() (bool, error)
+SetOutputEnabled(b bool) error
+DisableOutput() error
+EnableOutput() error
+OVPEnabled() (bool, error)
+SetOVPEnabled(b bool) error
+DisableOVP() error
+EnableOVP() error
+OVPLimit() (float64, error)
+SetOVPLimit(limit float64) error
+VoltageLevel() (float64, error)
+SetVoltageLevel(level float64) error
+ConfigureCurrentLimit(behavior CurrentLimitBehavior, limit float64) error
+ConfigureOutputRange(rt RangeType, rng float64) error
+ConfigureOVP(b bool, limit float64) error
+QueryCurrentLimitMax(voltage float64) (float64, error)
+QueryVoltageLevelMax(currentLimit float64) (float64, error)
+QueryOutputState(os OutputState) (bool, error)
+ResetOutputProtection() error
 }

@@ -105,7 +105,7 @@ func TestDriver_AcquisitionType(t *testing.T) {
 			mock := &mockInst{queryResp: tt.resp}
 			d := newTestDriver(mock)
 
-			got, err := d.AcquisitionType(context.Background())
+			got, err := d.AcquisitionType()
 			if tt.wantErr {
 				if err == nil {
 					t.Error("expected error, got nil")
@@ -141,7 +141,7 @@ func TestDriver_SetAcquisitionType(t *testing.T) {
 			mock := &mockInst{}
 			d := newTestDriver(mock)
 
-			err := d.SetAcquisitionType(context.Background(), tt.acType)
+			err := d.SetAcquisitionType(tt.acType)
 			if tt.wantErr {
 				if err == nil {
 					t.Error("expected error, got nil")
@@ -178,7 +178,7 @@ func TestDriver_TriggerType(t *testing.T) {
 			mock := &mockInst{queryResp: tt.resp}
 			d := newTestDriver(mock)
 
-			got, err := d.TriggerType(context.Background())
+			got, err := d.TriggerType()
 			if tt.wantErr {
 				if err == nil {
 					t.Error("expected error, got nil")
@@ -213,7 +213,7 @@ func TestDriver_SetTriggerType(t *testing.T) {
 			mock := &mockInst{}
 			d := newTestDriver(mock)
 
-			err := d.SetTriggerType(context.Background(), tt.trig)
+			err := d.SetTriggerType(tt.trig)
 			if tt.wantErr {
 				if err == nil {
 					t.Error("expected error, got nil")
@@ -233,7 +233,7 @@ func TestDriver_SetTriggerType(t *testing.T) {
 func TestDriver_SetTriggerLevel(t *testing.T) {
 	mock := &mockInst{}
 	d := newTestDriver(mock)
-	err := d.SetTriggerLevel(context.Background(), 1.5)
+	err := d.SetTriggerLevel(1.5)
 	if err != nil {
 		t.Errorf("SetTriggerLevel() error: %v", err)
 	}
@@ -259,7 +259,7 @@ func TestDriver_SetTriggerHoldoff(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			mock := &mockInst{}
 			d := newTestDriver(mock)
-			err := d.SetTriggerHoldoff(context.Background(), tt.holdoff)
+			err := d.SetTriggerHoldoff(tt.holdoff)
 			if tt.wantErr {
 				if err == nil {
 					t.Error("expected error, got nil")
@@ -287,7 +287,7 @@ func TestChannel_SetChannelEnabled(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			mock := &mockInst{}
 			ch := Channel{inst: mock, name: "CHAN1", num: 1}
-			err := ch.SetChannelEnabled(context.Background(), tt.enabled)
+			err := ch.SetChannelEnabled(tt.enabled)
 			if err != nil {
 				t.Errorf("SetChannelEnabled() error: %v", err)
 			}
@@ -314,7 +314,7 @@ func TestChannel_SetInputImpedance(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			mock := &mockInst{}
 			ch := Channel{inst: mock, name: "CHAN1", num: 1}
-			err := ch.SetInputImpedance(context.Background(), tt.impedance)
+			err := ch.SetInputImpedance(tt.impedance)
 			if tt.wantErr {
 				if err == nil {
 					t.Error("expected error, got nil")
@@ -348,7 +348,7 @@ func TestChannel_SetVerticalRange(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			mock := &mockInst{}
 			ch := Channel{inst: mock, name: "CHAN1", num: 1}
-			err := ch.SetVerticalRange(context.Background(), tt.rng)
+			err := ch.SetVerticalRange(tt.rng)
 			if tt.wantErr {
 				if err == nil {
 					t.Error("expected error, got nil")
@@ -381,7 +381,7 @@ func TestChannel_SetProbeAttenuation(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			mock := &mockInst{}
 			ch := Channel{inst: mock, name: "CHAN1", num: 1}
-			err := ch.SetProbeAttenuation(context.Background(), tt.atten)
+			err := ch.SetProbeAttenuation(tt.atten)
 			if tt.wantErr {
 				if err == nil {
 					t.Error("expected error, got nil")
@@ -400,13 +400,13 @@ func TestChannel_SetProbeAttenuationAuto(t *testing.T) {
 	ch := Channel{inst: mock, name: "CHAN1", num: 1}
 
 	// false should succeed
-	err := ch.SetProbeAttenuationAuto(context.Background(), false)
+	err := ch.SetProbeAttenuationAuto(false)
 	if err != nil {
 		t.Errorf("SetProbeAttenuationAuto(false) error: %v", err)
 	}
 
 	// true should fail (not supported)
-	err = ch.SetProbeAttenuationAuto(context.Background(), true)
+	err = ch.SetProbeAttenuationAuto(true)
 	if !errors.Is(err, ivi.ErrValueNotSupported) {
 		t.Errorf("SetProbeAttenuationAuto(true) = %v, want ErrValueNotSupported", err)
 	}
@@ -428,7 +428,7 @@ func TestChannel_SetVerticalCoupling(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			mock := &mockInst{}
 			ch := Channel{inst: mock, name: "CHAN1", num: 1}
-			err := ch.SetVerticalCoupling(context.Background(), tt.coupling)
+			err := ch.SetVerticalCoupling(tt.coupling)
 			if tt.wantErr {
 				if err == nil {
 					t.Error("expected error, got nil")
@@ -509,29 +509,28 @@ func TestDurationFromSeconds(t *testing.T) {
 func TestDriver_NotImplemented(t *testing.T) {
 	mock := &mockInst{}
 	d := newTestDriver(mock)
-	ctx := context.Background()
 
-	_, err := d.AcquisitionStatus(ctx)
+	_, err := d.AcquisitionStatus()
 	if !errors.Is(err, ivi.ErrNotImplemented) {
 		t.Errorf("AcquisitionStatus() = %v, want ErrNotImplemented", err)
 	}
 
-	_, err = d.TriggerSlope(ctx)
+	_, err = d.TriggerSlope()
 	if !errors.Is(err, ivi.ErrNotImplemented) {
 		t.Errorf("TriggerSlope() = %v, want ErrNotImplemented", err)
 	}
 
-	_, err = d.TriggerSource(ctx)
+	_, err = d.TriggerSource()
 	if !errors.Is(err, ivi.ErrNotImplemented) {
 		t.Errorf("TriggerSource() = %v, want ErrNotImplemented", err)
 	}
 
-	err = d.AbortMeasurement(ctx)
+	err = d.AbortMeasurement()
 	if !errors.Is(err, ivi.ErrNotImplemented) {
 		t.Errorf("AbortMeasurement() = %v, want ErrNotImplemented", err)
 	}
 
-	err = d.InitiateMeasurement(ctx)
+	err = d.InitiateMeasurement()
 	if !errors.Is(err, ivi.ErrNotImplemented) {
 		t.Errorf("InitiateMeasurement() = %v, want ErrNotImplemented", err)
 	}
@@ -540,7 +539,7 @@ func TestDriver_NotImplemented(t *testing.T) {
 func TestDriver_SetAcquisitionStartTime_NotSupported(t *testing.T) {
 	mock := &mockInst{}
 	d := newTestDriver(mock)
-	err := d.SetAcquisitionStartTime(context.Background(), 100*time.Microsecond)
+	err := d.SetAcquisitionStartTime(100*time.Microsecond)
 	if !errors.Is(err, ivi.ErrFunctionNotSupported) {
 		t.Errorf("SetAcquisitionStartTime() = %v, want ErrFunctionNotSupported", err)
 	}
@@ -549,7 +548,7 @@ func TestDriver_SetAcquisitionStartTime_NotSupported(t *testing.T) {
 func TestChannel_SetVerticalOffset(t *testing.T) {
 	mock := &mockInst{}
 	ch := Channel{inst: mock, name: "CHAN1", num: 1}
-	err := ch.SetVerticalOffset(context.Background(), 2.5)
+	err := ch.SetVerticalOffset(2.5)
 	if err != nil {
 		t.Errorf("SetVerticalOffset() error: %v", err)
 	}
@@ -561,7 +560,7 @@ func TestChannel_SetVerticalOffset(t *testing.T) {
 func TestDriver_ConfigureTrigger(t *testing.T) {
 	mock := &mockInst{}
 	d := newTestDriver(mock)
-	err := d.ConfigureTrigger(context.Background(), scope.EdgeTrigger, 100*time.Microsecond)
+	err := d.ConfigureTrigger(scope.EdgeTrigger, 100*time.Microsecond)
 	if err != nil {
 		t.Errorf("ConfigureTrigger() error: %v", err)
 	}
@@ -579,7 +578,7 @@ func TestDriver_ConfigureTrigger(t *testing.T) {
 func TestDriver_SetAcquisitionTimePerRecord(t *testing.T) {
 	mock := &mockInst{}
 	d := newTestDriver(mock)
-	err := d.SetAcquisitionTimePerRecord(context.Background(), 1*time.Millisecond)
+	err := d.SetAcquisitionTimePerRecord(1*time.Millisecond)
 	if err != nil {
 		t.Errorf("SetAcquisitionTimePerRecord() error: %v", err)
 	}

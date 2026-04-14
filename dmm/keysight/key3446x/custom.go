@@ -6,7 +6,6 @@
 package key3446x
 
 import (
-	"context"
 	"fmt"
 	"strings"
 
@@ -16,7 +15,10 @@ import (
 // SelectTerminals queries if the front or rear terminals are selected on the
 // 34461A front panel Front/Rear switch. This switch is not programmable; this
 // query reports the position of the switch, but cannot change it.
-func (d *Driver) SelectedTerminals(ctx context.Context) (Terminal, error) {
+func (d *Driver) SelectedTerminals() (Terminal, error) {
+	ctx, cancel := d.newContext()
+	defer cancel()
+
 	term, err := query.String(ctx, d.inst, "rout:term?")
 	if err != nil {
 		return 0, err

@@ -46,6 +46,7 @@ func (ct ChannelType) String() string {
 type U2751A struct {
 	inst     ivi.Transport
 	channels []Channel
+	timeout  time.Duration
 	ivi.Inherent
 	paths []path
 }
@@ -86,7 +87,7 @@ func New(inst ivi.Transport, opts ...ivi.DriverOption) (U2751A, error) {
 
 	channels := make([]Channel, outputCount)
 	for i, ch := range infoChannels {
-		channels[i] = newChannel(i, ch.name, ch.chType, ch.switchID, inst, cfg.Standalone)
+		channels[i] = newChannel(i, ch.name, ch.chType, ch.switchID, inst, timeout, cfg.Standalone)
 	}
 
 	inherentBase := ivi.InherentBase{
@@ -114,6 +115,7 @@ func New(inst ivi.Transport, opts ...ivi.DriverOption) (U2751A, error) {
 	driver := U2751A{
 		inst:     inst,
 		channels: channels,
+		timeout:  timeout,
 		Inherent: inherent,
 	}
 
@@ -134,6 +136,7 @@ type Channel struct {
 	virtualName           string
 	switchID              int
 	inst                  ivi.Transport
+	timeout               time.Duration
 	chType                ChannelType
 	acCurrentCarryMax     float64
 	acCurrentSwitchingMax float64
@@ -154,6 +157,16 @@ type Channel struct {
 	numWires              int
 }
 
+// newContext creates a context with the driver's configured timeout.
+func (d *U2751A) newContext() (context.Context, context.CancelFunc) {
+	return context.WithTimeout(context.Background(), d.timeout)
+}
+
+// newContext creates a context with the channel's configured timeout.
+func (ch *Channel) newContext() (context.Context, context.CancelFunc) {
+	return context.WithTimeout(context.Background(), ch.timeout)
+}
+
 // Close properly shuts down the switch matrix by returning it to local
 // control.
 func (d *U2751A) Close() error {
@@ -161,13 +174,16 @@ func (d *U2751A) Close() error {
 }
 
 // Disable causes the switch to disconnect all paths.
-func (d *U2751A) Disable(ctx context.Context) error {
+func (d *U2751A) Disable() error {
+	ctx, cancel := d.newContext()
+	defer cancel()
+
 	return ivi.Set(ctx, d.inst, "rout:open (@101:408)\n")
 }
 
 // Channel returns the channel based on either the virtual name or the physical
 // name. Virtual names are checked first.
-func (d *U2751A) Channel(ctx context.Context, name string) (*Channel, error) {
+func (d *U2751A) Channel(name string) (*Channel, error) {
 	// See if the given name matches one of the virtual channel names.
 	for _, ch := range d.channels {
 		if name == ch.virtualName {
@@ -184,7 +200,7 @@ func (d *U2751A) Channel(ctx context.Context, name string) (*Channel, error) {
 }
 
 // ChannelByID returns the channel based on the ID (0-based).
-func (d *U2751A) ChannelByID(ctx context.Context, id int) (*Channel, error) {
+func (d *U2751A) ChannelByID(id int) (*Channel, error) {
 	if id < 0 || id >= len(d.channels) {
 		return nil, fmt.Errorf("channel %d not found", id)
 	}
@@ -193,7 +209,7 @@ func (d *U2751A) ChannelByID(ctx context.Context, id int) (*Channel, error) {
 }
 
 // Channels returns all channels.
-func (d *U2751A) Channels(ctx context.Context) ([]Channel, error) {
+func (d *U2751A) Channels() ([]Channel, error) {
 	return d.channels, nil
 }
 
@@ -203,6 +219,7 @@ func newChannel(
 	chType ChannelType,
 	switchID int,
 	inst ivi.Transport,
+	timeout time.Duration,
 	standalone bool,
 ) Channel {
 	dcVoltageMax := 42.0
@@ -219,6 +236,7 @@ func newChannel(
 		virtualName:           name,
 		switchID:              switchID,
 		inst:                  inst,
+		timeout:               timeout,
 		chType:                chType,
 		acCurrentCarryMax:     2.0,
 		acCurrentSwitchingMax: 2.0,
@@ -247,7 +265,7 @@ func newChannel(
 // the physical name provided as the key. Each virtual name must be unique and
 // the number of virtual names provided must match the numder of channels
 // otherwise an error is returned.
-func (d *U2751A) SetVirtualNames(ctx context.Context, names map[string]string) error {
+func (d *U2751A) SetVirtualNames(names map[string]string) error {
 	for physicalName, virtualName := range names {
 		for i, ch := range d.channels {
 			if physicalName == ch.name {

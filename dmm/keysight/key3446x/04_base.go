@@ -6,7 +6,6 @@
 package key3446x
 
 import (
-	"context"
 	"fmt"
 	"time"
 
@@ -20,7 +19,10 @@ import (
 //
 // MeasurementFunction is the getter for the read-write IviDmmBase Attribute
 // Function described in Section 4.2.1 of IVI-4.2: IviDmm Class Specification.
-func (d *Driver) MeasurementFunction(ctx context.Context) (dmm.MeasurementFunction, error) {
+func (d *Driver) MeasurementFunction() (dmm.MeasurementFunction, error) {
+	ctx, cancel := d.newContext()
+	defer cancel()
+
 	response, err := query.String(ctx, d.inst, "FUNC?")
 	if err != nil {
 		return 0, err
@@ -41,9 +43,11 @@ func (d *Driver) MeasurementFunction(ctx context.Context) (dmm.MeasurementFuncti
 // SetMeasurementFunction is the setter for the read-write IviDmmBase Attribute
 // Function described in Section 4.2.1 of IVI-4.2: IviDmm Class Specification.
 func (d *Driver) SetMeasurementFunction(
-	ctx context.Context,
 	msrFunc dmm.MeasurementFunction,
 ) error {
+	ctx, cancel := d.newContext()
+	defer cancel()
+
 	scpiCmd, err := ivi.LookupSCPI(msrFuncToCmd, msrFunc)
 	if err != nil {
 		return fmt.Errorf("measurement function %v not supported: %w", msrFunc, err)
@@ -88,8 +92,11 @@ func (d *Driver) SetMeasurementFunction(
 //
 // Range is the getter for the read-write IviDmmBase Attribute Range described
 // in Section 4.2.2 of IVI-4.2: IviDmm Class Specification.
-func (d *Driver) Range(ctx context.Context) (dmm.AutoRange, float64, error) {
-	fcn, err := d.MeasurementFunction(ctx)
+func (d *Driver) Range() (dmm.AutoRange, float64, error) {
+	ctx, cancel := d.newContext()
+	defer cancel()
+
+	fcn, err := d.MeasurementFunction()
 	if err != nil {
 		return 0, 0.0, err
 	}
@@ -127,8 +134,11 @@ func (d *Driver) Range(ctx context.Context) (dmm.AutoRange, float64, error) {
 //
 // SetRange is the setter for the read-write IviDmmBase Attribute
 // Range described in Section 4.2.2 of IVI-4.2: IviDmm Class Specification.
-func (d *Driver) SetRange(ctx context.Context, autoRange dmm.AutoRange, rangeValue float64) error {
-	fcn, err := d.MeasurementFunction(ctx)
+func (d *Driver) SetRange(autoRange dmm.AutoRange, rangeValue float64) error {
+	ctx, cancel := d.newContext()
+	defer cancel()
+
+	fcn, err := d.MeasurementFunction()
 	if err != nil {
 		return err
 	}
@@ -195,8 +205,11 @@ func (d *Driver) SetRange(ctx context.Context, autoRange dmm.AutoRange, rangeVal
 // ResolutionAbsolute is the getter for the read-write IviDmmBase Attribute
 // Resolution Absolute described in Section 4.2.3 of IVI-4.2: IviDmm Class
 // Specification.
-func (d *Driver) ResolutionAbsolute(ctx context.Context) (float64, error) {
-	fcn, err := d.MeasurementFunction(ctx)
+func (d *Driver) ResolutionAbsolute() (float64, error) {
+	ctx, cancel := d.newContext()
+	defer cancel()
+
+	fcn, err := d.MeasurementFunction()
 	if err != nil {
 		return 0.0, err
 	}
@@ -215,10 +228,12 @@ func (d *Driver) ResolutionAbsolute(ctx context.Context) (float64, error) {
 // Resolution Absolute described in Section 4.2.3 of IVI-4.2: IviDmm Class
 // Specification.
 func (d *Driver) SetResolutionAbsolute(
-	ctx context.Context,
 	resolution float64,
 ) error {
-	fcn, err := d.MeasurementFunction(ctx)
+	ctx, cancel := d.newContext()
+	defer cancel()
+
+	fcn, err := d.MeasurementFunction()
 	if err != nil {
 		return err
 	}
@@ -236,7 +251,10 @@ func (d *Driver) SetResolutionAbsolute(
 //
 // TriggerDelay is the getter for the read-write IviDmmBase Attribute Trigger
 // Delay described in Section 4.2.5 of IVI-4.2: IviDmm Class Specification.
-func (d *Driver) TriggerDelay(ctx context.Context) (bool, time.Duration, error) {
+func (d *Driver) TriggerDelay() (bool, time.Duration, error) {
+	ctx, cancel := d.newContext()
+	defer cancel()
+
 	autoDelay, err := query.Bool(ctx, d.inst, "TRIG:DEL:AUTO?")
 	if err != nil {
 		return false, 0, fmt.Errorf("TriggerDelay: %w", err)
@@ -259,10 +277,12 @@ func (d *Driver) TriggerDelay(ctx context.Context) (bool, time.Duration, error) 
 // Trigger Delay described in Section 4.2.5 of IVI-4.2: IviDmm Class
 // Specification.
 func (d *Driver) SetTriggerDelay(
-	ctx context.Context,
 	autoDelay bool,
 	delay time.Duration,
 ) error {
+	ctx, cancel := d.newContext()
+	defer cancel()
+
 	if autoDelay {
 		return d.inst.Command(ctx, "TRIG:DEL:AUTO ON")
 	}
@@ -276,7 +296,10 @@ func (d *Driver) SetTriggerDelay(
 //
 // TriggerSource is the getter for the read-write IviDmmBase Attribute Trigger
 // Source described in Section 4.2.6 of IVI-4.2: IviDmm Class Specification.
-func (d *Driver) TriggerSource(ctx context.Context) (dmm.TriggerSource, error) {
+func (d *Driver) TriggerSource() (dmm.TriggerSource, error) {
+	ctx, cancel := d.newContext()
+	defer cancel()
+
 	s, err := query.String(ctx, d.inst, "TRIG:SOUR?")
 	if err != nil {
 		return 0, fmt.Errorf("TriggerSource: %w", err)
@@ -295,7 +318,10 @@ func (d *Driver) TriggerSource(ctx context.Context) (dmm.TriggerSource, error) {
 // SetTriggerSource is the setter for the read-write IviDmmBase Attribute
 // Trigger Source described in Section 4.2.6 of IVI-4.2: IviDmm Class
 // Specification.
-func (d *Driver) SetTriggerSource(ctx context.Context, src dmm.TriggerSource) error {
+func (d *Driver) SetTriggerSource(src dmm.TriggerSource) error {
+	ctx, cancel := d.newContext()
+	defer cancel()
+
 	cmd, err := ivi.LookupSCPI(triggerSourceToSCPI, src)
 	if err != nil {
 		return fmt.Errorf("SetTriggerSource: %w", err)
@@ -309,17 +335,22 @@ func (d *Driver) SetTriggerSource(ctx context.Context, src dmm.TriggerSource) er
 //
 // Abort implements the IviDmmBase function described in Section 4.3.1 of
 // IVI-4.2: IviDmm Class Specification.
-func (d *Driver) Abort(ctx context.Context) error {
+func (d *Driver) Abort() error {
+	ctx, cancel := d.newContext()
+	defer cancel()
+
 	return d.inst.Command(ctx, "ABOR")
 }
 
 func (d *Driver) ConfigureMeasurement(
-	ctx context.Context,
 	msrFunc dmm.MeasurementFunction,
 	autoRange dmm.AutoRange,
 	rangeValue float64,
 	resolution float64,
 ) error {
+	ctx, cancel := d.newContext()
+	defer cancel()
+
 	cmd, err := createConfigureMeasurementCommand(msrFunc, autoRange, rangeValue, resolution)
 	if err != nil {
 		return err
@@ -334,15 +365,14 @@ func (d *Driver) ConfigureMeasurement(
 // ConfigureTrigger implements the IviDmmBase function described in Section
 // 4.3.3 of IVI-4.2: IviDmm Class Specification.
 func (d *Driver) ConfigureTrigger(
-	ctx context.Context,
 	src dmm.TriggerSource,
 	delay time.Duration,
 ) error {
-	if err := d.SetTriggerSource(ctx, src); err != nil {
+	if err := d.SetTriggerSource(src); err != nil {
 		return err
 	}
 
-	return d.SetTriggerDelay(ctx, false, delay)
+	return d.SetTriggerDelay(false, delay)
 }
 
 // FetchMeasurement returns the measured value from a measurement that the
@@ -354,7 +384,10 @@ func (d *Driver) ConfigureTrigger(
 //
 // FetchMeasurement implements the IviDmmBase function described in Section
 // 4.3.4 of the IVI-4.2 IviDmm Class Specification.
-func (d *Driver) FetchMeasurement(ctx context.Context, _ time.Duration) (float64, error) {
+func (d *Driver) FetchMeasurement(_ time.Duration) (float64, error) {
+	ctx, cancel := d.newContext()
+	defer cancel()
+
 	return query.Float64(ctx, d.inst, "FETC?")
 }
 
@@ -370,7 +403,10 @@ func (d *Driver) FetchMeasurement(ctx context.Context, _ time.Duration) (float64
 //
 // InitiateMeasurement implements the IviDmmBase function described in Section
 // 4.3.5 of the IVI-4.2 IviDmm Class Specification.
-func (d *Driver) InitiateMeasurement(ctx context.Context) error {
+func (d *Driver) InitiateMeasurement() error {
+	ctx, cancel := d.newContext()
+	defer cancel()
+
 	return d.inst.Command(ctx, "init")
 }
 
@@ -384,7 +420,7 @@ const overRangeValue = 9.9e37
 //
 // IsOutOfRange implements the IviDmmBase function described in Section 4.3.6
 // of IVI-4.2: IviDmm Class Specification.
-func (d *Driver) IsOutOfRange(_ context.Context, value float64) (bool, error) {
+func (d *Driver) IsOutOfRange(value float64) (bool, error) {
 	return value >= overRangeValue || value <= -overRangeValue, nil
 }
 
@@ -393,7 +429,7 @@ func (d *Driver) IsOutOfRange(_ context.Context, value float64) (bool, error) {
 //
 // IsOverRange implements the IviDmmBase function described in Section 4.3.7
 // of IVI-4.2: IviDmm Class Specification.
-func (d *Driver) IsOverRange(_ context.Context, value float64) (bool, error) {
+func (d *Driver) IsOverRange(value float64) (bool, error) {
 	return value >= overRangeValue, nil
 }
 
@@ -402,11 +438,14 @@ func (d *Driver) IsOverRange(_ context.Context, value float64) (bool, error) {
 //
 // IsUnderRange implements the IviDmmBase function described in Section 4.3.8
 // of IVI-4.2: IviDmm Class Specification.
-func (d *Driver) IsUnderRange(_ context.Context, value float64) (bool, error) {
+func (d *Driver) IsUnderRange(value float64) (bool, error) {
 	return value <= -overRangeValue, nil
 }
 
-func (d *Driver) ReadMeasurement(ctx context.Context, _ time.Duration) (float64, error) {
+func (d *Driver) ReadMeasurement(_ time.Duration) (float64, error) {
+	ctx, cancel := d.newContext()
+	defer cancel()
+
 	return query.Float64(ctx, d.inst, "read?")
 }
 

@@ -10,6 +10,7 @@
 package infiniivision
 
 import (
+	"context"
 	"fmt"
 	"time"
 
@@ -35,15 +36,17 @@ var _ scope.BaseChannel = (*Channel)(nil)
 type Driver struct {
 	inst     ivi.Transport
 	channels []Channel
+	timeout  time.Duration
 	ivi.Inherent
 }
 
 // Channel models the output channel repeated capability for the function
 // generator output channel.
 type Channel struct {
-	inst ivi.Transport
-	name string
-	num  int
+	inst    ivi.Transport
+	name    string
+	num     int
+	timeout time.Duration
 }
 
 // New creates a new InfiniiVision IVI Instrument. Use [ivi.WithIDQuery] to
@@ -70,9 +73,10 @@ func New(inst ivi.Transport, opts ...ivi.DriverOption) (*Driver, error) {
 
 	for i, channelName := range channelNames {
 		ch := Channel{
-			name: channelName,
-			inst: inst,
-			num:  i + 1,
+			name:    channelName,
+			inst:    inst,
+			num:     i + 1,
+			timeout: timeout,
 		}
 		channels[i] = ch
 	}
@@ -111,6 +115,7 @@ func New(inst ivi.Transport, opts ...ivi.DriverOption) (*Driver, error) {
 	driver := Driver{
 		inst:     inst,
 		channels: channels,
+		timeout:  timeout,
 		Inherent: inherent,
 	}
 
@@ -130,6 +135,16 @@ func (d *Driver) Channel(index int) (*Channel, error) {
 	}
 
 	return &d.channels[index], nil
+}
+
+// newContext creates a context with the driver's configured timeout.
+func (d *Driver) newContext() (context.Context, context.CancelFunc) {
+	return context.WithTimeout(context.Background(), d.timeout)
+}
+
+// newContext creates a context with the channel's configured timeout.
+func (ch *Channel) newContext() (context.Context, context.CancelFunc) {
+	return context.WithTimeout(context.Background(), ch.timeout)
 }
 
 // Close properly shuts down the oscilloscope by returning it to local control.

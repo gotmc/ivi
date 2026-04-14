@@ -6,7 +6,6 @@
 package infiniivision
 
 import (
-	"context"
 	"fmt"
 
 	"github.com/gotmc/ivi"
@@ -24,9 +23,11 @@ var waveformMeasurementToSCPI = map[scope.WaveformMeasurement]string{
 }
 
 func (ch *Channel) FetchWaveformMeasurement(
-	ctx context.Context,
 	msrmnt scope.WaveformMeasurement,
 ) (float64, error) {
+	ctx, cancel := ch.newContext()
+	defer cancel()
+
 	scpiCmd, err := ivi.LookupSCPI(waveformMeasurementToSCPI, msrmnt)
 	if err != nil {
 		return 0.0, fmt.Errorf("waveform measurement %v not supported: %w", msrmnt, err)

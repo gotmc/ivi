@@ -5,7 +5,6 @@
 
 package dmm
 
-import "context"
 
 /*
 
@@ -39,6 +38,6 @@ None.
 // IviDmmTemperatureMeasurement extension group described in Section 7 of
 // IVI-4.2 IviDmm Class Specification.
 type TemperatureMeasurementExtension interface {
-	TemperatureTransducerType(ctx context.Context) (TempTransducerType, error)
-	SetTemperatureTransducerType(ctx context.Context, t TempTransducerType) error
+	TemperatureTransducerType() (TempTransducerType, error)
+	SetTemperatureTransducerType(t TempTransducerType) error
 }

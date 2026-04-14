@@ -5,7 +5,6 @@
 
 package dmm
 
-import "context"
 
 /*
 
@@ -38,6 +37,6 @@ None.
 // IviDmmFrequencyMeasurement extension group described in Section 6 of IVI-4.2
 // IviDmm Class Specification.
 type FrequencyMeasurementExtension interface {
-	FrequencyVoltageRange(ctx context.Context) (autoRange bool, rangeValue float64, err error)
-	SetFrequencyVoltageRange(ctx context.Context, autoRange bool, rangeValue float64) error
+	FrequencyVoltageRange() (autoRange bool, rangeValue float64, err error)
+	SetFrequencyVoltageRange(autoRange bool, rangeValue float64) error
 }

@@ -42,21 +42,25 @@ func (ch *Channel) String() string {
 // Set takes the same inputs as fmt.Sprintf() and writes the resultant command
 // to the IVI device.
 func (ch *Channel) Set(ctx context.Context, format string, a ...any) error {
+
 	return ivi.Set(ctx, ch.inst, format, a...)
 }
 
 // QueryBool queries the channel and returns a bool.
 func (ch *Channel) QueryBool(ctx context.Context, cmd string) (bool, error) {
+
 	return query.Bool(ctx, ch.inst, cmd)
 }
 
 // QueryFloat64 queries the channel and returns a float64.
 func (ch *Channel) QueryFloat64(ctx context.Context, cmd string) (float64, error) {
+
 	return query.Float64(ctx, ch.inst, cmd)
 }
 
 // QueryString queries the channel and returns a string.
 // FIXME(mdr): Change to take a format string and ...interface{}
 func (ch *Channel) QueryString(ctx context.Context, cmd string) (string, error) {
+
 	return query.String(ctx, ch.inst, cmd)
 }

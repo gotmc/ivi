@@ -5,7 +5,6 @@
 
 package dmm
 
-import "context"
 
 /*
 
@@ -41,9 +40,9 @@ Below are the .NET functions, since they are the basis for the Go interfaces.
 // IviDmmResistanceTemperatureDevice extension group described in Section 9 of
 // IVI-4.2 IviDmm Class Specification.
 type RTDExtension interface {
-	RTDAlpha(ctx context.Context) (float64, error)
-	SetRTDAlpha(ctx context.Context, alpha float64) error
-	RTDResistance(ctx context.Context) (float64, error)
-	SetRTDResistance(ctx context.Context, resistance float64) error
-	ConfigureRTD(ctx context.Context, alpha, resistance float64) error
+	RTDAlpha() (float64, error)
+	SetRTDAlpha(alpha float64) error
+	RTDResistance() (float64, error)
+	SetRTDResistance(resistance float64) error
+	ConfigureRTD(alpha, resistance float64) error
 }

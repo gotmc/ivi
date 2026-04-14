@@ -5,7 +5,6 @@
 
 package dmm
 
-import "context"
 
 /*
 
@@ -38,6 +37,6 @@ None.
 // extension group described in Section 14 of IVI-4.2 IviDmm Class
 // Specification.
 type DeviceInfoExtension interface {
-	ApertureTime(ctx context.Context) (float64, error)
-	ApertureTimeUnits(ctx context.Context) (ApertureTimeUnits, error)
+	ApertureTime() (float64, error)
+	ApertureTimeUnits() (ApertureTimeUnits, error)
 }

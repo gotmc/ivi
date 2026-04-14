@@ -20,9 +20,9 @@ import (
 // MeasureVoltage implements the IviDCPwrMeasurement function Measure for the
 // Voltage MeasurementType parameter described in Section 7.2.1 of IVI-4.4:
 // IviDCPwr Class Specification.
-func (ch *Channel) MeasureVoltage(ctx context.Context) (float64, error) {
+func (ch *Channel) MeasureVoltage() (float64, error) {
 	cmd := fmt.Sprintf("MEAS:VOLT? %s", ch.Name())
-	return ch.QueryFloat64(ctx, cmd)
+	return ch.QueryFloat64(context.Background(), cmd)
 }
 
 // MeasureCurrent takes a measurement on the output signal and returns the
@@ -31,7 +31,7 @@ func (ch *Channel) MeasureVoltage(ctx context.Context) (float64, error) {
 // MeasureCurrent implements the IviDCPwrMeasurement function Measure for the
 // Current MeasurementType parameter described in Section 7.2.1 of IVI-4.4:
 // IviDCPwr Class Specification.
-func (ch *Channel) MeasureCurrent(ctx context.Context) (float64, error) {
+func (ch *Channel) MeasureCurrent() (float64, error) {
 	cmd := fmt.Sprintf("MEAS:CURR? %s", ch.Name())
-	return ch.QueryFloat64(ctx, cmd)
+	return ch.QueryFloat64(context.Background(), cmd)
 }

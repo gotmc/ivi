@@ -6,7 +6,6 @@
 package scope
 
 import (
-	"context"
 	"time"
 )
 
@@ -60,19 +59,18 @@ Below are the .NET functions, since they are the basis for the Go interfaces.
 // WaveformMeasurement provides the interface required for the
 // IviScopeWaveformMeasurement extension group.
 type WaveformMeasurer interface {
-	HighReferenceLevel(ctx context.Context) (float64, error)
-	SetHighReferenceLevel(ctx context.Context, high float64) error
-	LowReferenceLevel(ctx context.Context) (float64, error)
-	SetLowReferenceLevel(ctx context.Context, low float64) error
-	MiddleReferenceLevel(ctx context.Context) (float64, error)
-	SetMiddleReferenceLevel(ctx context.Context, mid float64) error
-	ConfigureReferenceLevels(ctx context.Context, low, mid, high float64) error
+	HighReferenceLevel() (float64, error)
+	SetHighReferenceLevel(high float64) error
+	LowReferenceLevel() (float64, error)
+	SetLowReferenceLevel(low float64) error
+	MiddleReferenceLevel() (float64, error)
+	SetMiddleReferenceLevel(mid float64) error
+	ConfigureReferenceLevels(low, mid, high float64) error
 }
 
 type WaveformMeasurerChannel interface {
-	FetchWaveformMeasurement(ctx context.Context, msrmnt WaveformMeasurement) (float64, error)
+	FetchWaveformMeasurement(msrmnt WaveformMeasurement) (float64, error)
 	ReadWaveformMeasurement(
-		ctx context.Context,
 		msrmnt WaveformMeasurement,
 		maxTime time.Duration,
 	) (float64, error)

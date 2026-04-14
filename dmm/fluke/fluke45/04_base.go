@@ -6,7 +6,6 @@
 package fluke45
 
 import (
-	"context"
 	"fmt"
 	"strings"
 	"time"
@@ -20,7 +19,10 @@ import (
 //
 // MeasurementFunction is the getter for the read-write IviDmmBase Attribute
 // Function described in Section 4.2.1 of IVI-4.2: IviDmm Class Specification.
-func (d *Driver) MeasurementFunction(ctx context.Context) (dmm.MeasurementFunction, error) {
+func (d *Driver) MeasurementFunction() (dmm.MeasurementFunction, error) {
+	ctx, cancel := d.newContext()
+	defer cancel()
+
 	fcn, err := query.String(ctx, d.inst, "FUNC1?")
 	if err != nil {
 		return 0, err
@@ -39,9 +41,11 @@ func (d *Driver) MeasurementFunction(ctx context.Context) (dmm.MeasurementFuncti
 // SetMeasurementFunction is the setter for the read-write IviDmmBase Attribute
 // Function described in Section 4.2.1 of IVI-4.2: IviDmm Class Specification.
 func (d *Driver) SetMeasurementFunction(
-	ctx context.Context,
 	msrFunc dmm.MeasurementFunction,
 ) error {
+	ctx, cancel := d.newContext()
+	defer cancel()
+
 	scpiCmd, err := ivi.LookupSCPI(msrFuncToCmd, msrFunc)
 	if err != nil {
 		return fmt.Errorf("measurement function %v not supported: %w", msrFunc, err)
@@ -86,7 +90,10 @@ func (d *Driver) SetMeasurementFunction(
 //
 // Range is the getter for the read-write IviDmmBase Attribute Range described
 // in Section 4.2.2 of IVI-4.2: IviDmm Class Specification.
-func (d *Driver) Range(ctx context.Context) (dmm.AutoRange, float64, error) {
+func (d *Driver) Range() (dmm.AutoRange, float64, error) {
+	ctx, cancel := d.newContext()
+	defer cancel()
+
 	isAutoRange, err := query.Bool(ctx, d.inst, "AUTO?")
 	if err != nil {
 		return 0, 0.0, err
@@ -113,7 +120,10 @@ func (d *Driver) Range(ctx context.Context) (dmm.AutoRange, float64, error) {
 //
 // SetRange is the setter for the read-write IviDmmBase Attribute
 // Range described in Section 4.2.2 of IVI-4.2: IviDmm Class Specification.
-func (d *Driver) SetRange(ctx context.Context, autoRange dmm.AutoRange, rangeValue float64) error {
+func (d *Driver) SetRange(autoRange dmm.AutoRange, rangeValue float64) error {
+	ctx, cancel := d.newContext()
+	defer cancel()
+
 	// Set the range to auto if appropriate.
 	if autoRange == dmm.AutoOn {
 		return d.inst.Command(ctx, "auto")
@@ -130,7 +140,7 @@ func (d *Driver) SetRange(ctx context.Context, autoRange dmm.AutoRange, rangeVal
 		return err
 	}
 
-	fcn, err := d.MeasurementFunction(ctx)
+	fcn, err := d.MeasurementFunction()
 	if err != nil {
 		return err
 	}
@@ -250,7 +260,7 @@ func determineRangeCommand(
 // ResolutionAbsolute is the getter for the read-write IviDmmBase Attribute
 // Resolution Absolute described in Section 4.2.3 of IVI-4.2: IviDmm Class
 // Specification.
-func (d *Driver) ResolutionAbsolute(_ context.Context) (float64, error) {
+func (d *Driver) ResolutionAbsolute() (float64, error) {
 	return 0.0, fmt.Errorf(
 		"ResolutionAbsolute: %w", ivi.ErrFunctionNotSupported,
 	)
@@ -259,7 +269,6 @@ func (d *Driver) ResolutionAbsolute(_ context.Context) (float64, error) {
 // SetResolutionAbsolute is not directly supported on the Fluke 45. Resolution
 // is controlled by the measurement rate (RATE S/M/F).
 func (d *Driver) SetResolutionAbsolute(
-	_ context.Context,
 	_ float64,
 ) error {
 	return fmt.Errorf(
@@ -274,8 +283,10 @@ func (d *Driver) SetResolutionAbsolute(
 // TriggerDelay is the getter for the read-write IviDmmBase Attribute Trigger
 // Delay described in Section 4.2.5 of IVI-4.2: IviDmm Class Specification.
 func (d *Driver) TriggerDelay(
-	ctx context.Context,
 ) (bool, time.Duration, error) {
+	ctx, cancel := d.newContext()
+	defer cancel()
+
 	trigType, err := query.Int(ctx, d.inst, "TRIGGER?")
 	if err != nil {
 		return false, 0, fmt.Errorf("TriggerDelay: %w", err)
@@ -296,10 +307,12 @@ func (d *Driver) TriggerDelay(
 // Trigger Delay described in Section 4.2.5 of IVI-4.2: IviDmm Class
 // Specification.
 func (d *Driver) SetTriggerDelay(
-	ctx context.Context,
 	autoDelay bool,
 	_ time.Duration,
 ) error {
+	ctx, cancel := d.newContext()
+	defer cancel()
+
 	// Get current trigger type to determine if internal or external.
 	trigType, err := query.Int(ctx, d.inst, "TRIGGER?")
 	if err != nil {
@@ -334,8 +347,10 @@ func (d *Driver) SetTriggerDelay(
 // TriggerSource is the getter for the read-write IviDmmBase Attribute Trigger
 // Source described in Section 4.2.6 of IVI-4.2: IviDmm Class Specification.
 func (d *Driver) TriggerSource(
-	ctx context.Context,
 ) (dmm.TriggerSource, error) {
+	ctx, cancel := d.newContext()
+	defer cancel()
+
 	trigType, err := query.Int(ctx, d.inst, "TRIGGER?")
 	if err != nil {
 		return 0, fmt.Errorf("TriggerSource: %w", err)
@@ -355,9 +370,11 @@ func (d *Driver) TriggerSource(
 // Trigger Source described in Section 4.2.6 of IVI-4.2: IviDmm Class
 // Specification.
 func (d *Driver) SetTriggerSource(
-	ctx context.Context,
 	src dmm.TriggerSource,
 ) error {
+	ctx, cancel := d.newContext()
+	defer cancel()
+
 	switch src {
 	case dmm.TriggerSourceImmediate:
 		return d.inst.Command(ctx, "TRIGGER 1")
@@ -374,7 +391,7 @@ func (d *Driver) SetTriggerSource(
 }
 
 // Abort is not supported on the Fluke 45.
-func (d *Driver) Abort(_ context.Context) error {
+func (d *Driver) Abort() error {
 	return fmt.Errorf("Abort: %w", ivi.ErrFunctionNotSupported)
 }
 
@@ -383,17 +400,16 @@ func (d *Driver) Abort(_ context.Context) error {
 // ConfigureMeasurement implements the IviDmmBase function described in Section
 // 4.3.2 of IVI-4.2: IviDmm Class Specification.
 func (d *Driver) ConfigureMeasurement(
-	ctx context.Context,
 	msrFunc dmm.MeasurementFunction,
 	autoRange dmm.AutoRange,
 	rangeValue float64,
 	_ float64,
 ) error {
-	if err := d.SetMeasurementFunction(ctx, msrFunc); err != nil {
+	if err := d.SetMeasurementFunction(msrFunc); err != nil {
 		return err
 	}
 
-	return d.SetRange(ctx, autoRange, rangeValue)
+	return d.SetRange(autoRange, rangeValue)
 }
 
 // ConfigureTrigger configures the trigger source. The Fluke 45 does not
@@ -402,11 +418,10 @@ func (d *Driver) ConfigureMeasurement(
 // ConfigureTrigger implements the IviDmmBase function described in Section
 // 4.3.3 of IVI-4.2: IviDmm Class Specification.
 func (d *Driver) ConfigureTrigger(
-	ctx context.Context,
 	src dmm.TriggerSource,
 	_ time.Duration,
 ) error {
-	return d.SetTriggerSource(ctx, src)
+	return d.SetTriggerSource(src)
 }
 
 // FetchMeasurement returns the value shown on the primary display without
@@ -415,9 +430,11 @@ func (d *Driver) ConfigureTrigger(
 // FetchMeasurement implements the IviDmmBase function described in Section
 // 4.3.4 of IVI-4.2: IviDmm Class Specification.
 func (d *Driver) FetchMeasurement(
-	ctx context.Context,
 	_ time.Duration,
 ) (float64, error) {
+	ctx, cancel := d.newContext()
+	defer cancel()
+
 	return query.Float64(ctx, d.inst, "VAL1?")
 }
 
@@ -427,29 +444,35 @@ func (d *Driver) FetchMeasurement(
 //
 // InitiateMeasurement implements the IviDmmBase function described in Section
 // 4.3.5 of IVI-4.2: IviDmm Class Specification.
-func (d *Driver) InitiateMeasurement(ctx context.Context) error {
+func (d *Driver) InitiateMeasurement() error {
+	ctx, cancel := d.newContext()
+	defer cancel()
+
 	return d.inst.Command(ctx, "*TRG")
 }
 
-func (d *Driver) IsOutOfRange(_ context.Context, _ float64) (bool, error) {
+func (d *Driver) IsOutOfRange(_ float64) (bool, error) {
 	return false, fmt.Errorf(
 		"IsOutOfRange: %w", ivi.ErrFunctionNotSupported,
 	)
 }
 
-func (d *Driver) IsOverRange(_ context.Context, _ float64) (bool, error) {
+func (d *Driver) IsOverRange(_ float64) (bool, error) {
 	return false, fmt.Errorf(
 		"IsOverRange: %w", ivi.ErrFunctionNotSupported,
 	)
 }
 
-func (d *Driver) IsUnderRange(_ context.Context, _ float64) (bool, error) {
+func (d *Driver) IsUnderRange(_ float64) (bool, error) {
 	return false, fmt.Errorf(
 		"IsUnderRange: %w", ivi.ErrFunctionNotSupported,
 	)
 }
 
-func (d *Driver) ReadMeasurement(ctx context.Context, maxTime time.Duration) (float64, error) {
+func (d *Driver) ReadMeasurement(maxTime time.Duration) (float64, error) {
+	ctx, cancel := d.newContext()
+	defer cancel()
+
 	return query.Float64(ctx, d.inst, "meas1?")
 }
 

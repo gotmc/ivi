@@ -6,7 +6,6 @@
 package infiniivision
 
 import (
-	"context"
 	"fmt"
 	"strconv"
 	"strings"
@@ -72,7 +71,10 @@ var scpiToVerticalCoupling = map[string]scope.VerticalCoupling{
 // AcquisitionStartTime is the getter for the read-write IviScopeBase
 // Acquisition Start Time described in Section 4.2.1 of the IVI-4.1: IviScope
 // Class Specification.
-func (d *Driver) AcquisitionStartTime(ctx context.Context) (time.Duration, error) {
+func (d *Driver) AcquisitionStartTime() (time.Duration, error) {
+	ctx, cancel := d.newContext()
+	defer cancel()
+
 	// The InfiniiVision 3000 X-series scopes have 10 divisions, and the
 	// reference can either be the center, one division from the left, or one
 	// division from the right. Therefore, find the current range and reference.
@@ -106,7 +108,7 @@ func (d *Driver) AcquisitionStartTime(ctx context.Context) (time.Duration, error
 // SetAcquisitionStartTime is the setter for the read-write IviScopeBase
 // Acquisition Start Time described in Section 4.2.1 of the IVI-4.1: IviScope
 // Class Specification.
-func (d *Driver) SetAcquisitionStartTime(ctx context.Context, delay time.Duration) error {
+func (d *Driver) SetAcquisitionStartTime(delay time.Duration) error {
 	return ivi.ErrFunctionNotSupported
 }
 
@@ -123,7 +125,7 @@ func (d *Driver) SetAcquisitionStartTime(ctx context.Context, delay time.Duratio
 // AcquisitionStatus is the getter for the read-only IviScopeBase Acquisition
 // Status described in Section 4.2.2 of the IVI-4.1: IviScope Class
 // Specification.
-func (d *Driver) AcquisitionStatus(ctx context.Context) (scope.AcquisitionStatus, error) {
+func (d *Driver) AcquisitionStatus() (scope.AcquisitionStatus, error) {
 	return 0, ivi.ErrNotImplemented
 }
 
@@ -133,7 +135,10 @@ func (d *Driver) AcquisitionStatus(ctx context.Context) (scope.AcquisitionStatus
 // AcquisitionType is the getter for the read-write IviScopeBase Acquisition
 // Type described in Section 4.2.3 of the IVI-4.1: IviScope Class
 // Specification.
-func (d *Driver) AcquisitionType(ctx context.Context) (scope.AcquisitionType, error) {
+func (d *Driver) AcquisitionType() (scope.AcquisitionType, error) {
+	ctx, cancel := d.newContext()
+	defer cancel()
+
 	s, err := query.String(ctx, d.inst, ":ACQ:TYPE?")
 	if err != nil {
 		return 0, err
@@ -153,7 +158,10 @@ func (d *Driver) AcquisitionType(ctx context.Context) (scope.AcquisitionType, er
 // SetAcquisitionType is the setter for the read-write IviScopeBase Acquisition
 // Type described in Section 4.2.3 of the IVI-4.1: IviScope Class
 // Specification.
-func (d *Driver) SetAcquisitionType(ctx context.Context, acType scope.AcquisitionType) error {
+func (d *Driver) SetAcquisitionType(acType scope.AcquisitionType) error {
+	ctx, cancel := d.newContext()
+	defer cancel()
+
 	cmd, err := ivi.LookupSCPI(acquisitionTypeToSCPI, acType)
 	if err != nil {
 		return fmt.Errorf("acquisition type %v not supported: %w", acType, err)
@@ -184,7 +192,7 @@ func (d *Driver) ChannelCount() int {
 // AcquisitionMinNumPoints is the getter for the read-write IviScopeBase
 // Horizontal Minimum Number of Points described in Section 4.2.8 of the
 // IVI-4.1: IviScope Class Specification.
-func (d *Driver) AcquisitionMinNumPoints(ctx context.Context) (int, error) {
+func (d *Driver) AcquisitionMinNumPoints() (int, error) {
 	return 0, ivi.ErrNotImplemented
 }
 
@@ -199,7 +207,7 @@ func (d *Driver) AcquisitionMinNumPoints(ctx context.Context) (int, error) {
 // SetAcquisitionMinNumPoints is the setter for the read-write IviScopeBase
 // Horizontal Minimum Number of Points described in Section 4.2.8 of the
 // IVI-4.1: IviScope Class Specification.
-func (d *Driver) SetAcquisitionMinNumPoints(ctx context.Context, numPoints int) error {
+func (d *Driver) SetAcquisitionMinNumPoints(numPoints int) error {
 	return ivi.ErrNotImplemented
 }
 
@@ -211,7 +219,10 @@ func (d *Driver) SetAcquisitionMinNumPoints(ctx context.Context, numPoints int) 
 // AcquisitionRecordLength is the getter for the read-only IviScopeBase
 // Horizontal Record Length described in Section 4.2.9 of the IVI-4.1: IviScope
 // Class Specification.
-func (d *Driver) AcquisitionRecordLength(ctx context.Context) (int, error) {
+func (d *Driver) AcquisitionRecordLength() (int, error) {
+	ctx, cancel := d.newContext()
+	defer cancel()
+
 	return query.Int(ctx, d.inst, ":ACQ:POIN?")
 }
 
@@ -221,7 +232,10 @@ func (d *Driver) AcquisitionRecordLength(ctx context.Context) (int, error) {
 // AcquisitionSampleRate is the getter for the read-only IviScopeBase
 // Horizontal Sample Rate described in Section 4.2.10 of the IVI-4.1: IviScope
 // Class Specification.
-func (d *Driver) AcquisitionSampleRate(ctx context.Context) (float64, error) {
+func (d *Driver) AcquisitionSampleRate() (float64, error) {
+	ctx, cancel := d.newContext()
+	defer cancel()
+
 	return query.Float64(ctx, d.inst, ":ACQ:SRAT?")
 }
 
@@ -231,7 +245,10 @@ func (d *Driver) AcquisitionSampleRate(ctx context.Context) (float64, error) {
 // AcquisitionTimePerRecord is the getter for the read-write IviScopeBase
 // Horizontal Time Per Record described in Section 4.2.11 of the IVI-4.1:
 // IviScope Class Specification.
-func (d *Driver) AcquisitionTimePerRecord(ctx context.Context) (time.Duration, error) {
+func (d *Driver) AcquisitionTimePerRecord() (time.Duration, error) {
+	ctx, cancel := d.newContext()
+	defer cancel()
+
 	seconds, err := query.Float64(ctx, d.inst, ":TIM:RANG?")
 	if err != nil {
 		return 0, fmt.Errorf("%w: %v", ivi.ErrValueNotSupported, err)
@@ -247,9 +264,11 @@ func (d *Driver) AcquisitionTimePerRecord(ctx context.Context) (time.Duration, e
 // Horizontal Time Per Record described in Section 4.2.11 of the IVI-4.1:
 // IviScope Class Specification.
 func (d *Driver) SetAcquisitionTimePerRecord(
-	ctx context.Context,
 	timePerRecord time.Duration,
 ) error {
+	ctx, cancel := d.newContext()
+	defer cancel()
+
 	return d.inst.Command(ctx, ":TIM:RANG %.4e", timePerRecord.Seconds())
 }
 
@@ -265,7 +284,10 @@ func (d *Driver) SetAcquisitionTimePerRecord(
 //
 // TriggerHoldoff is the getter for the read-write IviScopeBase Trigger Holdoff
 // described in Section 4.2.18 of the IVI-4.1: IviScope Class Specification.
-func (d *Driver) TriggerHoldoff(ctx context.Context) (time.Duration, error) {
+func (d *Driver) TriggerHoldoff() (time.Duration, error) {
+	ctx, cancel := d.newContext()
+	defer cancel()
+
 	seconds, err := query.Float64(ctx, d.inst, ":TRIG:HOLD?")
 	if err != nil {
 		return 0, fmt.Errorf("%w: %v", ivi.ErrValueNotSupported, err)
@@ -274,7 +296,10 @@ func (d *Driver) TriggerHoldoff(ctx context.Context) (time.Duration, error) {
 	return durationFromSeconds(seconds), nil
 }
 
-func (d *Driver) SetTriggerHoldoff(ctx context.Context, holdoff time.Duration) error {
+func (d *Driver) SetTriggerHoldoff(holdoff time.Duration) error {
+	ctx, cancel := d.newContext()
+	defer cancel()
+
 	const (
 		minHoldoff = 40 * time.Nanosecond
 		maxHoldoff = 10 * time.Second
@@ -293,33 +318,42 @@ func (d *Driver) SetTriggerHoldoff(ctx context.Context, holdoff time.Duration) e
 	return d.inst.Command(ctx, ":TRIG:HOLD %e", holdoff.Seconds())
 }
 
-func (d *Driver) TriggerLevel(ctx context.Context) (float64, error) {
+func (d *Driver) TriggerLevel() (float64, error) {
+	ctx, cancel := d.newContext()
+	defer cancel()
+
 	return query.Float64(ctx, d.inst, ":TRIG:EDGE:LEV?")
 }
 
-func (d *Driver) SetTriggerLevel(ctx context.Context, level float64) error {
+func (d *Driver) SetTriggerLevel(level float64) error {
+	ctx, cancel := d.newContext()
+	defer cancel()
+
 	return d.inst.Command(ctx, ":TRIG:EDGE:LEV %e", level)
 }
 
-func (d *Driver) TriggerSlope(ctx context.Context) (scope.TriggerSlope, error) {
+func (d *Driver) TriggerSlope() (scope.TriggerSlope, error) {
 	return 0, ivi.ErrNotImplemented
 }
 
-func (d *Driver) SetTriggerSlope(ctx context.Context, slope scope.TriggerSlope) error {
+func (d *Driver) SetTriggerSlope(slope scope.TriggerSlope) error {
 	// Need to determine if in TV Trigger mode, because that has a different
 	// command.
 	return ivi.ErrNotImplemented
 }
 
-func (d *Driver) TriggerSource(ctx context.Context) (scope.TriggerSource, error) {
+func (d *Driver) TriggerSource() (scope.TriggerSource, error) {
 	return 0, ivi.ErrNotImplemented
 }
 
-func (d *Driver) SetTriggerSource(ctx context.Context, source scope.TriggerSource) error {
+func (d *Driver) SetTriggerSource(source scope.TriggerSource) error {
 	return ivi.ErrNotImplemented
 }
 
-func (d *Driver) TriggerType(ctx context.Context) (scope.TriggerType, error) {
+func (d *Driver) TriggerType() (scope.TriggerType, error) {
+	ctx, cancel := d.newContext()
+	defer cancel()
+
 	mode, err := query.String(ctx, d.inst, ":TRIG:MODE?")
 	if err != nil {
 		return 0, err
@@ -333,7 +367,10 @@ func (d *Driver) TriggerType(ctx context.Context) (scope.TriggerType, error) {
 	return trigType, nil
 }
 
-func (d *Driver) SetTriggerType(ctx context.Context, triggerType scope.TriggerType) error {
+func (d *Driver) SetTriggerType(triggerType scope.TriggerType) error {
+	ctx, cancel := d.newContext()
+	defer cancel()
+
 	// ImmediateTrigger uses a different command pattern.
 	if triggerType == scope.ImmediateTrigger {
 		return d.inst.Command(ctx, ":TRIG:FORC")
@@ -347,12 +384,11 @@ func (d *Driver) SetTriggerType(ctx context.Context, triggerType scope.TriggerTy
 	return d.inst.Command(ctx, ":TRIG:MODE %s", cmd)
 }
 
-func (d *Driver) AbortMeasurement(ctx context.Context) error {
+func (d *Driver) AbortMeasurement() error {
 	return ivi.ErrNotImplemented
 }
 
 func (d *Driver) ConfigureAcquisitionRecord(
-	ctx context.Context,
 	timePerRecord time.Duration,
 	minNumPoints int,
 	acquisitionStartTime time.Duration,
@@ -360,12 +396,11 @@ func (d *Driver) ConfigureAcquisitionRecord(
 	return ivi.ErrNotImplemented
 }
 
-func (d *Driver) CreateWaveform(ctx context.Context, numSamples int) error {
+func (d *Driver) CreateWaveform(numSamples int) error {
 	return ivi.ErrNotImplemented
 }
 
 func (d *Driver) ConfigureEdgeTrigger(
-	ctx context.Context,
 	triggerType scope.TriggerType,
 	level float64,
 	slope scope.TriggerSlope,
@@ -374,18 +409,17 @@ func (d *Driver) ConfigureEdgeTrigger(
 }
 
 func (d *Driver) ConfigureTrigger(
-	ctx context.Context,
 	triggerType scope.TriggerType,
 	holdoff time.Duration,
 ) error {
-	if err := d.SetTriggerType(ctx, triggerType); err != nil {
+	if err := d.SetTriggerType(triggerType); err != nil {
 		return err
 	}
 
-	return d.SetTriggerHoldoff(ctx, holdoff)
+	return d.SetTriggerHoldoff(holdoff)
 }
 
-func (d *Driver) InitiateMeasurement(ctx context.Context) error {
+func (d *Driver) InitiateMeasurement() error {
 	return ivi.ErrNotImplemented
 }
 
@@ -395,7 +429,10 @@ func (d *Driver) InitiateMeasurement(ctx context.Context) error {
 // ChannelEnabled is the getter for the read-write IviScopeBase Attribute
 // Channel Enabled described in Section 4.2.5 of the IVI-4.1: IviScope Class
 // Specification.
-func (ch *Channel) ChannelEnabled(ctx context.Context) (bool, error) {
+func (ch *Channel) ChannelEnabled() (bool, error) {
+	ctx, cancel := ch.newContext()
+	defer cancel()
+
 	return query.Boolf(ctx, ch.inst, ":CHAN%d:DISP?", ch.num)
 }
 
@@ -405,7 +442,10 @@ func (ch *Channel) ChannelEnabled(ctx context.Context) (bool, error) {
 // Enabled is the setter for the read-write IviScopeBase Attribute Channel
 // Enabled described in Section 4.2.5 of the IVI-4.1: IviScope Class
 // Specification.
-func (ch *Channel) SetChannelEnabled(ctx context.Context, b bool) error {
+func (ch *Channel) SetChannelEnabled(b bool) error {
+	ctx, cancel := ch.newContext()
+	defer cancel()
+
 	cmd := "1"
 	if !b {
 		cmd = "0"
@@ -428,7 +468,10 @@ func (ch *Channel) Name() string {
 // InputImpedance is the getter for the read-write IviScopeBase Attribute Input
 // Impedance described in Section 4.2.12 of the IVI-4.1: IviScope Class
 // Specification.
-func (ch *Channel) InputImpedance(ctx context.Context) (float64, error) {
+func (ch *Channel) InputImpedance() (float64, error) {
+	ctx, cancel := ch.newContext()
+	defer cancel()
+
 	imped, err := query.Stringf(ctx, ch.inst, ":CHAN%d:IMP?", ch.num)
 	if err != nil {
 		return 0.0, err
@@ -450,7 +493,10 @@ func (ch *Channel) InputImpedance(ctx context.Context) (float64, error) {
 // SetInputImpedance is the setter for the read-write IviScopeBase Attribute
 // Input Impedance described in Section 4.2.12 of the IVI-4.1: IviScope Class
 // Specification.
-func (ch *Channel) SetInputImpedance(ctx context.Context, impedance float64) error {
+func (ch *Channel) SetInputImpedance(impedance float64) error {
+	ctx, cancel := ch.newContext()
+	defer cancel()
+
 	switch impedance {
 	case fiftyOhms:
 		return ch.inst.Command(ctx, ":CHAN%d:IMP FIFT", ch.num)
@@ -471,11 +517,11 @@ func (ch *Channel) SetInputImpedance(ctx context.Context, impedance float64) err
 // MaxInputImpedance is the getter for the read-write IviScopeBase Attribute
 // Maximum Input Impedance described in Section 4.2.13 of the IVI-4.1: IviScope
 // Class Specification.
-func (ch *Channel) MaxInputFrequency(ctx context.Context) (float64, error) {
+func (ch *Channel) MaxInputFrequency() (float64, error) {
 	return 0.0, ivi.ErrNotImplemented
 }
 
-func (ch *Channel) SetMaxInputFrequency(ctx context.Context, _ float64) error {
+func (ch *Channel) SetMaxInputFrequency(_ float64) error {
 	return ivi.ErrNotImplemented
 }
 
@@ -490,7 +536,10 @@ func (ch *Channel) SetMaxInputFrequency(ctx context.Context, _ float64) error {
 // ProbeAttenuation is the getter for the read-write IviScopeBase Probe
 // Attenuation described in Section 4.2.16 of the IVI-4.1: IviScope Class
 // Specification.
-func (ch *Channel) ProbeAttenuation(ctx context.Context) (float64, error) {
+func (ch *Channel) ProbeAttenuation() (float64, error) {
+	ctx, cancel := ch.newContext()
+	defer cancel()
+
 	return query.Float64f(ctx, ch.inst, ":CHAN%d:PROBE?", ch.num)
 }
 
@@ -505,7 +554,10 @@ func (ch *Channel) ProbeAttenuation(ctx context.Context) (float64, error) {
 // ProbeAttenuation is the getter for the read-write IviScopeBase Probe
 // Attenuation described in Section 4.2.16 of the IVI-4.1: IviScope Class
 // Specification.
-func (ch *Channel) SetProbeAttenuation(ctx context.Context, atten float64) error {
+func (ch *Channel) SetProbeAttenuation(atten float64) error {
+	ctx, cancel := ch.newContext()
+	defer cancel()
+
 	if atten < 0.001 || atten > 10000.0 {
 		return ivi.ErrValueNotSupported
 	}
@@ -518,7 +570,7 @@ func (ch *Channel) SetProbeAttenuation(ctx context.Context, atten float64) error
 // ProbeAttenuationAuto is the getter for the read-write IviScopeBase Probe
 // Attenuation described in Section 4.2.16 of the IVI-4.1: IviScope Class
 // Specification.
-func (ch *Channel) ProbeAttenuationAuto(ctx context.Context) (bool, error) {
+func (ch *Channel) ProbeAttenuationAuto() (bool, error) {
 	return false, nil
 }
 
@@ -528,7 +580,7 @@ func (ch *Channel) ProbeAttenuationAuto(ctx context.Context) (bool, error) {
 // SetProbeAttenuationAuto is the setter for the read-write IviScopeBase Probe
 // Attenuation described in Section 4.2.16 of the IVI-4.1: IviScope Class
 // Specification.
-func (ch *Channel) SetProbeAttenuationAuto(ctx context.Context, b bool) error {
+func (ch *Channel) SetProbeAttenuationAuto(b bool) error {
 	if b {
 		return ivi.ErrValueNotSupported
 	}
@@ -536,15 +588,18 @@ func (ch *Channel) SetProbeAttenuationAuto(ctx context.Context, b bool) error {
 	return nil
 }
 
-func (ch *Channel) TriggerCoupling(ctx context.Context) (scope.TriggerCoupling, error) {
+func (ch *Channel) TriggerCoupling() (scope.TriggerCoupling, error) {
 	return 0, ivi.ErrNotImplemented
 }
 
-func (ch *Channel) SetTriggerCoupling(ctx context.Context, coupling scope.TriggerCoupling) error {
+func (ch *Channel) SetTriggerCoupling(coupling scope.TriggerCoupling) error {
 	return ivi.ErrNotImplemented
 }
 
-func (ch *Channel) VerticalCoupling(ctx context.Context) (scope.VerticalCoupling, error) {
+func (ch *Channel) VerticalCoupling() (scope.VerticalCoupling, error) {
+	ctx, cancel := ch.newContext()
+	defer cancel()
+
 	coupling, err := query.Stringf(ctx, ch.inst, ":CHAN%d:COUP?", ch.num)
 	if err != nil {
 		return 0, err
@@ -558,7 +613,10 @@ func (ch *Channel) VerticalCoupling(ctx context.Context) (scope.VerticalCoupling
 	return vc, nil
 }
 
-func (ch *Channel) SetVerticalCoupling(ctx context.Context, coupling scope.VerticalCoupling) error {
+func (ch *Channel) SetVerticalCoupling(coupling scope.VerticalCoupling) error {
+	ctx, cancel := ch.newContext()
+	defer cancel()
+
 	cmd, err := ivi.LookupSCPI(verticalCouplingToSCPI, coupling)
 	if err != nil {
 		return fmt.Errorf("vertical coupling %v not supported: %w", coupling, err)
@@ -574,7 +632,10 @@ func (ch *Channel) SetVerticalCoupling(ctx context.Context, coupling scope.Verti
 //
 // VerticalOffset is the getter for the read-write IviScopeBase Vertical Offset
 // described in Section 4.2.24 of the IVI-4.1: IviScope Class Specification.
-func (ch *Channel) VerticalOffset(ctx context.Context) (float64, error) {
+func (ch *Channel) VerticalOffset() (float64, error) {
+	ctx, cancel := ch.newContext()
+	defer cancel()
+
 	return query.Float64f(ctx, ch.inst, ":CHAN%d:OFFS?", ch.num)
 }
 
@@ -586,7 +647,10 @@ func (ch *Channel) VerticalOffset(ctx context.Context) (float64, error) {
 // SetVerticalOffset is the setter for the read-write IviScopeBase Vertical
 // Offset described in Section 4.2.24 of the IVI-4.1: IviScope Class
 // Specification.
-func (ch *Channel) SetVerticalOffset(ctx context.Context, offset float64) error {
+func (ch *Channel) SetVerticalOffset(offset float64) error {
+	ctx, cancel := ch.newContext()
+	defer cancel()
+
 	return ch.inst.Command(ctx, ":CHAN%d:OFFS %E", ch.num, offset)
 }
 
@@ -596,7 +660,10 @@ func (ch *Channel) SetVerticalOffset(ctx context.Context, offset float64) error 
 //
 // VerticalRange is the getter for the read-write IviScopeBase Vertical Range
 // described in Section 4.2.25 of the IVI-4.1: IviScope Class Specification.
-func (ch *Channel) VerticalRange(ctx context.Context) (float64, error) {
+func (ch *Channel) VerticalRange() (float64, error) {
+	ctx, cancel := ch.newContext()
+	defer cancel()
+
 	return query.Float64f(ctx, ch.inst, ":CHAN%d:RANG?", ch.num)
 }
 
@@ -608,7 +675,10 @@ func (ch *Channel) VerticalRange(ctx context.Context) (float64, error) {
 // SetVerticalRange is the setter for the read-write IviScopeBase Vertical
 // Range described in Section 4.2.25 of the IVI-4.1: IviScope Class
 // Specification.
-func (ch *Channel) SetVerticalRange(ctx context.Context, rng float64) error {
+func (ch *Channel) SetVerticalRange(rng float64) error {
+	ctx, cancel := ch.newContext()
+	defer cancel()
+
 	if rng < 0.008 || rng > 40.0 {
 		return ivi.ErrValueNotSupported
 	}
@@ -617,7 +687,6 @@ func (ch *Channel) SetVerticalRange(ctx context.Context, rng float64) error {
 }
 
 func (ch *Channel) Configure(
-	ctx context.Context,
 	rng float64,
 	offset float64,
 	coupling scope.VerticalCoupling,
@@ -625,40 +694,38 @@ func (ch *Channel) Configure(
 	probeAttenuation float64,
 	enabled bool,
 ) error {
-	if err := ch.SetVerticalRange(ctx, rng); err != nil {
+	if err := ch.SetVerticalRange(rng); err != nil {
 		return err
 	}
 
-	if err := ch.SetVerticalOffset(ctx, offset); err != nil {
+	if err := ch.SetVerticalOffset(offset); err != nil {
 		return err
 	}
 
-	if err := ch.SetVerticalCoupling(ctx, coupling); err != nil {
+	if err := ch.SetVerticalCoupling(coupling); err != nil {
 		return err
 	}
 
 	if !autoProbeAttenuation {
-		if err := ch.SetProbeAttenuation(ctx, probeAttenuation); err != nil {
+		if err := ch.SetProbeAttenuation(probeAttenuation); err != nil {
 			return err
 		}
 	}
 
-	return ch.SetChannelEnabled(ctx, enabled)
+	return ch.SetChannelEnabled(enabled)
 }
 
 func (ch *Channel) ConfigureCharacteristics(
-	ctx context.Context,
 	inputImepdance, inputFreqMax float64,
 ) error {
 	return ivi.ErrNotImplemented
 }
 
-func (ch *Channel) FetchWaveform(ctx context.Context, waveform *ivi.Waveform) error {
+func (ch *Channel) FetchWaveform(waveform *ivi.Waveform) error {
 	return ivi.ErrNotImplemented
 }
 
 func (ch *Channel) ReadWaveform(
-	ctx context.Context,
 	maximumTime time.Duration,
 	waveform *ivi.Waveform,
 ) error {

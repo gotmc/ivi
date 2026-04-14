@@ -10,6 +10,7 @@
 package dp800
 
 import (
+	"context"
 	"fmt"
 	"time"
 
@@ -33,6 +34,7 @@ var _ dcpwr.MeasurementChannel = (*Channel)(nil)
 type Driver struct {
 	inst     ivi.Transport
 	channels []Channel
+	timeout  time.Duration
 	ivi.Inherent
 }
 
@@ -143,6 +145,7 @@ func New(inst ivi.Transport, opts ...ivi.DriverOption) (*Driver, error) {
 			name:       genericChannel.name,
 			idx:        i + 1, // 1-based channel index
 			inst:       inst,
+			timeout:    timeout,
 			minVoltage: genericChannel.minVoltage,
 			maxVoltage: genericChannel.maxVoltage,
 			minCurrent: genericChannel.minCurrent,
@@ -153,6 +156,7 @@ func New(inst ivi.Transport, opts ...ivi.DriverOption) (*Driver, error) {
 	driver := Driver{
 		inst:     inst,
 		channels: channels,
+		timeout:  timeout,
 		Inherent: inherent,
 	}
 
@@ -174,6 +178,11 @@ func (d *Driver) Channel(index int) (*Channel, error) {
 	return &d.channels[index], nil
 }
 
+// newContext creates a context with the channel's configured timeout.
+func (ch *Channel) newContext() (context.Context, context.CancelFunc) {
+	return context.WithTimeout(context.Background(), ch.timeout)
+}
+
 // Close properly shuts down the power supply by returning it to local control.
 func (d *Driver) Close() error {
 	return d.Inherent.Close()
@@ -185,6 +194,7 @@ type Channel struct {
 	name       string
 	idx        int // 1-based channel index for :SOURce[<n>] commands
 	inst       ivi.Transport
+	timeout    time.Duration
 	minVoltage float64
 	maxVoltage float64
 	minCurrent float64

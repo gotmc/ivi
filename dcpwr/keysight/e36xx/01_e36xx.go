@@ -10,6 +10,7 @@
 package e36xx
 
 import (
+	"context"
 	"fmt"
 	"time"
 
@@ -33,14 +34,16 @@ var _ dcpwr.MeasurementChannel = (*Channel)(nil)
 type Driver struct {
 	inst     ivi.Transport
 	channels []Channel
+	timeout  time.Duration
 	ivi.Inherent
 }
 
 // Channel models the output channel repeated capability for the DC power
 // supply output channel.
 type Channel struct {
-	inst ivi.Transport
-	name string
+	inst    ivi.Transport
+	name    string
+	timeout time.Duration
 }
 
 // New creates a new IVI driver for the Keysight/Agilent E3600 series of DC
@@ -98,14 +101,16 @@ func New(inst ivi.Transport, opts ...ivi.DriverOption) (*Driver, error) {
 
 	for i, channelName := range channelNames {
 		channels[i] = Channel{
-			name: channelName,
-			inst: inst,
+			name:    channelName,
+			inst:    inst,
+			timeout: timeout,
 		}
 	}
 
 	driver := Driver{
 		inst:     inst,
 		channels: channels,
+		timeout:  timeout,
 		Inherent: inherent,
 	}
 
@@ -133,6 +138,11 @@ func (d *Driver) Channel(index int) (*Channel, error) {
 	}
 
 	return &d.channels[index], nil
+}
+
+// newContext creates a context with the channel's configured timeout.
+func (ch *Channel) newContext() (context.Context, context.CancelFunc) {
+	return context.WithTimeout(context.Background(), ch.timeout)
 }
 
 // Close properly shuts down the power supply by returning it to local control.

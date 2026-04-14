@@ -15,6 +15,7 @@
 package key3446x
 
 import (
+	"context"
 	"time"
 
 	"github.com/gotmc/ivi"
@@ -32,7 +33,8 @@ var _ dmm.Base = (*Driver)(nil)
 
 // Driver provides the IVI driver for the Keysight 3446x family of DMMs.
 type Driver struct {
-	inst ivi.Transport
+	inst    ivi.Transport
+	timeout time.Duration
 	ivi.Inherent
 }
 
@@ -91,6 +93,7 @@ func New(inst ivi.Transport, opts ...ivi.DriverOption) (*Driver, error) {
 
 	driver := Driver{
 		inst:     inst,
+		timeout:  timeout,
 		Inherent: inherent,
 	}
 
@@ -101,6 +104,11 @@ func New(inst ivi.Transport, opts ...ivi.DriverOption) (*Driver, error) {
 	}
 
 	return &driver, nil
+}
+
+// newContext creates a context with the driver's configured timeout.
+func (d *Driver) newContext() (context.Context, context.CancelFunc) {
+	return context.WithTimeout(context.Background(), d.timeout)
 }
 
 // Close properly shuts down the DMM by returning it to local control.

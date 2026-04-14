@@ -5,12 +5,10 @@
 
 package load
 
-import "context"
-
 type Base interface {
 	OutputCount() int
 }
 
 type BaseChannel interface {
-	SetMode(ctx context.Context, mode string) error
+	SetMode(mode string) error
 }

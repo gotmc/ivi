@@ -5,7 +5,6 @@
 
 package dmm
 
-import "context"
 
 /*
 
@@ -37,6 +36,6 @@ None.
 // extension group described in Section 16 of IVI-4.2 IviDmm Class
 // Specification.
 type AutoZeroExtension interface {
-	AutoZero(ctx context.Context) (AutoZero, error)
-	SetAutoZero(ctx context.Context, autoZero AutoZero) error
+	AutoZero() (AutoZero, error)
+	SetAutoZero(autoZero AutoZero) error
 }

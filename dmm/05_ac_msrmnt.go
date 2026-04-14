@@ -5,7 +5,6 @@
 
 package dmm
 
-import "context"
 
 /*
 
@@ -41,9 +40,9 @@ Below are the .NET functions, since they are the basis for the Go interfaces.
 // IviDmmACMeasurement extension group described in Section 5 of IVI-4.2 IviDmm
 // Class Specification.
 type ACMeasurementExtension interface {
-	MaxACFrequency(ctx context.Context) (float64, error)
-	SetMaxACFrequency(ctx context.Context, maxFreq float64) error
-	MinACFrequency(ctx context.Context) (float64, error)
-	SetMinACFrequency(ctx context.Context, minFreq float64) error
-	ConfigureACBandwidth(ctx context.Context, minFreq, maxFreq float64) error
+	MaxACFrequency() (float64, error)
+	SetMaxACFrequency(maxFreq float64) error
+	MinACFrequency() (float64, error)
+	SetMinACFrequency(minFreq float64) error
+	ConfigureACBandwidth(minFreq, maxFreq float64) error
 }

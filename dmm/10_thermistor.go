@@ -5,7 +5,6 @@
 
 package dmm
 
-import "context"
 
 /*
 
@@ -40,6 +39,6 @@ None.
 // extension group described in Section 10 of IVI-4.2 IviDmm Class
 // Specification.
 type ThermistorExtension interface {
-	ThermistorResistance(ctx context.Context) (float64, error)
-	SetThermistorResistance(ctx context.Context, resistance float64) error
+	ThermistorResistance() (float64, error)
+	SetThermistorResistance(resistance float64) error
 }

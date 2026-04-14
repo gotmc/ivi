@@ -6,7 +6,6 @@
 package dmm
 
 import (
-	"context"
 	"time"
 )
 
@@ -72,29 +71,28 @@ Below are the .NET functions, since they are the basis for the Go interfaces.
 
 // Base provides the interface required for the IviDmmBase capability group.
 type Base interface {
-	MeasurementFunction(ctx context.Context) (MeasurementFunction, error)
-	SetMeasurementFunction(ctx context.Context, msrFunc MeasurementFunction) error
-	Range(ctx context.Context) (autoRange AutoRange, rangeValue float64, err error)
-	SetRange(ctx context.Context, autoRange AutoRange, rangeValue float64) error
-	ResolutionAbsolute(ctx context.Context) (float64, error)
-	SetResolutionAbsolute(ctx context.Context, resolution float64) error
-	TriggerDelay(ctx context.Context) (autoDelay bool, delay time.Duration, err error)
-	SetTriggerDelay(ctx context.Context, autoDelay bool, delay time.Duration) error
-	TriggerSource(ctx context.Context) (TriggerSource, error)
-	SetTriggerSource(ctx context.Context, src TriggerSource) error
-	Abort(ctx context.Context) error
+	MeasurementFunction() (MeasurementFunction, error)
+	SetMeasurementFunction(msrFunc MeasurementFunction) error
+	Range() (autoRange AutoRange, rangeValue float64, err error)
+	SetRange(autoRange AutoRange, rangeValue float64) error
+	ResolutionAbsolute() (float64, error)
+	SetResolutionAbsolute(resolution float64) error
+	TriggerDelay() (autoDelay bool, delay time.Duration, err error)
+	SetTriggerDelay(autoDelay bool, delay time.Duration) error
+	TriggerSource() (TriggerSource, error)
+	SetTriggerSource(src TriggerSource) error
+	Abort() error
 	ConfigureMeasurement(
-		ctx context.Context,
 		msrFunc MeasurementFunction,
 		autoRange AutoRange,
 		rangeValue float64,
 		resolution float64,
 	) error
-	ConfigureTrigger(ctx context.Context, src TriggerSource, delay time.Duration) error
-	FetchMeasurement(ctx context.Context, maxTime time.Duration) (float64, error)
-	InitiateMeasurement(ctx context.Context) error
-	IsOutOfRange(ctx context.Context, value float64) (bool, error)
-	IsOverRange(ctx context.Context, value float64) (bool, error)
-	IsUnderRange(ctx context.Context, value float64) (bool, error)
-	ReadMeasurement(ctx context.Context, maxTime time.Duration) (float64, error)
+	ConfigureTrigger(src TriggerSource, delay time.Duration) error
+	FetchMeasurement(maxTime time.Duration) (float64, error)
+	InitiateMeasurement() error
+	IsOutOfRange(value float64) (bool, error)
+	IsOverRange(value float64) (bool, error)
+	IsUnderRange(value float64) (bool, error)
+	ReadMeasurement(maxTime time.Duration) (float64, error)
 }
