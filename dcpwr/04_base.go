@@ -5,7 +5,6 @@
 
 package dcpwr
 
-
 /*
 # Section 4 IviDCPwrBase Capability Group
 
@@ -57,27 +56,27 @@ type Base interface {
 // the IviDCPwrBase capability group.
 type BaseChannel interface {
 	Name() string
-CurrentLimit() (float64, error)
-SetCurrentLimit(limit float64) error
-CurrentLimitBehavior() (CurrentLimitBehavior, error)
-SetCurrentLimitBehavior(behavior CurrentLimitBehavior) error
-OutputEnabled() (bool, error)
-SetOutputEnabled(b bool) error
-DisableOutput() error
-EnableOutput() error
-OVPEnabled() (bool, error)
-SetOVPEnabled(b bool) error
-DisableOVP() error
-EnableOVP() error
-OVPLimit() (float64, error)
-SetOVPLimit(limit float64) error
-VoltageLevel() (float64, error)
-SetVoltageLevel(level float64) error
-ConfigureCurrentLimit(behavior CurrentLimitBehavior, limit float64) error
-ConfigureOutputRange(rt RangeType, rng float64) error
-ConfigureOVP(b bool, limit float64) error
-QueryCurrentLimitMax(voltage float64) (float64, error)
-QueryVoltageLevelMax(currentLimit float64) (float64, error)
-QueryOutputState(os OutputState) (bool, error)
-ResetOutputProtection() error
+	CurrentLimit() (float64, error)
+	SetCurrentLimit(limit float64) error
+	CurrentLimitBehavior() (CurrentLimitBehavior, error)
+	SetCurrentLimitBehavior(behavior CurrentLimitBehavior) error
+	OutputEnabled() (bool, error)
+	SetOutputEnabled(b bool) error
+	DisableOutput() error
+	EnableOutput() error
+	OVPEnabled() (bool, error)
+	SetOVPEnabled(b bool) error
+	DisableOVP() error
+	EnableOVP() error
+	OVPLimit() (float64, error)
+	SetOVPLimit(limit float64) error
+	VoltageLevel() (float64, error)
+	SetVoltageLevel(level float64) error
+	ConfigureCurrentLimit(behavior CurrentLimitBehavior, limit float64) error
+	ConfigureOutputRange(rt RangeType, rng float64) error
+	ConfigureOVP(b bool, limit float64) error
+	QueryCurrentLimitMax(voltage float64) (float64, error)
+	QueryVoltageLevelMax(currentLimit float64) (float64, error)
+	QueryOutputState(os OutputState) (bool, error)
+	ResetOutputProtection() error
 }

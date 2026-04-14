@@ -5,7 +5,6 @@
 
 package dmm
 
-
 /*
 
 # Section 12 IviDmmTriggerSlope Extension Group

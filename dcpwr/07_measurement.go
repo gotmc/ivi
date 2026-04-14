@@ -5,7 +5,6 @@
 
 package dcpwr
 
-
 /*
 
 # Section 7 IviDCPwrMeasurement Extension Group
@@ -27,7 +26,7 @@ Below are the .NET functions, since they are the basis for the Go interfaces.
 // MeasurementChannel provides the interface for the channel repeated
 // capability for the IviDCPwrMeasurement capability group.
 type MeasurementChannel interface {
-Measure(msrType MeasurementType) (float64, error)
-MeasureVoltage() (float64, error)
-MeasureCurrent() (float64, error)
+	Measure(msrType MeasurementType) (float64, error)
+	MeasureVoltage() (float64, error)
+	MeasureCurrent() (float64, error)
 }

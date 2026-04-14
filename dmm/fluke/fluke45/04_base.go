@@ -282,8 +282,7 @@ func (d *Driver) SetResolutionAbsolute(
 //
 // TriggerDelay is the getter for the read-write IviDmmBase Attribute Trigger
 // Delay described in Section 4.2.5 of IVI-4.2: IviDmm Class Specification.
-func (d *Driver) TriggerDelay(
-) (bool, time.Duration, error) {
+func (d *Driver) TriggerDelay() (bool, time.Duration, error) {
 	ctx, cancel := d.newContext()
 	defer cancel()
 
@@ -346,8 +345,7 @@ func (d *Driver) SetTriggerDelay(
 //
 // TriggerSource is the getter for the read-write IviDmmBase Attribute Trigger
 // Source described in Section 4.2.6 of IVI-4.2: IviDmm Class Specification.
-func (d *Driver) TriggerSource(
-) (dmm.TriggerSource, error) {
+func (d *Driver) TriggerSource() (dmm.TriggerSource, error) {
 	ctx, cancel := d.newContext()
 	defer cancel()
 

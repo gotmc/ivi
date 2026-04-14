@@ -10,26 +10,26 @@ package lcr
 type MeasurementFunction int
 
 const (
-	CpD  MeasurementFunction = iota // Parallel capacitance, Dissipation factor
-	CpQ                             // Parallel capacitance, Quality factor
-	CpG                             // Parallel capacitance, Conductance
-	CpRp                            // Parallel capacitance, Parallel resistance
-	CsD                             // Series capacitance, Dissipation factor
-	CsQ                             // Series capacitance, Quality factor
-	CsRs                            // Series capacitance, Series resistance
-	LpD                             // Parallel inductance, Dissipation factor
-	LpQ                             // Parallel inductance, Quality factor
-	LpG                             // Parallel inductance, Conductance
-	LpRp                            // Parallel inductance, Parallel resistance
-	LsD                             // Series inductance, Dissipation factor
-	LsQ                             // Series inductance, Quality factor
-	LsRs                            // Series inductance, Series resistance
-	RX                              // Resistance, Reactance
-	ZThetaDeg                       // |Z|, Phase angle (degrees)
-	ZThetaRad                       // |Z|, Phase angle (radians)
-	GB                              // Conductance, Susceptance
-	YThetaDeg                       // |Y|, Phase angle (degrees)
-	YThetaRad                       // |Y|, Phase angle (radians)
+	CpD       MeasurementFunction = iota // Parallel capacitance, Dissipation factor
+	CpQ                                  // Parallel capacitance, Quality factor
+	CpG                                  // Parallel capacitance, Conductance
+	CpRp                                 // Parallel capacitance, Parallel resistance
+	CsD                                  // Series capacitance, Dissipation factor
+	CsQ                                  // Series capacitance, Quality factor
+	CsRs                                 // Series capacitance, Series resistance
+	LpD                                  // Parallel inductance, Dissipation factor
+	LpQ                                  // Parallel inductance, Quality factor
+	LpG                                  // Parallel inductance, Conductance
+	LpRp                                 // Parallel inductance, Parallel resistance
+	LsD                                  // Series inductance, Dissipation factor
+	LsQ                                  // Series inductance, Quality factor
+	LsRs                                 // Series inductance, Series resistance
+	RX                                   // Resistance, Reactance
+	ZThetaDeg                            // |Z|, Phase angle (degrees)
+	ZThetaRad                            // |Z|, Phase angle (radians)
+	GB                                   // Conductance, Susceptance
+	YThetaDeg                            // |Y|, Phase angle (degrees)
+	YThetaRad                            // |Y|, Phase angle (radians)
 )
 
 var measurementFunctionDesc = map[MeasurementFunction]string{

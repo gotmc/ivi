@@ -5,7 +5,6 @@
 
 package dmm
 
-
 /*
 
 # Section 8 IviDmmThermocouple Extension Group

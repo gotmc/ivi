@@ -5,7 +5,6 @@
 
 package dmm
 
-
 /*
 
 # Section 9 IviDmmResistanceTemperatureDevice Extension Group

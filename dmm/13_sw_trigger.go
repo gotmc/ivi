@@ -5,7 +5,6 @@
 
 package dmm
 
-
 /*
 
 # Section 13 IviDmmSoftwareTrigger Extension Group

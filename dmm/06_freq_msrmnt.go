@@ -5,7 +5,6 @@
 
 package dmm
 
-
 /*
 
 # Section 6 IviDmmFrequencyMeasurement Extension Group

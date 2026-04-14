@@ -5,7 +5,6 @@
 
 package dmm
 
-
 /*
 
 # Section 10 IviDmmThermistor Extension Group

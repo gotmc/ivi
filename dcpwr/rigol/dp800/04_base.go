@@ -54,8 +54,7 @@ func (ch *Channel) SetCurrentLimit(limit float64) error {
 // CurrentLimitBehavior implements the getter for the read-write IviDCPwrBase
 // Attribute Current Limit Behavior described in Section 4.2.2 of IVI-4.4:
 // IviDCPwr Class Specification.
-func (ch *Channel) CurrentLimitBehavior(
-) (dcpwr.CurrentLimitBehavior, error) {
+func (ch *Channel) CurrentLimitBehavior() (dcpwr.CurrentLimitBehavior, error) {
 	ctx, cancel := ch.newContext()
 	defer cancel()
 

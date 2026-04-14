@@ -5,7 +5,6 @@
 
 package dmm
 
-
 /*
 
 # Section 17 IviDmmPowerLineFrequency Extension Group

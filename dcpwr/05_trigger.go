@@ -5,7 +5,6 @@
 
 package dcpwr
 
-
 /*
 
 # Section 5 IviDCPwrTrigger Extension Group
@@ -36,17 +35,17 @@ Below are the .NET functions, since they are the basis for the Go interfaces.
 
 // Trigger provides the interface for the IviDCPwrTrigger extension group.
 type Trigger interface {
-AbortTrigger() error
-InitiateTrigger() error
+	AbortTrigger() error
+	InitiateTrigger() error
 }
 
 // TriggerChannel provides the interface for the channel repeated capability
 // for the IviDCPwrTrigger extension group.
 type TriggerChannel interface {
-TriggerSource() (TriggerSource, error)
-SetTriggerSource(source TriggerSource) error
-TriggeredCurrentLimit() (float64, error)
-SetTriggeredCurrentLimit(limit float64) error
-TriggeredVoltageLevel() (float64, error)
-SetTriggeredVoltageLevel(level float64) error
+	TriggerSource() (TriggerSource, error)
+	SetTriggerSource(source TriggerSource) error
+	TriggeredCurrentLimit() (float64, error)
+	SetTriggeredCurrentLimit(limit float64) error
+	TriggeredVoltageLevel() (float64, error)
+	SetTriggeredVoltageLevel(level float64) error
 }

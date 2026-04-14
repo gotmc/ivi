@@ -5,7 +5,6 @@
 
 package dmm
 
-
 /*
 
 # Section 7 IviDmmTemperatureMeasurement Extension Group

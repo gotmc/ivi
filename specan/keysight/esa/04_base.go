@@ -406,7 +406,7 @@ func (d *Driver) TraceType(traceName string) (specan.TraceType, error) {
 }
 
 func (d *Driver) SetTraceType(
-traceName string, traceType specan.TraceType,
+	traceName string, traceType specan.TraceType,
 ) error {
 	ctx, cancel := d.newContext()
 	defer cancel()
@@ -455,7 +455,7 @@ func (d *Driver) DetectorType(_ string) (specan.DetectorType, error) {
 }
 
 func (d *Driver) SetDetectorType(
-_ string, detector specan.DetectorType,
+	_ string, detector specan.DetectorType,
 ) error {
 	ctx, cancel := d.newContext()
 	defer cancel()
@@ -538,7 +538,7 @@ func (d *Driver) ConfigureFrequencyCenterSpan(centerFreq, span float64) error {
 }
 
 func (d *Driver) ConfigureFrequencyStartStop(
-startFreq, stopFreq float64,
+	startFreq, stopFreq float64,
 ) error {
 	if err := d.SetFrequencyStart(startFreq); err != nil {
 		return err
@@ -548,7 +548,7 @@ startFreq, stopFreq float64,
 }
 
 func (d *Driver) ConfigureLevel(
-units specan.AmplitudeUnits, refLevel float64,
+	units specan.AmplitudeUnits, refLevel float64,
 ) error {
 	if err := d.SetAmplitudeUnits(units); err != nil {
 		return err
@@ -558,7 +558,7 @@ units specan.AmplitudeUnits, refLevel float64,
 }
 
 func (d *Driver) ConfigureSweepCoupling(
-resBW, videoBW, sweepTime float64,
+	resBW, videoBW, sweepTime float64,
 ) error {
 	if err := d.SetResolutionBandwidth(resBW); err != nil {
 		return err

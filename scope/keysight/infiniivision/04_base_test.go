@@ -539,7 +539,7 @@ func TestDriver_NotImplemented(t *testing.T) {
 func TestDriver_SetAcquisitionStartTime_NotSupported(t *testing.T) {
 	mock := &mockInst{}
 	d := newTestDriver(mock)
-	err := d.SetAcquisitionStartTime(100*time.Microsecond)
+	err := d.SetAcquisitionStartTime(100 * time.Microsecond)
 	if !errors.Is(err, ivi.ErrFunctionNotSupported) {
 		t.Errorf("SetAcquisitionStartTime() = %v, want ErrFunctionNotSupported", err)
 	}
@@ -578,7 +578,7 @@ func TestDriver_ConfigureTrigger(t *testing.T) {
 func TestDriver_SetAcquisitionTimePerRecord(t *testing.T) {
 	mock := &mockInst{}
 	d := newTestDriver(mock)
-	err := d.SetAcquisitionTimePerRecord(1*time.Millisecond)
+	err := d.SetAcquisitionTimePerRecord(1 * time.Millisecond)
 	if err != nil {
 		t.Errorf("SetAcquisitionTimePerRecord() error: %v", err)
 	}

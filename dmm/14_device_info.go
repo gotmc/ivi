@@ -5,7 +5,6 @@
 
 package dmm
 
-
 /*
 
 # Section 14 IviDmmDeviceInfo Extension Group
