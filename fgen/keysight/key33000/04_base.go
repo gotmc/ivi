@@ -233,7 +233,7 @@ func (ch *Channel) SetOutputImpedance(impedance float64) error {
 	ctx, cancel := ch.newContext()
 	defer cancel()
 
-	return ch.inst.Command(ctx, "OUTP%d:LOAD %f", ch.num, impedance)
+	return ch.inst.Command(ctx, "OUTP%d:LOAD %f", ch.num+1, impedance)
 }
 
 // AbortGeneration aborts a previously initiated signal generation.

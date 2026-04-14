@@ -66,7 +66,7 @@ func (ch *Channel) SetStartTriggerDelay(delay time.Duration) error {
 	ctx, cancel := ch.newContext()
 	defer cancel()
 
-	return ch.inst.Command(ctx, "TRIG%d:DEL %f", ch.num, delay.Seconds())
+	return ch.inst.Command(ctx, "TRIG%d:DEL %f", ch.num+1, delay.Seconds())
 }
 
 // StartTriggerSlope returns the slope of the trigger that starts the
@@ -111,7 +111,7 @@ func (ch *Channel) SetStartTriggerSlope(slope fgen.TriggerSlope) error {
 		return fmt.Errorf("SetStartTriggerSlope %v: %w", slope, err)
 	}
 
-	return ch.inst.Command(ctx, "TRIG%d:SLOP %s", ch.num, triggerSlope)
+	return ch.inst.Command(ctx, "TRIG%d:SLOP %s", ch.num+1, triggerSlope)
 }
 
 // StartTriggerSource returns the source of the start trigger.
@@ -154,7 +154,7 @@ func (ch *Channel) SetStartTriggerSource(src fgen.TriggerSource) error {
 		return fmt.Errorf("SetStartTriggerSource %v: %w", src, err)
 	}
 
-	return ch.inst.Command(ctx, "TRIG%d:SOUR %s", ch.num, triggerSource)
+	return ch.inst.Command(ctx, "TRIG%d:SOUR %s", ch.num+1, triggerSource)
 }
 
 func (ch *Channel) StartTriggerThreshold() (float64, error) {
