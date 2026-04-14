@@ -37,11 +37,6 @@ var scpiToOperationMode = map[string]fgen.OperationMode{
 	"1": fgen.BurstMode,
 }
 
-var operationModeToSCPI = map[fgen.OperationMode]string{
-	fgen.BurstMode:      "BURS:MODE TRIG;STAT ON",
-	fgen.ContinuousMode: "BURS:STAT OFF",
-}
-
 // OutputCount returns the number of available output channels.
 //
 // OutputCount is the getter for the read-only IviFgenBase Attribute Output
@@ -163,12 +158,18 @@ func (ch *Channel) SetOperationMode(mode fgen.OperationMode) error {
 	ctx, cancel := ch.newContext()
 	defer cancel()
 
-	cmd, err := ivi.LookupSCPI(operationModeToSCPI, mode)
-	if err != nil {
-		return fmt.Errorf("SetOperationMode: %w", err)
-	}
+	switch mode {
+	case fgen.BurstMode:
+		if err := ch.inst.Command(ctx, ch.srcPrefix()+"BURS:MODE TRIG"); err != nil {
+			return err
+		}
 
-	return ch.inst.Command(ctx, ch.srcPrefix()+cmd)
+		return ch.inst.Command(ctx, ch.srcPrefix()+"BURS:STAT ON")
+	case fgen.ContinuousMode:
+		return ch.inst.Command(ctx, ch.srcPrefix()+"BURS:STAT OFF")
+	default:
+		return fmt.Errorf("SetOperationMode: %w", ivi.ErrValueNotSupported)
+	}
 }
 
 // OutputEnabled determines if the output channel is enabled or disabled.

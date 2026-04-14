@@ -199,12 +199,36 @@ func (ch *Channel) SetStandardWaveform(wave fgen.StandardWaveform) error {
 	ctx, cancel := ch.newContext()
 	defer cancel()
 
-	cmd, err := ivi.LookupSCPI(waveformCommand, wave)
-	if err != nil {
-		return fmt.Errorf("SetStandardWaveform: %w", err)
-	}
+	// Triangle, RampUp, and RampDown require two commands: set the function to
+	// RAMP, then set the symmetry. These must be separate commands because the
+	// SOURce channel prefix must appear on each.
+	switch wave {
+	case fgen.Triangle:
+		if err := ch.inst.Command(ctx, ch.srcPrefix()+"FUNC RAMP"); err != nil {
+			return err
+		}
 
-	return ch.inst.Command(ctx, ch.srcPrefix()+cmd)
+		return ch.inst.Command(ctx, ch.srcPrefix()+"FUNC:RAMP:SYMM 50")
+	case fgen.RampUp:
+		if err := ch.inst.Command(ctx, ch.srcPrefix()+"FUNC RAMP"); err != nil {
+			return err
+		}
+
+		return ch.inst.Command(ctx, ch.srcPrefix()+"FUNC:RAMP:SYMM 100")
+	case fgen.RampDown:
+		if err := ch.inst.Command(ctx, ch.srcPrefix()+"FUNC RAMP"); err != nil {
+			return err
+		}
+
+		return ch.inst.Command(ctx, ch.srcPrefix()+"FUNC:RAMP:SYMM 0")
+	default:
+		cmd, err := ivi.LookupSCPI(waveformCommand, wave)
+		if err != nil {
+			return fmt.Errorf("SetStandardWaveform: %w", err)
+		}
+
+		return ch.inst.Command(ctx, ch.srcPrefix()+cmd)
+	}
 }
 
 // ConfigureStandardWaveform configures the attributes of the function
@@ -228,27 +252,49 @@ func (ch *Channel) ConfigureStandardWaveform(
 		return fmt.Errorf("ConfigureStandardWaveform: %w", err)
 	}
 
-	if err := ch.inst.Command(ctx, ch.srcPrefix()+format, freq, amp, offset); err != nil {
+	if err := ch.inst.Command(
+		ctx, ch.srcPrefix()+format, freq, amp, offset,
+	); err != nil {
 		return err
+	}
+
+	// For ramp-based waveforms, set the symmetry in a separate command since
+	// the SOURce channel prefix must appear on each command.
+	switch wave {
+	case fgen.Triangle:
+		if err := ch.inst.Command(
+			ctx, ch.srcPrefix()+"FUNC:RAMP:SYMM 50",
+		); err != nil {
+			return err
+		}
+	case fgen.RampUp:
+		if err := ch.inst.Command(
+			ctx, ch.srcPrefix()+"FUNC:RAMP:SYMM 100",
+		); err != nil {
+			return err
+		}
+	case fgen.RampDown:
+		if err := ch.inst.Command(
+			ctx, ch.srcPrefix()+"FUNC:RAMP:SYMM 0",
+		); err != nil {
+			return err
+		}
 	}
 
 	return ch.inst.Command(ctx, ch.srcPrefix()+"PHAS %.4f", phase)
 }
 
 var waveformCommand = map[fgen.StandardWaveform]string{
-	fgen.Sine:     "FUNC SIN",
-	fgen.Square:   "FUNC SQU",
-	fgen.Triangle: "FUNC RAMP;FUNC:RAMP:SYMM 50",
-	fgen.RampUp:   "FUNC RAMP;FUNC:RAMP:SYMM 100",
-	fgen.RampDown: "FUNC RAMP;FUNC:RAMP:SYMM 0",
-	fgen.DC:       "FUNC DC",
+	fgen.Sine:   "FUNC SIN",
+	fgen.Square: "FUNC SQU",
+	fgen.DC:     "FUNC DC",
 }
 
 var waveformApplyCommand = map[fgen.StandardWaveform]string{
 	fgen.Sine:     "APPL:SIN %.4f, %.4f, %.4f",
 	fgen.Square:   "APPL:SQU %.4f, %.4f, %.4f",
-	fgen.Triangle: "APPL:RAMP %.4f, %.4f, %.4f;:FUNC:RAMP:SYMM 50",
-	fgen.RampUp:   "APPL:RAMP %.4f, %.4f, %.4f;:FUNC:RAMP:SYMM 100",
-	fgen.RampDown: "APPL:RAMP %.4f, %.4f, %.4f;:FUNC:RAMP:SYMM 0",
+	fgen.Triangle: "APPL:RAMP %.4f, %.4f, %.4f",
+	fgen.RampUp:   "APPL:RAMP %.4f, %.4f, %.4f",
+	fgen.RampDown: "APPL:RAMP %.4f, %.4f, %.4f",
 	fgen.DC:       "APPL:DC %.4f, %.4f, %.4f",
 }
