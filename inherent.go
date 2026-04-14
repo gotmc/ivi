@@ -36,6 +36,7 @@ type Inherent struct {
 type InherentBase struct {
 	ClassSpecRevision         string
 	IDNString                 string
+	LocalControlCommand       string // SCPI command to return to local control (default: "SYST:LOC")
 	GroupCapabilities         []string
 	SupportedInstrumentModels []string
 	SupportedBusInterfaces    []string
@@ -182,7 +183,14 @@ func (inherent *Inherent) Disable() error {
 	defer cancel()
 
 	// Best-effort return to local control so the front panel regains control.
-	_ = inherent.inst.Command(ctx, "SYST:LOC")
+	// Use the instrument-specific command if provided, otherwise default to
+	// SYST:LOC which is the most common SCPI local control command.
+	cmd := inherent.LocalControlCommand
+	if cmd == "" {
+		cmd = "SYST:LOC"
+	}
+
+	_ = inherent.inst.Command(ctx, cmd)
 
 	return nil
 }

@@ -88,6 +88,7 @@ func New(inst ivi.Transport, opts ...ivi.DriverOption) (*Driver, error) {
 		ResetDelay:            500 * time.Millisecond,
 		ClearDelay:            500 * time.Millisecond,
 		ReturnToLocal:         true,
+		LocalControlCommand:   "SYST:COMM:RLST LOC",
 		GroupCapabilities: []string{
 			"IviFgenBase",
 			"IviFgenBurst",
