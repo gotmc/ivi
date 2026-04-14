@@ -132,7 +132,7 @@ func TestConcurrentOperations(t *testing.T) {
 	// Run multiple queries concurrently
 	done := make(chan bool, 3)
 
-	for i := 0; i < 3; i++ {
+	for range 3 {
 		go func() {
 			ctx, cancel := context.WithTimeout(context.Background(), 100*time.Millisecond)
 			defer cancel()
@@ -149,7 +149,7 @@ func TestConcurrentOperations(t *testing.T) {
 	}
 
 	// Wait for all goroutines to complete
-	for i := 0; i < 3; i++ {
+	for range 3 {
 		select {
 		case <-done:
 			// Success

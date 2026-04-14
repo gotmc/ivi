@@ -231,4 +231,3 @@ func SerialEndMark() string {
 func DefaultSerialDataFrame() string {
 	return "8N2"
 }
-

@@ -92,6 +92,6 @@ func NewChannel(id int, name string, inst ivi.Transport) Channel {
 }
 
 // Set writes the format string, using the given parameters to the channel.
-func (ch *Channel) Set(ctx context.Context, format string, a ...interface{}) error {
+func (ch *Channel) Set(ctx context.Context, format string, a ...any) error {
 	return ivi.Set(ctx, ch.inst, format, a...)
 }

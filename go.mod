@@ -1,6 +1,6 @@
 module github.com/gotmc/ivi
 
-go 1.21
+go 1.26
 
 require (
 	github.com/gotmc/convert v0.5.0

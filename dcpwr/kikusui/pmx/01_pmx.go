@@ -122,4 +122,3 @@ func (d *Driver) Channel(index int) (*Channel, error) {
 func (d *Driver) Close() error {
 	return d.Inherent.Close()
 }
-

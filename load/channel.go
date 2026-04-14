@@ -41,7 +41,7 @@ func (ch *Channel) String() string {
 
 // Set takes the same inputs as fmt.Sprintf() and writes the resultant command
 // to the IVI device.
-func (ch *Channel) Set(ctx context.Context, format string, a ...interface{}) error {
+func (ch *Channel) Set(ctx context.Context, format string, a ...any) error {
 	return ivi.Set(ctx, ch.inst, format, a...)
 }
 

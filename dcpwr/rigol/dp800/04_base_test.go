@@ -354,4 +354,3 @@ func TestChannel_ConfigureCurrentLimit(t *testing.T) {
 		t.Errorf("second command = %q, want :OUTP:OCP", mock.commandsSent[1])
 	}
 }
-
