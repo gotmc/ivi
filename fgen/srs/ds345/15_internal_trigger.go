@@ -6,8 +6,6 @@
 package ds345
 
 import (
-	"context"
-
 	"github.com/gotmc/ivi"
 	"github.com/gotmc/query"
 )
@@ -20,7 +18,10 @@ import (
 // InternalTriggerRate is the getter for the read-write IviFgenInternalTrigger
 // Attribute Internal Trigger Rate described in Section 15.2.1 of IVI-4.3:
 // IviFgen Class Specification.
-func (d *Driver) InternalTriggerRate(ctx context.Context) (float64, error) {
+func (d *Driver) InternalTriggerRate() (float64, error) {
+	ctx, cancel := d.newContext()
+	defer cancel()
+
 	return query.Float64(ctx, d.inst, "TRAT?")
 }
 
@@ -32,7 +33,10 @@ func (d *Driver) InternalTriggerRate(ctx context.Context) (float64, error) {
 // SetInternalTriggerRate is the setter for the read-write
 // IviFgenInternalTrigger Attribute Internal Trigger Rate described in Section
 // 15.2.1 of IVI-4.3: IviFgen Class Specification.
-func (d *Driver) SetInternalTriggerRate(ctx context.Context, rate float64) error {
+func (d *Driver) SetInternalTriggerRate(rate float64) error {
+	ctx, cancel := d.newContext()
+	defer cancel()
+
 	// The DS345 supports internal trigger rates from 0.001 Hz to 10 kHz.
 	if rate < 0.001 || rate > 10000 {
 		return ivi.ErrValueNotSupported

@@ -6,8 +6,6 @@
 package key33000
 
 import (
-	"context"
-
 	"github.com/gotmc/query"
 )
 
@@ -17,7 +15,10 @@ import (
 // InternalTriggerRate is the getter for the read-write IviFgenInternalTrigger
 // Attribute Internal Trigger Rate described in Section 15.2.1 of IVI-4.3:
 // IviFgen Class Specification.
-func (d *Driver) InternalTriggerRate(ctx context.Context) (float64, error) {
+func (d *Driver) InternalTriggerRate() (float64, error) {
+	ctx, cancel := d.newContext()
+	defer cancel()
+
 	// The 33500B stores the burst internal period in seconds; the IVI API
 	// expects the number of triggers per second. Therefore, we need the inverse.
 	per, err := query.Float64(ctx, d.inst, d.channels[0].srcPrefix()+"BURS:INT:PER?")
@@ -34,7 +35,10 @@ func (d *Driver) InternalTriggerRate(ctx context.Context) (float64, error) {
 // SetInternalTriggerRate is the setter for the read-write
 // IviFgenInternalTrigger Attribute Internal Trigger Rate described in Section
 // 15.2.1 of IVI-4.3: IviFgen Class Specification.
-func (d *Driver) SetInternalTriggerRate(ctx context.Context, rate float64) error {
+func (d *Driver) SetInternalTriggerRate(rate float64) error {
+	ctx, cancel := d.newContext()
+	defer cancel()
+
 	// Convert rate (Hz) to period (seconds).
 	return d.inst.Command(ctx, d.channels[0].srcPrefix()+"BURS:INT:PER %v", 1/rate)
 }

@@ -6,7 +6,6 @@
 package key33220
 
 import (
-	"context"
 	"fmt"
 	"strings"
 
@@ -15,111 +14,82 @@ import (
 	"github.com/gotmc/query"
 )
 
-// Amplitude reads the difference between the maximum and minimum waveform
-// values, i.e., the peak-to-peak voltage value.
-//
-// Amplitude is the getter for the read-write IviFgenStdFunc Attribute
-// Amplitude described in Section 5.2.1 of IVI-4.3: IviFgen Class
-// Specification.
-func (ch *Channel) Amplitude(ctx context.Context) (float64, error) {
+func (ch *Channel) Amplitude() (float64, error) {
+	ctx, cancel := ch.newContext()
+	defer cancel()
+
 	return query.Float64(ctx, ch.inst, "VOLT?")
 }
 
-// SetAmplitude specifies the difference between the maximum and minimum
-// waveform values, i.e., the peak-to-peak voltage value.
-//
-// SetAmplitude is the setter for the read-write IviFgenStdFunc Attribute
-// Amplitude described in Section 5.2.1 of IVI-4.3: IviFgen Class
-// Specification.
-func (ch *Channel) SetAmplitude(ctx context.Context, amp float64) error {
+func (ch *Channel) SetAmplitude(amp float64) error {
+	ctx, cancel := ch.newContext()
+	defer cancel()
+
 	return ch.inst.Command(ctx, "VOLT %f VPP", amp)
 }
 
-// DCOffset reads the difference between the average of the maximum and minimum
-// waveform values and the x-axis (0 volts).
-//
-// DCOffset is the getter for the read-write IviFgenStdFunc Attribute DC Offset
-// described in Section 5.2.2 of IVI-4.3: IviFgen Class Specification.
-func (ch *Channel) DCOffset(ctx context.Context) (float64, error) {
+func (ch *Channel) DCOffset() (float64, error) {
+	ctx, cancel := ch.newContext()
+	defer cancel()
+
 	return query.Float64(ctx, ch.inst, "VOLT:OFFS?")
 }
 
-// SetDCOffset sets the difference between the average of the maximum and
-// minimum waveform values and the x-axis (0 volts).
-//
-// SetDCOffset is the setter for the read-write IviFgenStdFunc Attribute DC
-// Offset described in Section 5.2.2 of IVI-4.3: IviFgen Class Specification.
-func (ch *Channel) SetDCOffset(ctx context.Context, offset float64) error {
+func (ch *Channel) SetDCOffset(offset float64) error {
+	ctx, cancel := ch.newContext()
+	defer cancel()
+
 	return ch.inst.Command(ctx, "VOLT:OFFS %f", offset)
 }
 
-// DutyCycleHigh reads the percentage of time, specified as 0-100, during one
-// cycle for which the square wave is at its high value.
-//
-// DutyCycle is the getter for the read-write IviFgenStdFunc Attribute Duty
-// Cycle High described in Section 5.2.3 of IVI-4.3: IviFgen Class
-// Specification.
-func (ch *Channel) DutyCycleHigh(ctx context.Context) (float64, error) {
+func (ch *Channel) DutyCycleHigh() (float64, error) {
+	ctx, cancel := ch.newContext()
+	defer cancel()
+
 	return query.Float64(ctx, ch.inst, "FUNC:SQU:DCYC?")
 }
 
-// SetDutyCycleHigh sets the percentage of time, specified as 0-100, during one
-// cycle for which the square wave is at its high value.
-//
-// SetDutyCycle is the setter for the read-write IviFgenStdFunc Attribute Duty
-// Cycle High described in Section 5.2.3 of IVI-4.3: IviFgen Class
-// Specification.
-func (ch *Channel) SetDutyCycleHigh(ctx context.Context, duty float64) error {
+func (ch *Channel) SetDutyCycleHigh(duty float64) error {
+	ctx, cancel := ch.newContext()
+	defer cancel()
+
 	return ch.inst.Command(ctx, "FUNC:SQU:DCYC %f", duty)
 }
 
-// Frequency reads the number of waveform cycles generated in one second (i.e.,
-// Hz). Frequency is not applicable for a DC waveform.
-//
-// Frequency is the getter for the read-write IviFgenStdFunc Attribute
-// Frequency described in Section 5.2.4 of IVI-4.3: IviFgen Class
-// Specification.
-func (ch *Channel) Frequency(ctx context.Context) (float64, error) {
+func (ch *Channel) Frequency() (float64, error) {
+	ctx, cancel := ch.newContext()
+	defer cancel()
+
 	return query.Float64(ctx, ch.inst, "FREQ?")
 }
 
-// SetFrequency sets the number of waveform cycles generated in one second
-// (i.e., Hz). Frequency is not applicable for a DC waveform.
-//
-// SetFrequency is the setter for the read-write IviFgenStdFunc Attribute
-// Frequency described in Section 5.2.4 of IVI-4.3: IviFgen Class
-// Specification.
-func (ch *Channel) SetFrequency(ctx context.Context, freq float64) error {
+func (ch *Channel) SetFrequency(freq float64) error {
+	ctx, cancel := ch.newContext()
+	defer cancel()
+
 	return ch.inst.Command(ctx, "FREQ %f", freq)
 }
 
-// StartPhase reads the start phase of the standard waveform the function
-// generator produces. When the Waveform attribute is set to Waveform DC, this
-// attribute does not affect signal output. The units are degrees.
-//
-// StartPhase is the getter for the read-write IviFgenStdFunc Attribute Start
-// Phase described in Section 5.2.5 of IVI-4.3: IviFgen Class Specification.
-func (ch *Channel) StartPhase(ctx context.Context) (float64, error) {
+func (ch *Channel) StartPhase() (float64, error) {
+	ctx, cancel := ch.newContext()
+	defer cancel()
+
 	return query.Float64(ctx, ch.inst, "PHAS?")
 }
 
-// SetStartPhase writes the start phase of the standard waveform the function
-// generator produces. When the Waveform attribute is set to Waveform DC, this
-// attribute does not affect signal output. The units are degrees.
-//
-// SetStartPhase is the setter for the read-write IviFgenStdFunc Attribute
-// Start Phase described in Section 5.2.5 of IVI-4.3: IviFgen Class
-// Specification.
-func (ch *Channel) SetStartPhase(ctx context.Context, freq float64) error {
-	return ch.inst.Command(ctx, "PHAS %f", freq)
+func (ch *Channel) SetStartPhase(phase float64) error {
+	ctx, cancel := ch.newContext()
+	defer cancel()
+
+	return ch.inst.Command(ctx, "PHAS %f", phase)
 }
 
-// StandardWaveform determines if one of the IVI Standard Waveforms is being output by
-// the function generator. If not, an error is returned.
-//
-// StandardWaveform is the getter for the read-write IviFgenStdFunc Attribute Waveform
-// described in Section 5.2.6 of IVI-4.3: IviFgen Class Specification.
-func (ch *Channel) StandardWaveform(ctx context.Context) (fgen.StandardWaveform, error) {
+// StandardWaveform determines if one of the IVI Standard Waveforms is being
+// output by the function generator.
+func (ch *Channel) StandardWaveform() (fgen.StandardWaveform, error) {
+	ctx, cancel := ch.newContext()
+	defer cancel()
+
 	var wave fgen.StandardWaveform
 
 	s, err := query.String(ctx, ch.inst, "FUNC?")
@@ -152,7 +122,9 @@ func (ch *Channel) StandardWaveform(ctx context.Context) (fgen.StandardWaveform,
 		case 50.0:
 			return fgen.Triangle, nil
 		default:
-			return wave, fmt.Errorf("unable to determine waveform type RAMP with SYMM %f", symm)
+			return wave, fmt.Errorf(
+				"unable to determine waveform type RAMP with SYMM %f", symm,
+			)
 		}
 	}
 
@@ -161,13 +133,10 @@ func (ch *Channel) StandardWaveform(ctx context.Context) (fgen.StandardWaveform,
 
 // SetStandardWaveform specifies which standard waveform the function generator
 // produces.
-//
-// SetStandardWaveform is the setter for the read-write IviFgenStdFunc
-// Attribute Waveform described in Section 5.2.6 of IVI-4.3: IviFgen Class
-// Specification.
-func (ch *Channel) SetStandardWaveform(ctx context.Context, wave fgen.StandardWaveform) error {
-	// FIXME(mdr): May need to change the phase offset in order to match the
-	// waveforms shown in Figure 5-1 of IVI-4.3: IviFgen Class Specification.
+func (ch *Channel) SetStandardWaveform(wave fgen.StandardWaveform) error {
+	ctx, cancel := ch.newContext()
+	defer cancel()
+
 	cmd, err := ivi.LookupSCPI(waveformCommand, wave)
 	if err != nil {
 		return fmt.Errorf("SetStandardWaveform: %w", err)
@@ -178,18 +147,16 @@ func (ch *Channel) SetStandardWaveform(ctx context.Context, wave fgen.StandardWa
 
 // ConfigureStandardWaveform configures the attributes of the function
 // generator that affect standard waveform generation.
-//
-// ConfigureStandardWaveform is the method that implements the Configure
-// Standard Waveform function described in Section 5.3.1 of IVI-4.3: IviFgen
-// Class Specification.
 func (ch *Channel) ConfigureStandardWaveform(
-	ctx context.Context,
 	wave fgen.StandardWaveform,
 	amp float64,
 	offset float64,
 	freq float64,
 	phase float64,
 ) error {
+	ctx, cancel := ch.newContext()
+	defer cancel()
+
 	format, err := ivi.LookupSCPI(waveformApplyCommand, wave)
 	if err != nil {
 		return fmt.Errorf("ConfigureStandardWaveform: %w", err)

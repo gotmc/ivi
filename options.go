@@ -5,6 +5,8 @@
 
 package ivi
 
+import "time"
+
 // DriverOption configures the behavior of a driver's New constructor.
 type DriverOption func(*DriverConfig)
 
@@ -14,6 +16,7 @@ type DriverOption func(*DriverConfig)
 // driver-specific (e.g., Standalone) are ignored by drivers that don't use
 // them.
 type DriverConfig struct {
+	Timeout    time.Duration
 	IDQuery    bool
 	Reset      bool
 	Standalone bool
@@ -41,6 +44,14 @@ func WithIDQuery() DriverOption {
 func WithReset() DriverOption {
 	return func(cfg *DriverConfig) {
 		cfg.Reset = true
+	}
+}
+
+// WithTimeout overrides the default timeout for instrument I/O operations
+// during driver construction and subsequent method calls.
+func WithTimeout(t time.Duration) DriverOption {
+	return func(cfg *DriverConfig) {
+		cfg.Timeout = t
 	}
 }
 

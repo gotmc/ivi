@@ -6,7 +6,6 @@
 package ds345
 
 import (
-	"context"
 	"fmt"
 	"strings"
 	"time"
@@ -28,23 +27,26 @@ var scpiToTriggerSource = map[string]fgen.TriggerSource{
 	"3": fgen.TriggerSourceExternal,
 }
 
-func (ch *Channel) StartTriggerDelay(_ context.Context) (time.Duration, error) {
+func (ch *Channel) StartTriggerDelay() (time.Duration, error) {
 	return time.Duration(0), ivi.ErrFunctionNotSupported
 }
 
-func (ch *Channel) SetStartTriggerDelay(_ context.Context, _ time.Duration) error {
+func (ch *Channel) SetStartTriggerDelay(_ time.Duration) error {
 	return ivi.ErrFunctionNotSupported
 }
 
-func (ch *Channel) StartTriggerSlope(_ context.Context) (fgen.TriggerSlope, error) {
+func (ch *Channel) StartTriggerSlope() (fgen.TriggerSlope, error) {
 	return 0, ivi.ErrFunctionNotSupported
 }
 
-func (ch *Channel) SetStartTriggerSlope(_ context.Context, slope fgen.TriggerSlope) error {
+func (ch *Channel) SetStartTriggerSlope(slope fgen.TriggerSlope) error {
 	return ivi.ErrFunctionNotSupported
 }
 
-func (ch *Channel) StartTriggerSource(ctx context.Context) (fgen.TriggerSource, error) {
+func (ch *Channel) StartTriggerSource() (fgen.TriggerSource, error) {
+	ctx, cancel := ch.newContext()
+	defer cancel()
+
 	var src fgen.TriggerSource
 
 	s, err := query.String(ctx, ch.inst, "TSRC?")
@@ -62,7 +64,10 @@ func (ch *Channel) StartTriggerSource(ctx context.Context) (fgen.TriggerSource, 
 	return src, nil
 }
 
-func (ch *Channel) SetStartTriggerSource(ctx context.Context, src fgen.TriggerSource) error {
+func (ch *Channel) SetStartTriggerSource(src fgen.TriggerSource) error {
+	ctx, cancel := ch.newContext()
+	defer cancel()
+
 	triggerSource, err := ivi.LookupSCPI(triggerSourceToSCPI, src)
 	if err != nil {
 		return fmt.Errorf("trigger source %s not supported: %w", src, err)
@@ -71,16 +76,15 @@ func (ch *Channel) SetStartTriggerSource(ctx context.Context, src fgen.TriggerSo
 	return ch.inst.Command(ctx, "TSRC%s", triggerSource)
 }
 
-func (ch *Channel) StartTriggerThreshold(_ context.Context) (float64, error) {
+func (ch *Channel) StartTriggerThreshold() (float64, error) {
 	return 0.0, ivi.ErrFunctionNotSupported
 }
 
-func (ch *Channel) SetStartTriggerThreshold(_ context.Context, threshold float64) error {
+func (ch *Channel) SetStartTriggerThreshold(threshold float64) error {
 	return ivi.ErrFunctionNotSupported
 }
 
 func (ch *Channel) StartTriggerConfigure(
-	_ context.Context,
 	source fgen.TriggerSource,
 	slope fgen.TriggerSlope,
 ) error {

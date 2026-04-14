@@ -5,8 +5,6 @@
 
 package fgen
 
-import "context"
-
 /*
 
 # Section 9 IviFgenTrigger Extension Group
@@ -46,8 +44,8 @@ There are no .NET functions for Section 9.3.
 // TriggerChannel provides the interface for the channel repeated capability for
 // the IviFgenTrigger extension group.
 type TriggerChannel interface {
-	TriggerSource(ctx context.Context) (OldTriggerSource, error)
-	SetTriggerSource(ctx context.Context, src OldTriggerSource) error
+	TriggerSource() (OldTriggerSource, error)
+	SetTriggerSource(src OldTriggerSource) error
 }
 
 // oldToNewTriggerSource maps deprecated OldTriggerSource values to their

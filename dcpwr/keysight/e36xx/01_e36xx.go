@@ -10,7 +10,6 @@
 package e36xx
 
 import (
-	"context"
 	"fmt"
 	"time"
 
@@ -45,13 +44,19 @@ type Channel struct {
 }
 
 // New creates a new IVI driver for the Keysight/Agilent E3600 series of DC
-// power supplies. The context is used for any I/O performed during
-// construction. The New function always queries the instrument to determine
+// power supplies. The New function always queries the instrument to determine
 // the model for channel configuration. Use [ivi.WithIDQuery] to also validate
-// the model against the supported models list. Use [ivi.WithReset] to reset
-// the instrument on creation.
-func New(ctx context.Context, inst ivi.Transport, opts ...ivi.DriverOption) (*Driver, error) {
+// the model against the supported models list, [ivi.WithReset] to reset
+// the instrument on creation, and [ivi.WithTimeout] to override the default
+// I/O timeout.
+func New(inst ivi.Transport, opts ...ivi.DriverOption) (*Driver, error) {
 	cfg := ivi.ApplyOptions(opts)
+
+	timeout := cfg.Timeout
+	if timeout == 0 {
+		timeout = ivi.DefaultTimeout
+	}
+
 	inherentBase := ivi.InherentBase{
 		ClassSpecMajorVersion: specMajorVersion,
 		ClassSpecMinorVersion: specMinorVersion,
@@ -74,15 +79,15 @@ func New(ctx context.Context, inst ivi.Transport, opts ...ivi.DriverOption) (*Dr
 			"SERIAL",
 		},
 	}
-	inherent := ivi.NewInherent(inst, inherentBase)
+	inherent := ivi.NewInherent(inst, inherentBase, timeout)
 
 	// Always query the model since channel configuration depends on it.
-	model, err := inherent.CheckID(ctx)
+	model, err := inherent.CheckID()
 	if err != nil && cfg.IDQuery {
 		return nil, err
 	} else if err != nil {
 		// Without idQuery, still need the model for channel config.
-		model, err = inherent.InstrumentModel(ctx)
+		model, err = inherent.InstrumentModel()
 		if err != nil {
 			return nil, fmt.Errorf("error determining instrument model: %w", err)
 		}
@@ -105,7 +110,7 @@ func New(ctx context.Context, inst ivi.Transport, opts ...ivi.DriverOption) (*Dr
 	}
 
 	if cfg.Reset {
-		if err := driver.Reset(ctx); err != nil {
+		if err := driver.Reset(); err != nil {
 			return &driver, err
 		}
 	}

@@ -5,8 +5,6 @@
 
 package fgen
 
-import "context"
-
 /*
 
 The following information is from the IVI-4.3: IviFgen Class Specification date
@@ -50,6 +48,6 @@ None.
 // BurstChannel provides the interface for the channel repeated capability for
 // the IviFgenBurst extension group.
 type BurstChannel interface {
-	BurstCount(ctx context.Context) (int, error)
-	SetBurstCount(ctx context.Context, count int) error
+	BurstCount() (int, error)
+	SetBurstCount(count int) error
 }

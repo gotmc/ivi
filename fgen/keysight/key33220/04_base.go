@@ -6,7 +6,6 @@
 package key33220
 
 import (
-	"context"
 	"fmt"
 	"strings"
 
@@ -47,17 +46,17 @@ func (d *Driver) OutputCount() int {
 	return len(d.channels)
 }
 
-// OutputMode returns the determines how the function generator produces
-// waveforms. This attribute determines which extension group’s functions and
-// attributes are used to configure the waveform the function generator
-// produces.
+// OutputMode returns how the function generator produces waveforms.
 //
-// OutputMode is the getter for the read-only IviFgenBase Attribute Output
+// OutputMode is the getter for the read-write IviFgenBase Attribute Output
 // Mode described in Section 4.2.5 of IVI-4.3: IviFgen Class Specification.
-func (d *Driver) OutputMode(ctx context.Context) (fgen.OutputMode, error) {
+func (d *Driver) OutputMode() (fgen.OutputMode, error) {
+	ctx, cancel := d.newContext()
+	defer cancel()
+
 	s, err := query.String(ctx, d.inst, "FUNC?")
 	if err != nil {
-		return 0, fmt.Errorf("error determining the output function type: %w", err)
+		return 0, fmt.Errorf("OutputMode: %w", err)
 	}
 
 	mode, err := ivi.ReverseLookup(scpiToOutputMode, s)
@@ -68,13 +67,14 @@ func (d *Driver) OutputMode(ctx context.Context) (fgen.OutputMode, error) {
 	return mode, nil
 }
 
-// SetOutputMode sets how the function generator produces waveforms. This
-// attribute determines which extension group’s functions and attributes are
-// used to configure the waveform the function generator produces.
+// SetOutputMode sets how the function generator produces waveforms.
 //
-// OutputMode is the setter for the read-only IviFgenBase Attribute Output
+// SetOutputMode is the setter for the read-write IviFgenBase Attribute Output
 // Mode described in Section 4.2.5 of IVI-4.3: IviFgen Class Specification.
-func (d *Driver) SetOutputMode(ctx context.Context, outputMode fgen.OutputMode) error {
+func (d *Driver) SetOutputMode(outputMode fgen.OutputMode) error {
+	ctx, cancel := d.newContext()
+	defer cancel()
+
 	cmd, err := ivi.LookupSCPI(outputModeToSCPI, outputMode)
 	if err != nil {
 		return fmt.Errorf("SetOutputMode: %w", err)
@@ -84,13 +84,12 @@ func (d *Driver) SetOutputMode(ctx context.Context, outputMode fgen.OutputMode) 
 }
 
 // InitiateGeneration initiates signal generation by enabling all outputs.
-// Instead of calling this function, the user can simply enable outputs.
 //
 // InitiateGeneration implements the IviFgenBase function described in Section
 // 4.3.8 of IVI-4.3: IviFgen Class Specification.
-func (d *Driver) InitiateGeneration(ctx context.Context) error {
+func (d *Driver) InitiateGeneration() error {
 	for _, channel := range d.channels {
-		if err := channel.EnableOutput(ctx); err != nil {
+		if err := channel.EnableOutput(); err != nil {
 			return err
 		}
 	}
@@ -103,9 +102,9 @@ func (d *Driver) InitiateGeneration(ctx context.Context) error {
 //
 // AbortGeneration implements the IviFgenBase function described in Section 4.3.1
 // of IVI-4.3: IviFgen Class Specification.
-func (d *Driver) AbortGeneration(ctx context.Context) error {
+func (d *Driver) AbortGeneration() error {
 	for _, channel := range d.channels {
-		if err := channel.DisableOutput(ctx); err != nil {
+		if err := channel.DisableOutput(); err != nil {
 			return err
 		}
 	}
@@ -113,11 +112,11 @@ func (d *Driver) AbortGeneration(ctx context.Context) error {
 	return nil
 }
 
-func (d *Driver) ReferenceClockSource(_ context.Context) (fgen.ClockSource, error) {
+func (d *Driver) ReferenceClockSource() (fgen.ClockSource, error) {
 	return fgen.RefClockInternal, nil
 }
 
-func (d *Driver) SetReferenceClockSource(_ context.Context, _ fgen.ClockSource) error {
+func (d *Driver) SetReferenceClockSource(_ fgen.ClockSource) error {
 	return nil
 }
 
@@ -131,10 +130,13 @@ func (ch *Channel) Name() string {
 // OperationMode implements the getter for the read-write IviFgenBase Attribute
 // Operation Mode described in Section 4.2.2 of IVI-4.3: IviFgen Class
 // Specification.
-func (ch *Channel) OperationMode(ctx context.Context) (fgen.OperationMode, error) {
+func (ch *Channel) OperationMode() (fgen.OperationMode, error) {
+	ctx, cancel := ch.newContext()
+	defer cancel()
+
 	s, err := query.String(ctx, ch.inst, "BURS:STAT?")
 	if err != nil {
-		return 0, fmt.Errorf("error getting operation mode: %w", err)
+		return 0, fmt.Errorf("OperationMode: %w", err)
 	}
 
 	mode, err := ivi.ReverseLookup(scpiToOperationMode, strings.TrimSpace(s))
@@ -146,10 +148,15 @@ func (ch *Channel) OperationMode(ctx context.Context) (fgen.OperationMode, error
 }
 
 // SetOperationMode specifies whether the function generator should produce a
-// continuous or burst output on the channel. SetOperationMode implements the
-// setter for the read-write IviFgenBase Attribute Operation Mode described in
-// Section 4.2.2 of IVI-4.3: IviFgen Class Specification.
-func (ch *Channel) SetOperationMode(ctx context.Context, mode fgen.OperationMode) error {
+// continuous or burst output on the channel.
+//
+// SetOperationMode implements the setter for the read-write IviFgenBase
+// Attribute Operation Mode described in Section 4.2.2 of IVI-4.3: IviFgen
+// Class Specification.
+func (ch *Channel) SetOperationMode(mode fgen.OperationMode) error {
+	ctx, cancel := ch.newContext()
+	defer cancel()
+
 	cmd, err := ivi.LookupSCPI(operationModeToSCPI, mode)
 	if err != nil {
 		return fmt.Errorf("SetOperationMode: %w", err)
@@ -159,18 +166,18 @@ func (ch *Channel) SetOperationMode(ctx context.Context, mode fgen.OperationMode
 }
 
 // OutputEnabled determines if the output channel is enabled or disabled.
-// OutputEnabled is the getter for the read-write IviFgenBase Attribute
-// Output Enabled described in Section 4.2.3 of IVI-4.3: IviFgen Class
-// Specification.
-func (ch *Channel) OutputEnabled(ctx context.Context) (bool, error) {
+func (ch *Channel) OutputEnabled() (bool, error) {
+	ctx, cancel := ch.newContext()
+	defer cancel()
+
 	return query.Bool(ctx, ch.inst, "OUTP?")
 }
 
 // SetOutputEnabled sets the output channel to enabled or disabled.
-// SetOutputEnabled is the setter for the read-write IviFgenBase Attribute
-// Output Enabled described in Section 4.2.3 of IVI-4.3: IviFgen Class
-// Specification.
-func (ch *Channel) SetOutputEnabled(ctx context.Context, b bool) error {
+func (ch *Channel) SetOutputEnabled(b bool) error {
+	ctx, cancel := ch.newContext()
+	defer cancel()
+
 	if b {
 		return ch.inst.Command(ctx, "OUTP ON")
 	}
@@ -180,38 +187,33 @@ func (ch *Channel) SetOutputEnabled(ctx context.Context, b bool) error {
 
 // DisableOutput is a convenience function for setting the Output Enabled
 // attribute to false.
-func (ch *Channel) DisableOutput(ctx context.Context) error {
-	return ch.SetOutputEnabled(ctx, false)
+func (ch *Channel) DisableOutput() error {
+	return ch.SetOutputEnabled(false)
 }
 
 // EnableOutput is a convenience function for setting the Output Enabled
 // attribute to true.
-func (ch *Channel) EnableOutput(ctx context.Context) error {
-	return ch.SetOutputEnabled(ctx, true)
+func (ch *Channel) EnableOutput() error {
+	return ch.SetOutputEnabled(true)
 }
 
 // OutputImpedance return the output channel's impedance in ohms.
-// OutputImpedance is the getter for the read-write IviFgenBase Attribute
-// Output Impedance described in Section 4.2.4 of IVI-4.3: IviFgen Class
-// Specification.
-func (ch *Channel) OutputImpedance(ctx context.Context) (float64, error) {
+func (ch *Channel) OutputImpedance() (float64, error) {
+	ctx, cancel := ch.newContext()
+	defer cancel()
+
 	return query.Float64(ctx, ch.inst, "OUTP:LOAD?")
 }
 
 // SetOutputImpedance sets the output channel's impedance in ohms.
-// SetOutputImpedance is the setter for the read-write IviFgenBase Attribute
-// Output Impedance described in Section 4.2.3 of IVI-4.3: IviFgen Class
-// Specification.
-func (ch *Channel) SetOutputImpedance(ctx context.Context, impedance float64) error {
+func (ch *Channel) SetOutputImpedance(impedance float64) error {
+	ctx, cancel := ch.newContext()
+	defer cancel()
+
 	return ch.inst.Command(ctx, "OUTP:LOAD %f", impedance)
 }
 
-// AbortGeneration Aborts a previously initiated signal generation. If the
-// function generator is in the Output Generation State, this function moves
-// the function generator to the Configuration State. If the function generator
-// is already in the Configuration State, the function does nothing and returns
-// Success. AbortGeneration implements the IviFgenBase function described in
-// Section 4.3 of IVI-4.3: IviFgen Class Specification.
-func (ch *Channel) AbortGeneration(ctx context.Context) error {
-	return ch.DisableOutput(ctx)
+// AbortGeneration aborts a previously initiated signal generation.
+func (ch *Channel) AbortGeneration() error {
+	return ch.DisableOutput()
 }

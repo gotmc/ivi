@@ -5,22 +5,16 @@
 
 package key33220
 
-import (
-	"context"
-
-	"github.com/gotmc/query"
-)
+import "github.com/gotmc/query"
 
 // InternalTriggerRate determines the rate at which the function generator's
 // internal trigger source produces a trigger in triggers per second (Hz).
-//
-// InternalTriggerRate is the getter for the read-write IviFgenInternalTrigger
-// Attribute Internal Trigger Rate described in Section 15.2.1 of IVI-4.3:
-// IviFgen Class Specification.
-func (d *Driver) InternalTriggerRate(ctx context.Context) (float64, error) {
-	// The Agilent 33220A needs to know the burst period in seconds; however, the
-	// IVI API expects the number of triggers per second. Therefore, we need the
-	// inverse.
+func (d *Driver) InternalTriggerRate() (float64, error) {
+	ctx, cancel := d.newContext()
+	defer cancel()
+
+	// The Agilent 33220A stores burst internal period in seconds; the IVI API
+	// expects triggers per second. Therefore, we need the inverse.
 	per, err := query.Float64(ctx, d.inst, "BURS:INT:PER?")
 	if err != nil {
 		return 0.0, err
@@ -31,13 +25,10 @@ func (d *Driver) InternalTriggerRate(ctx context.Context) (float64, error) {
 
 // SetInternalTriggerRate specifies the rate at which the function generator's
 // internal trigger source produces a trigger in triggers per second (Hz).
-//
-// SetInternalTriggerRate is the setter for the read-write
-// IviFgenInternalTrigger Attribute Internal Trigger Rate described in Section
-// 15.2.1 of IVI-4.3: IviFgen Class Specification.
-func (d *Driver) SetInternalTriggerRate(ctx context.Context, rate float64) error {
-	// The Agilent 33220A needs to know the burst period in seconds; however, the
-	// IVI API expects the number of triggers per second. Therefore, we need the
-	// inverse.
+func (d *Driver) SetInternalTriggerRate(rate float64) error {
+	ctx, cancel := d.newContext()
+	defer cancel()
+
+	// Convert rate (Hz) to period (seconds).
 	return d.inst.Command(ctx, "BURS:INT:PER %v", 1/rate)
 }

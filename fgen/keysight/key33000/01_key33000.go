@@ -48,15 +48,22 @@ var _ fgen.ArbWfmChannel = (*Channel)(nil)
 type Driver struct {
 	inst     ivi.Transport
 	channels []Channel
+	timeout  time.Duration
 	ivi.Inherent
 }
 
 // New creates a new IVI driver for the Keysight 33000 series
-// function/arbitrary waveform generators. The context is used for any I/O
-// performed during construction (e.g., ID query, reset). Use [ivi.WithIDQuery]
-// to verify the instrument model and [ivi.WithReset] to reset on creation.
-func New(ctx context.Context, inst ivi.Transport, opts ...ivi.DriverOption) (*Driver, error) {
+// function/arbitrary waveform generators. Use [ivi.WithIDQuery]
+// to verify the instrument model, [ivi.WithReset] to reset on creation, and
+// [ivi.WithTimeout] to override the default I/O timeout.
+func New(inst ivi.Transport, opts ...ivi.DriverOption) (*Driver, error) {
 	cfg := ivi.ApplyOptions(opts)
+
+	timeout := cfg.Timeout
+	if timeout == 0 {
+		timeout = ivi.DefaultTimeout
+	}
+
 	channelNames := []string{
 		"Output1",
 		"Output2",
@@ -66,9 +73,10 @@ func New(ctx context.Context, inst ivi.Transport, opts ...ivi.DriverOption) (*Dr
 
 	for i, channelName := range channelNames {
 		ch := Channel{
-			name: channelName,
-			inst: inst,
-			num:  i + 1,
+			name:    channelName,
+			inst:    inst,
+			num:     i + 1,
+			timeout: timeout,
 		}
 		channels[i] = ch
 	}
@@ -120,10 +128,10 @@ func New(ctx context.Context, inst ivi.Transport, opts ...ivi.DriverOption) (*Dr
 			"USB",
 		},
 	}
-	inherent := ivi.NewInherent(inst, inherentBase)
+	inherent := ivi.NewInherent(inst, inherentBase, timeout)
 
 	if cfg.IDQuery {
-		if _, err := inherent.CheckID(ctx); err != nil {
+		if _, err := inherent.CheckID(); err != nil {
 			return nil, err
 		}
 	}
@@ -131,16 +139,22 @@ func New(ctx context.Context, inst ivi.Transport, opts ...ivi.DriverOption) (*Dr
 	driver := Driver{
 		inst:     inst,
 		channels: channels,
+		timeout:  timeout,
 		Inherent: inherent,
 	}
 
 	if cfg.Reset {
-		if err := driver.Reset(ctx); err != nil {
+		if err := driver.Reset(); err != nil {
 			return &driver, err
 		}
 	}
 
 	return &driver, nil
+}
+
+// newContext creates a context with the driver's configured timeout.
+func (d *Driver) newContext() (context.Context, context.CancelFunc) {
+	return context.WithTimeout(context.Background(), d.timeout)
 }
 
 // Channel returns the Channel at the given index, with bounds checking.
@@ -180,9 +194,15 @@ func LANPorts() map[string]int {
 // Channel models the output channel repeated capability for the function
 // generator output channel.
 type Channel struct {
-	inst ivi.Transport
-	name string
-	num  int // 1-based channel number for SOURce[1|2]: prefix
+	inst    ivi.Transport
+	name    string
+	num     int // 1-based channel number for SOURce[1|2]: prefix
+	timeout time.Duration
+}
+
+// newContext creates a context with the channel's configured timeout.
+func (ch *Channel) newContext() (context.Context, context.CancelFunc) {
+	return context.WithTimeout(context.Background(), ch.timeout)
 }
 
 // srcPrefix returns the SCPI source prefix for this channel (e.g., "SOUR1:").

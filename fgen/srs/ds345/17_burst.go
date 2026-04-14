@@ -6,8 +6,6 @@
 package ds345
 
 import (
-	"context"
-
 	"github.com/gotmc/query"
 )
 
@@ -16,7 +14,10 @@ import (
 //
 // BurstCount is the getter for the read-write IviFgenBurst Attribute Burst
 // Count described in Section 17.2.1 of IVI-4.3: IviFgen Class Specification.
-func (ch *Channel) BurstCount(ctx context.Context) (int, error) {
+func (ch *Channel) BurstCount() (int, error) {
+	ctx, cancel := ch.newContext()
+	defer cancel()
+
 	return query.Int(ctx, ch.inst, "BCNT?")
 }
 
@@ -25,6 +26,9 @@ func (ch *Channel) BurstCount(ctx context.Context) (int, error) {
 //
 // SetBurstCount is the setter for the read-write IviFgenBurst Attribute Burst
 // Count described in Section 17.2.1 of IVI-4.3: IviFgen Class Specification.
-func (ch *Channel) SetBurstCount(ctx context.Context, count int) error {
+func (ch *Channel) SetBurstCount(count int) error {
+	ctx, cancel := ch.newContext()
+	defer cancel()
+
 	return ch.inst.Command(ctx, "BCNT %d", count)
 }

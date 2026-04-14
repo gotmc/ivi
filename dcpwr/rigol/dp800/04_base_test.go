@@ -55,7 +55,7 @@ func newTestDriver(mock *mockInst) *Driver {
 		{name: "CH2", idx: 2, inst: mock, maxVoltage: 32.0, maxCurrent: 3.2},
 		{name: "CH3", idx: 3, inst: mock, maxVoltage: 5.3, maxCurrent: 3.2},
 	}
-	inherent := ivi.NewInherent(mock, ivi.InherentBase{ReturnToLocal: true})
+	inherent := ivi.NewInherent(mock, ivi.InherentBase{ReturnToLocal: true}, 0)
 	return &Driver{
 		inst:     mock,
 		channels: channels,

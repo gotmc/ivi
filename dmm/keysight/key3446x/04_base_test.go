@@ -213,7 +213,7 @@ func (m *mockInst) Query(_ context.Context, _ string) (string, error) {
 func newTestDriver(t *testing.T, mock *mockInst) *Driver {
 	t.Helper()
 
-	d, err := New(context.Background(), mock)
+	d, err := New(mock)
 	if err != nil {
 		t.Fatalf("New() returned unexpected error: %v", err)
 	}

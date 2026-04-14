@@ -46,9 +46,9 @@ func (m *mockInstrumentWithClose) Close() error {
 
 func TestInherent_Disable(t *testing.T) {
 	mock := &mockInstrumentWithClose{}
-	inherent := NewInherent(mock, InherentBase{ReturnToLocal: true})
+	inherent := NewInherent(mock, InherentBase{ReturnToLocal: true}, 0)
 
-	err := inherent.Disable(context.Background())
+	err := inherent.Disable()
 	if err != nil {
 		t.Errorf("Expected no error, got %v", err)
 	}
@@ -65,9 +65,9 @@ func TestInherent_Disable(t *testing.T) {
 
 func TestInherent_Disable_ErrorIgnored(t *testing.T) {
 	mock := &mockInstrumentWithClose{shouldError: true}
-	inherent := NewInherent(mock, InherentBase{ReturnToLocal: true})
+	inherent := NewInherent(mock, InherentBase{ReturnToLocal: true}, 0)
 
-	err := inherent.Disable(context.Background())
+	err := inherent.Disable()
 	if err != nil {
 		t.Errorf("Expected no error (best-effort), got %v", err)
 	}
@@ -80,7 +80,7 @@ func TestInherent_Disable_ErrorIgnored(t *testing.T) {
 
 func TestInherent_Close(t *testing.T) {
 	mock := &mockInstrumentWithClose{}
-	inherent := NewInherent(mock, InherentBase{ReturnToLocal: true})
+	inherent := NewInherent(mock, InherentBase{ReturnToLocal: true}, 0)
 
 	err := inherent.Close()
 	if err != nil {
@@ -104,7 +104,7 @@ func TestInherent_Close(t *testing.T) {
 
 func TestInherent_ReturnToLocal_Control(t *testing.T) {
 	mock := &mockInstrumentWithClose{}
-	inherent := NewInherent(mock, InherentBase{ReturnToLocal: true})
+	inherent := NewInherent(mock, InherentBase{ReturnToLocal: true}, 0)
 
 	// Should be true when explicitly set
 	if !inherent.IsReturnToLocal() {
@@ -118,7 +118,7 @@ func TestInherent_ReturnToLocal_Control(t *testing.T) {
 	}
 
 	// Disable should not send commands when ReturnToLocal is false
-	err := inherent.Disable(context.Background())
+	err := inherent.Disable()
 	if err != nil {
 		t.Errorf("Expected no error, got %v", err)
 	}
@@ -129,7 +129,7 @@ func TestInherent_ReturnToLocal_Control(t *testing.T) {
 
 	// Re-enable and verify it works
 	inherent.SetReturnToLocal(true)
-	err = inherent.Disable(context.Background())
+	err = inherent.Disable()
 	if err != nil {
 		t.Errorf("Expected no error, got %v", err)
 	}

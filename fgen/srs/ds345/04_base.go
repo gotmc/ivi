@@ -6,7 +6,6 @@
 package ds345
 
 import (
-	"context"
 	"fmt"
 
 	"github.com/gotmc/ivi"
@@ -38,13 +37,16 @@ func (d *Driver) OutputCount() int {
 }
 
 // OutputMode returns the determines how the function generator produces
-// waveforms. This attribute determines which extension group’s functions and
+// waveforms. This attribute determines which extension group's functions and
 // attributes are used to configure the waveform the function generator
 // produces.
 //
 // OutputMode is the getter for the read-only IviFgenBase Attribute Output
 // Mode described in Section 4.2.5 of IVI-4.3: IviFgen Class Specification.
-func (d *Driver) OutputMode(ctx context.Context) (fgen.OutputMode, error) {
+func (d *Driver) OutputMode() (fgen.OutputMode, error) {
+	ctx, cancel := d.newContext()
+	defer cancel()
+
 	var outputMode fgen.OutputMode
 
 	funcType, err := query.Int(ctx, d.inst, "FUNC?")
@@ -65,12 +67,15 @@ func (d *Driver) OutputMode(ctx context.Context) (fgen.OutputMode, error) {
 }
 
 // SetOutputMode sets how the function generator produces waveforms. This
-// attribute determines which extension group’s functions and attributes are
+// attribute determines which extension group's functions and attributes are
 // used to configure the waveform the function generator produces.
 //
 // OutputMode is the setter for the read-only IviFgenBase Attribute Output
 // Mode described in Section 4.2.5 of IVI-4.3: IviFgen Class Specification.
-func (d *Driver) SetOutputMode(ctx context.Context, outputMode fgen.OutputMode) error {
+func (d *Driver) SetOutputMode(outputMode fgen.OutputMode) error {
+	ctx, cancel := d.newContext()
+	defer cancel()
+
 	cmd, err := ivi.LookupSCPI(outputModeToSCPI, outputMode)
 	if err != nil {
 		return fmt.Errorf("SetOutputMode: %w", err)
@@ -83,7 +88,10 @@ func (d *Driver) SetOutputMode(ctx context.Context, outputMode fgen.OutputMode) 
 // continuous or burst output on the channel. OperationMode implements the
 // getter for the read-write IviFgenBase Attribute Operation Mode described in
 // Section 4.2.2 of IVI-4.3: IviFgen Class Specification.
-func (ch *Channel) OperationMode(ctx context.Context) (fgen.OperationMode, error) {
+func (ch *Channel) OperationMode() (fgen.OperationMode, error) {
+	ctx, cancel := ch.newContext()
+	defer cancel()
+
 	var mode fgen.OperationMode
 
 	isModulationEnabled, err := query.Bool(ctx, ch.inst, "MENA?")
@@ -114,7 +122,10 @@ func (ch *Channel) OperationMode(ctx context.Context) (fgen.OperationMode, error
 // SetOperationMode implements the setter for the read-write IviFgenBase
 // Attribute Operation Mode described in Section 4.2.2 of IVI-4.3: IviFgen
 // Class Specification.
-func (ch *Channel) SetOperationMode(ctx context.Context, mode fgen.OperationMode) error {
+func (ch *Channel) SetOperationMode(mode fgen.OperationMode) error {
+	ctx, cancel := ch.newContext()
+	defer cancel()
+
 	cmd, err := ivi.LookupSCPI(operationModeToSCPI, mode)
 	if err != nil {
 		return fmt.Errorf("SetOperationMode: %w", err)
@@ -127,7 +138,7 @@ func (ch *Channel) SetOperationMode(ctx context.Context, mode fgen.OperationMode
 //
 // OutputEnabled is the getter for the read-write IviFgenBase Attribute Output
 // Enabled described in Section 4.2.3 of IVI-4.3: IviFgen Class Specification.
-func (ch *Channel) OutputEnabled(_ context.Context) (bool, error) {
+func (ch *Channel) OutputEnabled() (bool, error) {
 	return false, ivi.ErrFunctionNotSupported
 }
 
@@ -136,20 +147,20 @@ func (ch *Channel) OutputEnabled(_ context.Context) (bool, error) {
 // SetOutputEnabled is the setter for the read-write IviFgenBase Attribute
 // Output Enabled described in Section 4.2.3 of IVI-4.3: IviFgen Class
 // Specification.
-func (ch *Channel) SetOutputEnabled(_ context.Context, _ bool) error {
+func (ch *Channel) SetOutputEnabled(_ bool) error {
 	return ivi.ErrFunctionNotSupported
 }
 
 // DisableOutput is a convenience function for setting the Output Enabled
 // attribute to false.
-func (ch *Channel) DisableOutput(ctx context.Context) error {
-	return ch.SetOutputEnabled(ctx, false)
+func (ch *Channel) DisableOutput() error {
+	return ch.SetOutputEnabled(false)
 }
 
 // EnableOutput is a convenience function for setting the Output Enabled
 // attribute to true.
-func (ch *Channel) EnableOutput(ctx context.Context) error {
-	return ch.SetOutputEnabled(ctx, true)
+func (ch *Channel) EnableOutput() error {
+	return ch.SetOutputEnabled(true)
 }
 
 // OutputImpedance return the output channel's impedance in ohms.
@@ -157,7 +168,7 @@ func (ch *Channel) EnableOutput(ctx context.Context) error {
 // OutputImpedance is the getter for the read-write IviFgenBase Attribute
 // Output Impedance described in Section 4.2.4 of IVI-4.3: IviFgen Class
 // Specification.
-func (ch *Channel) OutputImpedance(_ context.Context) (float64, error) {
+func (ch *Channel) OutputImpedance() (float64, error) {
 	return outputImpedance, nil
 }
 
@@ -166,7 +177,7 @@ func (ch *Channel) OutputImpedance(_ context.Context) (float64, error) {
 // SetOutputImpedance is the setter for the read-write IviFgenBase Attribute
 // Output Impedance described in Section 4.2.4 of IVI-4.3: IviFgen Class
 // Specification.
-func (ch *Channel) SetOutputImpedance(_ context.Context, impedance float64) error {
+func (ch *Channel) SetOutputImpedance(impedance float64) error {
 	if impedance != outputImpedance {
 		return ivi.ErrFunctionNotSupported
 	}
@@ -180,7 +191,7 @@ func (ch *Channel) SetOutputImpedance(_ context.Context, impedance float64) erro
 //
 // AbortGeneration implements the IviFgenBase function described in Section 4.3.1
 // of IVI-4.3: IviFgen Class Specification.
-func (d *Driver) AbortGeneration(_ context.Context) error {
+func (d *Driver) AbortGeneration() error {
 	return nil
 }
 
@@ -190,15 +201,15 @@ func (d *Driver) AbortGeneration(_ context.Context) error {
 //
 // InitiateGeneration implements the IviFgenBase function described in Section
 // 4.3.8 of IVI-4.3: IviFgen Class Specification.
-func (d *Driver) InitiateGeneration(_ context.Context) error {
+func (d *Driver) InitiateGeneration() error {
 	return nil
 }
 
-func (d *Driver) ReferenceClockSource(_ context.Context) (fgen.ClockSource, error) {
+func (d *Driver) ReferenceClockSource() (fgen.ClockSource, error) {
 	return fgen.RefClockInternal, nil
 }
 
-func (d *Driver) SetReferenceClockSource(_ context.Context, src fgen.ClockSource) error {
+func (d *Driver) SetReferenceClockSource(_ fgen.ClockSource) error {
 	return nil
 }
 

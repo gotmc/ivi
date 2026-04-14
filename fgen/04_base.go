@@ -5,8 +5,6 @@
 
 package fgen
 
-import "context"
-
 /*
 
 # Section 4 IviFgenBase Capability Group
@@ -15,7 +13,7 @@ import "context"
 
 The IviFgenBase capability group supports the most basic function generator
 capabilities. The user can configure the output impedance and reference clock
-source, and enable or disable the function generator’s output channels.
+source, and enable or disable the function generator's output channels.
 
 ## Section 4.2 IviFgenBase Attributes
 
@@ -43,22 +41,22 @@ Below are the .NET functions, since they are the basis for the Go interfaces.
 // Base provides the interface required for the IviFgenBase capability group.
 type Base interface {
 	OutputCount() int
-	OutputMode(ctx context.Context) (OutputMode, error)
-	SetOutputMode(ctx context.Context, mode OutputMode) error
-	ReferenceClockSource(ctx context.Context) (ClockSource, error)
-	SetReferenceClockSource(ctx context.Context, src ClockSource) error
-	AbortGeneration(ctx context.Context) error
-	InitiateGeneration(ctx context.Context) error
+	OutputMode() (OutputMode, error)
+	SetOutputMode(mode OutputMode) error
+	ReferenceClockSource() (ClockSource, error)
+	SetReferenceClockSource(src ClockSource) error
+	AbortGeneration() error
+	InitiateGeneration() error
 }
 
 // BaseChannel provides the interface required for the channel repeated
 // capability for the IviFgenBase capability group.
 type BaseChannel interface {
 	Name() string
-	OperationMode(ctx context.Context) (OperationMode, error)
-	SetOperationMode(ctx context.Context, mode OperationMode) error
-	OutputEnabled(ctx context.Context) (bool, error)
-	SetOutputEnabled(ctx context.Context, b bool) error
-	OutputImpedance(ctx context.Context) (float64, error)
-	SetOutputImpedance(ctx context.Context, impedance float64) error
+	OperationMode() (OperationMode, error)
+	SetOperationMode(mode OperationMode) error
+	OutputEnabled() (bool, error)
+	SetOutputEnabled(b bool) error
+	OutputImpedance() (float64, error)
+	SetOutputImpedance(impedance float64) error
 }

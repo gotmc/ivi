@@ -6,7 +6,6 @@
 package ds345
 
 import (
-	"context"
 	"fmt"
 
 	"github.com/gotmc/ivi/fgen"
@@ -19,8 +18,8 @@ import (
 // Specification.
 //
 // Deprecated: Use StartTriggerSource instead (Section 10).
-func (ch *Channel) TriggerSource(ctx context.Context) (fgen.OldTriggerSource, error) {
-	src, err := ch.StartTriggerSource(ctx)
+func (ch *Channel) TriggerSource() (fgen.OldTriggerSource, error) {
+	src, err := ch.StartTriggerSource()
 	if err != nil {
 		return 0, err
 	}
@@ -40,11 +39,11 @@ func (ch *Channel) TriggerSource(ctx context.Context) (fgen.OldTriggerSource, er
 // Specification.
 //
 // Deprecated: Use SetStartTriggerSource instead (Section 10).
-func (ch *Channel) SetTriggerSource(ctx context.Context, src fgen.OldTriggerSource) error {
+func (ch *Channel) SetTriggerSource(src fgen.OldTriggerSource) error {
 	ts, ok := fgen.OldToNewTriggerSource(src)
 	if !ok {
 		return fmt.Errorf("trigger source %s not supported", src)
 	}
 
-	return ch.SetStartTriggerSource(ctx, ts)
+	return ch.SetStartTriggerSource(ts)
 }

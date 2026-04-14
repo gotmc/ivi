@@ -5,8 +5,6 @@
 
 package fgen
 
-import "context"
-
 /*
 
 The following information is from the IVI-4.3: IviFgen Class Specification date
@@ -45,6 +43,6 @@ None.
 // IviFgenInternalTrigger extension group as described in Section 15 of the
 // IVI-4.3: IviFgen Class Specification.
 type IntTrigger interface {
-	InternalTriggerRate(ctx context.Context) (float64, error)
-	SetInternalTriggerRate(ctx context.Context, rate float64) error
+	InternalTriggerRate() (float64, error)
+	SetInternalTriggerRate(rate float64) error
 }

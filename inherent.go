@@ -26,7 +26,8 @@ const (
 
 // Inherent provides the inherent capabilities for all IVI instruments.
 type Inherent struct {
-	inst Transport
+	inst    Transport
+	timeout time.Duration
 	InherentBase
 }
 
@@ -46,13 +47,29 @@ type InherentBase struct {
 }
 
 // NewInherent creates a new Inherent struct using the given Transport
-// interface and the InherentBase struct. Note: callers should explicitly set
-// ReturnToLocal in InherentBase (default Go zero value is false).
-func NewInherent(inst Transport, base InherentBase) Inherent {
+// interface, InherentBase struct, and timeout. If timeout is zero,
+// DefaultTimeout is used. Note: callers should explicitly set ReturnToLocal in
+// InherentBase (default Go zero value is false).
+func NewInherent(inst Transport, base InherentBase, timeout time.Duration) Inherent {
+	if timeout == 0 {
+		timeout = DefaultTimeout
+	}
+
 	return Inherent{
 		inst:         inst,
+		timeout:      timeout,
 		InherentBase: base,
 	}
+}
+
+// Timeout returns the timeout used for instrument I/O operations.
+func (inherent *Inherent) Timeout() time.Duration {
+	return inherent.timeout
+}
+
+// newContext creates a context with the driver's configured timeout.
+func (inherent *Inherent) newContext() (context.Context, context.CancelFunc) {
+	return context.WithTimeout(context.Background(), inherent.timeout)
 }
 
 // CheckID queries the instrument for its identification string (*IDN?) and
@@ -60,7 +77,10 @@ func NewInherent(inst Transport, base InherentBase) Inherent {
 // On success, the IDNString field is populated with the full *IDN? response and
 // the trimmed model string is returned. CheckID implements the IdQuery behavior
 // described in Section 6.16 of IVI-3.2: Inherent Capabilities Specification.
-func (inherent *Inherent) CheckID(ctx context.Context) (string, error) {
+func (inherent *Inherent) CheckID() (string, error) {
+	ctx, cancel := inherent.newContext()
+	defer cancel()
+
 	idn, err := query.String(ctx, inherent.inst, "*IDN?")
 	if err != nil {
 		return "", fmt.Errorf("error querying instrument identity: %w", err)
@@ -90,58 +110,58 @@ func (inherent *Inherent) CheckID(ctx context.Context) (string, error) {
 // the instrument. FirmwareRevision is the getter for the read-only inherent
 // attribute Instrument Firmware Revision described in Section 5.18 of IVI-3.2:
 // Inherent Capabilities Specification.
-func (inherent *Inherent) FirmwareRevision(ctx context.Context) (string, error) {
-	return inherent.queryIdentification(ctx, fwrID)
+func (inherent *Inherent) FirmwareRevision() (string, error) {
+	return inherent.queryIdentification(fwrID)
 }
 
 // InstrumentManufacturer queries the instrument and returns the manufacturer
 // of the instrument. InstrumentManufacturer is the getter for the read-only
 // inherent attribute Instrument Manufacturer described in Section 5.19 of
 // IVI-3.2: Inherent Capabilities Specification.
-func (inherent *Inherent) InstrumentManufacturer(ctx context.Context) (string, error) {
-	return inherent.queryIdentification(ctx, mfrID)
+func (inherent *Inherent) InstrumentManufacturer() (string, error) {
+	return inherent.queryIdentification(mfrID)
 }
 
 // InstrumentModel queries the instrument and returns the model of the
 // instrument.  InstrumentModel is the getter for the read-only inherent
 // attribute Instrument Model described in Section 5.20 of IVI-3.2: Inherent
 // Capabilities Specification.
-func (inherent *Inherent) InstrumentModel(ctx context.Context) (string, error) {
-	return inherent.queryIdentification(ctx, modelID)
+func (inherent *Inherent) InstrumentModel() (string, error) {
+	return inherent.queryIdentification(modelID)
 }
 
 // InstrumentSerialNumber queries the instrument and returns the S/N of the
 // instrument.
-func (inherent *Inherent) InstrumentSerialNumber(ctx context.Context) (string, error) {
-	return inherent.queryIdentification(ctx, snID)
+func (inherent *Inherent) InstrumentSerialNumber() (string, error) {
+	return inherent.queryIdentification(snID)
 }
 
 // Reset resets the instrument.
-func (inherent *Inherent) Reset(ctx context.Context) error {
+func (inherent *Inherent) Reset() error {
+	ctx, cancel := inherent.newContext()
+	defer cancel()
+
 	if err := inherent.inst.Command(ctx, "*rst"); err != nil {
 		return err
 	}
 	// Wait for the device to finish resetting.
-	select {
-	case <-time.After(inherent.ResetDelay):
-		return nil
-	case <-ctx.Done():
-		return ctx.Err()
-	}
+	time.Sleep(inherent.ResetDelay)
+
+	return nil
 }
 
 // Clear clears the instrument.
-func (inherent *Inherent) Clear(ctx context.Context) error {
+func (inherent *Inherent) Clear() error {
+	ctx, cancel := inherent.newContext()
+	defer cancel()
+
 	if err := inherent.inst.Command(ctx, "*cls"); err != nil {
 		return err
 	}
 	// Wait for the device to finish clearing.
-	select {
-	case <-time.After(inherent.ClearDelay):
-		return nil
-	case <-ctx.Done():
-		return ctx.Err()
-	}
+	time.Sleep(inherent.ClearDelay)
+
+	return nil
 }
 
 // Disable places the instrument in a quiescent state as quickly as possible.
@@ -153,10 +173,13 @@ func (inherent *Inherent) Clear(ctx context.Context) error {
 // Errors from the local control command are intentionally ignored because not
 // all instruments support SYST:LOC, and a failure to return to local should
 // not prevent the instrument from being closed.
-func (inherent *Inherent) Disable(ctx context.Context) error {
+func (inherent *Inherent) Disable() error {
 	if !inherent.ReturnToLocal {
 		return nil
 	}
+
+	ctx, cancel := inherent.newContext()
+	defer cancel()
 
 	// Best-effort return to local control so the front panel regains control.
 	_ = inherent.inst.Command(ctx, "SYST:LOC")
@@ -164,9 +187,10 @@ func (inherent *Inherent) Disable(ctx context.Context) error {
 	return nil
 }
 
-func (inherent *Inherent) queryIdentification(
-	ctx context.Context, part idPart,
-) (string, error) {
+func (inherent *Inherent) queryIdentification(part idPart) (string, error) {
+	ctx, cancel := inherent.newContext()
+	defer cancel()
+
 	s, err := query.String(ctx, inherent.inst, "*IDN?")
 	if err != nil {
 		return "", err
@@ -205,7 +229,7 @@ func (inherent *Inherent) IsReturnToLocal() bool {
 // local control for front panel operation.
 func (inherent *Inherent) Close() error {
 	// First, return the instrument to local control
-	disableErr := inherent.Disable(context.Background())
+	disableErr := inherent.Disable()
 
 	// Close the underlying transport connection
 	closeErr := inherent.inst.Close()

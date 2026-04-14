@@ -11,7 +11,6 @@
 package esa
 
 import (
-	"context"
 	"time"
 
 	"github.com/gotmc/ivi"
@@ -34,12 +33,17 @@ type Driver struct {
 	ivi.Inherent
 }
 
-// New creates a new IVI driver for Keysight/Agilent spectrum analyzers. The
-// context is used for any I/O performed during construction (e.g., ID query,
-// reset). Use [ivi.WithIDQuery] to verify the instrument model and
-// [ivi.WithReset] to reset on creation.
-func New(ctx context.Context, inst ivi.Transport, opts ...ivi.DriverOption) (*Driver, error) {
+// New creates a new IVI driver for Keysight/Agilent spectrum analyzers. Use
+// [ivi.WithIDQuery] to verify the instrument model, [ivi.WithReset] to reset
+// on creation, and [ivi.WithTimeout] to override the default I/O timeout.
+func New(inst ivi.Transport, opts ...ivi.DriverOption) (*Driver, error) {
 	cfg := ivi.ApplyOptions(opts)
+
+	timeout := cfg.Timeout
+	if timeout == 0 {
+		timeout = ivi.DefaultTimeout
+	}
+
 	inherentBase := ivi.InherentBase{
 		ClassSpecMajorVersion: specMajorVersion,
 		ClassSpecMinorVersion: specMinorVersion,
@@ -69,10 +73,10 @@ func New(ctx context.Context, inst ivi.Transport, opts ...ivi.DriverOption) (*Dr
 			"TCPIP",
 		},
 	}
-	inherent := ivi.NewInherent(inst, inherentBase)
+	inherent := ivi.NewInherent(inst, inherentBase, timeout)
 
 	if cfg.IDQuery {
-		if _, err := inherent.CheckID(ctx); err != nil {
+		if _, err := inherent.CheckID(); err != nil {
 			return nil, err
 		}
 	}
@@ -83,7 +87,7 @@ func New(ctx context.Context, inst ivi.Transport, opts ...ivi.DriverOption) (*Dr
 	}
 
 	if cfg.Reset {
-		if err := driver.Reset(ctx); err != nil {
+		if err := driver.Reset(); err != nil {
 			return &driver, err
 		}
 	}

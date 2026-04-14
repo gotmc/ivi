@@ -6,8 +6,6 @@
 package key33000
 
 import (
-	"context"
-
 	"github.com/gotmc/ivi"
 	"github.com/gotmc/query"
 )
@@ -25,7 +23,10 @@ const (
 // ArbitrarySampleRate is the getter for the read-write IviFgenArbWfm Attribute
 // Arbitrary Sample Rate described in Section 6.2.3 of IVI-4.3: IviFgen Class
 // Specification.
-func (d *Driver) ArbitrarySampleRate(ctx context.Context) (float64, error) {
+func (d *Driver) ArbitrarySampleRate() (float64, error) {
+	ctx, cancel := d.newContext()
+	defer cancel()
+
 	return query.Float64(ctx, d.inst, d.channels[0].srcPrefix()+"FUNC:ARB:SRAT?")
 }
 
@@ -35,7 +36,10 @@ func (d *Driver) ArbitrarySampleRate(ctx context.Context) (float64, error) {
 // SetArbitrarySampleRate is the setter for the read-write IviFgenArbWfm
 // Attribute Arbitrary Sample Rate described in Section 6.2.3 of IVI-4.3:
 // IviFgen Class Specification.
-func (d *Driver) SetArbitrarySampleRate(ctx context.Context, rate float64) error {
+func (d *Driver) SetArbitrarySampleRate(rate float64) error {
+	ctx, cancel := d.newContext()
+	defer cancel()
+
 	return d.inst.Command(ctx, d.channels[0].srcPrefix()+"FUNC:ARB:SRAT %f", rate)
 }
 
@@ -81,8 +85,8 @@ func (d *Driver) ArbWfmQuantum() int {
 // ArbitraryGain is the getter for the read-write IviFgenArbWfm attribute
 // Arbitrary Gain described in Section 6.2.1 of IVI-4.3: IviFgen Class
 // Specification.
-func (ch *Channel) ArbitraryGain(ctx context.Context) (float64, error) {
-	amp, err := ch.Amplitude(ctx)
+func (ch *Channel) ArbitraryGain() (float64, error) {
+	amp, err := ch.Amplitude()
 	if err != nil {
 		return 0.0, err
 	}
@@ -95,8 +99,8 @@ func (ch *Channel) ArbitraryGain(ctx context.Context) (float64, error) {
 // SetArbitraryGain is the setter for the read-write IviFgenArbWfm attribute
 // Arbitrary Gain described in Section 6.2.1 of IVI-4.3: IviFgen Class
 // Specification.
-func (ch *Channel) SetArbitraryGain(ctx context.Context, gain float64) error {
-	return ch.SetAmplitude(ctx, 2*gain)
+func (ch *Channel) SetArbitraryGain(gain float64) error {
+	return ch.SetAmplitude(2 * gain)
 }
 
 // ArbitraryOffset returns the offset of the arbitrary waveform the function
@@ -105,8 +109,8 @@ func (ch *Channel) SetArbitraryGain(ctx context.Context, gain float64) error {
 // ArbitraryOffset is the getter for the read-write IviFgenArbWfm attribute
 // Arbitrary Offset described in Section 6.2.2 of IVI-4.3: IviFgen Class
 // Specification.
-func (ch *Channel) ArbitraryOffset(ctx context.Context) (float64, error) {
-	return ch.DCOffset(ctx)
+func (ch *Channel) ArbitraryOffset() (float64, error) {
+	return ch.DCOffset()
 }
 
 // SetArbitraryOffset sets the offset of the arbitrary waveform the function
@@ -115,14 +119,14 @@ func (ch *Channel) ArbitraryOffset(ctx context.Context) (float64, error) {
 // SetArbitraryOffset is the setter for the read-write IviFgenArbWfm attribute
 // Arbitrary Offset described in Section 6.2.2 of IVI-4.3: IviFgen Class
 // Specification.
-func (ch *Channel) SetArbitraryOffset(ctx context.Context, offset float64) error {
-	return ch.SetDCOffset(ctx, offset)
+func (ch *Channel) SetArbitraryOffset(offset float64) error {
+	return ch.SetDCOffset(offset)
 }
 
-func (ch *Channel) ArbitraryWaveformHandle(_ context.Context) (int, error) {
+func (ch *Channel) ArbitraryWaveformHandle() (int, error) {
 	return 0, ivi.ErrFunctionNotSupported
 }
 
-func (ch *Channel) SetArbitraryWaveformHandle(_ context.Context, _ int) error {
+func (ch *Channel) SetArbitraryWaveformHandle(_ int) error {
 	return ivi.ErrFunctionNotSupported
 }

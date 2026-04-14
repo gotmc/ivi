@@ -8,7 +8,7 @@ package ivi
 import "context"
 
 // Set formats according to a format specifier and then sends the resulting
-// command to the given Commander interface.
+// command to the given Commander interface using the provided context.
 func Set(ctx context.Context, cmdr Commander, format string, a ...any) error {
 	return cmdr.Command(ctx, format, a...)
 }

@@ -52,12 +52,18 @@ type U2751A struct {
 
 type path []string
 
-// New creates a new U2751A IVI Instrument. The context is used for any I/O
-// performed during construction (e.g., ID query, reset). Use [ivi.WithIDQuery]
-// to verify the instrument model, [ivi.WithReset] to reset on creation, and
-// [ivi.WithStandalone] to configure standalone voltage ratings.
-func New(ctx context.Context, inst ivi.Transport, opts ...ivi.DriverOption) (U2751A, error) {
+// New creates a new U2751A IVI Instrument. Use [ivi.WithIDQuery] to verify the
+// instrument model, [ivi.WithReset] to reset on creation, [ivi.WithStandalone]
+// to configure standalone voltage ratings, and [ivi.WithTimeout] to override
+// the default I/O timeout.
+func New(inst ivi.Transport, opts ...ivi.DriverOption) (U2751A, error) {
 	cfg := ivi.ApplyOptions(opts)
+
+	timeout := cfg.Timeout
+	if timeout == 0 {
+		timeout = ivi.DefaultTimeout
+	}
+
 	infoChannels := []struct {
 		name     string
 		chType   ChannelType
@@ -97,10 +103,10 @@ func New(ctx context.Context, inst ivi.Transport, opts ...ivi.DriverOption) (U27
 			"U2751A",
 		},
 	}
-	inherent := ivi.NewInherent(inst, inherentBase)
+	inherent := ivi.NewInherent(inst, inherentBase, timeout)
 
 	if cfg.IDQuery {
-		if _, err := inherent.CheckID(ctx); err != nil {
+		if _, err := inherent.CheckID(); err != nil {
 			return U2751A{}, err
 		}
 	}
@@ -112,7 +118,7 @@ func New(ctx context.Context, inst ivi.Transport, opts ...ivi.DriverOption) (U27
 	}
 
 	if cfg.Reset {
-		if err := driver.Reset(ctx); err != nil {
+		if err := driver.Reset(); err != nil {
 			return driver, err
 		}
 	}

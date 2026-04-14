@@ -47,10 +47,8 @@ func TestInherent_InstrumentManufacturer(t *testing.T) {
 	mock := &mockIDNInstrument{
 		idnResponse: "KEYSIGHT TECHNOLOGIES,34465A,MY54505281,A.03.01-03.01-03.01-00.52-04-02",
 	}
-	inherent := NewInherent(mock, InherentBase{ReturnToLocal: true})
-	ctx := context.Background()
-
-	mfr, err := inherent.InstrumentManufacturer(ctx)
+	inherent := NewInherent(mock, InherentBase{ReturnToLocal: true}, 0)
+	mfr, err := inherent.InstrumentManufacturer()
 	if err != nil {
 		t.Fatalf("InstrumentManufacturer() error: %v", err)
 	}
@@ -63,10 +61,8 @@ func TestInherent_InstrumentModel(t *testing.T) {
 	mock := &mockIDNInstrument{
 		idnResponse: "KEYSIGHT TECHNOLOGIES,34465A,MY54505281,A.03.01-03.01-03.01-00.52-04-02",
 	}
-	inherent := NewInherent(mock, InherentBase{ReturnToLocal: true})
-	ctx := context.Background()
-
-	model, err := inherent.InstrumentModel(ctx)
+	inherent := NewInherent(mock, InherentBase{ReturnToLocal: true}, 0)
+	model, err := inherent.InstrumentModel()
 	if err != nil {
 		t.Fatalf("InstrumentModel() error: %v", err)
 	}
@@ -79,10 +75,8 @@ func TestInherent_InstrumentSerialNumber(t *testing.T) {
 	mock := &mockIDNInstrument{
 		idnResponse: "KEYSIGHT TECHNOLOGIES,34465A,MY54505281,A.03.01",
 	}
-	inherent := NewInherent(mock, InherentBase{ReturnToLocal: true})
-	ctx := context.Background()
-
-	sn, err := inherent.InstrumentSerialNumber(ctx)
+	inherent := NewInherent(mock, InherentBase{ReturnToLocal: true}, 0)
+	sn, err := inherent.InstrumentSerialNumber()
 	if err != nil {
 		t.Fatalf("InstrumentSerialNumber() error: %v", err)
 	}
@@ -95,10 +89,8 @@ func TestInherent_FirmwareRevision(t *testing.T) {
 	mock := &mockIDNInstrument{
 		idnResponse: "KEYSIGHT TECHNOLOGIES,34465A,MY54505281,A.03.01",
 	}
-	inherent := NewInherent(mock, InherentBase{ReturnToLocal: true})
-	ctx := context.Background()
-
-	fw, err := inherent.FirmwareRevision(ctx)
+	inherent := NewInherent(mock, InherentBase{ReturnToLocal: true}, 0)
+	fw, err := inherent.FirmwareRevision()
 	if err != nil {
 		t.Fatalf("FirmwareRevision() error: %v", err)
 	}
@@ -109,10 +101,8 @@ func TestInherent_FirmwareRevision(t *testing.T) {
 
 func TestInherent_Identification_QueryError(t *testing.T) {
 	mock := &mockIDNInstrument{shouldError: true}
-	inherent := NewInherent(mock, InherentBase{ReturnToLocal: true})
-	ctx := context.Background()
-
-	_, err := inherent.InstrumentManufacturer(ctx)
+	inherent := NewInherent(mock, InherentBase{ReturnToLocal: true}, 0)
+	_, err := inherent.InstrumentManufacturer()
 	if err == nil {
 		t.Error("expected error from query failure, got nil")
 	}
@@ -124,10 +114,8 @@ func TestInherent_CheckID(t *testing.T) {
 	}
 	inherent := NewInherent(mock, InherentBase{
 		SupportedInstrumentModels: []string{"34460A", "34461A", "34465A", "34470A"},
-	})
-	ctx := context.Background()
-
-	model, err := inherent.CheckID(ctx)
+	}, 0)
+	model, err := inherent.CheckID()
 	if err != nil {
 		t.Fatalf("CheckID() error: %v", err)
 	}
@@ -145,10 +133,8 @@ func TestInherent_CheckID_UnsupportedModel(t *testing.T) {
 	}
 	inherent := NewInherent(mock, InherentBase{
 		SupportedInstrumentModels: []string{"33220A"},
-	})
-	ctx := context.Background()
-
-	_, err := inherent.CheckID(ctx)
+	}, 0)
+	_, err := inherent.CheckID()
 	if err == nil {
 		t.Fatal("CheckID() expected error for unsupported model, got nil")
 	}
@@ -161,10 +147,8 @@ func TestInherent_CheckID_QueryError(t *testing.T) {
 	mock := &mockIDNInstrument{shouldError: true}
 	inherent := NewInherent(mock, InherentBase{
 		SupportedInstrumentModels: []string{"34465A"},
-	})
-	ctx := context.Background()
-
-	_, err := inherent.CheckID(ctx)
+	}, 0)
+	_, err := inherent.CheckID()
 	if err == nil {
 		t.Error("CheckID() expected error from query failure, got nil")
 	}
@@ -175,10 +159,9 @@ func TestInherent_Reset(t *testing.T) {
 	inherent := NewInherent(mock, InherentBase{
 		ReturnToLocal: true,
 		ResetDelay:    1 * time.Millisecond,
-	})
-	ctx := context.Background()
+	}, 0)
 
-	err := inherent.Reset(ctx)
+	err := inherent.Reset()
 	if err != nil {
 		t.Errorf("Reset() error: %v", err)
 	}
@@ -192,10 +175,9 @@ func TestInherent_Clear(t *testing.T) {
 	inherent := NewInherent(mock, InherentBase{
 		ReturnToLocal: true,
 		ClearDelay:    1 * time.Millisecond,
-	})
-	ctx := context.Background()
+	}, 0)
 
-	err := inherent.Clear(ctx)
+	err := inherent.Clear()
 	if err != nil {
 		t.Errorf("Clear() error: %v", err)
 	}

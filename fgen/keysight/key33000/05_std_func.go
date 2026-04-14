@@ -6,7 +6,6 @@
 package key33000
 
 import (
-	"context"
 	"fmt"
 	"strings"
 
@@ -21,7 +20,10 @@ import (
 // Amplitude is the getter for the read-write IviFgenStdFunc Attribute
 // Amplitude described in Section 5.2.1 of IVI-4.3: IviFgen Class
 // Specification.
-func (ch *Channel) Amplitude(ctx context.Context) (float64, error) {
+func (ch *Channel) Amplitude() (float64, error) {
+	ctx, cancel := ch.newContext()
+	defer cancel()
+
 	return query.Float64(ctx, ch.inst, ch.srcPrefix()+"VOLT?")
 }
 
@@ -31,7 +33,10 @@ func (ch *Channel) Amplitude(ctx context.Context) (float64, error) {
 // SetAmplitude is the setter for the read-write IviFgenStdFunc Attribute
 // Amplitude described in Section 5.2.1 of IVI-4.3: IviFgen Class
 // Specification.
-func (ch *Channel) SetAmplitude(ctx context.Context, amp float64) error {
+func (ch *Channel) SetAmplitude(amp float64) error {
+	ctx, cancel := ch.newContext()
+	defer cancel()
+
 	return ch.inst.Command(ctx, ch.srcPrefix()+"VOLT %f VPP", amp)
 }
 
@@ -40,7 +45,10 @@ func (ch *Channel) SetAmplitude(ctx context.Context, amp float64) error {
 //
 // DCOffset is the getter for the read-write IviFgenStdFunc Attribute DC Offset
 // described in Section 5.2.2 of IVI-4.3: IviFgen Class Specification.
-func (ch *Channel) DCOffset(ctx context.Context) (float64, error) {
+func (ch *Channel) DCOffset() (float64, error) {
+	ctx, cancel := ch.newContext()
+	defer cancel()
+
 	return query.Float64(ctx, ch.inst, ch.srcPrefix()+"VOLT:OFFS?")
 }
 
@@ -49,7 +57,10 @@ func (ch *Channel) DCOffset(ctx context.Context) (float64, error) {
 //
 // SetDCOffset is the setter for the read-write IviFgenStdFunc Attribute DC
 // Offset described in Section 5.2.2 of IVI-4.3: IviFgen Class Specification.
-func (ch *Channel) SetDCOffset(ctx context.Context, offset float64) error {
+func (ch *Channel) SetDCOffset(offset float64) error {
+	ctx, cancel := ch.newContext()
+	defer cancel()
+
 	return ch.inst.Command(ctx, ch.srcPrefix()+"VOLT:OFFS %f", offset)
 }
 
@@ -59,7 +70,10 @@ func (ch *Channel) SetDCOffset(ctx context.Context, offset float64) error {
 // DutyCycleHigh is the getter for the read-write IviFgenStdFunc Attribute Duty
 // Cycle High described in Section 5.2.3 of IVI-4.3: IviFgen Class
 // Specification.
-func (ch *Channel) DutyCycleHigh(ctx context.Context) (float64, error) {
+func (ch *Channel) DutyCycleHigh() (float64, error) {
+	ctx, cancel := ch.newContext()
+	defer cancel()
+
 	return query.Float64(ctx, ch.inst, ch.srcPrefix()+"FUNC:SQU:DCYC?")
 }
 
@@ -69,7 +83,10 @@ func (ch *Channel) DutyCycleHigh(ctx context.Context) (float64, error) {
 // SetDutyCycleHigh is the setter for the read-write IviFgenStdFunc Attribute
 // Duty Cycle High described in Section 5.2.3 of IVI-4.3: IviFgen Class
 // Specification.
-func (ch *Channel) SetDutyCycleHigh(ctx context.Context, duty float64) error {
+func (ch *Channel) SetDutyCycleHigh(duty float64) error {
+	ctx, cancel := ch.newContext()
+	defer cancel()
+
 	return ch.inst.Command(ctx, ch.srcPrefix()+"FUNC:SQU:DCYC %f", duty)
 }
 
@@ -79,7 +96,10 @@ func (ch *Channel) SetDutyCycleHigh(ctx context.Context, duty float64) error {
 // Frequency is the getter for the read-write IviFgenStdFunc Attribute
 // Frequency described in Section 5.2.4 of IVI-4.3: IviFgen Class
 // Specification.
-func (ch *Channel) Frequency(ctx context.Context) (float64, error) {
+func (ch *Channel) Frequency() (float64, error) {
+	ctx, cancel := ch.newContext()
+	defer cancel()
+
 	return query.Float64(ctx, ch.inst, ch.srcPrefix()+"FREQ?")
 }
 
@@ -89,7 +109,10 @@ func (ch *Channel) Frequency(ctx context.Context) (float64, error) {
 // SetFrequency is the setter for the read-write IviFgenStdFunc Attribute
 // Frequency described in Section 5.2.4 of IVI-4.3: IviFgen Class
 // Specification.
-func (ch *Channel) SetFrequency(ctx context.Context, freq float64) error {
+func (ch *Channel) SetFrequency(freq float64) error {
+	ctx, cancel := ch.newContext()
+	defer cancel()
+
 	return ch.inst.Command(ctx, ch.srcPrefix()+"FREQ %f", freq)
 }
 
@@ -98,7 +121,10 @@ func (ch *Channel) SetFrequency(ctx context.Context, freq float64) error {
 //
 // StartPhase is the getter for the read-write IviFgenStdFunc Attribute Start
 // Phase described in Section 5.2.5 of IVI-4.3: IviFgen Class Specification.
-func (ch *Channel) StartPhase(ctx context.Context) (float64, error) {
+func (ch *Channel) StartPhase() (float64, error) {
+	ctx, cancel := ch.newContext()
+	defer cancel()
+
 	return query.Float64(ctx, ch.inst, ch.srcPrefix()+"PHAS?")
 }
 
@@ -108,7 +134,10 @@ func (ch *Channel) StartPhase(ctx context.Context) (float64, error) {
 // SetStartPhase is the setter for the read-write IviFgenStdFunc Attribute
 // Start Phase described in Section 5.2.5 of IVI-4.3: IviFgen Class
 // Specification.
-func (ch *Channel) SetStartPhase(ctx context.Context, phase float64) error {
+func (ch *Channel) SetStartPhase(phase float64) error {
+	ctx, cancel := ch.newContext()
+	defer cancel()
+
 	return ch.inst.Command(ctx, ch.srcPrefix()+"PHAS %f", phase)
 }
 
@@ -117,7 +146,10 @@ func (ch *Channel) SetStartPhase(ctx context.Context, phase float64) error {
 //
 // StandardWaveform is the getter for the read-write IviFgenStdFunc Attribute
 // Waveform described in Section 5.2.6 of IVI-4.3: IviFgen Class Specification.
-func (ch *Channel) StandardWaveform(ctx context.Context) (fgen.StandardWaveform, error) {
+func (ch *Channel) StandardWaveform() (fgen.StandardWaveform, error) {
+	ctx, cancel := ch.newContext()
+	defer cancel()
+
 	var wave fgen.StandardWaveform
 
 	s, err := query.String(ctx, ch.inst, ch.srcPrefix()+"FUNC?")
@@ -163,7 +195,10 @@ func (ch *Channel) StandardWaveform(ctx context.Context) (fgen.StandardWaveform,
 // SetStandardWaveform is the setter for the read-write IviFgenStdFunc
 // Attribute Waveform described in Section 5.2.6 of IVI-4.3: IviFgen Class
 // Specification.
-func (ch *Channel) SetStandardWaveform(ctx context.Context, wave fgen.StandardWaveform) error {
+func (ch *Channel) SetStandardWaveform(wave fgen.StandardWaveform) error {
+	ctx, cancel := ch.newContext()
+	defer cancel()
+
 	cmd, err := ivi.LookupSCPI(waveformCommand, wave)
 	if err != nil {
 		return fmt.Errorf("SetStandardWaveform: %w", err)
@@ -179,13 +214,15 @@ func (ch *Channel) SetStandardWaveform(ctx context.Context, wave fgen.StandardWa
 // Standard Waveform function described in Section 5.3.1 of IVI-4.3: IviFgen
 // Class Specification.
 func (ch *Channel) ConfigureStandardWaveform(
-	ctx context.Context,
 	wave fgen.StandardWaveform,
 	amp float64,
 	offset float64,
 	freq float64,
 	phase float64,
 ) error {
+	ctx, cancel := ch.newContext()
+	defer cancel()
+
 	format, err := ivi.LookupSCPI(waveformApplyCommand, wave)
 	if err != nil {
 		return fmt.Errorf("ConfigureStandardWaveform: %w", err)

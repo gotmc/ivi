@@ -43,21 +43,29 @@ var _ fgen.TriggerChannel = (*Channel)(nil)
 type Driver struct {
 	inst     ivi.Transport
 	channels []Channel
+	timeout  time.Duration
 	ivi.Inherent
 }
 
 // Channel models the output channel repeated capability for the function
 // generator output channel.
 type Channel struct {
-	inst ivi.Transport
-	name string
+	inst    ivi.Transport
+	name    string
+	timeout time.Duration
 }
 
-// New creates a new DS345 IVI Instrument. The context is used for any I/O
-// performed during construction (e.g., ID query, reset). Use [ivi.WithIDQuery]
-// to verify the instrument model and [ivi.WithReset] to reset on creation.
-func New(ctx context.Context, inst ivi.Transport, opts ...ivi.DriverOption) (*Driver, error) {
+// New creates a new DS345 IVI Instrument. Use [ivi.WithIDQuery] to verify the
+// instrument model, [ivi.WithReset] to reset on creation, and
+// [ivi.WithTimeout] to override the default I/O timeout.
+func New(inst ivi.Transport, opts ...ivi.DriverOption) (*Driver, error) {
 	cfg := ivi.ApplyOptions(opts)
+
+	timeout := cfg.Timeout
+	if timeout == 0 {
+		timeout = ivi.DefaultTimeout
+	}
+
 	channelNames := []string{
 		"Output",
 	}
@@ -66,8 +74,9 @@ func New(ctx context.Context, inst ivi.Transport, opts ...ivi.DriverOption) (*Dr
 
 	for i, channelName := range channelNames {
 		ch := Channel{
-			name: channelName,
-			inst: inst,
+			name:    channelName,
+			inst:    inst,
+			timeout: timeout,
 		}
 		channels[i] = ch
 	}
@@ -101,10 +110,10 @@ func New(ctx context.Context, inst ivi.Transport, opts ...ivi.DriverOption) (*Dr
 			"RS232",
 		},
 	}
-	inherent := ivi.NewInherent(inst, inherentBase)
+	inherent := ivi.NewInherent(inst, inherentBase, timeout)
 
 	if cfg.IDQuery {
-		if _, err := inherent.CheckID(ctx); err != nil {
+		if _, err := inherent.CheckID(); err != nil {
 			return nil, err
 		}
 	}
@@ -112,20 +121,34 @@ func New(ctx context.Context, inst ivi.Transport, opts ...ivi.DriverOption) (*Dr
 	driver := Driver{
 		inst:     inst,
 		channels: channels,
+		timeout:  timeout,
 		Inherent: inherent,
 	}
 
 	if cfg.Reset {
-		if err := driver.Reset(ctx); err != nil {
+		if err := driver.Reset(); err != nil {
 			return &driver, err
 		}
 		// Default to internal trigger instead of single trigger when reset.
+		ctx, cancel := driver.newContext()
+		defer cancel()
+
 		if err := driver.inst.Command(ctx, "TSRC1"); err != nil {
 			return &driver, err
 		}
 	}
 
 	return &driver, nil
+}
+
+// newContext creates a context with the driver's configured timeout.
+func (d *Driver) newContext() (context.Context, context.CancelFunc) {
+	return context.WithTimeout(context.Background(), d.timeout)
+}
+
+// newContext creates a context with the channel's configured timeout.
+func (ch *Channel) newContext() (context.Context, context.CancelFunc) {
+	return context.WithTimeout(context.Background(), ch.timeout)
 }
 
 // Channel returns the Channel at the given index, with bounds checking.

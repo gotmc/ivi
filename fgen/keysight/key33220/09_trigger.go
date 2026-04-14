@@ -6,7 +6,6 @@
 package key33220
 
 import (
-	"context"
 	"fmt"
 
 	"github.com/gotmc/ivi/fgen"
@@ -14,13 +13,9 @@ import (
 
 // TriggerSource determines the trigger source.
 //
-// TriggerSource is the getter for the read-write IviFgenTrigger Attribute
-// Trigger Source described in Section 9.2.1 of IVI-4.3: IviFgen Class
-// Specification.
-//
 // Deprecated: Use StartTriggerSource instead (Section 10).
-func (ch *Channel) TriggerSource(ctx context.Context) (fgen.OldTriggerSource, error) {
-	src, err := ch.StartTriggerSource(ctx)
+func (ch *Channel) TriggerSource() (fgen.OldTriggerSource, error) {
+	src, err := ch.StartTriggerSource()
 	if err != nil {
 		return 0, err
 	}
@@ -35,16 +30,12 @@ func (ch *Channel) TriggerSource(ctx context.Context) (fgen.OldTriggerSource, er
 
 // SetTriggerSource specifies the trigger source.
 //
-// SetTriggerSource is the setter for the read-write IviFgenTrigger Attribute
-// Trigger Source described in Section 9.2.1 of IVI-4.3: IviFgen Class
-// Specification.
-//
 // Deprecated: Use SetStartTriggerSource instead (Section 10).
-func (ch *Channel) SetTriggerSource(ctx context.Context, src fgen.OldTriggerSource) error {
+func (ch *Channel) SetTriggerSource(src fgen.OldTriggerSource) error {
 	ts, ok := fgen.OldToNewTriggerSource(src)
 	if !ok {
 		return fmt.Errorf("trigger source %s not supported", src)
 	}
 
-	return ch.SetStartTriggerSource(ctx, ts)
+	return ch.SetStartTriggerSource(ts)
 }
