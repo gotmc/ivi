@@ -155,7 +155,7 @@ func TestInherent_CheckID_QueryError(t *testing.T) {
 }
 
 func TestInherent_Reset(t *testing.T) {
-	mock := &mockInstrumentWithClose{}
+	mock := &mockLocalControlInst{}
 	inherent := NewInherent(mock, InherentBase{
 		ReturnToLocal: true,
 		ResetDelay:    1 * time.Millisecond,
@@ -171,7 +171,7 @@ func TestInherent_Reset(t *testing.T) {
 }
 
 func TestInherent_Clear(t *testing.T) {
-	mock := &mockInstrumentWithClose{}
+	mock := &mockLocalControlInst{}
 	inherent := NewInherent(mock, InherentBase{
 		ReturnToLocal: true,
 		ClearDelay:    1 * time.Millisecond,

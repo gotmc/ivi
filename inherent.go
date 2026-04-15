@@ -231,20 +231,9 @@ func (inherent *Inherent) IsReturnToLocal() bool {
 	return inherent.ReturnToLocal
 }
 
-// Close properly shuts down the instrument connection by returning it to local
-// control and then closing the underlying transport connection. This method
-// should be called when finished with an instrument to ensure it returns to
-// local control for front panel operation.
+// Close returns the instrument to local front panel control by calling
+// Disable. The underlying transport connection is not closed — that is the
+// caller's responsibility since they created it.
 func (inherent *Inherent) Close() error {
-	// First, return the instrument to local control
-	disableErr := inherent.Disable()
-
-	// Close the underlying transport connection
-	closeErr := inherent.inst.Close()
-	// Prioritize close errors over disable errors
-	if closeErr != nil {
-		return closeErr
-	}
-
-	return disableErr
+	return inherent.Disable()
 }

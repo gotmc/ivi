@@ -9,13 +9,13 @@ import "context"
 
 // Transport provides the interface required for all IVI Instruments to
 // communicate with test equipment regardless of the transport layer driver
-// used (e.g., usbtmc, asrl, lxi, prologix).
+// used (e.g., usbtmc, asrl, lxi, prologix). The transport connection is owned
+// and closed by the caller, not by the IVI driver.
 type Transport interface {
 	Command(ctx context.Context, cmd string, a ...any) error
 	Query(ctx context.Context, cmd string) (value string, err error)
 	ReadBinary(ctx context.Context, p []byte) (n int, err error)
 	WriteBinary(ctx context.Context, p []byte) (n int, err error)
-	Close() error
 }
 
 // Commander provides the interface to send a SCPI/ASCII command with a
