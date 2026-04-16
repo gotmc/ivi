@@ -17,7 +17,7 @@ loc:
 docs:
   pkgsite -open .
 
-# Format and vet Go code. Runs before tests.
+# Fix, format, and vet Go code. Runs before tests.
 [group('test')]
 check:
 	go fix ./...
