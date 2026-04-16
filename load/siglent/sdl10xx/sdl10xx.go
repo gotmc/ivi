@@ -82,7 +82,7 @@ func New(inst ivi.Transport, opts ...ivi.DriverOption) (*SDL10xx, error) {
 
 	if cfg.Reset {
 		if err := driver.Reset(); err != nil {
-			return &driver, err
+			return nil, err
 		}
 	}
 

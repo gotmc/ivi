@@ -146,7 +146,7 @@ func New(inst ivi.Transport, opts ...ivi.DriverOption) (*Driver, error) {
 
 	if cfg.Reset {
 		if err := driver.Reset(); err != nil {
-			return &driver, err
+			return nil, err
 		}
 	}
 
