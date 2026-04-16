@@ -29,7 +29,12 @@ const (
 )
 
 // Confirm the interfaces implemented by the driver.
-var _ dmm.Base = (*Driver)(nil)
+var (
+	_ dmm.Base                            = (*Driver)(nil)
+	_ dmm.ACMeasurementExtension          = (*Driver)(nil)
+	_ dmm.FrequencyMeasurementExtension   = (*Driver)(nil)
+	_ dmm.TemperatureMeasurementExtension = (*Driver)(nil)
+)
 
 // Driver provides the IVI driver for the Keysight 3446x family of DMMs.
 type Driver struct {
@@ -60,7 +65,7 @@ func New(inst ivi.Transport, opts ...ivi.DriverOption) (*Driver, error) {
 			"IviDmmBase",
 			"IviDmmACMeasurement",
 			"IviDmmFrequencyMeasurement",
-			// "IviDmmTemperatureMeasurement",
+			"IviDmmTemperatureMeasurement",
 			// "IviDmmResistanceTemperatureDevice",
 			// "IviDmmThermistor",
 			// "IviDmmMultiPoint",
