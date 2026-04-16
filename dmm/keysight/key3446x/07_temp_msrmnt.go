@@ -7,6 +7,7 @@ package key3446x
 
 import (
 	"fmt"
+	"slices"
 	"strings"
 
 	"github.com/gotmc/ivi"
@@ -81,10 +82,7 @@ func (d *Driver) SetTemperatureTransducerType(t dmm.TempTransducerType) error {
 // thermocoupleCapableModels lists the Truevolt models that include
 // thermocouple measurement hardware. Per the Operating and Service Guide, the
 // TCouple transducer type is available only on the 34465A and 34470A.
-var thermocoupleCapableModels = map[string]struct{}{
-	"34465A": {},
-	"34470A": {},
-}
+var thermocoupleCapableModels = []string{"34465A", "34470A"}
 
 // requireThermocoupleCapableModel returns [ivi.ErrUnsupportedModel] if the
 // connected instrument's model cannot measure thermocouples. The model is
@@ -104,7 +102,7 @@ func (d *Driver) requireThermocoupleCapableModel() error {
 		model = strings.TrimSpace(fresh)
 	}
 
-	if _, ok := thermocoupleCapableModels[model]; !ok {
+	if !slices.Contains(thermocoupleCapableModels, model) {
 		return fmt.Errorf(
 			"SetTemperatureTransducerType: thermocouple not supported on %q: %w",
 			model, ivi.ErrUnsupportedModel,
