@@ -15,6 +15,12 @@ import (
 	"time"
 
 	"github.com/gotmc/ivi"
+	"github.com/gotmc/ivi/swtch"
+)
+
+var (
+	_ swtch.Base        = (*U2751A)(nil)
+	_ swtch.BaseChannel = (*Channel)(nil)
 )
 
 const (
@@ -181,9 +187,9 @@ func (d *U2751A) Disable() error {
 	return ivi.Set(ctx, d.inst, "rout:open (@101:408)\n")
 }
 
-// Channel returns the channel based on either the virtual name or the physical
-// name. Virtual names are checked first.
-func (d *U2751A) Channel(name string) (*Channel, error) {
+// channel returns the concrete channel based on either the virtual name or the
+// physical name. Virtual names are checked first.
+func (d *U2751A) channel(name string) (*Channel, error) {
 	// See if the given name matches one of the virtual channel names.
 	for _, ch := range d.channels {
 		if name == ch.virtualName {
@@ -199,8 +205,14 @@ func (d *U2751A) Channel(name string) (*Channel, error) {
 	return nil, fmt.Errorf("channel %s not found", name)
 }
 
+// Channel returns the channel based on either the virtual name or the physical
+// name. Virtual names are checked first.
+func (d *U2751A) Channel(name string) (swtch.BaseChannel, error) {
+	return d.channel(name)
+}
+
 // ChannelByID returns the channel based on the ID (0-based).
-func (d *U2751A) ChannelByID(id int) (*Channel, error) {
+func (d *U2751A) ChannelByID(id int) (swtch.BaseChannel, error) {
 	if id < 0 || id >= len(d.channels) {
 		return nil, fmt.Errorf("channel %d not found", id)
 	}
@@ -209,8 +221,12 @@ func (d *U2751A) ChannelByID(id int) (*Channel, error) {
 }
 
 // Channels returns all channels.
-func (d *U2751A) Channels() ([]Channel, error) {
-	return d.channels, nil
+func (d *U2751A) Channels() ([]swtch.BaseChannel, error) {
+	channels := make([]swtch.BaseChannel, len(d.channels))
+	for i := range d.channels {
+		channels[i] = &d.channels[i]
+	}
+	return channels, nil
 }
 
 func newChannel(

@@ -226,12 +226,12 @@ func (ch *Channel) WireMode() int {
 // Can Connect described in Section 4.3.1 of IVI-4.6: IviSwtch Class
 // Specification.
 func (d *U2751A) CanConnect(ch1name, ch2name string) (bool, error) {
-	ch1, err := d.Channel(ch1name)
+	ch1, err := d.channel(ch1name)
 	if err != nil {
 		return false, err
 	}
 
-	ch2, err := d.Channel(ch2name)
+	ch2, err := d.channel(ch2name)
 	if err != nil {
 		return false, err
 	}
@@ -279,13 +279,13 @@ func (d *U2751A) Connect(ch1name, ch2name string) error {
 	ctx, cancel := d.newContext()
 	defer cancel()
 
-	ch1, err := d.Channel(ch1name)
+	ch1, err := d.channel(ch1name)
 	if err != nil {
 		// Should I return an Unknown Channel Name per IVI-3.2 Table 9-2?
 		return err
 	}
 
-	ch2, err := d.Channel(ch2name)
+	ch2, err := d.channel(ch2name)
 	if err != nil {
 		return err
 	}
@@ -345,6 +345,43 @@ func (d *U2751A) Connect(ch1name, ch2name string) error {
 	d.paths = append(d.paths, newPath)
 
 	return nil
+}
+
+// Disconnect takes two channel names and, if possible, destroys the path
+// between the two channels. Disconnect implements the IviSwtch Base Function
+// Disconnect described in Section 4.3.3 of IVI-4.6: IviSwtch Class
+// Specification.
+func (d *U2751A) Disconnect(ch1, ch2 string) error {
+	return ivi.ErrNotImplemented
+}
+
+// DisconnectAll destroys all paths that the switch module has created.
+// DisconnectAll implements the IviSwtch Base Function Disconnect All described
+// in Section 4.3.4 of IVI-4.6: IviSwtch Class Specification.
+func (d *U2751A) DisconnectAll() error {
+	return ivi.ErrNotImplemented
+}
+
+// GetPath returns an ordered list of channel names that compose the path
+// between two channels. GetPath implements the IviSwtch Base Function Get Path
+// described in Section 4.3.5 of IVI-4.6: IviSwtch Class Specification.
+func (d *U2751A) GetPath(ch1, ch2 string) ([]string, error) {
+	return nil, ivi.ErrNotImplemented
+}
+
+// SetPath creates a path using the given list of channel names. SetPath
+// implements the IviSwtch Base Function Set Path described in Section 4.3.6 of
+// IVI-4.6: IviSwtch Class Specification.
+func (d *U2751A) SetPath(chs []string) error {
+	return ivi.ErrNotImplemented
+}
+
+// WaitForDebounce pauses execution until all switch modules have settled from
+// their switching operations or until maxTime has elapsed. WaitForDebounce
+// implements the IviSwtch Base Function Wait For Debounce described in Section
+// 4.3.7 of IVI-4.6: IviSwtch Class Specification.
+func (d *U2751A) WaitForDebounce(maxTime time.Duration) error {
+	return ivi.ErrNotImplemented
 }
 
 func pathsEqual(pathA, pathB []string) bool {

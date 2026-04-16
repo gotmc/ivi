@@ -15,7 +15,7 @@ import (
 
 // Base provides the interface required for the IviSwtchBase capability group.
 type Base interface {
-	CanConnect(ch1, ch2 string) error
+	CanConnect(ch1, ch2 string) (bool, error)
 	Channel(name string) (BaseChannel, error)
 	ChannelByID(id int) (BaseChannel, error)
 	ChannelCount() int
@@ -26,7 +26,7 @@ type Base interface {
 	GetPath(ch1, ch2 string) ([]string, error)
 	SetPath(chs []string) error
 	WaitForDebounce(maxTime time.Duration) error
-	SetVirtualNames(names []string) error
+	SetVirtualNames(names map[string]string) error
 }
 
 // BaseChannel provides the interface for the channel repeated capability for
