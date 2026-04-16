@@ -22,9 +22,9 @@ import (
 )
 
 const (
-	numChannels      = 16
-	defaultGPIBAddr  = 19
-	defaultBaudRate  = 9600
+	numChannels     = 16
+	defaultGPIBAddr = 19
+	defaultBaudRate = 9600
 )
 
 // Confirm the interfaces implemented by the driver.

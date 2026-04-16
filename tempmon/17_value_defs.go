@@ -9,7 +9,7 @@ package tempmon
 type TemperatureUnits int
 
 const (
-	Celsius    TemperatureUnits = iota
+	Celsius TemperatureUnits = iota
 	Fahrenheit
 	Kelvin
 )
