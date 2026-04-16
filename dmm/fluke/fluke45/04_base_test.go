@@ -133,7 +133,7 @@ func TestDriver_MeasurementFunction(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			mock := &mockInst{queryResp: tt.resp}
-			d, err := New(mock)
+			d, err := New(mock, ivi.WithoutIDQuery())
 			if err != nil {
 				t.Fatalf("New() error: %v", err)
 			}
@@ -171,7 +171,7 @@ func TestDriver_SetMeasurementFunction(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			mock := &mockInst{}
-			d, err := New(mock)
+			d, err := New(mock, ivi.WithoutIDQuery())
 			if err != nil {
 				t.Fatalf("New() error: %v", err)
 			}
@@ -208,7 +208,7 @@ func TestDriver_TriggerSource(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			mock := &mockInst{queryResp: tt.resp}
-			d, err := New(mock)
+			d, err := New(mock, ivi.WithoutIDQuery())
 			if err != nil {
 				t.Fatalf("New() error: %v", err)
 			}
@@ -246,7 +246,7 @@ func TestDriver_SetTriggerSource(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			mock := &mockInst{}
-			d, err := New(mock)
+			d, err := New(mock, ivi.WithoutIDQuery())
 			if err != nil {
 				t.Fatalf("New() error: %v", err)
 			}
@@ -270,7 +270,7 @@ func TestDriver_SetTriggerSource(t *testing.T) {
 
 func TestDriver_ResolutionAbsolute_NotSupported(t *testing.T) {
 	mock := &mockInst{}
-	d, err := New(mock)
+	d, err := New(mock, ivi.WithoutIDQuery())
 	if err != nil {
 		t.Fatalf("New() error: %v", err)
 	}
@@ -288,7 +288,7 @@ func TestDriver_ResolutionAbsolute_NotSupported(t *testing.T) {
 
 func TestDriver_Abort_NotSupported(t *testing.T) {
 	mock := &mockInst{}
-	d, err := New(mock)
+	d, err := New(mock, ivi.WithoutIDQuery())
 	if err != nil {
 		t.Fatalf("New() error: %v", err)
 	}
@@ -301,7 +301,7 @@ func TestDriver_Abort_NotSupported(t *testing.T) {
 
 func TestDriver_InitiateMeasurement(t *testing.T) {
 	mock := &mockInst{}
-	d, err := New(mock)
+	d, err := New(mock, ivi.WithoutIDQuery())
 	if err != nil {
 		t.Fatalf("New() error: %v", err)
 	}
@@ -317,7 +317,7 @@ func TestDriver_InitiateMeasurement(t *testing.T) {
 
 func TestDriver_IsOutOfRange_NotSupported(t *testing.T) {
 	mock := &mockInst{}
-	d, err := New(mock)
+	d, err := New(mock, ivi.WithoutIDQuery())
 	if err != nil {
 		t.Fatalf("New() error: %v", err)
 	}
@@ -355,7 +355,7 @@ func TestDriver_TriggerDelay(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			mock := &mockInst{queryResp: tt.resp}
-			d, err := New(mock)
+			d, err := New(mock, ivi.WithoutIDQuery())
 			if err != nil {
 				t.Fatalf("New() error: %v", err)
 			}
@@ -382,7 +382,7 @@ func TestDriver_TriggerDelay(t *testing.T) {
 
 func TestDriver_FetchMeasurement(t *testing.T) {
 	mock := &mockInst{queryResp: "1.234"}
-	d, err := New(mock)
+	d, err := New(mock, ivi.WithoutIDQuery())
 	if err != nil {
 		t.Fatalf("New() error: %v", err)
 	}
@@ -398,7 +398,7 @@ func TestDriver_FetchMeasurement(t *testing.T) {
 
 func TestDriver_ReadMeasurement(t *testing.T) {
 	mock := &mockInst{queryResp: "5.678"}
-	d, err := New(mock)
+	d, err := New(mock, ivi.WithoutIDQuery())
 	if err != nil {
 		t.Fatalf("New() error: %v", err)
 	}

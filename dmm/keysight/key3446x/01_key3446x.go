@@ -40,12 +40,15 @@ var (
 type Driver struct {
 	inst    ivi.Transport
 	timeout time.Duration
+	model   string
 	ivi.Inherent
 }
 
-// New creates a new IVI driver for the Keysight 3446x series of DMMs. Use
-// [ivi.WithIDQuery] to verify the instrument model, [ivi.WithReset] to reset
-// on creation, and [ivi.WithTimeout] to override the default I/O timeout.
+// New creates a new IVI driver for the Keysight 3446x series of DMMs. By
+// default the constructor queries *IDN? and verifies the model against the
+// supported list; pass [ivi.WithoutIDQuery] to skip that check. Use
+// [ivi.WithReset] to reset on creation and [ivi.WithTimeout] to override the
+// default I/O timeout.
 func New(inst ivi.Transport, opts ...ivi.DriverOption) (*Driver, error) {
 	cfg := ivi.ApplyOptions(opts)
 
@@ -90,15 +93,15 @@ func New(inst ivi.Transport, opts ...ivi.DriverOption) (*Driver, error) {
 	}
 	inherent := ivi.NewInherent(inst, inherentBase, timeout)
 
-	if cfg.IDQuery {
-		if _, err := inherent.CheckID(); err != nil {
-			return nil, err
-		}
+	model, err := inherent.CheckID()
+	if err != nil && !cfg.SkipIDQuery {
+		return nil, err
 	}
 
 	driver := Driver{
 		inst:     inst,
 		timeout:  timeout,
+		model:    model,
 		Inherent: inherent,
 	}
 

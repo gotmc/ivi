@@ -12,6 +12,7 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/gotmc/ivi"
 	"github.com/gotmc/ivi/fgen"
 )
 
@@ -50,7 +51,7 @@ func (m *mockInst) Query(_ context.Context, s string) (string, error) {
 
 func TestDriver_OutputCount(t *testing.T) {
 	mock := &mockInst{}
-	d, err := New(mock)
+	d, err := New(mock, ivi.WithoutIDQuery())
 	if err != nil {
 		t.Fatalf("New() error: %v", err)
 	}
@@ -61,7 +62,7 @@ func TestDriver_OutputCount(t *testing.T) {
 
 func TestDriver_Channel(t *testing.T) {
 	mock := &mockInst{}
-	d, err := New(mock)
+	d, err := New(mock, ivi.WithoutIDQuery())
 	if err != nil {
 		t.Fatalf("New() error: %v", err)
 	}
@@ -90,7 +91,7 @@ func TestDriver_Channel(t *testing.T) {
 
 func TestChannel_srcPrefix(t *testing.T) {
 	mock := &mockInst{}
-	d, err := New(mock)
+	d, err := New(mock, ivi.WithoutIDQuery())
 	if err != nil {
 		t.Fatalf("New() error: %v", err)
 	}
@@ -119,7 +120,7 @@ func TestChannel_SetOutputEnabled(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			mock := &mockInst{}
-			d, _ := New(mock)
+			d, _ := New(mock, ivi.WithoutIDQuery())
 			ch, _ := d.Channel(0)
 			err := ch.SetOutputEnabled(tt.enabled)
 			if err != nil {
@@ -134,7 +135,7 @@ func TestChannel_SetOutputEnabled(t *testing.T) {
 
 func TestChannel_SetOutputEnabled_Ch2(t *testing.T) {
 	mock := &mockInst{}
-	d, _ := New(mock)
+	d, _ := New(mock, ivi.WithoutIDQuery())
 	ch, _ := d.Channel(1)
 	if err := ch.SetOutputEnabled(true); err != nil {
 		t.Fatalf("SetOutputEnabled() error: %v", err)
@@ -146,7 +147,7 @@ func TestChannel_SetOutputEnabled_Ch2(t *testing.T) {
 
 func TestChannel_SetFrequency(t *testing.T) {
 	mock := &mockInst{}
-	d, _ := New(mock)
+	d, _ := New(mock, ivi.WithoutIDQuery())
 	ch, _ := d.Channel(0)
 	if err := ch.SetFrequency(1000.0); err != nil {
 		t.Fatalf("SetFrequency() error: %v", err)
@@ -159,7 +160,7 @@ func TestChannel_SetFrequency(t *testing.T) {
 
 func TestChannel_SetAmplitude(t *testing.T) {
 	mock := &mockInst{}
-	d, _ := New(mock)
+	d, _ := New(mock, ivi.WithoutIDQuery())
 	ch, _ := d.Channel(1)
 	if err := ch.SetAmplitude(2.5); err != nil {
 		t.Fatalf("SetAmplitude() error: %v", err)
@@ -184,7 +185,7 @@ func TestChannel_SetStandardWaveform(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			mock := &mockInst{}
-			d, _ := New(mock)
+			d, _ := New(mock, ivi.WithoutIDQuery())
 			ch, _ := d.Channel(0)
 			if err := ch.SetStandardWaveform(tt.wave); err != nil {
 				t.Fatalf("SetStandardWaveform() error: %v", err)
@@ -198,7 +199,7 @@ func TestChannel_SetStandardWaveform(t *testing.T) {
 
 func TestChannel_SetStandardWaveform_Triangle(t *testing.T) {
 	mock := &mockInst{}
-	d, _ := New(mock)
+	d, _ := New(mock, ivi.WithoutIDQuery())
 	ch, _ := d.Channel(0)
 	if err := ch.SetStandardWaveform(fgen.Triangle); err != nil {
 		t.Fatalf("SetStandardWaveform(Triangle) error: %v", err)
@@ -220,7 +221,7 @@ func TestChannel_SetStandardWaveform_Triangle(t *testing.T) {
 
 func TestChannel_SetOperationMode_Burst(t *testing.T) {
 	mock := &mockInst{}
-	d, _ := New(mock)
+	d, _ := New(mock, ivi.WithoutIDQuery())
 	ch, _ := d.Channel(0)
 	if err := ch.SetOperationMode(fgen.BurstMode); err != nil {
 		t.Fatalf("SetOperationMode(BurstMode) error: %v", err)
@@ -245,7 +246,7 @@ func TestChannel_SetOperationMode_Burst(t *testing.T) {
 
 func TestChannel_SetOperationMode_Continuous(t *testing.T) {
 	mock := &mockInst{}
-	d, _ := New(mock)
+	d, _ := New(mock, ivi.WithoutIDQuery())
 	ch, _ := d.Channel(0)
 	if err := ch.SetOperationMode(fgen.ContinuousMode); err != nil {
 		t.Fatalf("SetOperationMode(ContinuousMode) error: %v", err)
@@ -260,7 +261,7 @@ func TestChannel_SetOperationMode_Continuous(t *testing.T) {
 
 func TestChannel_SetBurstCount(t *testing.T) {
 	mock := &mockInst{}
-	d, _ := New(mock)
+	d, _ := New(mock, ivi.WithoutIDQuery())
 	ch, _ := d.Channel(0)
 	if err := ch.SetBurstCount(10); err != nil {
 		t.Fatalf("SetBurstCount() error: %v", err)
@@ -275,7 +276,7 @@ func TestChannel_SetBurstCount(t *testing.T) {
 
 func TestChannel_SetOutputImpedance(t *testing.T) {
 	mock := &mockInst{}
-	d, _ := New(mock)
+	d, _ := New(mock, ivi.WithoutIDQuery())
 	ch, _ := d.Channel(1)
 	if err := ch.SetOutputImpedance(50.0); err != nil {
 		t.Fatalf("SetOutputImpedance() error: %v", err)
@@ -299,7 +300,7 @@ func TestChannel_InternalTriggerRate(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			mock := &mockInst{queryResp: tt.response}
-			d, _ := New(mock)
+			d, _ := New(mock, ivi.WithoutIDQuery())
 			ch, _ := d.Channel(0)
 			got, err := ch.InternalTriggerRate()
 			if err != nil {
@@ -314,7 +315,7 @@ func TestChannel_InternalTriggerRate(t *testing.T) {
 
 func TestChannel_SetInternalTriggerRate(t *testing.T) {
 	mock := &mockInst{}
-	d, _ := New(mock)
+	d, _ := New(mock, ivi.WithoutIDQuery())
 	ch, _ := d.Channel(0)
 	if err := ch.SetInternalTriggerRate(1000.0); err != nil {
 		t.Fatalf("SetInternalTriggerRate() error: %v", err)
@@ -330,7 +331,7 @@ func TestChannel_SetInternalTriggerRate(t *testing.T) {
 
 func TestChannel_SetDCOffset(t *testing.T) {
 	mock := &mockInst{}
-	d, _ := New(mock)
+	d, _ := New(mock, ivi.WithoutIDQuery())
 	ch, _ := d.Channel(0)
 	if err := ch.SetDCOffset(0.5); err != nil {
 		t.Fatalf("SetDCOffset() error: %v", err)
@@ -355,7 +356,7 @@ func TestChannel_StandardWaveform(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			mock := &mockInst{queryResp: tt.resp}
-			d, _ := New(mock)
+			d, _ := New(mock, ivi.WithoutIDQuery())
 			ch, _ := d.Channel(0)
 			got, err := ch.StandardWaveform()
 			if err != nil {
@@ -383,7 +384,7 @@ func TestChannel_OutputMode(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			mock := &mockInst{queryResp: tt.resp}
-			d, _ := New(mock)
+			d, _ := New(mock, ivi.WithoutIDQuery())
 			got, err := d.OutputMode()
 			if err != nil {
 				t.Fatalf("OutputMode() error: %v", err)
@@ -397,7 +398,7 @@ func TestChannel_OutputMode(t *testing.T) {
 
 func TestChannel_CommandError(t *testing.T) {
 	mock := &mockInst{shouldError: true}
-	d, _ := New(mock)
+	d, _ := New(mock, ivi.WithoutIDQuery())
 	ch, _ := d.Channel(0)
 	if err := ch.SetFrequency(1000); err == nil {
 		t.Error("expected error, got nil")

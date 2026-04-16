@@ -13,6 +13,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/gotmc/ivi"
 	"github.com/gotmc/ivi/lcr"
 )
 
@@ -50,7 +51,7 @@ func (m *mockInst) Query(_ context.Context, s string) (string, error) {
 
 func TestNew(t *testing.T) {
 	mock := &mockInst{}
-	d, err := New(mock)
+	d, err := New(mock, ivi.WithoutIDQuery())
 	if err != nil {
 		t.Fatalf("New() error: %v", err)
 	}
@@ -76,7 +77,7 @@ func TestDriver_SetMeasurementFunction(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			mock := &mockInst{}
-			d, _ := New(mock)
+			d, _ := New(mock, ivi.WithoutIDQuery())
 			if err := d.SetMeasurementFunction(tt.fcn); err != nil {
 				t.Fatalf("SetMeasurementFunction() error: %v", err)
 			}
@@ -101,7 +102,7 @@ func TestDriver_MeasurementFunction(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			mock := &mockInst{queryResp: tt.resp}
-			d, _ := New(mock)
+			d, _ := New(mock, ivi.WithoutIDQuery())
 			got, err := d.MeasurementFunction()
 			if err != nil {
 				t.Fatalf("MeasurementFunction() error: %v", err)
@@ -115,7 +116,7 @@ func TestDriver_MeasurementFunction(t *testing.T) {
 
 func TestDriver_SetFrequency(t *testing.T) {
 	mock := &mockInst{}
-	d, _ := New(mock)
+	d, _ := New(mock, ivi.WithoutIDQuery())
 	if err := d.SetFrequency(1000.0); err != nil {
 		t.Fatalf("SetFrequency() error: %v", err)
 	}
@@ -127,7 +128,7 @@ func TestDriver_SetFrequency(t *testing.T) {
 
 func TestDriver_SetTestVoltageLevel(t *testing.T) {
 	mock := &mockInst{}
-	d, _ := New(mock)
+	d, _ := New(mock, ivi.WithoutIDQuery())
 	if err := d.SetTestVoltageLevel(1.0); err != nil {
 		t.Fatalf("SetTestVoltageLevel() error: %v", err)
 	}
@@ -150,7 +151,7 @@ func TestDriver_SetImpedanceAutoRange(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			mock := &mockInst{}
-			d, _ := New(mock)
+			d, _ := New(mock, ivi.WithoutIDQuery())
 			if err := d.SetImpedanceAutoRange(tt.auto); err != nil {
 				t.Fatalf("SetImpedanceAutoRange() error: %v", err)
 			}
@@ -176,7 +177,7 @@ func TestDriver_SetTriggerSource(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			mock := &mockInst{}
-			d, _ := New(mock)
+			d, _ := New(mock, ivi.WithoutIDQuery())
 			if err := d.SetTriggerSource(tt.src); err != nil {
 				t.Fatalf("SetTriggerSource() error: %v", err)
 			}
@@ -200,7 +201,7 @@ func TestDriver_TriggerSource(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			mock := &mockInst{queryResp: tt.resp}
-			d, _ := New(mock)
+			d, _ := New(mock, ivi.WithoutIDQuery())
 			got, err := d.TriggerSource()
 			if err != nil {
 				t.Fatalf("TriggerSource() error: %v", err)
@@ -214,7 +215,7 @@ func TestDriver_TriggerSource(t *testing.T) {
 
 func TestDriver_SetTriggerDelay(t *testing.T) {
 	mock := &mockInst{}
-	d, _ := New(mock)
+	d, _ := New(mock, ivi.WithoutIDQuery())
 	if err := d.SetTriggerDelay(100 * time.Millisecond); err != nil {
 		t.Fatalf("SetTriggerDelay() error: %v", err)
 	}
@@ -226,7 +227,7 @@ func TestDriver_SetTriggerDelay(t *testing.T) {
 
 func TestDriver_Abort(t *testing.T) {
 	mock := &mockInst{}
-	d, _ := New(mock)
+	d, _ := New(mock, ivi.WithoutIDQuery())
 	if err := d.Abort(); err != nil {
 		t.Fatalf("Abort() error: %v", err)
 	}
@@ -237,7 +238,7 @@ func TestDriver_Abort(t *testing.T) {
 
 func TestDriver_Initiate(t *testing.T) {
 	mock := &mockInst{}
-	d, _ := New(mock)
+	d, _ := New(mock, ivi.WithoutIDQuery())
 	if err := d.Initiate(); err != nil {
 		t.Fatalf("Initiate() error: %v", err)
 	}
@@ -248,7 +249,7 @@ func TestDriver_Initiate(t *testing.T) {
 
 func TestDriver_Trigger(t *testing.T) {
 	mock := &mockInst{}
-	d, _ := New(mock)
+	d, _ := New(mock, ivi.WithoutIDQuery())
 	if err := d.Trigger(); err != nil {
 		t.Fatalf("Trigger() error: %v", err)
 	}
@@ -259,7 +260,7 @@ func TestDriver_Trigger(t *testing.T) {
 
 func TestDriver_FetchMeasurement(t *testing.T) {
 	mock := &mockInst{queryResp: "+1.23456E-09,+3.45678E-03,+0"}
-	d, _ := New(mock)
+	d, _ := New(mock, ivi.WithoutIDQuery())
 	pri, sec, status, err := d.FetchMeasurement()
 	if err != nil {
 		t.Fatalf("FetchMeasurement() error: %v", err)
@@ -277,7 +278,7 @@ func TestDriver_FetchMeasurement(t *testing.T) {
 
 func TestDriver_FetchMeasurement_Overload(t *testing.T) {
 	mock := &mockInst{queryResp: "+9.99999E+37,+9.99999E+37,+1"}
-	d, _ := New(mock)
+	d, _ := New(mock, ivi.WithoutIDQuery())
 	_, _, status, err := d.FetchMeasurement()
 	if err != nil {
 		t.Fatalf("FetchMeasurement() error: %v", err)
@@ -300,7 +301,7 @@ func TestDriver_SetDCBiasEnabled(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			mock := &mockInst{}
-			d, _ := New(mock)
+			d, _ := New(mock, ivi.WithoutIDQuery())
 			if err := d.SetDCBiasEnabled(tt.enabled); err != nil {
 				t.Fatalf("SetDCBiasEnabled() error: %v", err)
 			}
@@ -313,7 +314,7 @@ func TestDriver_SetDCBiasEnabled(t *testing.T) {
 
 func TestDriver_SetOpenCorrectionEnabled(t *testing.T) {
 	mock := &mockInst{}
-	d, _ := New(mock)
+	d, _ := New(mock, ivi.WithoutIDQuery())
 	if err := d.SetOpenCorrectionEnabled(true); err != nil {
 		t.Fatalf("SetOpenCorrectionEnabled() error: %v", err)
 	}
@@ -327,7 +328,7 @@ func TestDriver_SetOpenCorrectionEnabled(t *testing.T) {
 
 func TestDriver_ExecuteOpenCorrection(t *testing.T) {
 	mock := &mockInst{}
-	d, _ := New(mock)
+	d, _ := New(mock, ivi.WithoutIDQuery())
 	if err := d.ExecuteOpenCorrection(); err != nil {
 		t.Fatalf("ExecuteOpenCorrection() error: %v", err)
 	}
@@ -351,7 +352,7 @@ func TestDriver_MeasurementSpeed(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			mock := &mockInst{queryResp: tt.resp}
-			d, _ := New(mock)
+			d, _ := New(mock, ivi.WithoutIDQuery())
 			got, err := d.MeasurementSpeed()
 			if err != nil {
 				t.Fatalf("MeasurementSpeed() error: %v", err)
@@ -377,7 +378,7 @@ func TestDriver_AveragingCount(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			mock := &mockInst{queryResp: tt.resp}
-			d, _ := New(mock)
+			d, _ := New(mock, ivi.WithoutIDQuery())
 			got, err := d.AveragingCount()
 			if err != nil {
 				t.Fatalf("AveragingCount() error: %v", err)
@@ -391,7 +392,7 @@ func TestDriver_AveragingCount(t *testing.T) {
 
 func TestDriver_CommandError(t *testing.T) {
 	mock := &mockInst{shouldError: true}
-	d, _ := New(mock)
+	d, _ := New(mock, ivi.WithoutIDQuery())
 	if err := d.SetFrequency(1000); err == nil {
 		t.Error("expected error, got nil")
 	}

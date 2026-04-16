@@ -16,13 +16,15 @@ type DriverOption func(*DriverConfig)
 // driver-specific (e.g., Standalone) are ignored by drivers that don't use
 // them.
 type DriverConfig struct {
-	Timeout    time.Duration
-	IDQuery    bool
-	Reset      bool
-	Standalone bool
+	Timeout     time.Duration
+	SkipIDQuery bool
+	Reset       bool
+	Standalone  bool
 }
 
 // ApplyOptions returns a DriverConfig with all the given options applied.
+// By default SkipIDQuery is false, meaning driver constructors will query
+// *IDN? and validate the model against the driver's supported list.
 func ApplyOptions(opts []DriverOption) DriverConfig {
 	var cfg DriverConfig
 	for _, opt := range opts {
@@ -32,11 +34,14 @@ func ApplyOptions(opts []DriverOption) DriverConfig {
 	return cfg
 }
 
-// WithIDQuery enables querying the instrument's *IDN? string during
-// construction and validating it against the driver's supported models.
-func WithIDQuery() DriverOption {
+// WithoutIDQuery disables the default *IDN? query and model validation
+// performed by driver constructors. Use this only when you know the attached
+// instrument is supported but cannot respond to *IDN? (for example, during
+// bring-up of a simulated instrument or a test fixture). Unsupported or
+// unresponsive instruments will fail later when a method call issues SCPI.
+func WithoutIDQuery() DriverOption {
 	return func(cfg *DriverConfig) {
-		cfg.IDQuery = true
+		cfg.SkipIDQuery = true
 	}
 }
 

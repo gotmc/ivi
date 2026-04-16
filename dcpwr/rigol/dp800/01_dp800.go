@@ -35,14 +35,16 @@ type Driver struct {
 	inst     ivi.Transport
 	channels []Channel
 	timeout  time.Duration
+	model    string
 	ivi.Inherent
 }
 
-// New creates a new Rigol DP800 IVI Instrument driver. The New function always
-// queries the instrument to determine the model for channel configuration. Use
-// [ivi.WithIDQuery] to also validate the model against the supported models
-// list, [ivi.WithReset] to reset the instrument on creation, and
-// [ivi.WithTimeout] to override the default I/O timeout.
+// New creates a new Rigol DP800 IVI Instrument driver. The constructor always
+// queries *IDN? since channel configuration depends on the model; by default
+// it also validates the model against the supported list. Pass
+// [ivi.WithoutIDQuery] to skip validation (the model is still queried). Use
+// [ivi.WithReset] to reset on creation and [ivi.WithTimeout] to override the
+// default I/O timeout.
 func New(inst ivi.Transport, opts ...ivi.DriverOption) (*Driver, error) {
 	cfg := ivi.ApplyOptions(opts)
 
@@ -76,17 +78,17 @@ func New(inst ivi.Transport, opts ...ivi.DriverOption) (*Driver, error) {
 	}
 	inherent := ivi.NewInherent(inst, inherentBase, timeout)
 
-	// Always query the model since channel configuration depends on it.
+	// CheckID populates the model even when it returns ErrUnsupportedModel,
+	// so the channel lookup below still works when validation is skipped.
+	// A hard failure (network error, malformed IDN) is only fatal when the
+	// caller did not pass WithoutIDQuery.
 	model, err := inherent.CheckID()
-	if err != nil && cfg.IDQuery {
+	if err != nil && !cfg.SkipIDQuery {
 		return nil, err
-	} else if err != nil {
-		// Without idQuery, still need the model for channel config.
-		// Try to get it directly.
-		model, err = inherent.InstrumentModel()
-		if err != nil {
-			return nil, fmt.Errorf("error determining instrument model: %w", err)
-		}
+	}
+
+	if model == "" {
+		return nil, fmt.Errorf("error determining instrument model: %w", err)
 	}
 
 	type genericChannel struct {
@@ -157,6 +159,7 @@ func New(inst ivi.Transport, opts ...ivi.DriverOption) (*Driver, error) {
 		inst:     inst,
 		channels: channels,
 		timeout:  timeout,
+		model:    model,
 		Inherent: inherent,
 	}
 

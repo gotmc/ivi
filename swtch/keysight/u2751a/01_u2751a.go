@@ -53,16 +53,18 @@ type U2751A struct {
 	inst     ivi.Transport
 	channels []Channel
 	timeout  time.Duration
+	model    string
 	ivi.Inherent
 	paths []path
 }
 
 type path []string
 
-// New creates a new U2751A IVI Instrument. Use [ivi.WithIDQuery] to verify the
-// instrument model, [ivi.WithReset] to reset on creation, [ivi.WithStandalone]
-// to configure standalone voltage ratings, and [ivi.WithTimeout] to override
-// the default I/O timeout.
+// New creates a new U2751A IVI Instrument. By default the constructor queries
+// *IDN? and verifies the model against the supported list; pass
+// [ivi.WithoutIDQuery] to skip that check. Use [ivi.WithReset] to reset on
+// creation, [ivi.WithStandalone] to configure standalone voltage ratings, and
+// [ivi.WithTimeout] to override the default I/O timeout.
 func New(inst ivi.Transport, opts ...ivi.DriverOption) (U2751A, error) {
 	cfg := ivi.ApplyOptions(opts)
 
@@ -112,16 +114,16 @@ func New(inst ivi.Transport, opts ...ivi.DriverOption) (U2751A, error) {
 	}
 	inherent := ivi.NewInherent(inst, inherentBase, timeout)
 
-	if cfg.IDQuery {
-		if _, err := inherent.CheckID(); err != nil {
-			return U2751A{}, err
-		}
+	model, err := inherent.CheckID()
+	if err != nil && !cfg.SkipIDQuery {
+		return U2751A{}, err
 	}
 
 	driver := U2751A{
 		inst:     inst,
 		channels: channels,
 		timeout:  timeout,
+		model:    model,
 		Inherent: inherent,
 	}
 

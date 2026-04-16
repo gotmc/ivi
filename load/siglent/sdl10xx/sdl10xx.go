@@ -28,12 +28,15 @@ const (
 type SDL10xx struct {
 	inst     ivi.Transport
 	channels []Channel
+	model    string
 	ivi.Inherent
 }
 
-// New creates a new Siglent SDL10xx IVI Instrument driver. Use
-// [ivi.WithIDQuery] to verify the instrument model, [ivi.WithReset] to reset
-// on creation, and [ivi.WithTimeout] to override the default I/O timeout.
+// New creates a new Siglent SDL10xx IVI Instrument driver. By default the
+// constructor queries *IDN? and verifies the model against the supported
+// list; pass [ivi.WithoutIDQuery] to skip that check. Use [ivi.WithReset] to
+// reset on creation and [ivi.WithTimeout] to override the default I/O
+// timeout.
 func New(inst ivi.Transport, opts ...ivi.DriverOption) (*SDL10xx, error) {
 	cfg := ivi.ApplyOptions(opts)
 
@@ -68,15 +71,15 @@ func New(inst ivi.Transport, opts ...ivi.DriverOption) (*SDL10xx, error) {
 	}
 	inherent := ivi.NewInherent(inst, inherentBase, timeout)
 
-	if cfg.IDQuery {
-		if _, err := inherent.CheckID(); err != nil {
-			return nil, err
-		}
+	model, err := inherent.CheckID()
+	if err != nil && !cfg.SkipIDQuery {
+		return nil, err
 	}
 
 	driver := SDL10xx{
 		inst:     inst,
 		channels: channels,
+		model:    model,
 		Inherent: inherent,
 	}
 

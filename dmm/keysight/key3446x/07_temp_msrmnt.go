@@ -50,12 +50,19 @@ func (d *Driver) TemperatureTransducerType() (dmm.TempTransducerType, error) {
 // thermistors. Callers that need to select the 4-wire form (FTHermistor) must
 // issue the SCPI command directly.
 //
+// Requesting [dmm.Thermocouple] on a model that lacks thermocouple hardware
+// (34460A, 34461A) returns [ivi.ErrUnsupportedModel] without touching the
+// instrument.
+//
 // SetTemperatureTransducerType is the setter for the read-write
 // IviDmmTemperatureMeasurement Attribute Temp Transducer Type described in
 // Section 7.2.1 of IVI-4.2: IviDmm Class Specification.
 func (d *Driver) SetTemperatureTransducerType(t dmm.TempTransducerType) error {
-	ctx, cancel := d.newContext()
-	defer cancel()
+	if t == dmm.Thermocouple {
+		if err := d.requireThermocoupleCapableModel(); err != nil {
+			return err
+		}
+	}
 
 	scpi, err := ivi.LookupSCPI(transducerTypeToSCPI, t)
 	if err != nil {
@@ -65,7 +72,33 @@ func (d *Driver) SetTemperatureTransducerType(t dmm.TempTransducerType) error {
 		)
 	}
 
+	ctx, cancel := d.newContext()
+	defer cancel()
+
 	return d.inst.Command(ctx, "TEMP:TRAN:TYPE %s", scpi)
+}
+
+// thermocoupleCapableModels lists the Truevolt models that include
+// thermocouple measurement hardware. Per the Operating and Service Guide, the
+// TCouple transducer type is available only on the 34465A and 34470A.
+var thermocoupleCapableModels = map[string]struct{}{
+	"34465A": {},
+	"34470A": {},
+}
+
+// requireThermocoupleCapableModel returns [ivi.ErrUnsupportedModel] if the
+// connected instrument's model cannot measure thermocouples. The model is
+// cached on the Driver at construction time, so this check does not issue any
+// SCPI.
+func (d *Driver) requireThermocoupleCapableModel() error {
+	if _, ok := thermocoupleCapableModels[strings.TrimSpace(d.model)]; !ok {
+		return fmt.Errorf(
+			"SetTemperatureTransducerType: thermocouple not supported on %q: %w",
+			d.model, ivi.ErrUnsupportedModel,
+		)
+	}
+
+	return nil
 }
 
 // transducerTypeToSCPI maps IVI TempTransducerType values to the SCPI form

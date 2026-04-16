@@ -12,6 +12,7 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/gotmc/ivi"
 	"github.com/gotmc/ivi/specan"
 )
 
@@ -49,7 +50,7 @@ func (m *mockInst) Query(_ context.Context, s string) (string, error) {
 
 func TestNew(t *testing.T) {
 	mock := &mockInst{}
-	d, err := New(mock)
+	d, err := New(mock, ivi.WithoutIDQuery())
 	if err != nil {
 		t.Fatalf("New() error: %v", err)
 	}
@@ -60,7 +61,7 @@ func TestNew(t *testing.T) {
 
 func TestDriver_TraceCount(t *testing.T) {
 	mock := &mockInst{}
-	d, _ := New(mock)
+	d, _ := New(mock, ivi.WithoutIDQuery())
 	if got := d.TraceCount(); got != 3 {
 		t.Errorf("TraceCount() = %d, want 3", got)
 	}
@@ -68,7 +69,7 @@ func TestDriver_TraceCount(t *testing.T) {
 
 func TestDriver_SetFrequencyStart(t *testing.T) {
 	mock := &mockInst{}
-	d, _ := New(mock)
+	d, _ := New(mock, ivi.WithoutIDQuery())
 	if err := d.SetFrequencyStart(1e6); err != nil {
 		t.Fatalf("SetFrequencyStart() error: %v", err)
 	}
@@ -80,7 +81,7 @@ func TestDriver_SetFrequencyStart(t *testing.T) {
 
 func TestDriver_SetFrequencyStop(t *testing.T) {
 	mock := &mockInst{}
-	d, _ := New(mock)
+	d, _ := New(mock, ivi.WithoutIDQuery())
 	if err := d.SetFrequencyStop(1.5e9); err != nil {
 		t.Fatalf("SetFrequencyStop() error: %v", err)
 	}
@@ -92,7 +93,7 @@ func TestDriver_SetFrequencyStop(t *testing.T) {
 
 func TestDriver_ConfigureFrequencyCenterSpan(t *testing.T) {
 	mock := &mockInst{}
-	d, _ := New(mock)
+	d, _ := New(mock, ivi.WithoutIDQuery())
 	if err := d.ConfigureFrequencyCenterSpan(750e6, 1.5e9); err != nil {
 		t.Fatalf("ConfigureFrequencyCenterSpan() error: %v", err)
 	}
@@ -109,7 +110,7 @@ func TestDriver_ConfigureFrequencyCenterSpan(t *testing.T) {
 
 func TestDriver_SetReferenceLevel(t *testing.T) {
 	mock := &mockInst{}
-	d, _ := New(mock)
+	d, _ := New(mock, ivi.WithoutIDQuery())
 	if err := d.SetReferenceLevel(-20.0); err != nil {
 		t.Fatalf("SetReferenceLevel() error: %v", err)
 	}
@@ -121,7 +122,7 @@ func TestDriver_SetReferenceLevel(t *testing.T) {
 
 func TestDriver_SetResolutionBandwidth(t *testing.T) {
 	mock := &mockInst{}
-	d, _ := New(mock)
+	d, _ := New(mock, ivi.WithoutIDQuery())
 	if err := d.SetResolutionBandwidth(10e3); err != nil {
 		t.Fatalf("SetResolutionBandwidth() error: %v", err)
 	}
@@ -144,7 +145,7 @@ func TestDriver_SetSweepModeContinuous(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			mock := &mockInst{}
-			d, _ := New(mock)
+			d, _ := New(mock, ivi.WithoutIDQuery())
 			if err := d.SetSweepModeContinuous(tt.continuous); err != nil {
 				t.Fatalf("SetSweepModeContinuous() error: %v", err)
 			}
@@ -169,7 +170,7 @@ func TestDriver_SetAmplitudeUnits(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			mock := &mockInst{}
-			d, _ := New(mock)
+			d, _ := New(mock, ivi.WithoutIDQuery())
 			if err := d.SetAmplitudeUnits(tt.units); err != nil {
 				t.Fatalf("SetAmplitudeUnits() error: %v", err)
 			}
@@ -194,7 +195,7 @@ func TestDriver_AmplitudeUnits(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			mock := &mockInst{queryResp: tt.resp}
-			d, _ := New(mock)
+			d, _ := New(mock, ivi.WithoutIDQuery())
 			got, err := d.AmplitudeUnits()
 			if err != nil {
 				t.Fatalf("AmplitudeUnits() error: %v", err)
@@ -219,7 +220,7 @@ func TestDriver_VerticalScale(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			mock := &mockInst{queryResp: tt.resp}
-			d, _ := New(mock)
+			d, _ := New(mock, ivi.WithoutIDQuery())
 			got, err := d.VerticalScale()
 			if err != nil {
 				t.Fatalf("VerticalScale() error: %v", err)
@@ -244,7 +245,7 @@ func TestDriver_SetAttenuationAuto(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			mock := &mockInst{}
-			d, _ := New(mock)
+			d, _ := New(mock, ivi.WithoutIDQuery())
 			if err := d.SetAttenuationAuto(tt.auto); err != nil {
 				t.Fatalf("SetAttenuationAuto() error: %v", err)
 			}
@@ -257,7 +258,7 @@ func TestDriver_SetAttenuationAuto(t *testing.T) {
 
 func TestDriver_Abort(t *testing.T) {
 	mock := &mockInst{}
-	d, _ := New(mock)
+	d, _ := New(mock, ivi.WithoutIDQuery())
 	if err := d.Abort(); err != nil {
 		t.Fatalf("Abort() error: %v", err)
 	}
@@ -268,7 +269,7 @@ func TestDriver_Abort(t *testing.T) {
 
 func TestDriver_Initiate(t *testing.T) {
 	mock := &mockInst{}
-	d, _ := New(mock)
+	d, _ := New(mock, ivi.WithoutIDQuery())
 	if err := d.Initiate(); err != nil {
 		t.Fatalf("Initiate() error: %v", err)
 	}
@@ -279,7 +280,7 @@ func TestDriver_Initiate(t *testing.T) {
 
 func TestDriver_CommandError(t *testing.T) {
 	mock := &mockInst{shouldError: true}
-	d, _ := New(mock)
+	d, _ := New(mock, ivi.WithoutIDQuery())
 	if err := d.SetFrequencyStart(1e6); err == nil {
 		t.Error("expected error, got nil")
 	}

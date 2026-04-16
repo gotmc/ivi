@@ -49,13 +49,15 @@ type Driver struct {
 	inst     ivi.Transport
 	channels []Channel
 	timeout  time.Duration
+	model    string
 	ivi.Inherent
 }
 
 // New creates a new IVI driver for the Keysight 33000 series
-// function/arbitrary waveform generators. Use [ivi.WithIDQuery]
-// to verify the instrument model, [ivi.WithReset] to reset on creation, and
-// [ivi.WithTimeout] to override the default I/O timeout.
+// function/arbitrary waveform generators. By default the constructor queries
+// *IDN? and verifies the model against the supported list; pass
+// [ivi.WithoutIDQuery] to skip that check. Use [ivi.WithReset] to reset on
+// creation and [ivi.WithTimeout] to override the default I/O timeout.
 func New(inst ivi.Transport, opts ...ivi.DriverOption) (*Driver, error) {
 	cfg := ivi.ApplyOptions(opts)
 
@@ -131,16 +133,16 @@ func New(inst ivi.Transport, opts ...ivi.DriverOption) (*Driver, error) {
 	}
 	inherent := ivi.NewInherent(inst, inherentBase, timeout)
 
-	if cfg.IDQuery {
-		if _, err := inherent.CheckID(); err != nil {
-			return nil, err
-		}
+	model, err := inherent.CheckID()
+	if err != nil && !cfg.SkipIDQuery {
+		return nil, err
 	}
 
 	driver := Driver{
 		inst:     inst,
 		channels: channels,
 		timeout:  timeout,
+		model:    model,
 		Inherent: inherent,
 	}
 
