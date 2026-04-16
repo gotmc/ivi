@@ -88,13 +88,26 @@ var thermocoupleCapableModels = map[string]struct{}{
 
 // requireThermocoupleCapableModel returns [ivi.ErrUnsupportedModel] if the
 // connected instrument's model cannot measure thermocouples. The model is
-// cached on the Driver at construction time, so this check does not issue any
-// SCPI.
+// normally cached on the Driver at construction time; when the caller
+// suppressed the ID query with [ivi.WithoutIDQuery] and *IDN? failed, the
+// cache is empty and we fall back to a live query here.
 func (d *Driver) requireThermocoupleCapableModel() error {
-	if _, ok := thermocoupleCapableModels[strings.TrimSpace(d.model)]; !ok {
+	model := d.model
+	if model == "" {
+		fresh, err := d.InstrumentModel()
+		if err != nil {
+			return fmt.Errorf(
+				"SetTemperatureTransducerType: cannot determine model: %w", err,
+			)
+		}
+
+		model = strings.TrimSpace(fresh)
+	}
+
+	if _, ok := thermocoupleCapableModels[model]; !ok {
 		return fmt.Errorf(
 			"SetTemperatureTransducerType: thermocouple not supported on %q: %w",
-			d.model, ivi.ErrUnsupportedModel,
+			model, ivi.ErrUnsupportedModel,
 		)
 	}
 
