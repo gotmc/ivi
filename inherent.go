@@ -26,8 +26,12 @@ const (
 
 // Inherent provides the inherent capabilities for all IVI instruments.
 type Inherent struct {
-	inst    Transport
-	timeout time.Duration
+	inst             Transport
+	timeout          time.Duration
+	manufacturer     string
+	model            string
+	serialNumber     string
+	firmwareRevision string
 	InherentBase
 }
 
@@ -75,14 +79,16 @@ func (inherent *Inherent) newContext() (context.Context, context.CancelFunc) {
 
 // CheckID queries the instrument for its identification string (*IDN?) and
 // verifies that the instrument model is in the list of SupportedInstrumentModels.
-// On success, the IDNString field is populated with the full *IDN? response and
-// the model string is returned. CheckID implements the IdQuery behavior
-// described in Section 6.16 of IVI-3.2: Inherent Capabilities Specification.
+// On success, IDNString is populated with the full *IDN? response, the four
+// identification fields (manufacturer, model, serial number, firmware
+// revision) are cached on the receiver, and the model string is returned.
+// CheckID implements the IdQuery behavior described in Section 6.16 of
+// IVI-3.2: Inherent Capabilities Specification.
 //
 // Once CheckID succeeds, the four identification accessors
 // ([Inherent.FirmwareRevision], [Inherent.InstrumentManufacturer],
-// [Inherent.InstrumentModel], [Inherent.InstrumentSerialNumber]) parse their
-// result from the cached IDNString without issuing additional SCPI.
+// [Inherent.InstrumentModel], [Inherent.InstrumentSerialNumber]) return the
+// cached values without issuing additional SCPI.
 func (inherent *Inherent) CheckID() (string, error) {
 	ctx, cancel := inherent.newContext()
 	defer cancel()
@@ -94,63 +100,90 @@ func (inherent *Inherent) CheckID() (string, error) {
 
 	inherent.IDNString = strings.TrimSpace(idn)
 
-	model, err := parseIdentification(inherent.IDNString, modelID)
+	if err := inherent.cacheIdentification(inherent.IDNString); err != nil {
+		return "", err
+	}
+
+	if !slices.Contains(inherent.SupportedInstrumentModels, inherent.model) {
+		return inherent.model, fmt.Errorf(
+			"%w: %q is not supported by this driver",
+			ErrUnsupportedModel,
+			inherent.model,
+		)
+	}
+
+	return inherent.model, nil
+}
+
+// FirmwareRevision returns the instrument firmware revision. It returns the
+// value cached by [Inherent.CheckID]; if the cache is empty (the
+// [WithoutIDQuery] path where construction-time *IDN? failed), it issues a
+// live *IDN? query and caches the result. FirmwareRevision is the getter for
+// the read-only inherent attribute Instrument Firmware Revision described in
+// Section 5.18 of IVI-3.2: Inherent Capabilities Specification.
+func (inherent *Inherent) FirmwareRevision() (string, error) {
+	return inherent.lookupIdentification(&inherent.firmwareRevision, fwrID)
+}
+
+// InstrumentManufacturer returns the instrument manufacturer. It returns the
+// value cached by [Inherent.CheckID]; if the cache is empty it issues a live
+// *IDN? query and caches the result. InstrumentManufacturer is the getter for
+// the read-only inherent attribute Instrument Manufacturer described in
+// Section 5.19 of IVI-3.2: Inherent Capabilities Specification.
+func (inherent *Inherent) InstrumentManufacturer() (string, error) {
+	return inherent.lookupIdentification(&inherent.manufacturer, mfrID)
+}
+
+// InstrumentModel returns the instrument model. It returns the value cached
+// by [Inherent.CheckID]; if the cache is empty it issues a live *IDN? query
+// and caches the result. InstrumentModel is the getter for the read-only
+// inherent attribute Instrument Model described in Section 5.20 of IVI-3.2:
+// Inherent Capabilities Specification.
+func (inherent *Inherent) InstrumentModel() (string, error) {
+	return inherent.lookupIdentification(&inherent.model, modelID)
+}
+
+// InstrumentSerialNumber returns the instrument serial number. It returns the
+// value cached by [Inherent.CheckID]; if the cache is empty it issues a live
+// *IDN? query and caches the result.
+func (inherent *Inherent) InstrumentSerialNumber() (string, error) {
+	return inherent.lookupIdentification(&inherent.serialNumber, snID)
+}
+
+// lookupIdentification returns the cached identification field when
+// populated, otherwise issues a live *IDN? query and caches the result.
+func (inherent *Inherent) lookupIdentification(field *string, part idPart) (string, error) {
+	if *field != "" {
+		return *field, nil
+	}
+
+	value, err := inherent.queryIdentification(part)
 	if err != nil {
 		return "", err
 	}
 
-	if !slices.Contains(inherent.SupportedInstrumentModels, model) {
-		return model, fmt.Errorf(
-			"%w: %q is not supported by this driver",
-			ErrUnsupportedModel,
-			model,
-		)
+	*field = value
+
+	return value, nil
+}
+
+// cacheIdentification parses the given IDN string into the four cached
+// identification fields on the receiver.
+func (inherent *Inherent) cacheIdentification(idn string) error {
+	const numIdentificationParts = 4
+
+	parts := strings.Split(idn, ",")
+
+	if len(parts) != numIdentificationParts {
+		return fmt.Errorf("idn string (`%s`) could not be split in four", idn)
 	}
 
-	return model, nil
-}
+	inherent.manufacturer = strings.TrimSpace(parts[mfrID])
+	inherent.model = strings.TrimSpace(parts[modelID])
+	inherent.serialNumber = strings.TrimSpace(parts[snID])
+	inherent.firmwareRevision = strings.TrimSpace(parts[fwrID])
 
-// FirmwareRevision returns the firmware revision of the instrument parsed
-// from the cached IDNString, falling back to a live *IDN? query if the cache
-// is empty. FirmwareRevision is the getter for the read-only inherent
-// attribute Instrument Firmware Revision described in Section 5.18 of
-// IVI-3.2: Inherent Capabilities Specification.
-func (inherent *Inherent) FirmwareRevision() (string, error) {
-	return inherent.identification(fwrID)
-}
-
-// InstrumentManufacturer returns the instrument manufacturer parsed from the
-// cached IDNString, falling back to a live *IDN? query if the cache is empty.
-// InstrumentManufacturer is the getter for the read-only inherent attribute
-// Instrument Manufacturer described in Section 5.19 of IVI-3.2: Inherent
-// Capabilities Specification.
-func (inherent *Inherent) InstrumentManufacturer() (string, error) {
-	return inherent.identification(mfrID)
-}
-
-// InstrumentModel returns the instrument model parsed from the cached
-// IDNString, falling back to a live *IDN? query if the cache is empty.
-// InstrumentModel is the getter for the read-only inherent attribute
-// Instrument Model described in Section 5.20 of IVI-3.2: Inherent
-// Capabilities Specification.
-func (inherent *Inherent) InstrumentModel() (string, error) {
-	return inherent.identification(modelID)
-}
-
-// InstrumentSerialNumber returns the instrument serial number parsed from the
-// cached IDNString, falling back to a live *IDN? query if the cache is empty.
-func (inherent *Inherent) InstrumentSerialNumber() (string, error) {
-	return inherent.identification(snID)
-}
-
-// identification returns the requested part of the IDN string, parsing the
-// cached IDNString when populated and otherwise issuing a live *IDN? query.
-func (inherent *Inherent) identification(part idPart) (string, error) {
-	if inherent.IDNString != "" {
-		return parseIdentification(inherent.IDNString, part)
-	}
-
-	return inherent.queryIdentification(part)
+	return nil
 }
 
 // Reset resets the instrument.
