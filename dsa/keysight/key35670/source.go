@@ -14,7 +14,7 @@ import (
 )
 
 // SourceEnabled determines if the source output is enabled or disabled.
-func (d *Key35670) SourceEnabled() (bool, error) {
+func (d *Driver) SourceEnabled() (bool, error) {
 	ctx, cancel := d.newContext()
 	defer cancel()
 
@@ -22,7 +22,7 @@ func (d *Key35670) SourceEnabled() (bool, error) {
 }
 
 // SetSourceEnabled sets the source output to enabled or disabled.
-func (d *Key35670) SetSourceEnabled(v bool) error {
+func (d *Driver) SetSourceEnabled(v bool) error {
 	ctx, cancel := d.newContext()
 	defer cancel()
 
@@ -34,17 +34,17 @@ func (d *Key35670) SetSourceEnabled(v bool) error {
 }
 
 // DisableSource is a convenience function for disabling the source output.
-func (d *Key35670) DisableSource() error {
+func (d *Driver) DisableSource() error {
 	return d.SetSourceEnabled(false)
 }
 
 // EnableSource is a convenience function for enabling the source output.
-func (d *Key35670) EnableSource() error {
+func (d *Driver) EnableSource() error {
 	return d.SetSourceEnabled(true)
 }
 
 // SourceShape queries the source output waveform shape.
-func (d *Key35670) SourceShape() (dsa.SourceShape, error) {
+func (d *Driver) SourceShape() (dsa.SourceShape, error) {
 	ctx, cancel := d.newContext()
 	defer cancel()
 
@@ -62,7 +62,7 @@ func (d *Key35670) SourceShape() (dsa.SourceShape, error) {
 }
 
 // SetSourceShape sets the source output waveform shape.
-func (d *Key35670) SetSourceShape(shape dsa.SourceShape) error {
+func (d *Driver) SetSourceShape(shape dsa.SourceShape) error {
 	ctx, cancel := d.newContext()
 	defer cancel()
 
@@ -70,7 +70,7 @@ func (d *Key35670) SetSourceShape(shape dsa.SourceShape) error {
 }
 
 // SourceFrequency queries the source output frequency in Hz.
-func (d *Key35670) SourceFrequency() (float64, error) {
+func (d *Driver) SourceFrequency() (float64, error) {
 	ctx, cancel := d.newContext()
 	defer cancel()
 
@@ -79,7 +79,7 @@ func (d *Key35670) SourceFrequency() (float64, error) {
 
 // SetSourceFrequency sets the source output frequency in Hz. Allowable range
 // is 0 to 115 kHz in 15.625 mHz increments.
-func (d *Key35670) SetSourceFrequency(freq float64) error {
+func (d *Driver) SetSourceFrequency(freq float64) error {
 	ctx, cancel := d.newContext()
 	defer cancel()
 
@@ -91,7 +91,7 @@ func (d *Key35670) SetSourceFrequency(freq float64) error {
 }
 
 // SourceOutputLevel queries the source output level.
-func (d *Key35670) SourceOutputLevel() (float64, error) {
+func (d *Driver) SourceOutputLevel() (float64, error) {
 	ctx, cancel := d.newContext()
 	defer cancel()
 
@@ -99,7 +99,7 @@ func (d *Key35670) SourceOutputLevel() (float64, error) {
 }
 
 // SetSourceOutputLevel sets the source output level.
-func (d *Key35670) SetSourceOutputLevel(level float64) error {
+func (d *Driver) SetSourceOutputLevel(level float64) error {
 	ctx, cancel := d.newContext()
 	defer cancel()
 

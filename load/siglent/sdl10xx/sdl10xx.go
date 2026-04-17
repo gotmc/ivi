@@ -23,20 +23,20 @@ const (
 	specRevision     = "N/A"
 )
 
-// SDL10xx provides the IVI driver for the Siglent SDL1000X and SDL1030X DC
+// Driver provides the IVI driver for the Siglent SDL1000X and SDL1030X DC
 // Electronic Loads.
-type SDL10xx struct {
+type Driver struct {
 	inst     ivi.Transport
 	channels []Channel
 	ivi.Inherent
 }
 
-// New creates a new Siglent SDL10xx IVI Instrument driver. By default the
-// constructor queries *IDN? and verifies the model against the supported
-// list; pass [ivi.WithoutIDQuery] to skip that check. Use [ivi.WithReset] to
-// reset on creation and [ivi.WithTimeout] to override the default I/O
-// timeout.
-func New(inst ivi.Transport, opts ...ivi.DriverOption) (*SDL10xx, error) {
+// New creates a new IVI driver for the Siglent SDL1000X/SDL1030X DC
+// Electronic Load. By default the constructor queries *IDN? and verifies the
+// model against the supported list; pass [ivi.WithoutIDQuery] to skip that
+// check. Use [ivi.WithReset] to reset on creation and [ivi.WithTimeout] to
+// override the default I/O timeout.
+func New(inst ivi.Transport, opts ...ivi.DriverOption) (*Driver, error) {
 	s, err := ivi.NewDriverSetup(inst, ivi.InherentBase{
 		ClassSpecMajorVersion:     specMajorVersion,
 		ClassSpecMinorVersion:     specMinorVersion,
@@ -60,7 +60,7 @@ func New(inst ivi.Transport, opts ...ivi.DriverOption) (*SDL10xx, error) {
 		channels[i] = Channel{load.NewChannel(i, ch, inst)}
 	}
 
-	driver := SDL10xx{
+	driver := Driver{
 		inst:     inst,
 		channels: channels,
 		Inherent: s.Inherent,
@@ -76,7 +76,7 @@ func New(inst ivi.Transport, opts ...ivi.DriverOption) (*SDL10xx, error) {
 }
 
 // Channel returns the Channel at the given index, with bounds checking.
-func (d *SDL10xx) Channel(index int) (*Channel, error) {
+func (d *Driver) Channel(index int) (*Channel, error) {
 	if index < 0 || index >= len(d.channels) {
 		return nil, fmt.Errorf("channel %d: %w", index, ivi.ErrChannelNotFound)
 	}

@@ -19,7 +19,7 @@ import (
 )
 
 var (
-	_ swtch.Base        = (*U2751A)(nil)
+	_ swtch.Base        = (*Driver)(nil)
 	_ swtch.BaseChannel = (*Channel)(nil)
 )
 
@@ -47,9 +47,9 @@ func (ct ChannelType) String() string {
 	return "column"
 }
 
-// U2751A provides the IVI driver for a Keysight U2751A 4x8 2-wire switch
+// Driver provides the IVI driver for a Keysight U2751A 4x8 2-wire switch
 // matrix.
-type U2751A struct {
+type Driver struct {
 	inst     ivi.Transport
 	channels []Channel
 	timeout  time.Duration
@@ -59,12 +59,13 @@ type U2751A struct {
 
 type path []string
 
-// New creates a new U2751A IVI Instrument. By default the constructor queries
-// *IDN? and verifies the model against the supported list; pass
-// [ivi.WithoutIDQuery] to skip that check. Use [ivi.WithReset] to reset on
-// creation, [ivi.WithStandalone] to configure standalone voltage ratings, and
-// [ivi.WithTimeout] to override the default I/O timeout.
-func New(inst ivi.Transport, opts ...ivi.DriverOption) (*U2751A, error) {
+// New creates a new IVI driver for the Keysight U2751A 4x8 switch matrix. By
+// default the constructor queries *IDN? and verifies the model against the
+// supported list; pass [ivi.WithoutIDQuery] to skip that check. Use
+// [ivi.WithReset] to reset on creation, [ivi.WithStandalone] to configure
+// standalone voltage ratings, and [ivi.WithTimeout] to override the default
+// I/O timeout.
+func New(inst ivi.Transport, opts ...ivi.DriverOption) (*Driver, error) {
 	s, err := ivi.NewDriverSetup(inst, ivi.InherentBase{
 		ClassSpecMajorVersion: specMajorVersion,
 		ClassSpecMinorVersion: specMinorVersion,
@@ -104,7 +105,7 @@ func New(inst ivi.Transport, opts ...ivi.DriverOption) (*U2751A, error) {
 		)
 	}
 
-	driver := U2751A{
+	driver := Driver{
 		inst:     inst,
 		channels: channels,
 		timeout:  s.Timeout,
@@ -150,7 +151,7 @@ type Channel struct {
 }
 
 // newContext creates a context with the driver's configured timeout.
-func (d *U2751A) newContext() (context.Context, context.CancelFunc) {
+func (d *Driver) newContext() (context.Context, context.CancelFunc) {
 	return context.WithTimeout(context.Background(), d.timeout)
 }
 
@@ -161,12 +162,12 @@ func (ch *Channel) newContext() (context.Context, context.CancelFunc) {
 
 // Close properly shuts down the switch matrix by returning it to local
 // control.
-func (d *U2751A) Close() error {
+func (d *Driver) Close() error {
 	return d.Inherent.Close()
 }
 
 // Disable causes the switch to disconnect all paths.
-func (d *U2751A) Disable() error {
+func (d *Driver) Disable() error {
 	ctx, cancel := d.newContext()
 	defer cancel()
 
@@ -175,7 +176,7 @@ func (d *U2751A) Disable() error {
 
 // channel returns the concrete channel based on either the virtual name or the
 // physical name. Virtual names are checked first.
-func (d *U2751A) channel(name string) (*Channel, error) {
+func (d *Driver) channel(name string) (*Channel, error) {
 	// See if the given name matches one of the virtual channel names.
 	for _, ch := range d.channels {
 		if name == ch.virtualName {
@@ -193,12 +194,12 @@ func (d *U2751A) channel(name string) (*Channel, error) {
 
 // Channel returns the channel based on either the virtual name or the physical
 // name. Virtual names are checked first.
-func (d *U2751A) Channel(name string) (swtch.BaseChannel, error) {
+func (d *Driver) Channel(name string) (swtch.BaseChannel, error) {
 	return d.channel(name)
 }
 
 // ChannelByID returns the channel based on the ID (0-based).
-func (d *U2751A) ChannelByID(id int) (swtch.BaseChannel, error) {
+func (d *Driver) ChannelByID(id int) (swtch.BaseChannel, error) {
 	if id < 0 || id >= len(d.channels) {
 		return nil, fmt.Errorf("channel %d not found", id)
 	}
@@ -207,7 +208,7 @@ func (d *U2751A) ChannelByID(id int) (swtch.BaseChannel, error) {
 }
 
 // Channels returns all channels.
-func (d *U2751A) Channels() ([]swtch.BaseChannel, error) {
+func (d *Driver) Channels() ([]swtch.BaseChannel, error) {
 	channels := make([]swtch.BaseChannel, len(d.channels))
 	for i := range d.channels {
 		channels[i] = &d.channels[i]
@@ -267,7 +268,7 @@ func newChannel(
 // the physical name provided as the key. Each virtual name must be unique and
 // the number of virtual names provided must match the numder of channels
 // otherwise an error is returned.
-func (d *U2751A) SetVirtualNames(names map[string]string) error {
+func (d *Driver) SetVirtualNames(names map[string]string) error {
 	for physicalName, virtualName := range names {
 		for i, ch := range d.channels {
 			if physicalName == ch.name {

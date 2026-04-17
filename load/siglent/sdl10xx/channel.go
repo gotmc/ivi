@@ -16,7 +16,7 @@ const (
 	currentQuery
 )
 
-// Channel models a SDL10xx load channel.
+// Channel models a Siglent SDL10xx load channel.
 type Channel struct {
 	load.Channel
 }

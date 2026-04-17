@@ -6,5 +6,5 @@
 package sdl10xx
 
 // Make sure the IviDCPwrBase capability group has been implemented.
-// var _ load.Base = (*SDL10xx)(nil)
+// var _ load.Base = (*Driver)(nil)
 // var _ load.BaseChannel = (*Channel)(nil)

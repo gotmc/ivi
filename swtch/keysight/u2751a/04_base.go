@@ -75,7 +75,7 @@ func (ch *Channel) Bandwidth() float64 {
 // ChannelCount returns the number of channels. ChannelCount is the getter for
 // the read-only IviSwtchBase attribute Channels.Count described in Section
 // 4.2.7 of IVI-4.6:IviSwtch Class Specification.
-func (d *U2751A) ChannelCount() int {
+func (d *Driver) ChannelCount() int {
 	return len(d.channels)
 }
 
@@ -225,7 +225,7 @@ func (ch *Channel) WireMode() int {
 // current paths in existence. CanConnect implements the IviSwtch Base Function
 // Can Connect described in Section 4.3.1 of IVI-4.6: IviSwtch Class
 // Specification.
-func (d *U2751A) CanConnect(ch1name, ch2name string) (bool, error) {
+func (d *Driver) CanConnect(ch1name, ch2name string) (bool, error) {
 	ch1, err := d.channel(ch1name)
 	if err != nil {
 		return false, err
@@ -275,7 +275,7 @@ func (d *U2751A) CanConnect(ch1name, ch2name string) (bool, error) {
 // Connect takes two channel names and, if possible, creates a path between the
 // two channels.  Connect implements the IviSwtch Base Function Connect
 // described in Section 4.3.2 of IVI-4.6: IviSwtch Class Specification.
-func (d *U2751A) Connect(ch1name, ch2name string) error {
+func (d *Driver) Connect(ch1name, ch2name string) error {
 	ctx, cancel := d.newContext()
 	defer cancel()
 
@@ -351,28 +351,28 @@ func (d *U2751A) Connect(ch1name, ch2name string) error {
 // between the two channels. Disconnect implements the IviSwtch Base Function
 // Disconnect described in Section 4.3.3 of IVI-4.6: IviSwtch Class
 // Specification.
-func (d *U2751A) Disconnect(ch1, ch2 string) error {
+func (d *Driver) Disconnect(ch1, ch2 string) error {
 	return ivi.ErrNotImplemented
 }
 
 // DisconnectAll destroys all paths that the switch module has created.
 // DisconnectAll implements the IviSwtch Base Function Disconnect All described
 // in Section 4.3.4 of IVI-4.6: IviSwtch Class Specification.
-func (d *U2751A) DisconnectAll() error {
+func (d *Driver) DisconnectAll() error {
 	return ivi.ErrNotImplemented
 }
 
 // GetPath returns an ordered list of channel names that compose the path
 // between two channels. GetPath implements the IviSwtch Base Function Get Path
 // described in Section 4.3.5 of IVI-4.6: IviSwtch Class Specification.
-func (d *U2751A) GetPath(ch1, ch2 string) ([]string, error) {
+func (d *Driver) GetPath(ch1, ch2 string) ([]string, error) {
 	return nil, ivi.ErrNotImplemented
 }
 
 // SetPath creates a path using the given list of channel names. SetPath
 // implements the IviSwtch Base Function Set Path described in Section 4.3.6 of
 // IVI-4.6: IviSwtch Class Specification.
-func (d *U2751A) SetPath(chs []string) error {
+func (d *Driver) SetPath(chs []string) error {
 	return ivi.ErrNotImplemented
 }
 
@@ -380,7 +380,7 @@ func (d *U2751A) SetPath(chs []string) error {
 // their switching operations or until maxTime has elapsed. WaitForDebounce
 // implements the IviSwtch Base Function Wait For Debounce described in Section
 // 4.3.7 of IVI-4.6: IviSwtch Class Specification.
-func (d *U2751A) WaitForDebounce(maxTime time.Duration) error {
+func (d *Driver) WaitForDebounce(maxTime time.Duration) error {
 	return ivi.ErrNotImplemented
 }
 

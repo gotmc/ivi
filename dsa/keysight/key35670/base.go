@@ -19,63 +19,63 @@ import (
 
 // --- Frequency ---
 
-func (d *Key35670) FrequencyStart() (float64, error) {
+func (d *Driver) FrequencyStart() (float64, error) {
 	ctx, cancel := d.newContext()
 	defer cancel()
 
 	return query.Float64(ctx, d.inst, "SENS:FREQ:STAR?")
 }
 
-func (d *Key35670) SetFrequencyStart(freq float64) error {
+func (d *Driver) SetFrequencyStart(freq float64) error {
 	ctx, cancel := d.newContext()
 	defer cancel()
 
 	return d.inst.Command(ctx, "SENS:FREQ:STAR %f", freq)
 }
 
-func (d *Key35670) FrequencyStop() (float64, error) {
+func (d *Driver) FrequencyStop() (float64, error) {
 	ctx, cancel := d.newContext()
 	defer cancel()
 
 	return query.Float64(ctx, d.inst, "SENS:FREQ:STOP?")
 }
 
-func (d *Key35670) SetFrequencyStop(freq float64) error {
+func (d *Driver) SetFrequencyStop(freq float64) error {
 	ctx, cancel := d.newContext()
 	defer cancel()
 
 	return d.inst.Command(ctx, "SENS:FREQ:STOP %f", freq)
 }
 
-func (d *Key35670) FrequencySpan() (float64, error) {
+func (d *Driver) FrequencySpan() (float64, error) {
 	ctx, cancel := d.newContext()
 	defer cancel()
 
 	return query.Float64(ctx, d.inst, "SENS:FREQ:SPAN?")
 }
 
-func (d *Key35670) SetFrequencySpan(span float64) error {
+func (d *Driver) SetFrequencySpan(span float64) error {
 	ctx, cancel := d.newContext()
 	defer cancel()
 
 	return d.inst.Command(ctx, "SENS:FREQ:SPAN %f", span)
 }
 
-func (d *Key35670) FrequencyCenter() (float64, error) {
+func (d *Driver) FrequencyCenter() (float64, error) {
 	ctx, cancel := d.newContext()
 	defer cancel()
 
 	return query.Float64(ctx, d.inst, "SENS:FREQ:CENT?")
 }
 
-func (d *Key35670) SetFrequencyCenter(freq float64) error {
+func (d *Driver) SetFrequencyCenter(freq float64) error {
 	ctx, cancel := d.newContext()
 	defer cancel()
 
 	return d.inst.Command(ctx, "SENS:FREQ:CENT %f", freq)
 }
 
-func (d *Key35670) ConfigureFrequencyStartStop(
+func (d *Driver) ConfigureFrequencyStartStop(
 	startFreq, stopFreq float64,
 ) error {
 	if err := d.SetFrequencyStart(startFreq); err != nil {
@@ -85,7 +85,7 @@ func (d *Key35670) ConfigureFrequencyStartStop(
 	return d.SetFrequencyStop(stopFreq)
 }
 
-func (d *Key35670) ConfigureFrequencyCenterSpan(
+func (d *Driver) ConfigureFrequencyCenterSpan(
 	centerFreq, span float64,
 ) error {
 	if err := d.SetFrequencyCenter(centerFreq); err != nil {
@@ -97,14 +97,14 @@ func (d *Key35670) ConfigureFrequencyCenterSpan(
 
 // --- Resolution (spectral lines) ---
 
-func (d *Key35670) SpectralLines() (int, error) {
+func (d *Driver) SpectralLines() (int, error) {
 	ctx, cancel := d.newContext()
 	defer cancel()
 
 	return query.Int(ctx, d.inst, "SENS:FREQ:RES?")
 }
 
-func (d *Key35670) SetSpectralLines(lines int) error {
+func (d *Driver) SetSpectralLines(lines int) error {
 	ctx, cancel := d.newContext()
 	defer cancel()
 
@@ -129,7 +129,7 @@ var scpiToWindowType = map[string]dsa.WindowType{
 	"EXP":  dsa.WindowExponential,
 }
 
-func (d *Key35670) WindowType() (dsa.WindowType, error) {
+func (d *Driver) WindowType() (dsa.WindowType, error) {
 	ctx, cancel := d.newContext()
 	defer cancel()
 
@@ -146,7 +146,7 @@ func (d *Key35670) WindowType() (dsa.WindowType, error) {
 	return wt, nil
 }
 
-func (d *Key35670) SetWindowType(window dsa.WindowType) error {
+func (d *Driver) SetWindowType(window dsa.WindowType) error {
 	ctx, cancel := d.newContext()
 	defer cancel()
 
@@ -160,14 +160,14 @@ func (d *Key35670) SetWindowType(window dsa.WindowType) error {
 
 // --- Averaging ---
 
-func (d *Key35670) AveragingEnabled() (bool, error) {
+func (d *Driver) AveragingEnabled() (bool, error) {
 	ctx, cancel := d.newContext()
 	defer cancel()
 
 	return query.Bool(ctx, d.inst, "SENS:AVER?")
 }
 
-func (d *Key35670) SetAveragingEnabled(enabled bool) error {
+func (d *Driver) SetAveragingEnabled(enabled bool) error {
 	ctx, cancel := d.newContext()
 	defer cancel()
 
@@ -178,14 +178,14 @@ func (d *Key35670) SetAveragingEnabled(enabled bool) error {
 	return d.inst.Command(ctx, "SENS:AVER OFF")
 }
 
-func (d *Key35670) AveragingCount() (int, error) {
+func (d *Driver) AveragingCount() (int, error) {
 	ctx, cancel := d.newContext()
 	defer cancel()
 
 	return query.Int(ctx, d.inst, "SENS:AVER:COUN?")
 }
 
-func (d *Key35670) SetAveragingCount(count int) error {
+func (d *Driver) SetAveragingCount(count int) error {
 	ctx, cancel := d.newContext()
 	defer cancel()
 
@@ -208,7 +208,7 @@ var scpiToAveragingType = map[string]dsa.AveragingType{
 	"PEAK":  dsa.AveragingPeakHold,
 }
 
-func (d *Key35670) AveragingType() (dsa.AveragingType, error) {
+func (d *Driver) AveragingType() (dsa.AveragingType, error) {
 	ctx, cancel := d.newContext()
 	defer cancel()
 
@@ -225,7 +225,7 @@ func (d *Key35670) AveragingType() (dsa.AveragingType, error) {
 	return at, nil
 }
 
-func (d *Key35670) SetAveragingType(avgType dsa.AveragingType) error {
+func (d *Driver) SetAveragingType(avgType dsa.AveragingType) error {
 	ctx, cancel := d.newContext()
 	defer cancel()
 
@@ -239,28 +239,28 @@ func (d *Key35670) SetAveragingType(avgType dsa.AveragingType) error {
 
 // --- Input range ---
 
-func (d *Key35670) InputRange(channel int) (float64, error) {
+func (d *Driver) InputRange(channel int) (float64, error) {
 	ctx, cancel := d.newContext()
 	defer cancel()
 
 	return query.Float64f(ctx, d.inst, "INP%d:RANG?", channel+1)
 }
 
-func (d *Key35670) SetInputRange(channel int, rangeDBVrms float64) error {
+func (d *Driver) SetInputRange(channel int, rangeDBVrms float64) error {
 	ctx, cancel := d.newContext()
 	defer cancel()
 
 	return d.inst.Command(ctx, "INP%d:RANG %f", channel+1, rangeDBVrms)
 }
 
-func (d *Key35670) InputAutoRange(channel int) (bool, error) {
+func (d *Driver) InputAutoRange(channel int) (bool, error) {
 	ctx, cancel := d.newContext()
 	defer cancel()
 
 	return query.Boolf(ctx, d.inst, "INP%d:RANG:AUTO?", channel+1)
 }
 
-func (d *Key35670) SetInputAutoRange(channel int, auto bool) error {
+func (d *Driver) SetInputAutoRange(channel int, auto bool) error {
 	ctx, cancel := d.newContext()
 	defer cancel()
 
@@ -281,7 +281,7 @@ var scpiToInputCoupling = map[string]dsa.InputCoupling{
 	"DC": dsa.InputCouplingDC,
 }
 
-func (d *Key35670) InputCoupling(channel int) (dsa.InputCoupling, error) {
+func (d *Driver) InputCoupling(channel int) (dsa.InputCoupling, error) {
 	ctx, cancel := d.newContext()
 	defer cancel()
 
@@ -300,7 +300,7 @@ func (d *Key35670) InputCoupling(channel int) (dsa.InputCoupling, error) {
 	return coupling, nil
 }
 
-func (d *Key35670) SetInputCoupling(
+func (d *Driver) SetInputCoupling(
 	channel int, coupling dsa.InputCoupling,
 ) error {
 	ctx, cancel := d.newContext()
@@ -334,7 +334,7 @@ var scpiToMeasurementMode = map[string]dsa.MeasurementMode{
 	"SWEP": dsa.MeasurementModeSweptSine,
 }
 
-func (d *Key35670) MeasurementMode() (dsa.MeasurementMode, error) {
+func (d *Driver) MeasurementMode() (dsa.MeasurementMode, error) {
 	ctx, cancel := d.newContext()
 	defer cancel()
 
@@ -353,7 +353,7 @@ func (d *Key35670) MeasurementMode() (dsa.MeasurementMode, error) {
 	return mode, nil
 }
 
-func (d *Key35670) SetMeasurementMode(mode dsa.MeasurementMode) error {
+func (d *Driver) SetMeasurementMode(mode dsa.MeasurementMode) error {
 	ctx, cancel := d.newContext()
 	defer cancel()
 
@@ -365,14 +365,14 @@ func (d *Key35670) SetMeasurementMode(mode dsa.MeasurementMode) error {
 	return d.inst.Command(ctx, "INST:SEL %s", cmd)
 }
 
-func (d *Key35670) ChannelCount() (int, error) {
+func (d *Driver) ChannelCount() (int, error) {
 	ctx, cancel := d.newContext()
 	defer cancel()
 
 	return query.Int(ctx, d.inst, "INST:NCHA?")
 }
 
-func (d *Key35670) SetChannelCount(count int) error {
+func (d *Driver) SetChannelCount(count int) error {
 	ctx, cancel := d.newContext()
 	defer cancel()
 
@@ -381,28 +381,28 @@ func (d *Key35670) SetChannelCount(count int) error {
 
 // --- Acquisition control ---
 
-func (d *Key35670) Abort() error {
+func (d *Driver) Abort() error {
 	ctx, cancel := d.newContext()
 	defer cancel()
 
 	return d.inst.Command(ctx, "ABOR")
 }
 
-func (d *Key35670) Initiate() error {
+func (d *Driver) Initiate() error {
 	ctx, cancel := d.newContext()
 	defer cancel()
 
 	return d.inst.Command(ctx, "INIT")
 }
 
-func (d *Key35670) SweepModeContinuous() (bool, error) {
+func (d *Driver) SweepModeContinuous() (bool, error) {
 	ctx, cancel := d.newContext()
 	defer cancel()
 
 	return query.Bool(ctx, d.inst, "INIT:CONT?")
 }
 
-func (d *Key35670) SetSweepModeContinuous(continuous bool) error {
+func (d *Driver) SetSweepModeContinuous(continuous bool) error {
 	ctx, cancel := d.newContext()
 	defer cancel()
 
@@ -416,7 +416,7 @@ func (d *Key35670) SetSweepModeContinuous(continuous bool) error {
 // --- Trace data ---
 
 // FetchYTrace returns the trace data as a slice of float64 values.
-func (d *Key35670) FetchYTrace(traceName string) ([]float64, error) {
+func (d *Driver) FetchYTrace(traceName string) ([]float64, error) {
 	ctx, cancel := d.newContext()
 	defer cancel()
 
@@ -430,7 +430,7 @@ func (d *Key35670) FetchYTrace(traceName string) ([]float64, error) {
 
 // ReadYTrace initiates a measurement, waits for completion, and returns the
 // trace data.
-func (d *Key35670) ReadYTrace(
+func (d *Driver) ReadYTrace(
 	traceName string, maxTime time.Duration,
 ) ([]float64, error) {
 	ctx, cancel := d.newContext()

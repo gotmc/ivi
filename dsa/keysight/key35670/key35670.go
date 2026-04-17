@@ -32,23 +32,23 @@ const (
 )
 
 // Confirm the interfaces implemented by the driver.
-var _ dsa.Base = (*Key35670)(nil)
-var _ dsa.Source = (*Key35670)(nil)
+var _ dsa.Base = (*Driver)(nil)
+var _ dsa.Source = (*Driver)(nil)
 
-// Key35670 provides the IVI driver for a Keysight 35670A Dynamic Signal
+// Driver provides the IVI driver for a Keysight 35670A Dynamic Signal
 // Analyzer.
-type Key35670 struct {
+type Driver struct {
 	inst     ivi.Transport
 	channels []Channel
 	timeout  time.Duration
 	ivi.Inherent
 }
 
-// New creates a new Key35670 IVI Instrument driver. By default the constructor
+// New creates a new IVI driver for the Keysight 35670A DSA. By default the constructor
 // queries *IDN? and verifies the model against the supported list; pass
 // [ivi.WithoutIDQuery] to skip that check. Use [ivi.WithReset] to reset on
 // creation and [ivi.WithTimeout] to override the default I/O timeout.
-func New(inst ivi.Transport, opts ...ivi.DriverOption) (*Key35670, error) {
+func New(inst ivi.Transport, opts ...ivi.DriverOption) (*Driver, error) {
 	s, err := ivi.NewDriverSetup(inst, ivi.InherentBase{
 		ClassSpecMajorVersion:     specMajorVersion,
 		ClassSpecMinorVersion:     specMinorVersion,
@@ -69,7 +69,7 @@ func New(inst ivi.Transport, opts ...ivi.DriverOption) (*Key35670, error) {
 		channels[i] = Channel{dsa.NewChannel(i, ch, inst)}
 	}
 
-	driver := Key35670{
+	driver := Driver{
 		inst:     inst,
 		channels: channels,
 		timeout:  s.Timeout,
@@ -86,12 +86,12 @@ func New(inst ivi.Transport, opts ...ivi.DriverOption) (*Key35670, error) {
 }
 
 // newContext creates a context with the driver's configured timeout.
-func (d *Key35670) newContext() (context.Context, context.CancelFunc) {
+func (d *Driver) newContext() (context.Context, context.CancelFunc) {
 	return context.WithTimeout(context.Background(), d.timeout)
 }
 
 // Channel returns the Channel at the given index, with bounds checking.
-func (d *Key35670) Channel(index int) (*Channel, error) {
+func (d *Driver) Channel(index int) (*Channel, error) {
 	if index < 0 || index >= len(d.channels) {
 		return nil, fmt.Errorf("channel %d: %w", index, ivi.ErrChannelNotFound)
 	}

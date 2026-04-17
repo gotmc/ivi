@@ -11,7 +11,7 @@ import (
 )
 
 // Make sure the IviDCPwrMeasurement capability group has been implemented.
-// var _ load.Measurement = (*SDL10xx)(nil)
+// var _ load.Measurement = (*Driver)(nil)
 // var _ load.MeasurementChannel = (*Channel)(nil)
 
 // MeasureVoltage takes a measurement on the output signal and returns the
