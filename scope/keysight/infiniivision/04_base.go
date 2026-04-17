@@ -61,8 +61,8 @@ var scpiToVerticalCoupling = map[string]scope.VerticalCoupling{
 	"DC": scope.DCVerticalCoupling,
 }
 
-// AcquisitionStartTime, also referred to as the Horizontal Time Per Record in
-// the IVI specification, queries the length of time from the trigger event to
+// AcquisitionStartTime (also referred to as the Horizontal Time Per Record in
+// the IVI specification) queries the length of time from the trigger event to
 // the first point in the waveform record. If the value is positive, the first
 // point in the waveform record occurs after the trigger event. If the value is
 // negative, the first point in the waveform record occurs before the trigger
@@ -170,7 +170,7 @@ func (d *Driver) SetAcquisitionType(acType scope.AcquisitionType) error {
 	return d.inst.Command(ctx, ":ACQ:TYPE %s", cmd)
 }
 
-// ChnnalCount returns the number of currently available channels. The count
+// ChannelCount returns the number of currently available channels. The count
 // returned includes any of the supported reserved repeated capability names
 // defined in Section 2.3, Repeated Capability Names as well as any custom
 // repeated capability identifiers.
@@ -257,8 +257,8 @@ func (d *Driver) AcquisitionTimePerRecord() (time.Duration, error) {
 	return durationFromSeconds(seconds), nil
 }
 
-// SetAcquisitionSampleRate specifies the length of time that corresponds to
-// the record length.
+// SetAcquisitionTimePerRecord specifies the length of time that corresponds
+// to the record length.
 //
 // SetAcquisitionTimePerRecord is the setter for the read-write IviScopeBase
 // Horizontal Time Per Record described in Section 4.2.11 of the IVI-4.1:
@@ -528,7 +528,7 @@ func (ch *Channel) SetMaxInputFrequency(_ float64) error {
 // ProbeAttenuation queries the scaling factor by which the probe the end-user
 // attaches to the channel attenuates the input. The probe attenuation factor
 // may be 0.001 to 10,000.0.
-
+//
 // For example, for a 10:1 probe, ProbeAttenuation would return 10.0. Note that
 // if the probe is changed to one with a different attenuation, and this
 // attribute is not set, the amplitude calculations will be incorrect.
@@ -543,7 +543,7 @@ func (ch *Channel) ProbeAttenuation() (float64, error) {
 	return query.Float64f(ctx, ch.inst, ":CHAN%d:PROBE?", ch.num)
 }
 
-// ProbeAttenuation sets the scaling factor by which the probe the end-user
+// SetProbeAttenuation sets the scaling factor by which the probe the end-user
 // attaches to the channel attenuates the input and disables auto probe
 // attenuation. The probe attenuation factor may be 0.001 to 10,000.0.
 //
@@ -551,7 +551,7 @@ func (ch *Channel) ProbeAttenuation() (float64, error) {
 // Note that if the probe is changed to one with a different attenuation, and
 // this attribute is not set, the amplitude calculations will be incorrect.
 //
-// ProbeAttenuation is the getter for the read-write IviScopeBase Probe
+// SetProbeAttenuation is the setter for the read-write IviScopeBase Probe
 // Attenuation described in Section 4.2.16 of the IVI-4.1: IviScope Class
 // Specification.
 func (ch *Channel) SetProbeAttenuation(atten float64) error {

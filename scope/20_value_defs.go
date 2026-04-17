@@ -166,10 +166,10 @@ func (tt TriggerType) String() string {
 	return triggerTypes[tt]
 }
 
-// InterpolationType models the defined values for the available interpolation
-// methods defined in Section 20 IviScope Attribute Value Definitions and used
-// in the Interpolation function in Section 5.2.1 of IVI-4.1: IviScopeClass
-// Specification.
+// InterpolationMethod models the defined values for the available
+// interpolation methods defined in Section 20 IviScope Attribute Value
+// Definitions and used in the Interpolation function in Section 5.2.1 of
+// IVI-4.1: IviScopeClass Specification.
 type InterpolationMethod int
 
 const (

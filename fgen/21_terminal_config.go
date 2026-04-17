@@ -36,7 +36,7 @@ None.
 
 */
 
-// TerminalConfiguration provides the interface required for the
+// TerminalConfigurator provides the interface required for the
 // IviFgenTerminalConfiguration extension group.
 type TerminalConfigurator interface {
 	TerminalConfiguration(ctx context.Context) (TerminalConfigurationType, error)

@@ -56,7 +56,7 @@ Below are the .NET functions, since they are the basis for the Go interfaces.
 
 */
 
-// WaveformMeasurement provides the interface required for the
+// WaveformMeasurer provides the interface required for the
 // IviScopeWaveformMeasurement extension group.
 type WaveformMeasurer interface {
 	HighReferenceLevel() (float64, error)

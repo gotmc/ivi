@@ -99,7 +99,7 @@ func (d *Driver) Channel(index int) (*Channel, error) {
 	return &d.channels[index], nil
 }
 
-// InputChannel represents a repeated capability of an input channel for the
+// Channel represents a repeated capability of an input channel for the
 // Dynamic Signal Analyzer (DSA).
 type Channel struct {
 	dsa.Channel

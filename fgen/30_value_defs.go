@@ -332,6 +332,8 @@ func (ams AMSource) String() string {
 	return amSources[ams]
 }
 
+// AMWaveform models the internal modulating waveform used for AM modulation.
+//
 // FIXME: I'm going to try to use the StandardWaveform instead, since that's
 // what the standard calls for. However, the AM Modulation doesn't allow a DC
 // standard waveform, whereas the StdFunc does.
