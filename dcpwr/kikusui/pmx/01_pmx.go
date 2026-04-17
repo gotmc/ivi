@@ -52,27 +52,7 @@ type Channel struct {
 // [ivi.WithoutIDQuery] to skip that check. Use [ivi.WithReset] to reset on
 // creation and [ivi.WithTimeout] to override the default I/O timeout.
 func New(inst ivi.Transport, opts ...ivi.DriverOption) (*Driver, error) {
-	cfg := ivi.ApplyOptions(opts)
-
-	timeout := cfg.Timeout
-	if timeout == 0 {
-		timeout = ivi.DefaultTimeout
-	}
-
-	channelNames := []string{
-		"DCOutput",
-	}
-	outputCount := len(channelNames)
-	channels := make([]Channel, outputCount)
-	for i, channelName := range channelNames {
-		ch := Channel{
-			name:    channelName,
-			inst:    inst,
-			timeout: timeout,
-		}
-		channels[i] = ch
-	}
-	inherentBase := ivi.InherentBase{
+	s, err := ivi.NewDriverSetup(inst, ivi.InherentBase{
 		ClassSpecMajorVersion: specMajorVersion,
 		ClassSpecMinorVersion: specMinorVersion,
 		ClassSpecRevision:     specRevision,
@@ -85,31 +65,28 @@ func New(inst ivi.Transport, opts ...ivi.DriverOption) (*Driver, error) {
 			"IviDCPwrTrigger",
 		},
 		SupportedInstrumentModels: []string{
-			"PMX18-2A",
-			"PMX18-5A",
-			"PMX35-1A",
-			"PMX35-3A",
-			"PMX70-1A",
-			"PMX110-0.6A",
-			"PMX250-0.25A",
-			"PMX350-0.2A",
-			"PMX500-0.2A",
+			"PMX18-2A", "PMX18-5A", "PMX35-1A", "PMX35-3A", "PMX70-1A",
+			"PMX110-0.6A", "PMX250-0.25A", "PMX350-0.2A", "PMX500-0.2A",
 		},
-	}
-	inherent := ivi.NewInherent(inst, inherentBase, timeout)
-
-	if _, err := inherent.CheckID(); err != nil && !cfg.SkipIDQuery {
+	}, opts)
+	if err != nil {
 		return nil, err
+	}
+
+	channelNames := []string{"DCOutput"}
+	channels := make([]Channel, len(channelNames))
+	for i, name := range channelNames {
+		channels[i] = Channel{name: name, inst: inst, timeout: s.Timeout}
 	}
 
 	driver := Driver{
 		inst:     inst,
 		channels: channels,
-		timeout:  timeout,
-		Inherent: inherent,
+		timeout:  s.Timeout,
+		Inherent: s.Inherent,
 	}
 
-	if cfg.Reset {
+	if s.Config.Reset {
 		if err := driver.Reset(); err != nil {
 			return nil, err
 		}

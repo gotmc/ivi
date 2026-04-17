@@ -41,23 +41,14 @@ type Driver struct {
 // [ivi.WithReset] to reset on creation and [ivi.WithTimeout] to override the
 // default I/O timeout.
 func New(inst ivi.Transport, opts ...ivi.DriverOption) (*Driver, error) {
-	cfg := ivi.ApplyOptions(opts)
-
-	timeout := cfg.Timeout
-	if timeout == 0 {
-		timeout = ivi.DefaultTimeout
-	}
-
-	inherentBase := ivi.InherentBase{
+	s, err := ivi.NewDriverSetup(inst, ivi.InherentBase{
 		ClassSpecMajorVersion: specMajorVersion,
 		ClassSpecMinorVersion: specMinorVersion,
 		ClassSpecRevision:     specRevision,
 		ResetDelay:            500 * time.Millisecond,
 		ClearDelay:            500 * time.Millisecond,
 		ReturnToLocal:         true,
-		GroupCapabilities: []string{
-			"IviSpecAnBase",
-		},
+		GroupCapabilities:     []string{"IviSpecAnBase"},
 		SupportedInstrumentModels: []string{
 			// ESA-L Series
 			"E4411B",
@@ -72,24 +63,19 @@ func New(inst ivi.Transport, opts ...ivi.DriverOption) (*Driver, error) {
 			// X-Series
 			"N9030A", "N9020A", "N9010A", "N9000A",
 		},
-		SupportedBusInterfaces: []string{
-			"GPIB",
-			"TCPIP",
-		},
-	}
-	inherent := ivi.NewInherent(inst, inherentBase, timeout)
-
-	if _, err := inherent.CheckID(); err != nil && !cfg.SkipIDQuery {
+		SupportedBusInterfaces: []string{"GPIB", "TCPIP"},
+	}, opts)
+	if err != nil {
 		return nil, err
 	}
 
 	driver := Driver{
 		inst:     inst,
-		timeout:  timeout,
-		Inherent: inherent,
+		timeout:  s.Timeout,
+		Inherent: s.Inherent,
 	}
 
-	if cfg.Reset {
+	if s.Config.Reset {
 		if err := driver.Reset(); err != nil {
 			return &driver, err
 		}

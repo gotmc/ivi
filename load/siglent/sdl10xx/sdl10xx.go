@@ -37,50 +37,36 @@ type SDL10xx struct {
 // reset on creation and [ivi.WithTimeout] to override the default I/O
 // timeout.
 func New(inst ivi.Transport, opts ...ivi.DriverOption) (*SDL10xx, error) {
-	cfg := ivi.ApplyOptions(opts)
-
-	timeout := cfg.Timeout
-	if timeout == 0 {
-		timeout = ivi.DefaultTimeout
-	}
-
-	// FIXME(mdr): Need to query the instrument to determine the model and then
-	// set any model specific attributes, such as quantity and names of channels.
-	channelNames := []string{
-		"Input",
-	}
-	outputCount := len(channelNames)
-	channels := make([]Channel, outputCount)
-	for i, ch := range channelNames {
-		baseChannel := load.NewChannel(i, ch, inst)
-		channels[i] = Channel{baseChannel}
-	}
-	inherentBase := ivi.InherentBase{
-		ClassSpecMajorVersion: specMajorVersion,
-		ClassSpecMinorVersion: specMinorVersion,
-		ClassSpecRevision:     specRevision,
-		ResetDelay:            500 * time.Millisecond,
-		ClearDelay:            500 * time.Millisecond,
-		ReturnToLocal:         true,
-		GroupCapabilities:     []string{},
-		SupportedInstrumentModels: []string{
-			"SDL1000X",
-			"SDL1030X",
-		},
-	}
-	inherent := ivi.NewInherent(inst, inherentBase, timeout)
-
-	if _, err := inherent.CheckID(); err != nil && !cfg.SkipIDQuery {
+	s, err := ivi.NewDriverSetup(inst, ivi.InherentBase{
+		ClassSpecMajorVersion:     specMajorVersion,
+		ClassSpecMinorVersion:     specMinorVersion,
+		ClassSpecRevision:         specRevision,
+		ResetDelay:                500 * time.Millisecond,
+		ClearDelay:                500 * time.Millisecond,
+		ReturnToLocal:             true,
+		GroupCapabilities:         []string{},
+		SupportedInstrumentModels: []string{"SDL1000X", "SDL1030X"},
+	}, opts)
+	if err != nil {
 		return nil, err
+	}
+
+	// FIXME(mdr): Need to query the instrument to determine the model and
+	// then set any model specific attributes, such as quantity and names of
+	// channels.
+	channelNames := []string{"Input"}
+	channels := make([]Channel, len(channelNames))
+	for i, ch := range channelNames {
+		channels[i] = Channel{load.NewChannel(i, ch, inst)}
 	}
 
 	driver := SDL10xx{
 		inst:     inst,
 		channels: channels,
-		Inherent: inherent,
+		Inherent: s.Inherent,
 	}
 
-	if cfg.Reset {
+	if s.Config.Reset {
 		if err := driver.Reset(); err != nil {
 			return nil, err
 		}

@@ -49,53 +49,34 @@ type Key35670 struct {
 // [ivi.WithoutIDQuery] to skip that check. Use [ivi.WithReset] to reset on
 // creation and [ivi.WithTimeout] to override the default I/O timeout.
 func New(inst ivi.Transport, opts ...ivi.DriverOption) (*Key35670, error) {
-	cfg := ivi.ApplyOptions(opts)
-
-	timeout := cfg.Timeout
-	if timeout == 0 {
-		timeout = ivi.DefaultTimeout
-	}
-
-	channelNames := []string{
-		"CH1",
-		"CH2",
-		"CH3",
-		"CH4",
-	}
-	inputCount := len(channelNames)
-	channels := make([]Channel, inputCount)
-	for i, ch := range channelNames {
-		baseChannel := dsa.NewChannel(i, ch, inst)
-		channels[i] = Channel{baseChannel}
-	}
-	inherentBase := ivi.InherentBase{
-		ClassSpecMajorVersion: specMajorVersion,
-		ClassSpecMinorVersion: specMinorVersion,
-		ClassSpecRevision:     specRevision,
-		ResetDelay:            500 * time.Millisecond,
-		ClearDelay:            500 * time.Millisecond,
-		ReturnToLocal:         true,
-		GroupCapabilities: []string{
-			"IviDSABase",
-		},
-		SupportedInstrumentModels: []string{
-			"35670A",
-		},
-	}
-	inherent := ivi.NewInherent(inst, inherentBase, timeout)
-
-	if _, err := inherent.CheckID(); err != nil && !cfg.SkipIDQuery {
+	s, err := ivi.NewDriverSetup(inst, ivi.InherentBase{
+		ClassSpecMajorVersion:     specMajorVersion,
+		ClassSpecMinorVersion:     specMinorVersion,
+		ClassSpecRevision:         specRevision,
+		ResetDelay:                500 * time.Millisecond,
+		ClearDelay:                500 * time.Millisecond,
+		ReturnToLocal:             true,
+		GroupCapabilities:         []string{"IviDSABase"},
+		SupportedInstrumentModels: []string{"35670A"},
+	}, opts)
+	if err != nil {
 		return nil, err
+	}
+
+	channelNames := []string{"CH1", "CH2", "CH3", "CH4"}
+	channels := make([]Channel, len(channelNames))
+	for i, ch := range channelNames {
+		channels[i] = Channel{dsa.NewChannel(i, ch, inst)}
 	}
 
 	driver := Key35670{
 		inst:     inst,
 		channels: channels,
-		timeout:  timeout,
-		Inherent: inherent,
+		timeout:  s.Timeout,
+		Inherent: s.Inherent,
 	}
 
-	if cfg.Reset {
+	if s.Config.Reset {
 		if err := driver.Reset(); err != nil {
 			return &driver, err
 		}

@@ -65,39 +65,7 @@ type path []string
 // creation, [ivi.WithStandalone] to configure standalone voltage ratings, and
 // [ivi.WithTimeout] to override the default I/O timeout.
 func New(inst ivi.Transport, opts ...ivi.DriverOption) (*U2751A, error) {
-	cfg := ivi.ApplyOptions(opts)
-
-	timeout := cfg.Timeout
-	if timeout == 0 {
-		timeout = ivi.DefaultTimeout
-	}
-
-	infoChannels := []struct {
-		name     string
-		chType   ChannelType
-		switchID int
-	}{
-		{"Row1", Row, 1},
-		{"Row2", Row, 2},
-		{"Row3", Row, 3},
-		{"Row4", Row, 4},
-		{"Col1", Col, 1},
-		{"Col2", Col, 2},
-		{"Col3", Col, 3},
-		{"Col4", Col, 4},
-		{"Col5", Col, 5},
-		{"Col6", Col, 6},
-		{"Col7", Col, 7},
-		{"Col8", Col, 8},
-	}
-	outputCount := len(infoChannels)
-
-	channels := make([]Channel, outputCount)
-	for i, ch := range infoChannels {
-		channels[i] = newChannel(i, ch.name, ch.chType, ch.switchID, inst, timeout, cfg.Standalone)
-	}
-
-	inherentBase := ivi.InherentBase{
+	s, err := ivi.NewDriverSetup(inst, ivi.InherentBase{
 		ClassSpecMajorVersion: specMajorVersion,
 		ClassSpecMinorVersion: specMinorVersion,
 		ClassSpecRevision:     specRevision,
@@ -107,24 +75,43 @@ func New(inst ivi.Transport, opts ...ivi.DriverOption) (*U2751A, error) {
 			"IviSwtchScanner",
 			"IviSwtchSoftware",
 		},
-		SupportedInstrumentModels: []string{
-			"U2751A",
-		},
-	}
-	inherent := ivi.NewInherent(inst, inherentBase, timeout)
-
-	if _, err := inherent.CheckID(); err != nil && !cfg.SkipIDQuery {
+		SupportedInstrumentModels: []string{"U2751A"},
+	}, opts)
+	if err != nil {
 		return nil, err
+	}
+
+	infoChannels := []struct {
+		name     string
+		chType   ChannelType
+		switchID int
+	}{
+		{"Row1", Row, 1}, {"Row2", Row, 2}, {"Row3", Row, 3}, {"Row4", Row, 4},
+		{"Col1", Col, 1}, {"Col2", Col, 2}, {"Col3", Col, 3}, {"Col4", Col, 4},
+		{"Col5", Col, 5}, {"Col6", Col, 6}, {"Col7", Col, 7}, {"Col8", Col, 8},
+	}
+
+	channels := make([]Channel, len(infoChannels))
+	for i, ch := range infoChannels {
+		channels[i] = newChannel(
+			i,
+			ch.name,
+			ch.chType,
+			ch.switchID,
+			inst,
+			s.Timeout,
+			s.Config.Standalone,
+		)
 	}
 
 	driver := U2751A{
 		inst:     inst,
 		channels: channels,
-		timeout:  timeout,
-		Inherent: inherent,
+		timeout:  s.Timeout,
+		Inherent: s.Inherent,
 	}
 
-	if cfg.Reset {
+	if s.Config.Reset {
 		if err := driver.Reset(); err != nil {
 			return &driver, err
 		}

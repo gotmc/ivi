@@ -60,29 +60,7 @@ type Channel struct {
 // [ivi.WithoutIDQuery] to skip that check. Use [ivi.WithReset] to reset on
 // creation and [ivi.WithTimeout] to override the default I/O timeout.
 func New(inst ivi.Transport, opts ...ivi.DriverOption) (*Driver, error) {
-	cfg := ivi.ApplyOptions(opts)
-
-	timeout := cfg.Timeout
-	if timeout == 0 {
-		timeout = ivi.DefaultTimeout
-	}
-
-	channelNames := []string{
-		"Output",
-	}
-	outputCount := len(channelNames)
-	channels := make([]Channel, outputCount)
-
-	for i, channelName := range channelNames {
-		ch := Channel{
-			name:    channelName,
-			inst:    inst,
-			timeout: timeout,
-		}
-		channels[i] = ch
-	}
-
-	inherentBase := ivi.InherentBase{
+	s, err := ivi.NewDriverSetup(inst, ivi.InherentBase{
 		ClassSpecMajorVersion: specMajorVersion,
 		ClassSpecMinorVersion: specMinorVersion,
 		ClassSpecRevision:     specRevision,
@@ -103,28 +81,27 @@ func New(inst ivi.Transport, opts ...ivi.DriverOption) (*Driver, error) {
 			"IviFgenStdfunc",
 			"IviFgenTrigger",
 		},
-		SupportedInstrumentModels: []string{
-			"DS345",
-		},
-		SupportedBusInterfaces: []string{
-			"GPIB",
-			"RS232",
-		},
-	}
-	inherent := ivi.NewInherent(inst, inherentBase, timeout)
-
-	if _, err := inherent.CheckID(); err != nil && !cfg.SkipIDQuery {
+		SupportedInstrumentModels: []string{"DS345"},
+		SupportedBusInterfaces:    []string{"GPIB", "RS232"},
+	}, opts)
+	if err != nil {
 		return nil, err
+	}
+
+	channelNames := []string{"Output"}
+	channels := make([]Channel, len(channelNames))
+	for i, name := range channelNames {
+		channels[i] = Channel{name: name, inst: inst, timeout: s.Timeout}
 	}
 
 	driver := Driver{
 		inst:     inst,
 		channels: channels,
-		timeout:  timeout,
-		Inherent: inherent,
+		timeout:  s.Timeout,
+		Inherent: s.Inherent,
 	}
 
-	if cfg.Reset {
+	if s.Config.Reset {
 		if err := driver.Reset(); err != nil {
 			return &driver, err
 		}

@@ -54,35 +54,7 @@ type Channel struct {
 // [ivi.WithoutIDQuery] to skip that check. Use [ivi.WithReset] to reset on
 // creation and [ivi.WithTimeout] to override the default I/O timeout.
 func New(inst ivi.Transport, opts ...ivi.DriverOption) (*Driver, error) {
-	cfg := ivi.ApplyOptions(opts)
-
-	timeout := cfg.Timeout
-	if timeout == 0 {
-		timeout = ivi.DefaultTimeout
-	}
-
-	// FIXME: Need to query the instrument for the model and then determine the
-	// number of channels based on the model returned.
-	channelNames := []string{
-		"CHAN1",
-		"CHAN2",
-		"CHAN3",
-		"CHAN4",
-	}
-	outputCount := len(channelNames)
-	channels := make([]Channel, outputCount)
-
-	for i, channelName := range channelNames {
-		ch := Channel{
-			name:    channelName,
-			inst:    inst,
-			num:     i + 1,
-			timeout: timeout,
-		}
-		channels[i] = ch
-	}
-
-	inherentBase := ivi.InherentBase{
+	s, err := ivi.NewDriverSetup(inst, ivi.InherentBase{
 		ClassSpecMajorVersion: specMajorVersion,
 		ClassSpecMinorVersion: specMinorVersion,
 		ClassSpecRevision:     specRevision,
@@ -93,32 +65,29 @@ func New(inst ivi.Transport, opts ...ivi.DriverOption) (*Driver, error) {
 			"IviScopeBase",
 			"IviScopeWaveformMeasurement",
 		},
-		SupportedInstrumentModels: []string{
-			"DSOX3024A",
-			"DSOX3034A",
-			"MSOX3024A",
-			"MSOX3034A",
-		},
-		SupportedBusInterfaces: []string{
-			"USB",
-			"GPIB",
-			"LAN",
-		},
-	}
-	inherent := ivi.NewInherent(inst, inherentBase, timeout)
-
-	if _, err := inherent.CheckID(); err != nil && !cfg.SkipIDQuery {
+		SupportedInstrumentModels: []string{"DSOX3024A", "DSOX3034A", "MSOX3024A", "MSOX3034A"},
+		SupportedBusInterfaces:    []string{"USB", "GPIB", "LAN"},
+	}, opts)
+	if err != nil {
 		return nil, err
+	}
+
+	// FIXME: Need to query the instrument for the model and then determine
+	// the number of channels based on the model returned.
+	channelNames := []string{"CHAN1", "CHAN2", "CHAN3", "CHAN4"}
+	channels := make([]Channel, len(channelNames))
+	for i, name := range channelNames {
+		channels[i] = Channel{name: name, inst: inst, num: i + 1, timeout: s.Timeout}
 	}
 
 	driver := Driver{
 		inst:     inst,
 		channels: channels,
-		timeout:  timeout,
-		Inherent: inherent,
+		timeout:  s.Timeout,
+		Inherent: s.Inherent,
 	}
 
-	if cfg.Reset {
+	if s.Config.Reset {
 		if err := driver.Reset(); err != nil {
 			return &driver, err
 		}

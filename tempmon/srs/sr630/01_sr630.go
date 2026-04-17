@@ -45,14 +45,7 @@ type Driver struct {
 // [ivi.WithReset] to reset on creation and [ivi.WithTimeout] to override the
 // default I/O timeout.
 func New(inst ivi.Transport, opts ...ivi.DriverOption) (*Driver, error) {
-	cfg := ivi.ApplyOptions(opts)
-
-	timeout := cfg.Timeout
-	if timeout == 0 {
-		timeout = ivi.DefaultTimeout
-	}
-
-	inherentBase := ivi.InherentBase{
+	s, err := ivi.NewDriverSetup(inst, ivi.InherentBase{
 		ClassSpecMajorVersion: 0,
 		ClassSpecMinorVersion: 0,
 		ClassSpecRevision:     "N/A",
@@ -64,27 +57,20 @@ func New(inst ivi.Transport, opts ...ivi.DriverOption) (*Driver, error) {
 			"TempMonScanner",
 			"TempMonRelativeTemperature",
 		},
-		SupportedInstrumentModels: []string{
-			"SR630",
-		},
-		SupportedBusInterfaces: []string{
-			"GPIB",
-			"RS232",
-		},
-	}
-	inherent := ivi.NewInherent(inst, inherentBase, timeout)
-
-	if _, err := inherent.CheckID(); err != nil && !cfg.SkipIDQuery {
+		SupportedInstrumentModels: []string{"SR630"},
+		SupportedBusInterfaces:    []string{"GPIB", "RS232"},
+	}, opts)
+	if err != nil {
 		return nil, err
 	}
 
 	driver := Driver{
 		inst:     inst,
-		timeout:  timeout,
-		Inherent: inherent,
+		timeout:  s.Timeout,
+		Inherent: s.Inherent,
 	}
 
-	if cfg.Reset {
+	if s.Config.Reset {
 		if err := driver.Reset(); err != nil {
 			return &driver, err
 		}

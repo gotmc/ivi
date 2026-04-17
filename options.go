@@ -69,3 +69,49 @@ func WithStandalone() DriverOption {
 		cfg.Standalone = true
 	}
 }
+
+// DriverSetup bundles the pieces a driver constructor needs after applying
+// options and performing *IDN? validation. It is returned from
+// [NewDriverSetup].
+type DriverSetup struct {
+	// Inherent is the constructed Inherent ready to be embedded in the
+	// driver struct.
+	Inherent Inherent
+	// Timeout is the resolved I/O timeout, falling back to DefaultTimeout
+	// when the caller did not pass [WithTimeout].
+	Timeout time.Duration
+	// Config is the fully applied DriverConfig so the caller can inspect
+	// driver-specific option fields (Reset, Standalone, etc.).
+	Config DriverConfig
+}
+
+// NewDriverSetup performs the setup that every driver constructor needs:
+// applying options, resolving the timeout, constructing an Inherent, and
+// running the *IDN? check (which the caller can suppress with
+// [WithoutIDQuery]). Driver constructors call it, then build their channels
+// and assemble the driver struct, and finally call Reset on the driver if
+// the returned [DriverSetup.Config].Reset is set.
+func NewDriverSetup(
+	inst Transport,
+	base InherentBase,
+	opts []DriverOption,
+) (*DriverSetup, error) {
+	cfg := ApplyOptions(opts)
+
+	timeout := cfg.Timeout
+	if timeout == 0 {
+		timeout = DefaultTimeout
+	}
+
+	inherent := NewInherent(inst, base, timeout)
+
+	if _, err := inherent.CheckID(); err != nil && !cfg.SkipIDQuery {
+		return nil, err
+	}
+
+	return &DriverSetup{
+		Inherent: inherent,
+		Timeout:  timeout,
+		Config:   cfg,
+	}, nil
+}

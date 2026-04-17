@@ -58,31 +58,7 @@ type Driver struct {
 // [ivi.WithoutIDQuery] to skip that check. Use [ivi.WithReset] to reset on
 // creation and [ivi.WithTimeout] to override the default I/O timeout.
 func New(inst ivi.Transport, opts ...ivi.DriverOption) (*Driver, error) {
-	cfg := ivi.ApplyOptions(opts)
-
-	timeout := cfg.Timeout
-	if timeout == 0 {
-		timeout = ivi.DefaultTimeout
-	}
-
-	channelNames := []string{
-		"Output1",
-		"Output2",
-	}
-	outputCount := len(channelNames)
-	channels := make([]Channel, outputCount)
-
-	for i, channelName := range channelNames {
-		ch := Channel{
-			name:    channelName,
-			inst:    inst,
-			num:     i,
-			timeout: timeout,
-		}
-		channels[i] = ch
-	}
-
-	inherentBase := ivi.InherentBase{
+	s, err := ivi.NewDriverSetup(inst, ivi.InherentBase{
 		ClassSpecMajorVersion: specMajorVersion,
 		ClassSpecMinorVersion: specMinorVersion,
 		ClassSpecRevision:     specRevision,
@@ -98,52 +74,32 @@ func New(inst ivi.Transport, opts ...ivi.DriverOption) (*Driver, error) {
 			"IviFgenTrigger",
 		},
 		SupportedInstrumentModels: []string{
-			"33210A",
-			"33220A",
-			"33502A",
-			"33509B",
-			"33510B",
-			"33511B",
-			"33512B",
-			"33519B",
-			"33520B",
-			"33521A",
-			"33521B",
-			"33522A",
-			"33522B",
-			"33609A",
-			"33610A",
-			"33611A",
-			"33612A",
-			"33619A",
-			"33620A",
-			"33621A",
-			"33622A",
-			"EDU33211A",
-			"EDU33212A",
-			"FG33531A",
-			"FG33532A",
+			"33210A", "33220A", "33502A", "33509B", "33510B", "33511B",
+			"33512B", "33519B", "33520B", "33521A", "33521B", "33522A",
+			"33522B", "33609A", "33610A", "33611A", "33612A", "33619A",
+			"33620A", "33621A", "33622A", "EDU33211A", "EDU33212A",
+			"FG33531A", "FG33532A",
 		},
-		SupportedBusInterfaces: []string{
-			"TCPIP",
-			"GPIB",
-			"USB",
-		},
-	}
-	inherent := ivi.NewInherent(inst, inherentBase, timeout)
-
-	if _, err := inherent.CheckID(); err != nil && !cfg.SkipIDQuery {
+		SupportedBusInterfaces: []string{"TCPIP", "GPIB", "USB"},
+	}, opts)
+	if err != nil {
 		return nil, err
+	}
+
+	channelNames := []string{"Output1", "Output2"}
+	channels := make([]Channel, len(channelNames))
+	for i, name := range channelNames {
+		channels[i] = Channel{name: name, inst: inst, num: i, timeout: s.Timeout}
 	}
 
 	driver := Driver{
 		inst:     inst,
 		channels: channels,
-		timeout:  timeout,
-		Inherent: inherent,
+		timeout:  s.Timeout,
+		Inherent: s.Inherent,
 	}
 
-	if cfg.Reset {
+	if s.Config.Reset {
 		if err := driver.Reset(); err != nil {
 			return nil, err
 		}

@@ -53,14 +53,7 @@ type Channel struct {
 // (the model is still queried). Use [ivi.WithReset] to reset on creation and
 // [ivi.WithTimeout] to override the default I/O timeout.
 func New(inst ivi.Transport, opts ...ivi.DriverOption) (*Driver, error) {
-	cfg := ivi.ApplyOptions(opts)
-
-	timeout := cfg.Timeout
-	if timeout == 0 {
-		timeout = ivi.DefaultTimeout
-	}
-
-	inherentBase := ivi.InherentBase{
+	s, err := ivi.NewDriverSetup(inst, ivi.InherentBase{
 		ClassSpecMajorVersion: specMajorVersion,
 		ClassSpecMinorVersion: specMinorVersion,
 		ClassSpecRevision:     specRevision,
@@ -71,51 +64,34 @@ func New(inst ivi.Transport, opts ...ivi.DriverOption) (*Driver, error) {
 			"IviDCPwrBase",
 			"IviDCPwrMeasurement",
 		},
-		SupportedInstrumentModels: []string{
-			"E3631A",
-			"E3632A",
-			"E3633A",
-			"E3634A",
-		},
-		SupportedBusInterfaces: []string{
-			"GPIB",
-			"SERIAL",
-		},
-	}
-	inherent := ivi.NewInherent(inst, inherentBase, timeout)
-
-	// CheckID populates the model even when it returns ErrUnsupportedModel,
-	// so the channel lookup below still works when validation is skipped.
-	// A hard failure (network error, malformed IDN) is only fatal when the
-	// caller did not pass WithoutIDQuery.
-	model, err := inherent.CheckID()
-	if err != nil && !cfg.SkipIDQuery {
+		SupportedInstrumentModels: []string{"E3631A", "E3632A", "E3633A", "E3634A"},
+		SupportedBusInterfaces:    []string{"GPIB", "SERIAL"},
+	}, opts)
+	if err != nil {
 		return nil, err
 	}
 
-	if model == "" {
+	// Channel configuration depends on the queried model.
+	model, err := s.Inherent.InstrumentModel()
+	if err != nil {
 		return nil, fmt.Errorf("error determining instrument model: %w", err)
 	}
 
 	channelNames := availableChannels[model]
 	channels := make([]Channel, len(channelNames))
 
-	for i, channelName := range channelNames {
-		channels[i] = Channel{
-			name:    channelName,
-			inst:    inst,
-			timeout: timeout,
-		}
+	for i, name := range channelNames {
+		channels[i] = Channel{name: name, inst: inst, timeout: s.Timeout}
 	}
 
 	driver := Driver{
 		inst:     inst,
 		channels: channels,
-		timeout:  timeout,
-		Inherent: inherent,
+		timeout:  s.Timeout,
+		Inherent: s.Inherent,
 	}
 
-	if cfg.Reset {
+	if s.Config.Reset {
 		if err := driver.Reset(); err != nil {
 			return nil, err
 		}
