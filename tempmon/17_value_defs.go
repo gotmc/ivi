@@ -8,6 +8,7 @@ package tempmon
 // TemperatureUnits specifies the measurement units for a channel.
 type TemperatureUnits int
 
+// Available TemperatureUnits values.
 const (
 	Celsius TemperatureUnits = iota
 	Fahrenheit
@@ -25,6 +26,7 @@ func (tu TemperatureUnits) String() string { return temperatureUnitsDesc[tu] }
 // ThermocoupleType specifies the thermocouple type for a channel.
 type ThermocoupleType int
 
+// Available ThermocoupleType values.
 const (
 	TypeB ThermocoupleType = iota
 	TypeE

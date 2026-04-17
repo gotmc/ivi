@@ -5,8 +5,11 @@
 
 package dmm
 
+// ApertureTimeUnits specifies the units used to express the aperture time
+// described in Section 14 of IVI-4.2: IviDmm Class Specification.
 type ApertureTimeUnits int
 
+// Available ApertureTimeUnits values.
 const (
 	Seconds ApertureTimeUnits = iota
 	PowerLineCycles
@@ -44,8 +47,11 @@ func (ar AutoRange) String() string {
 	return autoRanges[ar]
 }
 
+// AutoZero specifies whether the DMM automatically makes zero-value readings
+// described in Section 16 of IVI-4.2: IviDmm Class Specification.
 type AutoZero int
 
+// Available AutoZero values.
 const (
 	AutoZeroOff AutoZero = iota
 	AutoZeroOn
@@ -162,8 +168,11 @@ func (ts TriggerSource) String() string {
 	return triggerSources[ts]
 }
 
+// TempTransducerType identifies the transducer used for temperature
+// measurements described in Section 7 of IVI-4.2: IviDmm Class Specification.
 type TempTransducerType int
 
+// Available TempTransducerType values.
 const (
 	Thermocouple TempTransducerType = iota
 	Thermistor
@@ -183,8 +192,11 @@ func (ttt TempTransducerType) String() string {
 	return tempTransducerTypes[ttt]
 }
 
+// ReferenceJunctionType identifies how the reference-junction temperature is
+// established for thermocouple measurements.
 type ReferenceJunctionType int
 
+// Available ReferenceJunctionType values.
 const (
 	InternalReferenceJunction ReferenceJunctionType = iota
 	FixedReferenceJunction
@@ -200,8 +212,12 @@ func (rjt ReferenceJunctionType) String() string {
 	return referenceJunctionTypes[rjt]
 }
 
+// ThermocoupleType identifies the thermocouple alloy used to convert
+// temperature to voltage. Values correspond to letter designations in
+// IEC 60584-1 and ASTM E230.
 type ThermocoupleType int
 
+// Available ThermocoupleType values.
 const (
 	ThermocoupleB ThermocoupleType = iota
 	ThermocoupleC
@@ -239,8 +255,12 @@ func (tt ThermocoupleType) String() string {
 	return thermocoupleTypes[tt]
 }
 
+// MeasurementDestination identifies where the DMM should route a "measurement
+// complete" signal, as described in Section 14 of IVI-4.2: IviDmm Class
+// Specification.
 type MeasurementDestination int
 
+// Available MeasurementDestination values.
 const (
 	MsrDestinationNone MeasurementDestination = iota
 	MsrDestinationExternal
@@ -292,8 +312,12 @@ func (md MeasurementDestination) String() string {
 	return measurementDestinations[md]
 }
 
+// TriggerSlope identifies the edge (positive or negative) on which the DMM
+// recognizes an external trigger, as described in Section 12 of IVI-4.2:
+// IviDmm Class Specification.
 type TriggerSlope int
 
+// Available TriggerSlope values.
 const (
 	PositiveTriggerSlope TriggerSlope = iota
 	NegativeTriggerSlope

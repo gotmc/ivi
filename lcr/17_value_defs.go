@@ -9,6 +9,8 @@ package lcr
 // measures. Each function produces a primary and secondary result value.
 type MeasurementFunction int
 
+// Available MeasurementFunction values; each pairs a primary quantity with
+// a secondary one.
 const (
 	CpD       MeasurementFunction = iota // Parallel capacitance, Dissipation factor
 	CpQ                                  // Parallel capacitance, Quality factor
@@ -61,6 +63,7 @@ func (mf MeasurementFunction) String() string { return measurementFunctionDesc[m
 // integration times produce more accurate results at the cost of speed.
 type MeasurementSpeed int
 
+// Available MeasurementSpeed values.
 const (
 	MeasurementSpeedShort MeasurementSpeed = iota
 	MeasurementSpeedMedium
@@ -78,6 +81,7 @@ func (ms MeasurementSpeed) String() string { return measurementSpeedDesc[ms] }
 // TriggerSource specifies the source of measurement triggers.
 type TriggerSource int
 
+// Available TriggerSource values.
 const (
 	TriggerSourceInternal TriggerSource = iota
 	TriggerSourceExternal
@@ -97,6 +101,8 @@ func (ts TriggerSource) String() string { return triggerSourceDesc[ts] }
 // MeasurementStatus indicates the status of a measurement result.
 type MeasurementStatus int
 
+// Available MeasurementStatus values, with the integer values matching the
+// status codes returned by the instrument.
 const (
 	MeasurementStatusNormal          MeasurementStatus = 0
 	MeasurementStatusOverload        MeasurementStatus = 1

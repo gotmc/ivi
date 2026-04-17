@@ -281,8 +281,12 @@ func (ts TriggerSource) String() string {
 	return triggerSources[ts]
 }
 
+// SampleClockSource identifies whether the arbitrary-waveform sample clock
+// is generated internally or supplied externally, as described in Section 20
+// of IVI-4.3: IviFgen Class Specification.
 type SampleClockSource int
 
+// Available SampleClockSource values.
 const (
 	SampleClockInternal SampleClockSource = iota
 	SampleClockExternal
@@ -298,8 +302,11 @@ func (scs SampleClockSource) String() string {
 	return sampleClockSources[scs]
 }
 
+// MarkerPolarity identifies whether a marker output pulse is asserted high
+// or low, as described in Section 25 of IVI-4.3: IviFgen Class Specification.
 type MarkerPolarity int
 
+// Available MarkerPolarity values.
 const (
 	MarkerActiveHigh MarkerPolarity = iota
 	MarkerActiveLow
@@ -315,8 +322,12 @@ func (mp MarkerPolarity) String() string {
 	return markerPolarities[mp]
 }
 
+// AMSource identifies whether amplitude-modulation data comes from the
+// instrument's internal modulator or an external signal, as described in
+// Section 18 of IVI-4.3: IviFgen Class Specification.
 type AMSource int
 
+// Available AMSource values.
 const (
 	AMSourceInternal AMSource = iota
 	AMSourceExternal
@@ -339,6 +350,7 @@ func (ams AMSource) String() string {
 // standard waveform, whereas the StdFunc does.
 type AMWaveform int
 
+// Available AMWaveform values.
 const (
 	AMInternalSine AMWaveform = iota
 	AMInternalSquare
@@ -360,8 +372,12 @@ func (amw AMWaveform) String() string {
 	return amWaveforms[amw]
 }
 
+// FMSource identifies whether frequency-modulation data comes from the
+// instrument's internal modulator or an external signal, as described in
+// Section 19 of IVI-4.3: IviFgen Class Specification.
 type FMSource int
 
+// Available FMSource values.
 const (
 	FMSourceInternal FMSource = iota
 	FMSourceExternal
@@ -377,8 +393,12 @@ func (fms FMSource) String() string {
 	return fmSources[fms]
 }
 
+// BinaryAlignment identifies how binary arbitrary-waveform data is aligned
+// within the sample word, as described in Section 24 of IVI-4.3: IviFgen
+// Class Specification.
 type BinaryAlignment int
 
+// Available BinaryAlignment values.
 const (
 	BinaryAlignmentLeft BinaryAlignment = iota
 	BinaryAlignmentRight
@@ -394,8 +414,12 @@ func (ba BinaryAlignment) String() string {
 	return binaryAlignments[ba]
 }
 
+// TerminalConfigurationType identifies whether an output terminal is
+// single-ended or differential, as described in Section 21 of IVI-4.3:
+// IviFgen Class Specification.
 type TerminalConfigurationType int
 
+// Available TerminalConfigurationType values.
 const (
 	TerminalConfigurationSingleEnded TerminalConfigurationType = iota
 	TerminalConfigurationDifferential
@@ -415,6 +439,7 @@ func (tct TerminalConfigurationType) String() string {
 // Section 10.2.2 and Section 30 of IVI-4.3: IviFgenClass Specification.
 type TriggerSlope int
 
+// Available TriggerSlope values.
 const (
 	TriggerSlopePositive TriggerSlope = iota
 	TriggerSlopeNegative

@@ -5,8 +5,12 @@
 
 package scope
 
+// AcquisitionType models the defined values for the acquisition type defined
+// in Section 20 IviScope Attribute Value Definitions of IVI-4.1: IviScope
+// Class Specification.
 type AcquisitionType int
 
+// Available AcquisitionType values.
 const (
 	NormalAcquisition AcquisitionType = iota
 	PeakDetectAcquisition
@@ -19,16 +23,21 @@ var acquisitionTypes = map[AcquisitionType]string{
 	NormalAcquisition:         "normal",
 	PeakDetectAcquisition:     "peak detect",
 	HighResolutionAcquisition: "high resolution",
-	EnvelopeAcquisition:       "envelope",
+	EnvelopeAcquisition:       "average",
 	AverageAcquisition:        "average",
 }
 
+// String implements the Stringer interface for AcquisitionType.
 func (at AcquisitionType) String() string {
 	return acquisitionTypes[at]
 }
 
+// VerticalCoupling models the defined values for a channel's vertical input
+// coupling defined in Section 20 IviScope Attribute Value Definitions of
+// IVI-4.1: IviScope Class Specification.
 type VerticalCoupling int
 
+// Available VerticalCoupling values.
 const (
 	ACVerticalCoupling VerticalCoupling = iota
 	DCVerticalCoupling
@@ -46,8 +55,12 @@ func (vc VerticalCoupling) String() string {
 	return verticalCouplings[vc]
 }
 
+// TriggerCoupling models the defined values for the trigger coupling defined
+// in Section 20 IviScope Attribute Value Definitions of IVI-4.1: IviScope
+// Class Specification.
 type TriggerCoupling int
 
+// Available TriggerCoupling values.
 const (
 	ACTriggerCoupling TriggerCoupling = iota
 	DCTriggerCoupling
@@ -69,8 +82,12 @@ func (tc TriggerCoupling) String() string {
 	return triggerCouplings[tc]
 }
 
+// TriggerSlope models the defined values for the trigger slope defined in
+// Section 20 IviScope Attribute Value Definitions of IVI-4.1: IviScope Class
+// Specification.
 type TriggerSlope int
 
+// Available TriggerSlope values.
 const (
 	PositiveTriggerSlope TriggerSlope = iota
 	NegativeTriggerSlope
@@ -139,8 +156,12 @@ func (ts TriggerSource) String() string {
 	return triggerSources[ts]
 }
 
+// TriggerType models the defined values for the kinds of triggers defined in
+// Section 20 IviScope Attribute Value Definitions of IVI-4.1: IviScope Class
+// Specification.
 type TriggerType int
 
+// Available TriggerType values.
 const (
 	EdgeTrigger TriggerType = iota
 	WidthTrigger
@@ -172,6 +193,7 @@ func (tt TriggerType) String() string {
 // IVI-4.1: IviScopeClass Specification.
 type InterpolationMethod int
 
+// Available InterpolationMethod values.
 const (
 	NoInterpolation InterpolationMethod = iota
 	SineXOverXInterpolation
@@ -195,6 +217,7 @@ func (im InterpolationMethod) String() string {
 // IVI-4.1: IviScopeClass Specification.
 type TVTriggerEvent int
 
+// Available TVTriggerEvent values.
 const (
 	TVTriggerEventField1 TVTriggerEvent = iota
 	TVTriggerEventField2
@@ -216,8 +239,12 @@ func (te TVTriggerEvent) String() string {
 	return tvTriggerEvents[te]
 }
 
+// TVTriggerSignalFormat models the defined values for the supported TV signal
+// formats defined in Section 20 IviScope Attribute Value Definitions of
+// IVI-4.1: IviScope Class Specification.
 type TVTriggerSignalFormat int
 
+// Available TVTriggerSignalFormat values.
 const (
 	TVSignalFormatNTSC TVTriggerSignalFormat = iota
 	TVSignalFormatPAL
@@ -235,8 +262,12 @@ func (sf TVTriggerSignalFormat) String() string {
 	return tvTriggerSignalFormats[sf]
 }
 
+// TVTriggerPolarity models the defined values for the TV trigger polarity
+// defined in Section 20 IviScope Attribute Value Definitions of IVI-4.1:
+// IviScope Class Specification.
 type TVTriggerPolarity int
 
+// Available TVTriggerPolarity values.
 const (
 	TVTriggerPositive TVTriggerPolarity = iota
 	TVTriggerNegative
@@ -252,8 +283,12 @@ func (tp TVTriggerPolarity) String() string {
 	return tvTriggerPolarities[tp]
 }
 
+// Polarity models the defined values for the runt-trigger polarity defined
+// in Section 20 IviScope Attribute Value Definitions of IVI-4.1: IviScope
+// Class Specification.
 type Polarity int
 
+// Available Polarity values.
 const (
 	PositivePolarity Polarity = iota
 	NegativePolarity
@@ -271,8 +306,12 @@ func (p Polarity) String() string {
 	return polarities[p]
 }
 
+// GlitchCondition models the defined values for the glitch-trigger condition
+// defined in Section 20 IviScope Attribute Value Definitions of IVI-4.1:
+// IviScope Class Specification.
 type GlitchCondition int
 
+// Available GlitchCondition values.
 const (
 	GlitchLessThan GlitchCondition = iota
 	GlitchGreaterThan
@@ -288,8 +327,12 @@ func (gc GlitchCondition) String() string {
 	return glitchConditions[gc]
 }
 
+// WidthCondition models the defined values for the width-trigger condition
+// defined in Section 20 IviScope Attribute Value Definitions of IVI-4.1:
+// IviScope Class Specification.
 type WidthCondition int
 
+// Available WidthCondition values.
 const (
 	WidthWithin WidthCondition = iota
 	WidthOutside
@@ -305,8 +348,12 @@ func (wc WidthCondition) String() string {
 	return widthConditions[wc]
 }
 
+// ACLineTriggerSlope models the defined values for the AC-line trigger slope
+// defined in Section 20 IviScope Attribute Value Definitions of IVI-4.1:
+// IviScope Class Specification.
 type ACLineTriggerSlope int
 
+// Available ACLineTriggerSlope values.
 const (
 	ACLinePositive ACLineTriggerSlope = iota
 	ACLineNegative
@@ -324,8 +371,12 @@ func (s ACLineTriggerSlope) String() string {
 	return acLineTriggerSlopes[s]
 }
 
+// SampleMode models the defined values for the acquisition sample mode
+// defined in Section 20 IviScope Attribute Value Definitions of IVI-4.1:
+// IviScope Class Specification.
 type SampleMode int
 
+// Available SampleMode values.
 const (
 	RealTimeSampleMode SampleMode = iota
 	EquivalentTimeSampleMode
@@ -341,8 +392,12 @@ func (sm SampleMode) String() string {
 	return sampleModes[sm]
 }
 
+// TriggerModifier models the defined values for the trigger modifier defined
+// in Section 20 IviScope Attribute Value Definitions of IVI-4.1: IviScope
+// Class Specification.
 type TriggerModifier int
 
+// Available TriggerModifier values.
 const (
 	TriggerModifierNone TriggerModifier = iota
 	TriggerModifierAuto
@@ -360,8 +415,12 @@ func (tm TriggerModifier) String() string {
 	return triggerModifiers[tm]
 }
 
+// MaximumTime models the special maximum-time values accepted by fetch/read
+// methods that take a timeout: Zero for "do not wait" and MaxTimeValue for
+// "wait indefinitely."
 type MaximumTime int
 
+// Available MaximumTime values.
 const (
 	Zero MaximumTime = iota
 	MaxTimeValue
@@ -377,8 +436,13 @@ func (mt MaximumTime) String() string {
 	return maximumTimes[mt]
 }
 
+// WaveformMeasurement models the defined values for the supported waveform
+// measurements defined in Section 20 IviScope Attribute Value Definitions of
+// IVI-4.1: IviScope Class Specification and used by the
+// IviScopeWaveformMeasurement extension group.
 type WaveformMeasurement int
 
+// Available WaveformMeasurement values.
 const (
 	RiseTime WaveformMeasurement = iota
 	FallTime

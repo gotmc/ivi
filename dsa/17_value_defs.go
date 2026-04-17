@@ -9,6 +9,7 @@ package dsa
 // before frequency analysis.
 type WindowType int
 
+// Available WindowType values.
 const (
 	WindowHanning WindowType = iota
 	WindowUniform
@@ -31,6 +32,7 @@ func (wt WindowType) String() string { return windowTypeDesc[wt] }
 // measurements.
 type AveragingType int
 
+// Available AveragingType values.
 const (
 	AveragingRMS AveragingType = iota
 	AveragingRMSExponential
@@ -52,6 +54,7 @@ func (at AveragingType) String() string { return averagingTypeDesc[at] }
 // InputCoupling specifies the input coupling mode.
 type InputCoupling int
 
+// Available InputCoupling values.
 const (
 	InputCouplingAC InputCoupling = iota
 	InputCouplingDC
@@ -67,6 +70,7 @@ func (ic InputCoupling) String() string { return inputCouplingDesc[ic] }
 // MeasurementMode specifies the analysis mode of the DSA.
 type MeasurementMode int
 
+// Available MeasurementMode values.
 const (
 	MeasurementModeFFT MeasurementMode = iota
 	MeasurementModeCorrelation
