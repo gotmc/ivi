@@ -5,10 +5,14 @@
 
 package load
 
+// Base is the interface required of every electronic-load driver; it
+// provides discovery of the load's channel count.
 type Base interface {
 	OutputCount() int
 }
 
+// BaseChannel is the per-channel interface required of every electronic-load
+// driver.
 type BaseChannel interface {
 	SetMode(mode string) error
 }

@@ -22,6 +22,11 @@ var waveformMeasurementToSCPI = map[scope.WaveformMeasurement]string{
 	scope.VoltagePeakToPeak: ":MEAS:VPP?",
 }
 
+// FetchWaveformMeasurement fetches a specified waveform measurement from a
+// previously acquired waveform on this channel.
+//
+// FetchWaveformMeasurement implements the IviScopeWaveformMeasurement
+// function described in Section 11 of IVI-4.1: IviScope Class Specification.
 func (ch *Channel) FetchWaveformMeasurement(
 	msrmnt scope.WaveformMeasurement,
 ) (float64, error) {

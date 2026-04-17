@@ -68,6 +68,8 @@ type WaveformMeasurer interface {
 	ConfigureReferenceLevels(low, mid, high float64) error
 }
 
+// WaveformMeasurerChannel provides the per-channel interface required for
+// the IviScopeWaveformMeasurement extension group.
 type WaveformMeasurerChannel interface {
 	FetchWaveformMeasurement(msrmnt WaveformMeasurement) (float64, error)
 	ReadWaveformMeasurement(

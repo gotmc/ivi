@@ -13,6 +13,11 @@ import (
 	"github.com/gotmc/query"
 )
 
+// Measure takes a measurement of the requested type (voltage or current) on
+// this channel.
+//
+// Measure implements the IviDCPwrMeasurement function described in Section
+// 7.3.1 of IVI-4.4: IviDCPwr Class Specification.
 func (ch *Channel) Measure(msrType dcpwr.MeasurementType) (float64, error) {
 	switch msrType {
 	case dcpwr.CurrentMeasurement:

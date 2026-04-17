@@ -11,8 +11,13 @@ package scope
 
 */
 
+// AcquisitionStatus models the defined values returned by
+// [BaseChannel.AcquisitionStatus] as described in Section 21 IviScope
+// Function Parameter Value Definitions of IVI-4.1: IviScope Class
+// Specification.
 type AcquisitionStatus int
 
+// Available AcquisitionStatus values.
 const (
 	AcquisitionComplete AcquisitionStatus = iota
 	AcquisitionInprogress

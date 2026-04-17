@@ -22,6 +22,7 @@ func (d *Driver) OutputChannelCount() int {
 	return len(d.channels)
 }
 
+// Name returns the channel's symbolic name (e.g., "P6V", "Output").
 func (ch *Channel) Name() string {
 	return ch.name
 }

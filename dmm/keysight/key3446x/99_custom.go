@@ -34,8 +34,12 @@ func (d *Driver) SelectedTerminals() (Terminal, error) {
 	return 0, fmt.Errorf("illegal terminal value: %s", term)
 }
 
+// Terminal identifies which pair of input terminals (front or rear) the
+// instrument's front-panel switch has selected. This is a Truevolt-specific
+// capability not covered by the IVI-4.2 DMM class specification.
 type Terminal int
 
+// Available Terminal values.
 const (
 	FrontTerminals Terminal = iota
 	RearTerminals

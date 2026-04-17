@@ -14,10 +14,17 @@ import (
 	"github.com/gotmc/query"
 )
 
+// OutputChannelCount returns the number of output channels the connected
+// instrument exposes (varies by DP800 model).
+//
+// OutputChannelCount is the getter for the read-only IviDCPwrBase Attribute
+// Output Channel Count described in Section 4.2.7 of IVI-4.4: IviDCPwr
+// Class Specification.
 func (d *Driver) OutputChannelCount() int {
 	return len(d.channels)
 }
 
+// Name returns the channel's symbolic name (e.g., "CH1", "Range1").
 func (ch *Channel) Name() string {
 	return ch.name
 }

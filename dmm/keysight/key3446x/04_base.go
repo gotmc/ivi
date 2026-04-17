@@ -342,6 +342,12 @@ func (d *Driver) Abort() error {
 	return d.inst.Command(ctx, "ABOR")
 }
 
+// ConfigureMeasurement configures the measurement function, range, and
+// absolute resolution in a single SCPI CONF: command. It is a convenience
+// for callers that would otherwise set these three attributes separately.
+//
+// ConfigureMeasurement implements the IviDmmBase function described in
+// Section 4.3.2 of IVI-4.2: IviDmm Class Specification.
 func (d *Driver) ConfigureMeasurement(
 	msrFunc dmm.MeasurementFunction,
 	autoRange dmm.AutoRange,
@@ -442,6 +448,11 @@ func (d *Driver) IsUnderRange(value float64) (bool, error) {
 	return value <= -overRangeValue, nil
 }
 
+// ReadMeasurement initiates a measurement, waits for it to complete, and
+// returns the measured value. The maxTime argument is currently ignored.
+//
+// ReadMeasurement implements the IviDmmBase function described in Section
+// 4.3.9 of IVI-4.2: IviDmm Class Specification.
 func (d *Driver) ReadMeasurement(_ time.Duration) (float64, error) {
 	ctx, cancel := d.newContext()
 	defer cancel()
