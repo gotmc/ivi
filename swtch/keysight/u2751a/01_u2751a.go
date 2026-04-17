@@ -53,7 +53,6 @@ type U2751A struct {
 	inst     ivi.Transport
 	channels []Channel
 	timeout  time.Duration
-	model    string
 	ivi.Inherent
 	paths []path
 }
@@ -114,8 +113,7 @@ func New(inst ivi.Transport, opts ...ivi.DriverOption) (U2751A, error) {
 	}
 	inherent := ivi.NewInherent(inst, inherentBase, timeout)
 
-	model, err := inherent.CheckID()
-	if err != nil && !cfg.SkipIDQuery {
+	if _, err := inherent.CheckID(); err != nil && !cfg.SkipIDQuery {
 		return U2751A{}, err
 	}
 
@@ -123,7 +121,6 @@ func New(inst ivi.Transport, opts ...ivi.DriverOption) (U2751A, error) {
 		inst:     inst,
 		channels: channels,
 		timeout:  timeout,
-		model:    model,
 		Inherent: inherent,
 	}
 

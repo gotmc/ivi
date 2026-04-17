@@ -35,7 +35,6 @@ type Driver struct {
 	inst     ivi.Transport
 	channels []Channel
 	timeout  time.Duration
-	model    string
 	ivi.Inherent
 }
 
@@ -159,7 +158,6 @@ func New(inst ivi.Transport, opts ...ivi.DriverOption) (*Driver, error) {
 		inst:     inst,
 		channels: channels,
 		timeout:  timeout,
-		model:    model,
 		Inherent: inherent,
 	}
 

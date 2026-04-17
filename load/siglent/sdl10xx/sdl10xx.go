@@ -28,7 +28,6 @@ const (
 type SDL10xx struct {
 	inst     ivi.Transport
 	channels []Channel
-	model    string
 	ivi.Inherent
 }
 
@@ -71,15 +70,13 @@ func New(inst ivi.Transport, opts ...ivi.DriverOption) (*SDL10xx, error) {
 	}
 	inherent := ivi.NewInherent(inst, inherentBase, timeout)
 
-	model, err := inherent.CheckID()
-	if err != nil && !cfg.SkipIDQuery {
+	if _, err := inherent.CheckID(); err != nil && !cfg.SkipIDQuery {
 		return nil, err
 	}
 
 	driver := SDL10xx{
 		inst:     inst,
 		channels: channels,
-		model:    model,
 		Inherent: inherent,
 	}
 

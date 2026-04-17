@@ -40,7 +40,6 @@ var (
 type Driver struct {
 	inst    ivi.Transport
 	timeout time.Duration
-	model   string
 	ivi.Inherent
 }
 
@@ -93,15 +92,13 @@ func New(inst ivi.Transport, opts ...ivi.DriverOption) (*Driver, error) {
 	}
 	inherent := ivi.NewInherent(inst, inherentBase, timeout)
 
-	model, err := inherent.CheckID()
-	if err != nil && !cfg.SkipIDQuery {
+	if _, err := inherent.CheckID(); err != nil && !cfg.SkipIDQuery {
 		return nil, err
 	}
 
 	driver := Driver{
 		inst:     inst,
 		timeout:  timeout,
-		model:    model,
 		Inherent: inherent,
 	}
 

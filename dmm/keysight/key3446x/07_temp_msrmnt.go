@@ -85,21 +85,17 @@ func (d *Driver) SetTemperatureTransducerType(t dmm.TempTransducerType) error {
 var thermocoupleCapableModels = []string{"34465A", "34470A"}
 
 // requireThermocoupleCapableModel returns [ivi.ErrUnsupportedModel] if the
-// connected instrument's model cannot measure thermocouples. The model is
-// normally cached on the Driver at construction time; when the caller
-// suppressed the ID query with [ivi.WithoutIDQuery] and *IDN? failed, the
-// cache is empty and we fall back to a live query here.
+// connected instrument's model cannot measure thermocouples.
+// [ivi.Inherent.InstrumentModel] reads the cached IDN string when it was
+// populated by New, so this check typically does not issue any SCPI; it falls
+// back to a live *IDN? query when the cache is empty (e.g., the caller
+// passed [ivi.WithoutIDQuery] and construction-time *IDN? failed).
 func (d *Driver) requireThermocoupleCapableModel() error {
-	model := d.model
-	if model == "" {
-		fresh, err := d.InstrumentModel()
-		if err != nil {
-			return fmt.Errorf(
-				"SetTemperatureTransducerType: cannot determine model: %w", err,
-			)
-		}
-
-		model = strings.TrimSpace(fresh)
+	model, err := d.InstrumentModel()
+	if err != nil {
+		return fmt.Errorf(
+			"SetTemperatureTransducerType: cannot determine model: %w", err,
+		)
 	}
 
 	if !slices.Contains(thermocoupleCapableModels, model) {
