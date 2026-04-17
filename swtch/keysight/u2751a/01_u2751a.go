@@ -64,7 +64,7 @@ type path []string
 // [ivi.WithoutIDQuery] to skip that check. Use [ivi.WithReset] to reset on
 // creation, [ivi.WithStandalone] to configure standalone voltage ratings, and
 // [ivi.WithTimeout] to override the default I/O timeout.
-func New(inst ivi.Transport, opts ...ivi.DriverOption) (U2751A, error) {
+func New(inst ivi.Transport, opts ...ivi.DriverOption) (*U2751A, error) {
 	cfg := ivi.ApplyOptions(opts)
 
 	timeout := cfg.Timeout
@@ -114,7 +114,7 @@ func New(inst ivi.Transport, opts ...ivi.DriverOption) (U2751A, error) {
 	inherent := ivi.NewInherent(inst, inherentBase, timeout)
 
 	if _, err := inherent.CheckID(); err != nil && !cfg.SkipIDQuery {
-		return U2751A{}, err
+		return nil, err
 	}
 
 	driver := U2751A{
@@ -126,11 +126,11 @@ func New(inst ivi.Transport, opts ...ivi.DriverOption) (U2751A, error) {
 
 	if cfg.Reset {
 		if err := driver.Reset(); err != nil {
-			return driver, err
+			return &driver, err
 		}
 	}
 
-	return driver, nil
+	return &driver, nil
 }
 
 // Channel represents a repeated capability of an output channel for the
