@@ -123,12 +123,6 @@ const (
 )
 ```
 
-## Installation
-
-```bash
-$ go get github.com/gotmc/ivi
-```
-
 ## Usage
 
 The [ivi][] package requires receiving an Instrument interface. The following

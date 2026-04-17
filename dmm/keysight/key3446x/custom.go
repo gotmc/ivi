@@ -12,7 +12,7 @@ import (
 	"github.com/gotmc/query"
 )
 
-// SelectTerminals queries if the front or rear terminals are selected on the
+// SelectedTerminals queries if the front or rear terminals are selected on the
 // 34461A front panel Front/Rear switch. This switch is not programmable; this
 // query reports the position of the switch, but cannot change it.
 func (d *Driver) SelectedTerminals() (Terminal, error) {
