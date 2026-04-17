@@ -6,50 +6,16 @@
 package e36xx
 
 import (
-	"context"
 	"errors"
-	"fmt"
 	"strings"
 	"testing"
 
 	"github.com/gotmc/ivi"
 	"github.com/gotmc/ivi/dcpwr"
+	"github.com/gotmc/ivi/internal/ivitest"
 )
 
-// mockInst captures commands and returns configurable query responses.
-type mockInst struct {
-	commandsSent []string
-	queryResp    string
-	shouldError  bool
-}
-
-func (m *mockInst) ReadBinary(_ context.Context, p []byte) (int, error) {
-	return 0, nil
-}
-
-func (m *mockInst) WriteBinary(_ context.Context, p []byte) (int, error) {
-	return len(p), nil
-}
-
-func (m *mockInst) Close() error { return nil }
-
-func (m *mockInst) Command(_ context.Context, format string, a ...any) error {
-	if m.shouldError {
-		return errors.New("mock command error")
-	}
-	cmd := fmt.Sprintf(format, a...)
-	m.commandsSent = append(m.commandsSent, cmd)
-	return nil
-}
-
-func (m *mockInst) Query(_ context.Context, s string) (string, error) {
-	if m.shouldError {
-		return "", errors.New("mock query error")
-	}
-	return m.queryResp, nil
-}
-
-func newTestDriver(mock *mockInst) *Driver {
+func newTestDriver(mock *ivitest.Mock) *Driver {
 	channels := []Channel{
 		{inst: mock, name: "P6V"},
 		{inst: mock, name: "P25V"},
@@ -64,14 +30,14 @@ func newTestDriver(mock *mockInst) *Driver {
 }
 
 func TestDriver_OutputChannelCount(t *testing.T) {
-	d := newTestDriver(&mockInst{})
+	d := newTestDriver(&ivitest.Mock{})
 	if got := d.OutputChannelCount(); got != 3 {
 		t.Errorf("OutputChannelCount() = %d, want 3", got)
 	}
 }
 
 func TestChannel_Name(t *testing.T) {
-	d := newTestDriver(&mockInst{})
+	d := newTestDriver(&ivitest.Mock{})
 	names := []string{"P6V", "P25V", "N25V"}
 	for i, want := range names {
 		ch, err := d.Channel(i)
@@ -96,21 +62,21 @@ func TestChannel_SetOutputEnabled(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			mock := &mockInst{}
+			mock := &ivitest.Mock{}
 			ch := Channel{inst: mock, name: "P6V"}
 			err := ch.SetOutputEnabled(tt.enabled)
 			if err != nil {
 				t.Errorf("SetOutputEnabled() error: %v", err)
 			}
-			if len(mock.commandsSent) != 1 || mock.commandsSent[0] != tt.wantCmd {
-				t.Errorf("sent %v, want [%q]", mock.commandsSent, tt.wantCmd)
+			if len(mock.CommandsSent) != 1 || mock.CommandsSent[0] != tt.wantCmd {
+				t.Errorf("sent %v, want [%q]", mock.CommandsSent, tt.wantCmd)
 			}
 		})
 	}
 }
 
 func TestChannel_CurrentLimitBehavior(t *testing.T) {
-	mock := &mockInst{}
+	mock := &ivitest.Mock{}
 	ch := Channel{inst: mock, name: "P6V"}
 	got, err := ch.CurrentLimitBehavior()
 	if err != nil {
@@ -133,7 +99,7 @@ func TestChannel_SetCurrentLimitBehavior(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			mock := &mockInst{}
+			mock := &ivitest.Mock{}
 			ch := Channel{inst: mock, name: "P6V"}
 			err := ch.SetCurrentLimitBehavior(tt.behavior)
 			if tt.wantErr {
@@ -153,31 +119,31 @@ func TestChannel_SetCurrentLimitBehavior(t *testing.T) {
 }
 
 func TestChannel_SetVoltageLevel(t *testing.T) {
-	mock := &mockInst{}
+	mock := &ivitest.Mock{}
 	ch := Channel{inst: mock, name: "P6V"}
 	err := ch.SetVoltageLevel(5.0)
 	if err != nil {
 		t.Errorf("SetVoltageLevel() error: %v", err)
 	}
-	if len(mock.commandsSent) != 1 || !strings.Contains(mock.commandsSent[0], "volt") {
-		t.Errorf("sent %v, want volt command", mock.commandsSent)
+	if len(mock.CommandsSent) != 1 || !strings.Contains(mock.CommandsSent[0], "volt") {
+		t.Errorf("sent %v, want volt command", mock.CommandsSent)
 	}
 }
 
 func TestChannel_SetCurrentLimit(t *testing.T) {
-	mock := &mockInst{}
+	mock := &ivitest.Mock{}
 	ch := Channel{inst: mock, name: "P6V"}
 	err := ch.SetCurrentLimit(0.5)
 	if err != nil {
 		t.Errorf("SetCurrentLimit() error: %v", err)
 	}
-	if len(mock.commandsSent) != 1 || !strings.Contains(mock.commandsSent[0], "CURR") {
-		t.Errorf("sent %v, want CURR command", mock.commandsSent)
+	if len(mock.CommandsSent) != 1 || !strings.Contains(mock.CommandsSent[0], "CURR") {
+		t.Errorf("sent %v, want CURR command", mock.CommandsSent)
 	}
 }
 
 func TestChannel_OVP_NotSupported(t *testing.T) {
-	mock := &mockInst{}
+	mock := &ivitest.Mock{}
 	ch := Channel{inst: mock, name: "P6V"}
 
 	// OVPEnabled should return false with no error
@@ -215,7 +181,7 @@ func TestChannel_OVP_NotSupported(t *testing.T) {
 }
 
 func TestChannel_NotImplemented_WrapsCorrectError(t *testing.T) {
-	mock := &mockInst{}
+	mock := &ivitest.Mock{}
 	ch := Channel{inst: mock, name: "P6V"}
 
 	// Verify unimplemented methods return errors.Is-compatible ivi.ErrNotImplemented
@@ -246,25 +212,25 @@ func TestChannel_NotImplemented_WrapsCorrectError(t *testing.T) {
 }
 
 func TestChannel_DisableOutput(t *testing.T) {
-	mock := &mockInst{}
+	mock := &ivitest.Mock{}
 	ch := Channel{inst: mock, name: "P6V"}
 	err := ch.DisableOutput()
 	if err != nil {
 		t.Errorf("DisableOutput() error: %v", err)
 	}
-	if len(mock.commandsSent) != 1 || mock.commandsSent[0] != "OUTP OFF" {
-		t.Errorf("sent %v, want [\"OUTP OFF\"]", mock.commandsSent)
+	if len(mock.CommandsSent) != 1 || mock.CommandsSent[0] != "OUTP OFF" {
+		t.Errorf("sent %v, want [\"OUTP OFF\"]", mock.CommandsSent)
 	}
 }
 
 func TestChannel_EnableOutput(t *testing.T) {
-	mock := &mockInst{}
+	mock := &ivitest.Mock{}
 	ch := Channel{inst: mock, name: "P6V"}
 	err := ch.EnableOutput()
 	if err != nil {
 		t.Errorf("EnableOutput() error: %v", err)
 	}
-	if len(mock.commandsSent) != 1 || mock.commandsSent[0] != "OUTP ON" {
-		t.Errorf("sent %v, want [\"OUTP ON\"]", mock.commandsSent)
+	if len(mock.CommandsSent) != 1 || mock.CommandsSent[0] != "OUTP ON" {
+		t.Errorf("sent %v, want [\"OUTP ON\"]", mock.CommandsSent)
 	}
 }

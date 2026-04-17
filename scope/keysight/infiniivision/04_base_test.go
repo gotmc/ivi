@@ -6,51 +6,17 @@
 package infiniivision
 
 import (
-	"context"
 	"errors"
-	"fmt"
 	"strings"
 	"testing"
 	"time"
 
 	"github.com/gotmc/ivi"
+	"github.com/gotmc/ivi/internal/ivitest"
 	"github.com/gotmc/ivi/scope"
 )
 
-// mockInst captures commands and returns configurable query responses.
-type mockInst struct {
-	commandsSent []string
-	queryResp    string
-	shouldError  bool
-}
-
-func (m *mockInst) ReadBinary(_ context.Context, p []byte) (int, error) {
-	return 0, nil
-}
-
-func (m *mockInst) WriteBinary(_ context.Context, p []byte) (int, error) {
-	return len(p), nil
-}
-
-func (m *mockInst) Close() error { return nil }
-
-func (m *mockInst) Command(_ context.Context, format string, a ...any) error {
-	if m.shouldError {
-		return errors.New("mock command error")
-	}
-	cmd := fmt.Sprintf(format, a...)
-	m.commandsSent = append(m.commandsSent, cmd)
-	return nil
-}
-
-func (m *mockInst) Query(_ context.Context, s string) (string, error) {
-	if m.shouldError {
-		return "", errors.New("mock query error")
-	}
-	return m.queryResp, nil
-}
-
-func newTestDriver(mock *mockInst) *Driver {
+func newTestDriver(mock *ivitest.Mock) *Driver {
 	channels := []Channel{
 		{name: "CHAN1", num: 1, inst: mock},
 		{name: "CHAN2", num: 2, inst: mock},
@@ -66,14 +32,14 @@ func newTestDriver(mock *mockInst) *Driver {
 }
 
 func TestDriver_ChannelCount(t *testing.T) {
-	d := newTestDriver(&mockInst{})
+	d := newTestDriver(&ivitest.Mock{})
 	if got := d.ChannelCount(); got != 4 {
 		t.Errorf("ChannelCount() = %d, want 4", got)
 	}
 }
 
 func TestChannel_Name(t *testing.T) {
-	d := newTestDriver(&mockInst{})
+	d := newTestDriver(&ivitest.Mock{})
 	want := []string{"CH1", "CH2", "CH3", "CH4"}
 	for i, w := range want {
 		ch, err := d.Channel(i)
@@ -102,7 +68,7 @@ func TestDriver_AcquisitionType(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			mock := &mockInst{queryResp: tt.resp}
+			mock := &ivitest.Mock{QueryResp: tt.resp}
 			d := newTestDriver(mock)
 
 			got, err := d.AcquisitionType()
@@ -138,7 +104,7 @@ func TestDriver_SetAcquisitionType(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			mock := &mockInst{}
+			mock := &ivitest.Mock{}
 			d := newTestDriver(mock)
 
 			err := d.SetAcquisitionType(tt.acType)
@@ -151,8 +117,8 @@ func TestDriver_SetAcquisitionType(t *testing.T) {
 			if err != nil {
 				t.Errorf("unexpected error: %v", err)
 			}
-			if len(mock.commandsSent) != 1 || mock.commandsSent[0] != tt.wantCmd {
-				t.Errorf("sent %v, want [%q]", mock.commandsSent, tt.wantCmd)
+			if len(mock.CommandsSent) != 1 || mock.CommandsSent[0] != tt.wantCmd {
+				t.Errorf("sent %v, want [%q]", mock.CommandsSent, tt.wantCmd)
 			}
 		})
 	}
@@ -175,7 +141,7 @@ func TestDriver_TriggerType(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			mock := &mockInst{queryResp: tt.resp}
+			mock := &ivitest.Mock{QueryResp: tt.resp}
 			d := newTestDriver(mock)
 
 			got, err := d.TriggerType()
@@ -210,7 +176,7 @@ func TestDriver_SetTriggerType(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			mock := &mockInst{}
+			mock := &ivitest.Mock{}
 			d := newTestDriver(mock)
 
 			err := d.SetTriggerType(tt.trig)
@@ -223,22 +189,22 @@ func TestDriver_SetTriggerType(t *testing.T) {
 			if err != nil {
 				t.Errorf("unexpected error: %v", err)
 			}
-			if len(mock.commandsSent) != 1 || mock.commandsSent[0] != tt.wantCmd {
-				t.Errorf("sent %v, want [%q]", mock.commandsSent, tt.wantCmd)
+			if len(mock.CommandsSent) != 1 || mock.CommandsSent[0] != tt.wantCmd {
+				t.Errorf("sent %v, want [%q]", mock.CommandsSent, tt.wantCmd)
 			}
 		})
 	}
 }
 
 func TestDriver_SetTriggerLevel(t *testing.T) {
-	mock := &mockInst{}
+	mock := &ivitest.Mock{}
 	d := newTestDriver(mock)
 	err := d.SetTriggerLevel(1.5)
 	if err != nil {
 		t.Errorf("SetTriggerLevel() error: %v", err)
 	}
-	if len(mock.commandsSent) != 1 || !strings.HasPrefix(mock.commandsSent[0], ":TRIG:EDGE:LEV") {
-		t.Errorf("sent %v, want :TRIG:EDGE:LEV command", mock.commandsSent)
+	if len(mock.CommandsSent) != 1 || !strings.HasPrefix(mock.CommandsSent[0], ":TRIG:EDGE:LEV") {
+		t.Errorf("sent %v, want :TRIG:EDGE:LEV command", mock.CommandsSent)
 	}
 }
 
@@ -257,7 +223,7 @@ func TestDriver_SetTriggerHoldoff(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			mock := &mockInst{}
+			mock := &ivitest.Mock{}
 			d := newTestDriver(mock)
 			err := d.SetTriggerHoldoff(tt.holdoff)
 			if tt.wantErr {
@@ -285,14 +251,14 @@ func TestChannel_SetChannelEnabled(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			mock := &mockInst{}
+			mock := &ivitest.Mock{}
 			ch := Channel{inst: mock, name: "CHAN1", num: 1}
 			err := ch.SetChannelEnabled(tt.enabled)
 			if err != nil {
 				t.Errorf("SetChannelEnabled() error: %v", err)
 			}
-			if len(mock.commandsSent) != 1 || mock.commandsSent[0] != tt.wantCmd {
-				t.Errorf("sent %v, want [%q]", mock.commandsSent, tt.wantCmd)
+			if len(mock.CommandsSent) != 1 || mock.CommandsSent[0] != tt.wantCmd {
+				t.Errorf("sent %v, want [%q]", mock.CommandsSent, tt.wantCmd)
 			}
 		})
 	}
@@ -312,7 +278,7 @@ func TestChannel_SetInputImpedance(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			mock := &mockInst{}
+			mock := &ivitest.Mock{}
 			ch := Channel{inst: mock, name: "CHAN1", num: 1}
 			err := ch.SetInputImpedance(tt.impedance)
 			if tt.wantErr {
@@ -324,8 +290,8 @@ func TestChannel_SetInputImpedance(t *testing.T) {
 			if err != nil {
 				t.Errorf("unexpected error: %v", err)
 			}
-			if len(mock.commandsSent) != 1 || mock.commandsSent[0] != tt.wantCmd {
-				t.Errorf("sent %v, want [%q]", mock.commandsSent, tt.wantCmd)
+			if len(mock.CommandsSent) != 1 || mock.CommandsSent[0] != tt.wantCmd {
+				t.Errorf("sent %v, want [%q]", mock.CommandsSent, tt.wantCmd)
 			}
 		})
 	}
@@ -346,7 +312,7 @@ func TestChannel_SetVerticalRange(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			mock := &mockInst{}
+			mock := &ivitest.Mock{}
 			ch := Channel{inst: mock, name: "CHAN1", num: 1}
 			err := ch.SetVerticalRange(tt.rng)
 			if tt.wantErr {
@@ -379,7 +345,7 @@ func TestChannel_SetProbeAttenuation(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			mock := &mockInst{}
+			mock := &ivitest.Mock{}
 			ch := Channel{inst: mock, name: "CHAN1", num: 1}
 			err := ch.SetProbeAttenuation(tt.atten)
 			if tt.wantErr {
@@ -396,7 +362,7 @@ func TestChannel_SetProbeAttenuation(t *testing.T) {
 }
 
 func TestChannel_SetProbeAttenuationAuto(t *testing.T) {
-	mock := &mockInst{}
+	mock := &ivitest.Mock{}
 	ch := Channel{inst: mock, name: "CHAN1", num: 1}
 
 	// false should succeed
@@ -426,7 +392,7 @@ func TestChannel_SetVerticalCoupling(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			mock := &mockInst{}
+			mock := &ivitest.Mock{}
 			ch := Channel{inst: mock, name: "CHAN1", num: 1}
 			err := ch.SetVerticalCoupling(tt.coupling)
 			if tt.wantErr {
@@ -438,8 +404,8 @@ func TestChannel_SetVerticalCoupling(t *testing.T) {
 			if err != nil {
 				t.Errorf("unexpected error: %v", err)
 			}
-			if len(mock.commandsSent) != 1 || mock.commandsSent[0] != tt.wantCmd {
-				t.Errorf("sent %v, want [%q]", mock.commandsSent, tt.wantCmd)
+			if len(mock.CommandsSent) != 1 || mock.CommandsSent[0] != tt.wantCmd {
+				t.Errorf("sent %v, want [%q]", mock.CommandsSent, tt.wantCmd)
 			}
 		})
 	}
@@ -507,7 +473,7 @@ func TestDurationFromSeconds(t *testing.T) {
 }
 
 func TestDriver_NotImplemented(t *testing.T) {
-	mock := &mockInst{}
+	mock := &ivitest.Mock{}
 	d := newTestDriver(mock)
 
 	_, err := d.AcquisitionStatus()
@@ -537,7 +503,7 @@ func TestDriver_NotImplemented(t *testing.T) {
 }
 
 func TestDriver_SetAcquisitionStartTime_NotSupported(t *testing.T) {
-	mock := &mockInst{}
+	mock := &ivitest.Mock{}
 	d := newTestDriver(mock)
 	err := d.SetAcquisitionStartTime(100 * time.Microsecond)
 	if !errors.Is(err, ivi.ErrFunctionNotSupported) {
@@ -546,43 +512,43 @@ func TestDriver_SetAcquisitionStartTime_NotSupported(t *testing.T) {
 }
 
 func TestChannel_SetVerticalOffset(t *testing.T) {
-	mock := &mockInst{}
+	mock := &ivitest.Mock{}
 	ch := Channel{inst: mock, name: "CHAN1", num: 1}
 	err := ch.SetVerticalOffset(2.5)
 	if err != nil {
 		t.Errorf("SetVerticalOffset() error: %v", err)
 	}
-	if len(mock.commandsSent) != 1 || !strings.HasPrefix(mock.commandsSent[0], ":CHAN1:OFFS") {
-		t.Errorf("sent %v, want :CHAN1:OFFS command", mock.commandsSent)
+	if len(mock.CommandsSent) != 1 || !strings.HasPrefix(mock.CommandsSent[0], ":CHAN1:OFFS") {
+		t.Errorf("sent %v, want :CHAN1:OFFS command", mock.CommandsSent)
 	}
 }
 
 func TestDriver_ConfigureTrigger(t *testing.T) {
-	mock := &mockInst{}
+	mock := &ivitest.Mock{}
 	d := newTestDriver(mock)
 	err := d.ConfigureTrigger(scope.EdgeTrigger, 100*time.Microsecond)
 	if err != nil {
 		t.Errorf("ConfigureTrigger() error: %v", err)
 	}
-	if len(mock.commandsSent) != 2 {
-		t.Fatalf("expected 2 commands, got %d", len(mock.commandsSent))
+	if len(mock.CommandsSent) != 2 {
+		t.Fatalf("expected 2 commands, got %d", len(mock.CommandsSent))
 	}
-	if mock.commandsSent[0] != ":TRIG:MODE EDGE" {
-		t.Errorf("first command = %q, want \":TRIG:MODE EDGE\"", mock.commandsSent[0])
+	if mock.CommandsSent[0] != ":TRIG:MODE EDGE" {
+		t.Errorf("first command = %q, want \":TRIG:MODE EDGE\"", mock.CommandsSent[0])
 	}
-	if !strings.HasPrefix(mock.commandsSent[1], ":TRIG:HOLD") {
-		t.Errorf("second command = %q, want :TRIG:HOLD command", mock.commandsSent[1])
+	if !strings.HasPrefix(mock.CommandsSent[1], ":TRIG:HOLD") {
+		t.Errorf("second command = %q, want :TRIG:HOLD command", mock.CommandsSent[1])
 	}
 }
 
 func TestDriver_SetAcquisitionTimePerRecord(t *testing.T) {
-	mock := &mockInst{}
+	mock := &ivitest.Mock{}
 	d := newTestDriver(mock)
 	err := d.SetAcquisitionTimePerRecord(1 * time.Millisecond)
 	if err != nil {
 		t.Errorf("SetAcquisitionTimePerRecord() error: %v", err)
 	}
-	if len(mock.commandsSent) != 1 || !strings.HasPrefix(mock.commandsSent[0], ":TIM:RANG") {
-		t.Errorf("sent %v, want :TIM:RANG command", mock.commandsSent)
+	if len(mock.CommandsSent) != 1 || !strings.HasPrefix(mock.CommandsSent[0], ":TIM:RANG") {
+		t.Errorf("sent %v, want :TIM:RANG command", mock.CommandsSent)
 	}
 }

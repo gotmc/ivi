@@ -6,13 +6,11 @@
 package key3446x
 
 import (
-	"context"
-	"errors"
-	"fmt"
 	"testing"
 
 	"github.com/gotmc/ivi"
 	"github.com/gotmc/ivi/dmm"
+	"github.com/gotmc/ivi/internal/ivitest"
 )
 
 func TestCreateConfigureVoltageACCommand(t *testing.T) {
@@ -173,44 +171,8 @@ func TestDetermineVoltageRange(t *testing.T) {
 	}
 }
 
-// mockInst implements the ivi.Transport interface for unit testing.
-type mockInst struct {
-	commandsSent []string
-	queryResp    string
-	shouldError  bool
-}
-
-func (m *mockInst) ReadBinary(_ context.Context, p []byte) (int, error) {
-	return 0, nil
-}
-
-func (m *mockInst) WriteBinary(_ context.Context, p []byte) (int, error) {
-	return len(p), nil
-}
-
-func (m *mockInst) Close() error { return nil }
-
-func (m *mockInst) Command(_ context.Context, format string, a ...any) error {
-	if m.shouldError {
-		return errors.New("mock command error")
-	}
-
-	cmd := fmt.Sprintf(format, a...)
-	m.commandsSent = append(m.commandsSent, cmd)
-
-	return nil
-}
-
-func (m *mockInst) Query(_ context.Context, _ string) (string, error) {
-	if m.shouldError {
-		return "", errors.New("mock query error")
-	}
-
-	return m.queryResp, nil
-}
-
 // newTestDriver creates a Driver with the given mock instrument for testing.
-func newTestDriver(t *testing.T, mock *mockInst) *Driver {
+func newTestDriver(t *testing.T, mock *ivitest.Mock) *Driver {
 	t.Helper()
 
 	d, err := New(mock, ivi.WithoutIDQuery())
@@ -245,9 +207,9 @@ func TestMeasurementFunction(t *testing.T) {
 	}
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
-			mock := &mockInst{
-				queryResp:   tc.queryResp,
-				shouldError: tc.shouldError,
+			mock := &ivitest.Mock{
+				QueryResp:   tc.queryResp,
+				ShouldError: tc.shouldError,
 			}
 			d := newTestDriver(t, mock)
 
@@ -289,7 +251,7 @@ func TestSetMeasurementFunction(t *testing.T) {
 	}
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
-			mock := &mockInst{shouldError: tc.shouldError}
+			mock := &ivitest.Mock{ShouldError: tc.shouldError}
 			d := newTestDriver(t, mock)
 
 			err := d.SetMeasurementFunction(tc.msrFunc)
@@ -303,12 +265,12 @@ func TestSetMeasurementFunction(t *testing.T) {
 			}
 
 			if !tc.expectErr {
-				if len(mock.commandsSent) != 1 {
-					t.Fatalf("expected 1 command sent, got %d", len(mock.commandsSent))
+				if len(mock.CommandsSent) != 1 {
+					t.Fatalf("expected 1 command sent, got %d", len(mock.CommandsSent))
 				}
 
-				if mock.commandsSent[0] != tc.expectedCmd {
-					t.Errorf("wanted command %q, got %q", tc.expectedCmd, mock.commandsSent[0])
+				if mock.CommandsSent[0] != tc.expectedCmd {
+					t.Errorf("wanted command %q, got %q", tc.expectedCmd, mock.CommandsSent[0])
 				}
 			}
 		})
@@ -331,9 +293,9 @@ func TestTriggerSource(t *testing.T) {
 	}
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
-			mock := &mockInst{
-				queryResp:   tc.queryResp,
-				shouldError: tc.shouldError,
+			mock := &ivitest.Mock{
+				QueryResp:   tc.queryResp,
+				ShouldError: tc.shouldError,
 			}
 			d := newTestDriver(t, mock)
 
@@ -369,7 +331,7 @@ func TestSetTriggerSource(t *testing.T) {
 	}
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
-			mock := &mockInst{shouldError: tc.shouldError}
+			mock := &ivitest.Mock{ShouldError: tc.shouldError}
 			d := newTestDriver(t, mock)
 
 			err := d.SetTriggerSource(tc.src)
@@ -383,12 +345,12 @@ func TestSetTriggerSource(t *testing.T) {
 			}
 
 			if !tc.expectErr {
-				if len(mock.commandsSent) != 1 {
-					t.Fatalf("expected 1 command sent, got %d", len(mock.commandsSent))
+				if len(mock.CommandsSent) != 1 {
+					t.Fatalf("expected 1 command sent, got %d", len(mock.CommandsSent))
 				}
 
-				if mock.commandsSent[0] != tc.expectedCmd {
-					t.Errorf("wanted command %q, got %q", tc.expectedCmd, mock.commandsSent[0])
+				if mock.CommandsSent[0] != tc.expectedCmd {
+					t.Errorf("wanted command %q, got %q", tc.expectedCmd, mock.CommandsSent[0])
 				}
 			}
 		})
@@ -397,7 +359,7 @@ func TestSetTriggerSource(t *testing.T) {
 
 func TestAbort(t *testing.T) {
 	t.Run("success", func(t *testing.T) {
-		mock := &mockInst{}
+		mock := &ivitest.Mock{}
 		d := newTestDriver(t, mock)
 
 		err := d.Abort()
@@ -405,17 +367,17 @@ func TestAbort(t *testing.T) {
 			t.Fatalf("unexpected error: %v", err)
 		}
 
-		if len(mock.commandsSent) != 1 {
-			t.Fatalf("expected 1 command sent, got %d", len(mock.commandsSent))
+		if len(mock.CommandsSent) != 1 {
+			t.Fatalf("expected 1 command sent, got %d", len(mock.CommandsSent))
 		}
 
-		if mock.commandsSent[0] != "ABOR" {
-			t.Errorf("wanted command %q, got %q", "ABOR", mock.commandsSent[0])
+		if mock.CommandsSent[0] != "ABOR" {
+			t.Errorf("wanted command %q, got %q", "ABOR", mock.CommandsSent[0])
 		}
 	})
 
 	t.Run("error", func(t *testing.T) {
-		mock := &mockInst{shouldError: true}
+		mock := &ivitest.Mock{ShouldError: true}
 		d := newTestDriver(t, mock)
 
 		err := d.Abort()
@@ -427,7 +389,7 @@ func TestAbort(t *testing.T) {
 
 func TestInitiateMeasurement(t *testing.T) {
 	t.Run("success", func(t *testing.T) {
-		mock := &mockInst{}
+		mock := &ivitest.Mock{}
 		d := newTestDriver(t, mock)
 
 		err := d.InitiateMeasurement()
@@ -435,17 +397,17 @@ func TestInitiateMeasurement(t *testing.T) {
 			t.Fatalf("unexpected error: %v", err)
 		}
 
-		if len(mock.commandsSent) != 1 {
-			t.Fatalf("expected 1 command sent, got %d", len(mock.commandsSent))
+		if len(mock.CommandsSent) != 1 {
+			t.Fatalf("expected 1 command sent, got %d", len(mock.CommandsSent))
 		}
 
-		if mock.commandsSent[0] != "init" {
-			t.Errorf("wanted command %q, got %q", "init", mock.commandsSent[0])
+		if mock.CommandsSent[0] != "init" {
+			t.Errorf("wanted command %q, got %q", "init", mock.CommandsSent[0])
 		}
 	})
 
 	t.Run("error", func(t *testing.T) {
-		mock := &mockInst{shouldError: true}
+		mock := &ivitest.Mock{ShouldError: true}
 		d := newTestDriver(t, mock)
 
 		err := d.InitiateMeasurement()

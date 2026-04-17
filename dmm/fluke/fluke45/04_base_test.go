@@ -6,48 +6,14 @@
 package fluke45
 
 import (
-	"context"
 	"errors"
-	"fmt"
 	"testing"
 	"time"
 
 	"github.com/gotmc/ivi"
 	"github.com/gotmc/ivi/dmm"
+	"github.com/gotmc/ivi/internal/ivitest"
 )
-
-// mockInst captures commands and returns configurable query responses.
-type mockInst struct {
-	commandsSent []string
-	queryResp    string
-	shouldError  bool
-}
-
-func (m *mockInst) ReadBinary(_ context.Context, p []byte) (int, error) {
-	return 0, nil
-}
-
-func (m *mockInst) WriteBinary(_ context.Context, p []byte) (int, error) {
-	return len(p), nil
-}
-
-func (m *mockInst) Close() error { return nil }
-
-func (m *mockInst) Command(_ context.Context, format string, a ...any) error {
-	if m.shouldError {
-		return errors.New("mock command error")
-	}
-	cmd := fmt.Sprintf(format, a...)
-	m.commandsSent = append(m.commandsSent, cmd)
-	return nil
-}
-
-func (m *mockInst) Query(_ context.Context, s string) (string, error) {
-	if m.shouldError {
-		return "", errors.New("mock query error")
-	}
-	return m.queryResp, nil
-}
 
 func TestDetermineRangeCommand(t *testing.T) {
 	tests := []struct {
@@ -132,7 +98,7 @@ func TestDriver_MeasurementFunction(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			mock := &mockInst{queryResp: tt.resp}
+			mock := &ivitest.Mock{QueryResp: tt.resp}
 			d, err := New(mock, ivi.WithoutIDQuery())
 			if err != nil {
 				t.Fatalf("New() error: %v", err)
@@ -170,7 +136,7 @@ func TestDriver_SetMeasurementFunction(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			mock := &mockInst{}
+			mock := &ivitest.Mock{}
 			d, err := New(mock, ivi.WithoutIDQuery())
 			if err != nil {
 				t.Fatalf("New() error: %v", err)
@@ -186,8 +152,8 @@ func TestDriver_SetMeasurementFunction(t *testing.T) {
 			if err != nil {
 				t.Errorf("unexpected error: %v", err)
 			}
-			if len(mock.commandsSent) != 1 || mock.commandsSent[0] != tt.wantCmd {
-				t.Errorf("sent %v, want [%q]", mock.commandsSent, tt.wantCmd)
+			if len(mock.CommandsSent) != 1 || mock.CommandsSent[0] != tt.wantCmd {
+				t.Errorf("sent %v, want [%q]", mock.CommandsSent, tt.wantCmd)
 			}
 		})
 	}
@@ -207,7 +173,7 @@ func TestDriver_TriggerSource(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			mock := &mockInst{queryResp: tt.resp}
+			mock := &ivitest.Mock{QueryResp: tt.resp}
 			d, err := New(mock, ivi.WithoutIDQuery())
 			if err != nil {
 				t.Fatalf("New() error: %v", err)
@@ -245,7 +211,7 @@ func TestDriver_SetTriggerSource(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			mock := &mockInst{}
+			mock := &ivitest.Mock{}
 			d, err := New(mock, ivi.WithoutIDQuery())
 			if err != nil {
 				t.Fatalf("New() error: %v", err)
@@ -261,15 +227,15 @@ func TestDriver_SetTriggerSource(t *testing.T) {
 			if err != nil {
 				t.Errorf("unexpected error: %v", err)
 			}
-			if len(mock.commandsSent) != 1 || mock.commandsSent[0] != tt.wantCmd {
-				t.Errorf("sent %v, want [%q]", mock.commandsSent, tt.wantCmd)
+			if len(mock.CommandsSent) != 1 || mock.CommandsSent[0] != tt.wantCmd {
+				t.Errorf("sent %v, want [%q]", mock.CommandsSent, tt.wantCmd)
 			}
 		})
 	}
 }
 
 func TestDriver_ResolutionAbsolute_NotSupported(t *testing.T) {
-	mock := &mockInst{}
+	mock := &ivitest.Mock{}
 	d, err := New(mock, ivi.WithoutIDQuery())
 	if err != nil {
 		t.Fatalf("New() error: %v", err)
@@ -287,7 +253,7 @@ func TestDriver_ResolutionAbsolute_NotSupported(t *testing.T) {
 }
 
 func TestDriver_Abort_NotSupported(t *testing.T) {
-	mock := &mockInst{}
+	mock := &ivitest.Mock{}
 	d, err := New(mock, ivi.WithoutIDQuery())
 	if err != nil {
 		t.Fatalf("New() error: %v", err)
@@ -300,7 +266,7 @@ func TestDriver_Abort_NotSupported(t *testing.T) {
 }
 
 func TestDriver_InitiateMeasurement(t *testing.T) {
-	mock := &mockInst{}
+	mock := &ivitest.Mock{}
 	d, err := New(mock, ivi.WithoutIDQuery())
 	if err != nil {
 		t.Fatalf("New() error: %v", err)
@@ -310,13 +276,13 @@ func TestDriver_InitiateMeasurement(t *testing.T) {
 	if err != nil {
 		t.Errorf("InitiateMeasurement() error: %v", err)
 	}
-	if len(mock.commandsSent) != 1 || mock.commandsSent[0] != "*TRG" {
-		t.Errorf("sent %v, want [\"*TRG\"]", mock.commandsSent)
+	if len(mock.CommandsSent) != 1 || mock.CommandsSent[0] != "*TRG" {
+		t.Errorf("sent %v, want [\"*TRG\"]", mock.CommandsSent)
 	}
 }
 
 func TestDriver_IsOutOfRange_NotSupported(t *testing.T) {
-	mock := &mockInst{}
+	mock := &ivitest.Mock{}
 	d, err := New(mock, ivi.WithoutIDQuery())
 	if err != nil {
 		t.Fatalf("New() error: %v", err)
@@ -354,7 +320,7 @@ func TestDriver_TriggerDelay(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			mock := &mockInst{queryResp: tt.resp}
+			mock := &ivitest.Mock{QueryResp: tt.resp}
 			d, err := New(mock, ivi.WithoutIDQuery())
 			if err != nil {
 				t.Fatalf("New() error: %v", err)
@@ -381,7 +347,7 @@ func TestDriver_TriggerDelay(t *testing.T) {
 }
 
 func TestDriver_FetchMeasurement(t *testing.T) {
-	mock := &mockInst{queryResp: "1.234"}
+	mock := &ivitest.Mock{QueryResp: "1.234"}
 	d, err := New(mock, ivi.WithoutIDQuery())
 	if err != nil {
 		t.Fatalf("New() error: %v", err)
@@ -397,7 +363,7 @@ func TestDriver_FetchMeasurement(t *testing.T) {
 }
 
 func TestDriver_ReadMeasurement(t *testing.T) {
-	mock := &mockInst{queryResp: "5.678"}
+	mock := &ivitest.Mock{QueryResp: "5.678"}
 	d, err := New(mock, ivi.WithoutIDQuery())
 	if err != nil {
 		t.Fatalf("New() error: %v", err)

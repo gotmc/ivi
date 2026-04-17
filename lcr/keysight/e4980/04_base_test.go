@@ -6,51 +6,17 @@
 package e4980
 
 import (
-	"context"
-	"errors"
-	"fmt"
 	"strings"
 	"testing"
 	"time"
 
 	"github.com/gotmc/ivi"
+	"github.com/gotmc/ivi/internal/ivitest"
 	"github.com/gotmc/ivi/lcr"
 )
 
-type mockInst struct {
-	commandsSent []string
-	queryResp    string
-	shouldError  bool
-}
-
-func (m *mockInst) ReadBinary(_ context.Context, _ []byte) (int, error) {
-	return 0, nil
-}
-
-func (m *mockInst) WriteBinary(_ context.Context, p []byte) (int, error) {
-	return len(p), nil
-}
-
-func (m *mockInst) Close() error { return nil }
-
-func (m *mockInst) Command(_ context.Context, format string, a ...any) error {
-	if m.shouldError {
-		return errors.New("mock command error")
-	}
-	cmd := fmt.Sprintf(format, a...)
-	m.commandsSent = append(m.commandsSent, cmd)
-	return nil
-}
-
-func (m *mockInst) Query(_ context.Context, s string) (string, error) {
-	if m.shouldError {
-		return "", errors.New("mock query error")
-	}
-	return m.queryResp, nil
-}
-
 func TestNew(t *testing.T) {
-	mock := &mockInst{}
+	mock := &ivitest.Mock{}
 	d, err := New(mock, ivi.WithoutIDQuery())
 	if err != nil {
 		t.Fatalf("New() error: %v", err)
@@ -76,13 +42,13 @@ func TestDriver_SetMeasurementFunction(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			mock := &mockInst{}
+			mock := &ivitest.Mock{}
 			d, _ := New(mock, ivi.WithoutIDQuery())
 			if err := d.SetMeasurementFunction(tt.fcn); err != nil {
 				t.Fatalf("SetMeasurementFunction() error: %v", err)
 			}
-			if len(mock.commandsSent) != 1 || mock.commandsSent[0] != tt.want {
-				t.Errorf("sent %v, want [%q]", mock.commandsSent, tt.want)
+			if len(mock.CommandsSent) != 1 || mock.CommandsSent[0] != tt.want {
+				t.Errorf("sent %v, want [%q]", mock.CommandsSent, tt.want)
 			}
 		})
 	}
@@ -101,7 +67,7 @@ func TestDriver_MeasurementFunction(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			mock := &mockInst{queryResp: tt.resp}
+			mock := &ivitest.Mock{QueryResp: tt.resp}
 			d, _ := New(mock, ivi.WithoutIDQuery())
 			got, err := d.MeasurementFunction()
 			if err != nil {
@@ -115,26 +81,26 @@ func TestDriver_MeasurementFunction(t *testing.T) {
 }
 
 func TestDriver_SetFrequency(t *testing.T) {
-	mock := &mockInst{}
+	mock := &ivitest.Mock{}
 	d, _ := New(mock, ivi.WithoutIDQuery())
 	if err := d.SetFrequency(1000.0); err != nil {
 		t.Fatalf("SetFrequency() error: %v", err)
 	}
-	if len(mock.commandsSent) != 1 ||
-		!strings.HasPrefix(mock.commandsSent[0], "FREQ:CW") {
-		t.Errorf("sent %v, want FREQ:CW command", mock.commandsSent)
+	if len(mock.CommandsSent) != 1 ||
+		!strings.HasPrefix(mock.CommandsSent[0], "FREQ:CW") {
+		t.Errorf("sent %v, want FREQ:CW command", mock.CommandsSent)
 	}
 }
 
 func TestDriver_SetTestVoltageLevel(t *testing.T) {
-	mock := &mockInst{}
+	mock := &ivitest.Mock{}
 	d, _ := New(mock, ivi.WithoutIDQuery())
 	if err := d.SetTestVoltageLevel(1.0); err != nil {
 		t.Fatalf("SetTestVoltageLevel() error: %v", err)
 	}
-	if len(mock.commandsSent) != 1 ||
-		!strings.HasPrefix(mock.commandsSent[0], "VOLT:LEV") {
-		t.Errorf("sent %v, want VOLT:LEV command", mock.commandsSent)
+	if len(mock.CommandsSent) != 1 ||
+		!strings.HasPrefix(mock.CommandsSent[0], "VOLT:LEV") {
+		t.Errorf("sent %v, want VOLT:LEV command", mock.CommandsSent)
 	}
 }
 
@@ -150,13 +116,13 @@ func TestDriver_SetImpedanceAutoRange(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			mock := &mockInst{}
+			mock := &ivitest.Mock{}
 			d, _ := New(mock, ivi.WithoutIDQuery())
 			if err := d.SetImpedanceAutoRange(tt.auto); err != nil {
 				t.Fatalf("SetImpedanceAutoRange() error: %v", err)
 			}
-			if len(mock.commandsSent) != 1 || mock.commandsSent[0] != tt.want {
-				t.Errorf("sent %v, want [%q]", mock.commandsSent, tt.want)
+			if len(mock.CommandsSent) != 1 || mock.CommandsSent[0] != tt.want {
+				t.Errorf("sent %v, want [%q]", mock.CommandsSent, tt.want)
 			}
 		})
 	}
@@ -176,13 +142,13 @@ func TestDriver_SetTriggerSource(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			mock := &mockInst{}
+			mock := &ivitest.Mock{}
 			d, _ := New(mock, ivi.WithoutIDQuery())
 			if err := d.SetTriggerSource(tt.src); err != nil {
 				t.Fatalf("SetTriggerSource() error: %v", err)
 			}
-			if len(mock.commandsSent) != 1 || mock.commandsSent[0] != tt.want {
-				t.Errorf("sent %v, want [%q]", mock.commandsSent, tt.want)
+			if len(mock.CommandsSent) != 1 || mock.CommandsSent[0] != tt.want {
+				t.Errorf("sent %v, want [%q]", mock.CommandsSent, tt.want)
 			}
 		})
 	}
@@ -200,7 +166,7 @@ func TestDriver_TriggerSource(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			mock := &mockInst{queryResp: tt.resp}
+			mock := &ivitest.Mock{QueryResp: tt.resp}
 			d, _ := New(mock, ivi.WithoutIDQuery())
 			got, err := d.TriggerSource()
 			if err != nil {
@@ -214,52 +180,52 @@ func TestDriver_TriggerSource(t *testing.T) {
 }
 
 func TestDriver_SetTriggerDelay(t *testing.T) {
-	mock := &mockInst{}
+	mock := &ivitest.Mock{}
 	d, _ := New(mock, ivi.WithoutIDQuery())
 	if err := d.SetTriggerDelay(100 * time.Millisecond); err != nil {
 		t.Fatalf("SetTriggerDelay() error: %v", err)
 	}
-	if len(mock.commandsSent) != 1 ||
-		!strings.HasPrefix(mock.commandsSent[0], "TRIG:DEL") {
-		t.Errorf("sent %v, want TRIG:DEL command", mock.commandsSent)
+	if len(mock.CommandsSent) != 1 ||
+		!strings.HasPrefix(mock.CommandsSent[0], "TRIG:DEL") {
+		t.Errorf("sent %v, want TRIG:DEL command", mock.CommandsSent)
 	}
 }
 
 func TestDriver_Abort(t *testing.T) {
-	mock := &mockInst{}
+	mock := &ivitest.Mock{}
 	d, _ := New(mock, ivi.WithoutIDQuery())
 	if err := d.Abort(); err != nil {
 		t.Fatalf("Abort() error: %v", err)
 	}
-	if len(mock.commandsSent) != 1 || mock.commandsSent[0] != "ABOR" {
-		t.Errorf("sent %v, want [\"ABOR\"]", mock.commandsSent)
+	if len(mock.CommandsSent) != 1 || mock.CommandsSent[0] != "ABOR" {
+		t.Errorf("sent %v, want [\"ABOR\"]", mock.CommandsSent)
 	}
 }
 
 func TestDriver_Initiate(t *testing.T) {
-	mock := &mockInst{}
+	mock := &ivitest.Mock{}
 	d, _ := New(mock, ivi.WithoutIDQuery())
 	if err := d.Initiate(); err != nil {
 		t.Fatalf("Initiate() error: %v", err)
 	}
-	if len(mock.commandsSent) != 1 || mock.commandsSent[0] != "INIT:IMM" {
-		t.Errorf("sent %v, want [\"INIT:IMM\"]", mock.commandsSent)
+	if len(mock.CommandsSent) != 1 || mock.CommandsSent[0] != "INIT:IMM" {
+		t.Errorf("sent %v, want [\"INIT:IMM\"]", mock.CommandsSent)
 	}
 }
 
 func TestDriver_Trigger(t *testing.T) {
-	mock := &mockInst{}
+	mock := &ivitest.Mock{}
 	d, _ := New(mock, ivi.WithoutIDQuery())
 	if err := d.Trigger(); err != nil {
 		t.Fatalf("Trigger() error: %v", err)
 	}
-	if len(mock.commandsSent) != 1 || mock.commandsSent[0] != "TRIG:IMM" {
-		t.Errorf("sent %v, want [\"TRIG:IMM\"]", mock.commandsSent)
+	if len(mock.CommandsSent) != 1 || mock.CommandsSent[0] != "TRIG:IMM" {
+		t.Errorf("sent %v, want [\"TRIG:IMM\"]", mock.CommandsSent)
 	}
 }
 
 func TestDriver_FetchMeasurement(t *testing.T) {
-	mock := &mockInst{queryResp: "+1.23456E-09,+3.45678E-03,+0"}
+	mock := &ivitest.Mock{QueryResp: "+1.23456E-09,+3.45678E-03,+0"}
 	d, _ := New(mock, ivi.WithoutIDQuery())
 	pri, sec, status, err := d.FetchMeasurement()
 	if err != nil {
@@ -277,7 +243,7 @@ func TestDriver_FetchMeasurement(t *testing.T) {
 }
 
 func TestDriver_FetchMeasurement_Overload(t *testing.T) {
-	mock := &mockInst{queryResp: "+9.99999E+37,+9.99999E+37,+1"}
+	mock := &ivitest.Mock{QueryResp: "+9.99999E+37,+9.99999E+37,+1"}
 	d, _ := New(mock, ivi.WithoutIDQuery())
 	_, _, status, err := d.FetchMeasurement()
 	if err != nil {
@@ -300,41 +266,41 @@ func TestDriver_SetDCBiasEnabled(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			mock := &mockInst{}
+			mock := &ivitest.Mock{}
 			d, _ := New(mock, ivi.WithoutIDQuery())
 			if err := d.SetDCBiasEnabled(tt.enabled); err != nil {
 				t.Fatalf("SetDCBiasEnabled() error: %v", err)
 			}
-			if len(mock.commandsSent) != 1 || mock.commandsSent[0] != tt.want {
-				t.Errorf("sent %v, want [%q]", mock.commandsSent, tt.want)
+			if len(mock.CommandsSent) != 1 || mock.CommandsSent[0] != tt.want {
+				t.Errorf("sent %v, want [%q]", mock.CommandsSent, tt.want)
 			}
 		})
 	}
 }
 
 func TestDriver_SetOpenCorrectionEnabled(t *testing.T) {
-	mock := &mockInst{}
+	mock := &ivitest.Mock{}
 	d, _ := New(mock, ivi.WithoutIDQuery())
 	if err := d.SetOpenCorrectionEnabled(true); err != nil {
 		t.Fatalf("SetOpenCorrectionEnabled() error: %v", err)
 	}
-	if len(mock.commandsSent) != 1 ||
-		mock.commandsSent[0] != "CORR:OPEN:STAT ON" {
+	if len(mock.CommandsSent) != 1 ||
+		mock.CommandsSent[0] != "CORR:OPEN:STAT ON" {
 		t.Errorf(
-			"sent %v, want [\"CORR:OPEN:STAT ON\"]", mock.commandsSent,
+			"sent %v, want [\"CORR:OPEN:STAT ON\"]", mock.CommandsSent,
 		)
 	}
 }
 
 func TestDriver_ExecuteOpenCorrection(t *testing.T) {
-	mock := &mockInst{}
+	mock := &ivitest.Mock{}
 	d, _ := New(mock, ivi.WithoutIDQuery())
 	if err := d.ExecuteOpenCorrection(); err != nil {
 		t.Fatalf("ExecuteOpenCorrection() error: %v", err)
 	}
-	if len(mock.commandsSent) != 1 ||
-		mock.commandsSent[0] != "CORR:OPEN" {
-		t.Errorf("sent %v, want [\"CORR:OPEN\"]", mock.commandsSent)
+	if len(mock.CommandsSent) != 1 ||
+		mock.CommandsSent[0] != "CORR:OPEN" {
+		t.Errorf("sent %v, want [\"CORR:OPEN\"]", mock.CommandsSent)
 	}
 }
 
@@ -351,7 +317,7 @@ func TestDriver_MeasurementSpeed(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			mock := &mockInst{queryResp: tt.resp}
+			mock := &ivitest.Mock{QueryResp: tt.resp}
 			d, _ := New(mock, ivi.WithoutIDQuery())
 			got, err := d.MeasurementSpeed()
 			if err != nil {
@@ -377,7 +343,7 @@ func TestDriver_AveragingCount(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			mock := &mockInst{queryResp: tt.resp}
+			mock := &ivitest.Mock{QueryResp: tt.resp}
 			d, _ := New(mock, ivi.WithoutIDQuery())
 			got, err := d.AveragingCount()
 			if err != nil {
@@ -391,7 +357,7 @@ func TestDriver_AveragingCount(t *testing.T) {
 }
 
 func TestDriver_CommandError(t *testing.T) {
-	mock := &mockInst{shouldError: true}
+	mock := &ivitest.Mock{ShouldError: true}
 	d, _ := New(mock, ivi.WithoutIDQuery())
 	if err := d.SetFrequency(1000); err == nil {
 		t.Error("expected error, got nil")
