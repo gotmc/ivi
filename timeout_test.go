@@ -91,7 +91,7 @@ func TestQuery_Timeout(t *testing.T) {
 	defer cancel()
 
 	_, err := mock.Query(ctx, "*IDN?")
-	if err != context.DeadlineExceeded {
+	if !errors.Is(err, context.DeadlineExceeded) {
 		t.Errorf("Expected context.DeadlineExceeded, got %v", err)
 	}
 }
@@ -119,7 +119,7 @@ func TestCommand_Timeout(t *testing.T) {
 	defer cancel()
 
 	err := mock.Command(ctx, "*RST")
-	if err != context.DeadlineExceeded {
+	if !errors.Is(err, context.DeadlineExceeded) {
 		t.Errorf("Expected context.DeadlineExceeded, got %v", err)
 	}
 }
