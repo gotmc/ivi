@@ -25,9 +25,11 @@ const (
 )
 
 // Confirm that the device driver implements the IviDCPwrBase interface.
-var _ dcpwr.Base = (*Driver)(nil)
-var _ dcpwr.BaseChannel = (*Channel)(nil)
-var _ dcpwr.MeasurementChannel = (*Channel)(nil)
+var (
+	_ dcpwr.Base               = (*Driver)(nil)
+	_ dcpwr.BaseChannel        = (*Channel)(nil)
+	_ dcpwr.MeasurementChannel = (*Channel)(nil)
+)
 
 // Driver provides the IVI driver for the Rigol DP800 series of DC power
 // supplies.

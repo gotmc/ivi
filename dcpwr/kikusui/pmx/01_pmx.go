@@ -25,9 +25,11 @@ const (
 )
 
 // Confirm implemented interfaces by the pmx driver.
-var _ dcpwr.Base = (*Driver)(nil)
-var _ dcpwr.BaseChannel = (*Channel)(nil)
-var _ dcpwr.MeasurementChannel = (*Channel)(nil)
+var (
+	_ dcpwr.Base               = (*Driver)(nil)
+	_ dcpwr.BaseChannel        = (*Channel)(nil)
+	_ dcpwr.MeasurementChannel = (*Channel)(nil)
+)
 
 // Driver provides the IVI driver for the Kikusui PMX series of DC power
 // supplies.
