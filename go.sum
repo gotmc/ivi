@@ -1,4 +1,4 @@
-github.com/gotmc/convert v0.5.0 h1:dxzstMUCUE/lH5k7EhT5NAODvMJgPSClXzoIMx9izjE=
-github.com/gotmc/convert v0.5.0/go.mod h1:ClVdnU/ZcOFgUQWXgHexlLqE9/AFEeo5uZDf9kkAtyw=
-github.com/gotmc/query v0.7.0 h1:DBvWAQdFL02dH0VsLsNrcpqrYTnfT/rWf+hixuEK4Ek=
-github.com/gotmc/query v0.7.0/go.mod h1:5Fe+Q3az2zfXXa4pdvQ95mgieY6Bf/XFEOyMtdKjukE=
+github.com/gotmc/convert v0.5.1 h1:AxW06xVnClqtf6VYpfPI+vktcYgR7EgbLb1/ZXE76ZM=
+github.com/gotmc/convert v0.5.1/go.mod h1:ClVdnU/ZcOFgUQWXgHexlLqE9/AFEeo5uZDf9kkAtyw=
+github.com/gotmc/query v0.7.1 h1:WLnOf2FBhEYfYgq2KMoDjXYjXuzva8Jk/FzUstCxHnA=
+github.com/gotmc/query v0.7.1/go.mod h1:5Fe+Q3az2zfXXa4pdvQ95mgieY6Bf/XFEOyMtdKjukE=
