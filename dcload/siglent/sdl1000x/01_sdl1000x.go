@@ -14,7 +14,7 @@ import (
 	"time"
 
 	"github.com/gotmc/ivi"
-	"github.com/gotmc/ivi/load"
+	"github.com/gotmc/ivi/dcload"
 )
 
 const (
@@ -59,7 +59,7 @@ func New(inst ivi.Transport, opts ...ivi.DriverOption) (*Driver, error) {
 	channelNames := []string{"Input"}
 	channels := make([]Channel, len(channelNames))
 	for i, ch := range channelNames {
-		channels[i] = Channel{load.NewChannel(i, ch, inst)}
+		channels[i] = Channel{dcload.NewChannel(i, ch, inst)}
 	}
 
 	driver := Driver{

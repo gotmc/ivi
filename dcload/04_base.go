@@ -3,7 +3,7 @@
 // Use of this source code is governed by a MIT-style license that
 // can be found in the LICENSE.txt file for the project.
 
-package load
+package dcload
 
 // Base is the interface required of every electronic-load driver; it
 // provides discovery of the load's channel count.

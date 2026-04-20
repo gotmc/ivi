@@ -6,7 +6,7 @@
 package sdl1000x
 
 import (
-	"github.com/gotmc/ivi/load"
+	"github.com/gotmc/ivi/dcload"
 )
 
 type voltageCurrent int
@@ -18,5 +18,5 @@ const (
 
 // Channel models a Siglent SDL10xx load channel.
 type Channel struct {
-	load.Channel
+	dcload.Channel
 }
