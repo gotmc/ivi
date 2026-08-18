@@ -16,11 +16,12 @@ Specifications.
 
 The main advantage of the [ivi][] package is not having to learn the [SCPI][]
 commands for each individual piece of test equipment. For instance, by using the
-[ivi][] package both the Agilent 33220A and the Stanford Research Systems DS345
-function generators can be programmed using one standard API. The only
-requirement for this is having an IVI driver for the desired test equipment.
+[ivi][] package both the Agilent/Keysight 33220A and the Stanford Research
+Systems DS345 function generators can be programmed using one standard API. The
+only requirement for this is having an IVI driver for the desired test
+equipment.
 
-If an [ivi][] driver doesn't exist for a peice of test equipment that you want
+If an [ivi][] driver doesn't exist for a piece of test equipment that you want
 to use, please open an issue and/or submit a pull request. The [IVI
 Specifications][ivi-specs] don't provide APIs for every type of test equipment
 (e.g., they don't specify an API for electronic loads) in which case a set of
@@ -52,8 +53,8 @@ As stated in Section 1.5 Conformance Requirements of the _IVI-3.1: Driver
 Architecture Specification, Revision 3.8_, "IVI drivers can be developed with a
 COM, ANSI-C, or .NET API." In general, the Go method signatures try to be as
 close to the .NET signatures as possible. However, given the desire to write
-idiomatic Go, where necessary and where it makes sense, the Go-based IVI drivers
-deviate from the detailed [IVI Specifications][ivi-specs] at times.
+idiomatic Go, where it makes sense, the Go-based IVI drivers deviate from the
+detailed [IVI Specifications][ivi-specs] at times.
 
 For instance, since Go does not provide [method overloading][go-overload],
 the .NET method prototypes cannot be followed in all cases. For example,
@@ -71,7 +72,7 @@ void Configure(MeasurementFunction measurementFunction,
                Double resolution);
 ```
 
-However, Go isn't C, so the Go-based IVI drivers don't have to rely on defined
+Also, Go isn't C, so the Go-based IVI drivers don't have to rely on defined
 values, such as specific negative numbers representing auto-range (e.g., -1.0 =
 auto range on) and positive numbers representing the user specified manual
 range. Using the same example, below is the C prototype for `Configure`, where
@@ -140,15 +141,17 @@ gotmc packages meet the Instrument interface:
 
 Examples can be found at <https://github.com/gotmc/ivi-examples>.
 
-For timeout usage examples, see the [timeout examples](https://github.com/gotmc/ivi-examples/blob/master/timeout_example.md) in the ivi-examples repository.
+For timeout usage examples, see the [timeout
+examples](https://github.com/gotmc/ivi-examples/blob/master/timeout_example.md)
+in the ivi-examples repository.
 
 ## Documentation
 
 Documentation can be found at either:
 
 - <https://godoc.org/github.com/gotmc/ivi>
-- <http://localhost:6060/pkg/github.com/gotmc/ivi/> after running `$
-godoc -http=:6060`
+- Locally in the browser by running `just docs`, which serves the package
+  documentation via [pkgsite][].
 
 ## Timeout Support
 
@@ -288,6 +291,7 @@ $ just cover
 [LICENSE.txt]: https://github.com/gotmc/ivi/blob/master/LICENSE.txt
 [license badge]: https://img.shields.io/badge/license-MIT-blue.svg
 [lxi]: https://github.com/gotmc/lxi
+[pkgsite]: https://pkg.go.dev/golang.org/x/pkgsite/cmd/pkgsite
 [prologix]: https://github.com/gotmc/prologix
 [pull request]: https://help.github.com/articles/using-pull-requests
 [report badge]: https://goreportcard.com/badge/github.com/gotmc/ivi
