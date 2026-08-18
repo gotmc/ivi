@@ -39,7 +39,7 @@ func (ch *Channel) MeasureVoltage() (float64, error) {
 	ctx, cancel := ch.newContext()
 	defer cancel()
 
-	return query.Float64f(ctx, ch.inst, "MEAS:VOLT? %s", ch.name)
+	return query.Float64f(ctx, ch.inst, "MEAS:VOLT?%s", ch.measureParameter())
 }
 
 // MeasureCurrent takes a measurement on the output signal and returns the
@@ -52,5 +52,5 @@ func (ch *Channel) MeasureCurrent() (float64, error) {
 	ctx, cancel := ch.newContext()
 	defer cancel()
 
-	return query.Float64f(ctx, ch.inst, "MEAS:CURR? %s", ch.name)
+	return query.Float64f(ctx, ch.inst, "MEAS:CURR?%s", ch.measureParameter())
 }

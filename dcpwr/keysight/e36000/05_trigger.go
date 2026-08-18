@@ -15,9 +15,10 @@ import (
 )
 
 // The E3631A supports only the Immediate ("IMM") and Software/Bus ("BUS")
-// trigger sources; the E36300 series supports the same set. External and
-// hardware trigger sources defined by IVI-4.4 are not supported by either
-// family, so SetTriggerSource returns [ivi.ErrValueNotSupported] for them.
+// trigger sources; the E36100B and E36300 series support the same set.
+// External and hardware trigger sources defined by IVI-4.4 are not supported
+// by any of them, so SetTriggerSource returns [ivi.ErrValueNotSupported] for
+// those.
 var triggerSourceToSCPI = map[dcpwr.TriggerSource]string{
 	dcpwr.TriggerSourceImmediate: "IMM",
 	dcpwr.TriggerSourceSoftware:  "BUS",
@@ -64,10 +65,11 @@ func (ch *Channel) TriggerSource() (dcpwr.TriggerSource, error) {
 	ctx, cancel := ch.newContext()
 	defer cancel()
 
-	// Trigger source is an instrument-wide setting on the E3631A and applies
-	// to the currently selected output; select this channel first so the
-	// query result reflects the channel the caller asked about.
-	s, err := query.Stringf(ctx, ch.inst, "INST %s; TRIG:SOUR?", ch.name)
+	// On the multi-output models the trigger source is an instrument-wide
+	// setting that applies to the currently selected output, so the prefix
+	// selects this channel first and the result reflects the channel the
+	// caller asked about.
+	s, err := query.Stringf(ctx, ch.inst, "%sTRIG:SOUR?", ch.prefix())
 	if err != nil {
 		return 0, fmt.Errorf("TriggerSource: %w", err)
 	}
@@ -100,7 +102,7 @@ func (ch *Channel) SetTriggerSource(source dcpwr.TriggerSource) error {
 		)
 	}
 
-	return ch.inst.Command(ctx, "INST %s; TRIG:SOUR %s", ch.name, scpi)
+	return ch.inst.Command(ctx, "%sTRIG:SOUR %s", ch.prefix(), scpi)
 }
 
 // TriggeredCurrentLimit returns the current limit (in Amps) that the
@@ -114,7 +116,7 @@ func (ch *Channel) TriggeredCurrentLimit() (float64, error) {
 	ctx, cancel := ch.newContext()
 	defer cancel()
 
-	return query.Float64f(ctx, ch.inst, "INST %s; CURR:TRIG?", ch.name)
+	return query.Float64f(ctx, ch.inst, "%sCURR:TRIG?", ch.prefix())
 }
 
 // SetTriggeredCurrentLimit specifies the current limit (in Amps) that the
@@ -127,7 +129,7 @@ func (ch *Channel) SetTriggeredCurrentLimit(limit float64) error {
 	ctx, cancel := ch.newContext()
 	defer cancel()
 
-	return ch.inst.Command(ctx, "INST %s; CURR:TRIG %.4f", ch.name, limit)
+	return ch.inst.Command(ctx, "%sCURR:TRIG %.4f", ch.prefix(), limit)
 }
 
 // TriggeredVoltageLevel returns the voltage level (in Volts) that the
@@ -141,7 +143,7 @@ func (ch *Channel) TriggeredVoltageLevel() (float64, error) {
 	ctx, cancel := ch.newContext()
 	defer cancel()
 
-	return query.Float64f(ctx, ch.inst, "INST %s; VOLT:TRIG?", ch.name)
+	return query.Float64f(ctx, ch.inst, "%sVOLT:TRIG?", ch.prefix())
 }
 
 // SetTriggeredVoltageLevel specifies the voltage level (in Volts) that the
@@ -154,5 +156,5 @@ func (ch *Channel) SetTriggeredVoltageLevel(level float64) error {
 	ctx, cancel := ch.newContext()
 	defer cancel()
 
-	return ch.inst.Command(ctx, "INST %s; VOLT:TRIG %.4f", ch.name, level)
+	return ch.inst.Command(ctx, "%sVOLT:TRIG %.4f", ch.prefix(), level)
 }
