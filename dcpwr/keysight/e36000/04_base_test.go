@@ -3,7 +3,7 @@
 // Use of this source code is governed by a MIT-style license that
 // can be found in the LICENSE.txt file for the project.
 
-package kte36000
+package e36000
 
 import (
 	"errors"

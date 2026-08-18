@@ -3,11 +3,11 @@
 // Use of this source code is governed by a MIT-style license that
 // can be found in the LICENSE.txt file for the project.
 
-// Package kte36000 implements the IVI driver for the Keysight/Agilent E3600
+// Package e36000 implements the IVI driver for the Keysight/Agilent E3600
 // series of power supplies.
 //
 // State Caching: Not implemented
-package kte36000
+package e36000
 
 import (
 	"context"
@@ -52,11 +52,9 @@ type Channel struct {
 }
 
 // New creates a new IVI driver for the Keysight/Agilent E3600 series of DC
-// power supplies. The constructor always queries *IDN? since channel
-// configuration depends on the model; by default it also validates the model
-// against the supported list. Pass [ivi.WithoutIDQuery] to skip validation
-// (the model is still queried). Use [ivi.WithReset] to reset on creation and
-// [ivi.WithTimeout] to override the default I/O timeout.
+// power supplies. By default the instrument is queried to determine the model
+// and ensure it is supported. Optional driver options can be provided to set
+// the timeout, not query the instrument, etc.
 func New(inst ivi.Transport, opts ...ivi.DriverOption) (*Driver, error) {
 	s, err := ivi.NewDriverSetup(inst, ivi.InherentBase{
 		ClassSpecMajorVersion: specMajorVersion,
@@ -72,51 +70,20 @@ func New(inst ivi.Transport, opts ...ivi.DriverOption) (*Driver, error) {
 			"IviDCPwrSoftwareTrigger",
 		},
 		SupportedInstrumentModels: []string{
-			"E3631A",
-			"E3632A",
-			"E3633A",
-			"E3634A",
-			"E3640A",
-			"E3641A",
-			"E3642A",
-			"E3643A",
-			"E3644A",
-			"E3645A",
-			"E3646A",
-			"E3647A",
-			"E3648A",
-			"E3649A",
-			"E36102A",
-			"E36103A",
-			"E36104A",
-			"E36105A",
-			"E36106A",
-			"E36102B",
-			"E36103B",
-			"E36104B",
-			"E36105B",
-			"E36106B",
-			"E36231A",
-			"E36232A",
-			"E36154A",
-			"E36155A",
-			"E36233A",
-			"E36234A",
-			"E36311A",
-			"E36312A",
-			"E36313A",
-			"E36441A",
-			"E36731A",
-			"EDU36311A",
+			"E3631A", "E3632A", "E3633A", "E3634A", "E3640A", "E3641A",
+			"E3642A", "E3643A", "E3644A", "E3645A", "E3646A", "E3647A",
+			"E3648A", "E3649A", "E36102A", "E36103A", "E36104A", "E36105A",
+			"E36106A", "E36102B", "E36103B", "E36104B", "E36105B", "E36106B",
+			"E36231A", "E36232A", "E36154A", "E36155A", "E36233A", "E36234A",
+			"E36311A", "E36312A", "E36313A", "E36441A", "E36731A", "EDU36311A",
 		},
-
 		SupportedBusInterfaces: []string{"GPIB", "SERIAL"},
 	}, opts)
 	if err != nil {
 		return nil, err
 	}
 
-	// Channel configuration depends on the queried model.
+	// Channel configuration depends on the instrument model.
 	model, err := s.Inherent.InstrumentModel()
 	if err != nil {
 		return nil, fmt.Errorf("error determining instrument model: %w", err)
