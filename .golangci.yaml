@@ -7,12 +7,15 @@ linters:
     - govet
     - errcheck
     - ineffassign
-    - unused
     - errcheck
     - gosec
     - misspell
     - bodyclose
     - contextcheck
+  disable:
+    # unused is part of the standard set, so it has to be disabled explicitly
+    # rather than just left out of the enable list above.
+    - unused
 
 formatters:
   enable:
