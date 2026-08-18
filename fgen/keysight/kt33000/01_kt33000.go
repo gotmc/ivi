@@ -6,7 +6,7 @@
 // Package kt33000 implements the IVI driver for the Keysight 33000 series
 // function/arbitrary waveform generators, including the 33200A, 33500A,
 // 33500B, and 33600A families. This driver corresponds to the Keysight
-// IVI-C Kt33000 driver.
+// IVI.NET Kt33000 driver.
 //
 // The 33500B and 33600A models use LAN port 5025 for SCPI Socket sessions.
 // The default GPIB address is 10.
@@ -47,16 +47,17 @@ var _ fgen.ArbWfmChannel = (*Channel)(nil)
 // function/arbitrary waveform generators.
 type Driver struct {
 	inst     ivi.Transport
+	gen      functionGenerator
 	channels []Channel
 	timeout  time.Duration
 	ivi.Inherent
 }
 
-// New creates a new IVI driver for the Keysight 33000 series
-// function/arbitrary waveform generators. By default the constructor queries
-// *IDN? and verifies the model against the supported list; pass
-// [ivi.WithoutIDQuery] to skip that check. Use [ivi.WithReset] to reset on
-// creation and [ivi.WithTimeout] to override the default I/O timeout.
+// New creates a new IVI driver for a Keysight 33000 series function/arbitrary
+// waveform generator using the given transport layer. By default the
+// instrument is queried to determine if it is one of the supported instrument
+// models. Optional driver options can be provided to set the timeout, not
+// query the instrument, etc.
 func New(inst ivi.Transport, opts ...ivi.DriverOption) (*Driver, error) {
 	s, err := ivi.NewDriverSetup(inst, ivi.InherentBase{
 		ClassSpecMajorVersion: specMajorVersion,
@@ -73,27 +74,32 @@ func New(inst ivi.Transport, opts ...ivi.DriverOption) (*Driver, error) {
 			"IviFgenStdfunc",
 			"IviFgenTrigger",
 		},
-		SupportedInstrumentModels: []string{
-			"33210A", "33220A", "33502A", "33509B", "33510B", "33511B",
-			"33512B", "33519B", "33520B", "33521A", "33521B", "33522A",
-			"33522B", "33609A", "33610A", "33611A", "33612A", "33619A",
-			"33620A", "33621A", "33622A", "EDU33211A", "EDU33212A",
-			"FG33531A", "FG33532A",
-		},
-		SupportedBusInterfaces: []string{"TCPIP", "GPIB", "USB"},
+		SupportedInstrumentModels: supportedModels(),
+		SupportedBusInterfaces:    []string{"TCPIP", "GPIB", "USB"},
 	}, opts)
 	if err != nil {
 		return nil, err
 	}
 
-	channelNames := []string{"Output1", "Output2"}
-	channels := make([]Channel, len(channelNames))
-	for i, name := range channelNames {
+	// Channel configuration depends on the instrument model.
+	model, err := s.Inherent.InstrumentModel()
+	if err != nil {
+		return nil, fmt.Errorf("error determining instrument model: %w", err)
+	}
+
+	gen, err := generatorForModel(model)
+	if err != nil {
+		return nil, err
+	}
+
+	channels := make([]Channel, len(gen.channels))
+	for i, name := range gen.channels {
 		channels[i] = Channel{name: name, inst: inst, num: i, timeout: s.Timeout}
 	}
 
 	driver := Driver{
 		inst:     inst,
+		gen:      gen,
 		channels: channels,
 		timeout:  s.Timeout,
 		Inherent: s.Inherent,
@@ -106,6 +112,118 @@ func New(inst ivi.Transport, opts ...ivi.DriverOption) (*Driver, error) {
 	}
 
 	return &driver, nil
+}
+
+// Channel name sets shared by the entries in supportedGenerators. The slices
+// are read-only; New copies each name into the Channel it creates.
+var (
+	oneOutput  = []string{"Output"}
+	twoOutputs = []string{"Output 1", "Output 2"}
+)
+
+// supportedGenerators describes the model-specific configuration of every
+// instrument this driver supports. generatorForModel selects the entry
+// matching the model reported by *IDN?, and supportedModels derives the
+// InherentBase model list from it, so this table is the single source of
+// truth for which models the driver accepts.
+var supportedGenerators = []functionGenerator{
+	// 33200 series. The 33210A gains arbitrary waveform capability only with
+	// Option 002, which the driver cannot detect from *IDN?.
+	{model: "33210A", channels: oneOutput, bandwidthHz: 10_000_000, arbWaveforms: false},
+	{model: "33220A", channels: oneOutput, bandwidthHz: 20_000_000, arbWaveforms: true},
+
+	// 33500A/33500B series. Within the series, models ending in 09/10 and
+	// 19/20 are function generators without arbitrary waveform capability,
+	// while those ending in 11/12 and 21/22 add it. The even-numbered model
+	// of each pair is the two-channel version.
+	{model: "33509B", channels: oneOutput, bandwidthHz: 20_000_000, arbWaveforms: false},
+	{model: "33510B", channels: twoOutputs, bandwidthHz: 20_000_000, arbWaveforms: false},
+	{model: "33511B", channels: oneOutput, bandwidthHz: 20_000_000, arbWaveforms: true},
+	{model: "33512B", channels: twoOutputs, bandwidthHz: 20_000_000, arbWaveforms: true},
+	{model: "33519B", channels: oneOutput, bandwidthHz: 30_000_000, arbWaveforms: false},
+	{model: "33520B", channels: twoOutputs, bandwidthHz: 30_000_000, arbWaveforms: false},
+	{model: "33521A", channels: oneOutput, bandwidthHz: 30_000_000, arbWaveforms: true},
+	{model: "33521B", channels: oneOutput, bandwidthHz: 30_000_000, arbWaveforms: true},
+	{model: "33522A", channels: twoOutputs, bandwidthHz: 30_000_000, arbWaveforms: true},
+	{model: "33522B", channels: twoOutputs, bandwidthHz: 30_000_000, arbWaveforms: true},
+
+	// 33600A series, following the same numbering convention as the 33500
+	// series.
+	{model: "33609A", channels: oneOutput, bandwidthHz: 80_000_000, arbWaveforms: false},
+	{model: "33610A", channels: twoOutputs, bandwidthHz: 80_000_000, arbWaveforms: false},
+	{model: "33611A", channels: oneOutput, bandwidthHz: 80_000_000, arbWaveforms: true},
+	{model: "33612A", channels: twoOutputs, bandwidthHz: 80_000_000, arbWaveforms: true},
+	{model: "33619A", channels: oneOutput, bandwidthHz: 120_000_000, arbWaveforms: false},
+	{model: "33620A", channels: twoOutputs, bandwidthHz: 120_000_000, arbWaveforms: false},
+	{model: "33621A", channels: oneOutput, bandwidthHz: 120_000_000, arbWaveforms: true},
+	{model: "33622A", channels: twoOutputs, bandwidthHz: 120_000_000, arbWaveforms: true},
+
+	// EDU33210 series.
+	{model: "EDU33211A", channels: oneOutput, bandwidthHz: 20_000_000, arbWaveforms: true},
+	{model: "EDU33212A", channels: twoOutputs, bandwidthHz: 20_000_000, arbWaveforms: true},
+
+	// The 33502A is a two-channel isolated amplifier accessory rather than a
+	// generator, so its channels are amplifier outputs and it has no
+	// waveform generation of its own.
+	{model: "33502A", channels: []string{"Channel 1", "Channel 2"}},
+
+	// The FG33531A and FG33532A specifications have not been verified
+	// against a datasheet, so their bandwidth is left unspecified.
+	{model: "FG33531A", channels: oneOutput},
+	{model: "FG33532A", channels: twoOutputs},
+}
+
+// functionGenerator describes the model-specific configuration and
+// capabilities of one supported instrument.
+type functionGenerator struct {
+	// model is the model number as reported by the *IDN? query.
+	model string
+	// channels names the instrument's output channels, in channel order.
+	channels []string
+	// bandwidthHz is the maximum sine wave output frequency in hertz. A zero
+	// value means the maximum frequency is not recorded for the model.
+	bandwidthHz int
+	// arbWaveforms reports whether the model provides arbitrary waveform
+	// capability as standard equipment.
+	arbWaveforms bool
+}
+
+// supportedModels returns the model numbers described by supportedGenerators,
+// in table order.
+func supportedModels() []string {
+	models := make([]string, len(supportedGenerators))
+	for i, gen := range supportedGenerators {
+		models[i] = gen.model
+	}
+
+	return models
+}
+
+// generatorForModel returns the supportedGenerators entry for the given model
+// number, or [ivi.ErrUnsupportedModel] if the model is not in the table.
+func generatorForModel(model string) (functionGenerator, error) {
+	for _, gen := range supportedGenerators {
+		if gen.model == model {
+			return gen, nil
+		}
+	}
+
+	return functionGenerator{}, fmt.Errorf("%q: %w", model, ivi.ErrUnsupportedModel)
+}
+
+// MaxFrequency returns the maximum sine wave output frequency in hertz for
+// the connected instrument model. It returns 0 when the maximum frequency is
+// not recorded for the model.
+func (d *Driver) MaxFrequency() float64 {
+	return float64(d.gen.bandwidthHz)
+}
+
+// SupportsArbWaveform reports whether the connected instrument model provides
+// arbitrary waveform capability as standard equipment. Models that offer it
+// only as an ordering option (such as the 33210A with Option 002) report
+// false, since the option cannot be detected from the *IDN? response.
+func (d *Driver) SupportsArbWaveform() bool {
+	return d.gen.arbWaveforms
 }
 
 // newContext creates a context with the driver's configured timeout.
