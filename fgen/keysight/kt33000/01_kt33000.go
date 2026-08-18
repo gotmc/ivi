@@ -4,9 +4,16 @@
 // can be found in the LICENSE.txt file for the project.
 
 // Package kt33000 implements the IVI driver for the Keysight 33000 series
-// function/arbitrary waveform generators, including the 33200A, 33500A,
-// 33500B, and 33600A families. This driver corresponds to the Keysight
-// IVI.NET Kt33000 driver.
+// function/arbitrary waveform generators, covering the 33200, 33500A,
+// 33500B, 33600A, and EDU33210 families. This driver corresponds to the
+// Keysight IVI.NET Kt33000 driver.
+//
+// The supported models span two generations of SCPI command set, described
+// by [scpiFamily]. The 33500 and later models address channel-specific
+// subsystems with a suffix (SOUR1:, OUTP2, TRIG1:), while the single-channel
+// 33200 series has no such nodes and takes the unsuffixed form (FREQ, OUTP,
+// TRIG:SLOP). New selects the right form from the connected model, so callers
+// use the same API for either generation.
 //
 // The 33500B and 33600A models use LAN port 5025 for SCPI Socket sessions.
 // The default GPIB address is 10.
@@ -17,6 +24,7 @@ package kt33000
 import (
 	"context"
 	"fmt"
+	"strconv"
 	"time"
 
 	"github.com/gotmc/ivi"
@@ -66,7 +74,6 @@ func New(inst ivi.Transport, opts ...ivi.DriverOption) (*Driver, error) {
 		ResetDelay:            500 * time.Millisecond,
 		ClearDelay:            500 * time.Millisecond,
 		ReturnToLocal:         true,
-		LocalControlCommand:   "SYST:COMM:RLST LOC",
 		GroupCapabilities: []string{
 			"IviFgenBase",
 			"IviFgenBurst",
@@ -92,9 +99,16 @@ func New(inst ivi.Transport, opts ...ivi.DriverOption) (*Driver, error) {
 		return nil, err
 	}
 
+	// The command used to return the instrument to local control is family
+	// specific, and the family is not known until the model is queried.
+	s.Inherent.LocalControlCommand = gen.family.localControlCommand()
+
 	channels := make([]Channel, len(gen.channels))
 	for i, name := range gen.channels {
-		channels[i] = Channel{name: name, inst: inst, num: i, timeout: s.Timeout}
+		channels[i] = Channel{
+			name: name, inst: inst, num: i,
+			family: gen.family, timeout: s.Timeout,
+		}
 	}
 
 	driver := Driver{
@@ -127,10 +141,17 @@ var (
 // InherentBase model list from it, so this table is the single source of
 // truth for which models the driver accepts.
 var supportedGenerators = []functionGenerator{
-	// 33200 series. The 33210A gains arbitrary waveform capability only with
-	// Option 002, which the driver cannot detect from *IDN?.
-	{model: "33210A", channels: oneOutput, bandwidthHz: 10_000_000, arbWaveforms: false},
-	{model: "33220A", channels: oneOutput, bandwidthHz: 20_000_000, arbWaveforms: true},
+	// 33200 series. These are the only models using the legacy33200 command
+	// set. The 33210A gains arbitrary waveform capability only with Option
+	// 002, which the driver cannot detect from *IDN?.
+	{
+		model: "33210A", channels: oneOutput, bandwidthHz: 10_000_000,
+		family: legacy33200, arbWaveforms: false,
+	},
+	{
+		model: "33220A", channels: oneOutput, bandwidthHz: 20_000_000,
+		family: legacy33200, arbWaveforms: true,
+	},
 
 	// 33500A/33500B series. Within the series, models ending in 09/10 and
 	// 19/20 are function generators without arbitrary waveform capability,
@@ -183,9 +204,40 @@ type functionGenerator struct {
 	// bandwidthHz is the maximum sine wave output frequency in hertz. A zero
 	// value means the maximum frequency is not recorded for the model.
 	bandwidthHz int
+	// family selects the SCPI command set the model implements. The zero
+	// value is trueform, which covers every model except the 33200 series.
+	family scpiFamily
 	// arbWaveforms reports whether the model provides arbitrary waveform
 	// capability as standard equipment.
 	arbWaveforms bool
+}
+
+// scpiFamily identifies the generation of SCPI command set a model
+// implements. The two generations differ in whether subsystem keywords carry
+// a channel suffix, so the family determines how commands are spelled.
+type scpiFamily int
+
+const (
+	// trueform is the command set used by the 33500, 33600, and EDU33210
+	// series. Channel-specific subsystems carry a suffix: the source
+	// subsystem is addressed as SOUR1:/SOUR2:, outputs as OUTP1/OUTP2, and
+	// triggers as TRIG1:/TRIG2:.
+	trueform scpiFamily = iota
+	// legacy33200 is the command set used by the single-channel 33200
+	// series. Its command tree has no channel-suffixed nodes, so commands
+	// are unprefixed and unsuffixed: FREQ, OUTP, and TRIG:SLOP. Sending the
+	// suffixed form to a 33220A produces an undefined header error.
+	legacy33200
+)
+
+// localControlCommand returns the SCPI command that returns the instrument to
+// local front-panel control.
+func (family scpiFamily) localControlCommand() string {
+	if family == legacy33200 {
+		return "SYST:LOC"
+	}
+
+	return "SYST:COMM:RLST LOC"
 }
 
 // supportedModels returns the model numbers described by supportedGenerators,
@@ -271,6 +323,7 @@ type Channel struct {
 	inst    ivi.Transport
 	name    string
 	num     int // 0-based channel index
+	family  scpiFamily
 	timeout time.Duration
 }
 
@@ -279,7 +332,30 @@ func (ch *Channel) newContext() (context.Context, context.CancelFunc) {
 	return context.WithTimeout(context.Background(), ch.timeout)
 }
 
-// srcPrefix returns the SCPI source prefix for this channel (e.g., "SOUR1:").
+// srcPrefix returns the SCPI source subsystem prefix for this channel, such
+// as "SOUR1:". It is empty on the 33200 series, whose commands hang directly
+// off the root of the command tree.
 func (ch *Channel) srcPrefix() string {
+	if ch.family == legacy33200 {
+		return ""
+	}
+
 	return fmt.Sprintf("SOUR%d:", ch.num+1)
+}
+
+// chanSuffix returns the channel suffix appended to subsystem keywords that
+// carry one, such as the "1" in OUTP1 and TRIG1:. It is empty on the 33200
+// series, which rejects the suffixed form.
+func (ch *Channel) chanSuffix() string {
+	if ch.family == legacy33200 {
+		return ""
+	}
+
+	return strconv.Itoa(ch.num + 1)
+}
+
+// trigPrefix returns the SCPI trigger subsystem prefix for this channel, such
+// as "TRIG1:". It is "TRIG:" on the 33200 series.
+func (ch *Channel) trigPrefix() string {
+	return "TRIG" + ch.chanSuffix() + ":"
 }

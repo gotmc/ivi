@@ -79,7 +79,10 @@ All enum types implement the `Stringer` interface with `String()` methods.
 #### Driver Implementation Pattern
 
 Drivers live under `<class>/<manufacturer>/<model>/` (e.g.,
-`fgen/keysight/key33220/`). All drivers follow this structure:
+`fgen/keysight/kt33000/`). A driver may cover a whole family of models; where
+models differ, the driver keys the difference off the model reported by
+`*IDN?` rather than splitting into separate packages. All drivers follow this
+structure:
 
 - `01_<model>.go`: Package doc, Driver struct, Channel struct, `New()` constructor,
   `Close()` method

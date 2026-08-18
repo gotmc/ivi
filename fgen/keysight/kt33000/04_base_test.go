@@ -15,10 +15,16 @@ import (
 )
 
 // newTestDriver returns a driver configured as a two-channel 33522B, wired to
-// the given mock. It bypasses New so that tests can set Mock.QueryResp to the
-// response under test rather than to an *IDN? string.
+// the given mock.
 func newTestDriver(mock *ivitest.Mock) *Driver {
-	gen, err := generatorForModel("33522B")
+	return newTestDriverForModel(mock, "33522B")
+}
+
+// newTestDriverForModel returns a driver configured as the given model, wired
+// to the given mock. It bypasses New so that tests can set Mock.QueryResp to
+// the response under test rather than to an *IDN? string.
+func newTestDriverForModel(mock *ivitest.Mock, model string) *Driver {
+	gen, err := generatorForModel(model)
 	if err != nil {
 		panic(err)
 	}
@@ -26,7 +32,8 @@ func newTestDriver(mock *ivitest.Mock) *Driver {
 	channels := make([]Channel, len(gen.channels))
 	for i, name := range gen.channels {
 		channels[i] = Channel{
-			name: name, inst: mock, num: i, timeout: ivi.DefaultTimeout,
+			name: name, inst: mock, num: i,
+			family: gen.family, timeout: ivi.DefaultTimeout,
 		}
 	}
 
