@@ -187,7 +187,7 @@ interface.
 
 - `github.com/gotmc/query`: SCPI query utilities
 - `github.com/gotmc/convert`: Data conversion helpers
-- Go 1.21+ required
+- Go 1.26+ required (see the `go` directive in `go.mod`)
 
 ## Code Style and Conventions
 
