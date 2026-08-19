@@ -20,6 +20,8 @@ package e36000
 import (
 	"context"
 	"fmt"
+	"strconv"
+	"strings"
 	"time"
 
 	"github.com/gotmc/ivi"
@@ -57,6 +59,7 @@ type Driver struct {
 type Channel struct {
 	inst       ivi.Transport
 	name       string
+	num        int // 0-based output index, used to build a channel list
 	family     scpiFamily
 	protection protectionSupport
 	timeout    time.Duration
@@ -104,6 +107,7 @@ func New(inst ivi.Transport, opts ...ivi.DriverOption) (*Driver, error) {
 		channels[i] = Channel{
 			name:       name,
 			inst:       inst,
+			num:        i,
 			family:     supply.family,
 			protection: supply.protection,
 			timeout:    s.Timeout,
@@ -147,6 +151,18 @@ const (
 	// -113 (Undefined header), and "MEAS:VOLT? Output" produces a parameter
 	// error rather than a reading.
 	singleOutput
+	// channelList is the command set used by supplies that name the outputs a
+	// command applies to with a trailing channel list, such as the E36400
+	// series. Rather than selecting an output first, every channel-scoped
+	// command carries "(@n)" as its last parameter: "VOLT 4.1000,(@1)" to
+	// set, "VOLT? (@1)" to read. The syntax also admits several outputs at
+	// once, as "(@1,2)", and ranges, as "(@1:3)", though this driver scopes
+	// each Channel to exactly one output.
+	//
+	// Because the output is named by number rather than by identifier, the
+	// channel names of these models never reach the wire and may be
+	// descriptive, as with singleOutput.
+	channelList
 )
 
 // protectionSupport records which output protection subsystems a model
@@ -190,9 +206,14 @@ type powerSupply struct {
 
 // Channel name sets shared by the entries in supportedSupplies. The slices are
 // read-only; New copies each name into the Channel it creates.
+// For the instSelect family these names are spliced into "INST <name>; ", so
+// they must be the identifiers the instrument's INSTrument subsystem accepts,
+// not descriptive labels. Only the singleOutput family may use a descriptive
+// name, since those names never reach the wire.
 var (
-	oneOutput  = []string{"Output"}
-	twoOutputs = []string{"Output 1", "Output 2"}
+	oneOutput     = []string{"Output"}
+	twoNumbered   = []string{"OUT1", "OUT2"}
+	threeChannels = []string{"CH1", "CH2", "CH3"}
 )
 
 // e36100Protection is the protection capability of the E36100 series, which
@@ -235,15 +256,13 @@ var supportedSupplies = []powerSupply{
 	{model: "E36105B", channels: oneOutput, family: singleOutput, protection: e36100Protection},
 	{model: "E36106B", channels: oneOutput, family: singleOutput, protection: e36100Protection},
 
-	// The models below have not been verified against a programming guide
-	// and are left on the instSelect command set they have always used. The
-	// single-output models among them almost certainly belong to the
-	// singleOutput family for the same reason the E36100 series does, and
-	// the multi-output models need the identifiers their INSTrument
-	// subsystem actually accepts rather than the descriptive names below
-	// (the E3646A through E3649A use OUT1 and OUT2; the E36300 series uses
-	// CH1, CH2, and CH3). Both are corrections worth making once a guide is
-	// on hand to confirm them.
+	// The models below are still on the instSelect command set they have
+	// always used. The single-output models among them almost certainly
+	// belong to the singleOutput family for the same reason the E36100
+	// series does, but that is a semantic change no string level check can
+	// confirm, so it waits on a programming guide. Their "Output" name is a
+	// legal SCPI token, so it parses; it simply names an output that the
+	// INSTrument subsystem, where one exists at all, does not know.
 	{model: "E3632A", channels: oneOutput},
 	{model: "E3633A", channels: oneOutput},
 	{model: "E3634A", channels: oneOutput},
@@ -253,22 +272,33 @@ var supportedSupplies = []powerSupply{
 	{model: "E3643A", channels: oneOutput},
 	{model: "E3644A", channels: oneOutput},
 	{model: "E3645A", channels: oneOutput},
-	{model: "E3646A", channels: twoOutputs},
-	{model: "E3647A", channels: twoOutputs},
-	{model: "E3648A", channels: twoOutputs},
-	{model: "E3649A", channels: twoOutputs},
+	// The E3646A through E3649A select their two outputs with
+	// INSTrument[:SELect] OUT1 | OUT2.
+	{model: "E3646A", channels: twoNumbered},
+	{model: "E3647A", channels: twoNumbered},
+	{model: "E3648A", channels: twoNumbered},
+	{model: "E3649A", channels: twoNumbered},
 	{model: "E36154A", channels: oneOutput},
 	{model: "E36155A", channels: oneOutput},
 	{model: "E36231A", channels: oneOutput},
 	{model: "E36232A", channels: oneOutput},
 	{model: "E36233A", channels: oneOutput},
 	{model: "E36234A", channels: oneOutput},
-	{model: "E36311A", channels: []string{"Output 1", "Output 2", "Output 3"}},
-	{model: "E36312A", channels: []string{"Output 1", "Output 2", "Output 3"}},
-	{model: "E36313A", channels: []string{"Output 1", "Output 2", "Output 3"}},
-	{model: "E36441A", channels: []string{"Output 1", "Output 2", "Output 3", "Output 4"}},
+	// The E36300 series selects its three outputs with
+	// INSTrument[:SELect] CH1 | CH2 | CH3.
+	{model: "E36311A", channels: threeChannels},
+	{model: "E36312A", channels: threeChannels},
+	{model: "E36313A", channels: threeChannels},
+	// The E36400 series names the outputs a command applies to with a
+	// trailing channel list rather than selecting one beforehand, so its
+	// channel names are descriptive and never reach the wire.
+	{
+		model:    "E36441A",
+		channels: []string{"Output 1", "Output 2", "Output 3", "Output 4"},
+		family:   channelList,
+	},
 	{model: "E36731A", channels: oneOutput},
-	{model: "EDU36311A", channels: []string{"Output 1", "Output 2", "Output 3"}},
+	{model: "EDU36311A", channels: threeChannels},
 }
 
 // supportedModels returns the model numbers described by supportedSupplies,
@@ -303,26 +333,80 @@ func (d *Driver) Channel(index int) (*Channel, error) {
 	return &d.channels[index], nil
 }
 
-// prefix returns the command prefix that selects this channel for the
-// subsystems INSTrument[:SELect] applies to. It is empty for models whose
-// command set has no way to select an output.
-func (ch *Channel) prefix() string {
-	if ch.family == singleOutput {
-		return ""
-	}
-
-	return "INST " + ch.name + "; "
+// chanList returns this channel's SCPI channel list, such as "(@1)".
+func (ch *Channel) chanList() string {
+	return "(@" + strconv.Itoa(ch.num+1) + ")"
 }
 
-// measureParameter returns the output identifier that the MEASure subsystem
-// takes on this model, including the leading space that separates it from the
-// query. It is empty for models whose MEASure commands take no parameter.
-func (ch *Channel) measureParameter() string {
-	if ch.family == singleOutput {
-		return ""
+// scope appends this channel's channel list to a command body. The list is a
+// parameter, so it follows a comma when the body already carries a value and
+// a space when it does not.
+func (ch *Channel) scope(body string) string {
+	if strings.Contains(body, " ") {
+		return body + "," + ch.chanList()
 	}
 
-	return " " + ch.name
+	return body + " " + ch.chanList()
+}
+
+// setCmd returns the complete format string for a channel-scoped command that
+// carries a value.
+func (ch *Channel) setCmd(body string) string {
+	switch ch.family {
+	case channelList:
+		return ch.scope(body)
+	case singleOutput:
+		return body
+	default:
+		return "INST " + ch.name + "; " + body
+	}
+}
+
+// getCmd returns the complete query string for a channel-scoped read.
+func (ch *Channel) getCmd(body string) string {
+	switch ch.family {
+	case channelList:
+		return ch.scope(body)
+	case singleOutput:
+		return body
+	default:
+		return "INST " + ch.name + "; " + body
+	}
+}
+
+// measCmd returns the complete query for a MEASure read. The instSelect
+// models name the output as a parameter of the query rather than selecting it
+// beforehand, so MEASure is spelled differently from every other subsystem.
+func (ch *Channel) measCmd(body string) string {
+	switch ch.family {
+	case channelList:
+		return ch.scope(body)
+	case singleOutput:
+		return body
+	default:
+		return body + " " + ch.name
+	}
+}
+
+// outputSetCmd returns the command that switches this channel's output.
+// OUTPut:STATe is global on the instSelect models, where it switches every
+// output at once, and there is only one output to switch on the singleOutput
+// models, so only the channel list family scopes it.
+func (ch *Channel) outputSetCmd(body string) string {
+	if ch.family == channelList {
+		return ch.scope(body)
+	}
+
+	return body
+}
+
+// outputGetCmd is [Channel.outputSetCmd] for the query form.
+func (ch *Channel) outputGetCmd(body string) string {
+	if ch.family == channelList {
+		return ch.scope(body)
+	}
+
+	return body
 }
 
 // newContext creates a context with the driver's configured timeout.

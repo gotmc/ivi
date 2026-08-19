@@ -36,7 +36,7 @@ func (ch *Channel) CurrentLimit() (float64, error) {
 	ctx, cancel := ch.newContext()
 	defer cancel()
 
-	return query.Float64f(ctx, ch.inst, "%sCURR?", ch.prefix())
+	return query.Float64(ctx, ch.inst, ch.getCmd("CURR?"))
 }
 
 // SetCurrentLimit specifies the output current limit in Amperes.
@@ -48,7 +48,7 @@ func (ch *Channel) SetCurrentLimit(limit float64) error {
 	ctx, cancel := ch.newContext()
 	defer cancel()
 
-	return ch.inst.Command(ctx, "%sCURR %.4f", ch.prefix(), limit)
+	return ch.inst.Command(ctx, ch.setCmd("CURR %.4f"), limit)
 }
 
 // CurrentLimitBehavior determines the behavior of the power supply when the
@@ -69,7 +69,7 @@ func (ch *Channel) CurrentLimitBehavior() (dcpwr.CurrentLimitBehavior, error) {
 	ctx, cancel := ch.newContext()
 	defer cancel()
 
-	tripping, err := query.Boolf(ctx, ch.inst, "%sCURR:PROT:STAT?", ch.prefix())
+	tripping, err := query.Bool(ctx, ch.inst, ch.getCmd("CURR:PROT:STAT?"))
 	if err != nil {
 		return 0, fmt.Errorf("CurrentLimitBehavior: %w", err)
 	}
@@ -113,7 +113,7 @@ func (ch *Channel) SetCurrentLimitBehavior(
 		state = "ON"
 	}
 
-	return ch.inst.Command(ctx, "%sCURR:PROT:STAT %s", ch.prefix(), state)
+	return ch.inst.Command(ctx, ch.setCmd("CURR:PROT:STAT %s"), state)
 }
 
 // OutputEnabled determines if all three output channels are enabled or
@@ -125,7 +125,7 @@ func (ch *Channel) OutputEnabled() (bool, error) {
 	ctx, cancel := ch.newContext()
 	defer cancel()
 
-	return query.Bool(ctx, ch.inst, "OUTP?")
+	return query.Bool(ctx, ch.inst, ch.outputGetCmd("OUTP?"))
 }
 
 // SetOutputEnabled sets all three output channels to enabled or disabled.
@@ -138,10 +138,10 @@ func (ch *Channel) SetOutputEnabled(v bool) error {
 	defer cancel()
 
 	if v {
-		return ch.inst.Command(ctx, "OUTP ON")
+		return ch.inst.Command(ctx, ch.outputSetCmd("OUTP ON"))
 	}
 
-	return ch.inst.Command(ctx, "OUTP OFF")
+	return ch.inst.Command(ctx, ch.outputSetCmd("OUTP OFF"))
 }
 
 // DisableOutput is a convenience function for setting the Output Enabled
@@ -169,7 +169,7 @@ func (ch *Channel) OVPEnabled() (bool, error) {
 	ctx, cancel := ch.newContext()
 	defer cancel()
 
-	enabled, err := query.Boolf(ctx, ch.inst, "%sVOLT:PROT:STAT?", ch.prefix())
+	enabled, err := query.Bool(ctx, ch.inst, ch.getCmd("VOLT:PROT:STAT?"))
 	if err != nil {
 		return false, fmt.Errorf("OVPEnabled: %w", err)
 	}
@@ -195,7 +195,7 @@ func (ch *Channel) SetOVPEnabled(v bool) error {
 		state = "ON"
 	}
 
-	return ch.inst.Command(ctx, "%sVOLT:PROT:STAT %s", ch.prefix(), state)
+	return ch.inst.Command(ctx, ch.setCmd("VOLT:PROT:STAT %s"), state)
 }
 
 // DisableOVP is a convenience function for setting the OVP Enabled attribute
@@ -230,7 +230,7 @@ func (ch *Channel) OVPLimit() (float64, error) {
 	ctx, cancel := ch.newContext()
 	defer cancel()
 
-	return query.Float64f(ctx, ch.inst, "%sVOLT:PROT?", ch.prefix())
+	return query.Float64(ctx, ch.inst, ch.getCmd("VOLT:PROT?"))
 }
 
 // SetOVPLimit specifies the voltage, in Volts, at which Over-Voltage
@@ -247,7 +247,7 @@ func (ch *Channel) SetOVPLimit(limit float64) error {
 	ctx, cancel := ch.newContext()
 	defer cancel()
 
-	return ch.inst.Command(ctx, "%sVOLT:PROT %.4f", ch.prefix(), limit)
+	return ch.inst.Command(ctx, ch.setCmd("VOLT:PROT %.4f"), limit)
 }
 
 // VoltageLevel reads the specified voltage level the DC power supply attempts
@@ -259,7 +259,7 @@ func (ch *Channel) VoltageLevel() (float64, error) {
 	ctx, cancel := ch.newContext()
 	defer cancel()
 
-	return query.Float64f(ctx, ch.inst, "%sVOLT?", ch.prefix())
+	return query.Float64(ctx, ch.inst, ch.getCmd("VOLT?"))
 }
 
 // SetVoltageLevel specifies the voltage level the DC power supply attempts
@@ -272,7 +272,7 @@ func (ch *Channel) SetVoltageLevel(level float64) error {
 	ctx, cancel := ch.newContext()
 	defer cancel()
 
-	return ch.inst.Command(ctx, "%sVOLT %.4f", ch.prefix(), level)
+	return ch.inst.Command(ctx, ch.setCmd("VOLT %.4f"), level)
 }
 
 // ConfigureCurrentLimit configures the current limit. It specifies the output
@@ -420,7 +420,7 @@ func (ch *Channel) QueryOutputState(os dcpwr.OutputState) (bool, error) {
 	ctx, cancel := ch.newContext()
 	defer cancel()
 
-	condition, err := query.Intf(ctx, ch.inst, "%s%s", ch.prefix(), register)
+	condition, err := query.Int(ctx, ch.inst, ch.getCmd(register))
 	if err != nil {
 		return false, fmt.Errorf("QueryOutputState: %w", err)
 	}
@@ -442,5 +442,5 @@ func (ch *Channel) ResetOutputProtection() error {
 	ctx, cancel := ch.newContext()
 	defer cancel()
 
-	return ch.inst.Command(ctx, "%sOUTP:PROT:CLE", ch.prefix())
+	return ch.inst.Command(ctx, ch.setCmd("OUTP:PROT:CLE"))
 }

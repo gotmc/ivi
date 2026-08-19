@@ -69,7 +69,7 @@ func (ch *Channel) TriggerSource() (dcpwr.TriggerSource, error) {
 	// setting that applies to the currently selected output, so the prefix
 	// selects this channel first and the result reflects the channel the
 	// caller asked about.
-	s, err := query.Stringf(ctx, ch.inst, "%sTRIG:SOUR?", ch.prefix())
+	s, err := query.String(ctx, ch.inst, ch.getCmd("TRIG:SOUR?"))
 	if err != nil {
 		return 0, fmt.Errorf("TriggerSource: %w", err)
 	}
@@ -102,7 +102,7 @@ func (ch *Channel) SetTriggerSource(source dcpwr.TriggerSource) error {
 		)
 	}
 
-	return ch.inst.Command(ctx, "%sTRIG:SOUR %s", ch.prefix(), scpi)
+	return ch.inst.Command(ctx, ch.setCmd("TRIG:SOUR %s"), scpi)
 }
 
 // TriggeredCurrentLimit returns the current limit (in Amps) that the
@@ -116,7 +116,7 @@ func (ch *Channel) TriggeredCurrentLimit() (float64, error) {
 	ctx, cancel := ch.newContext()
 	defer cancel()
 
-	return query.Float64f(ctx, ch.inst, "%sCURR:TRIG?", ch.prefix())
+	return query.Float64(ctx, ch.inst, ch.getCmd("CURR:TRIG?"))
 }
 
 // SetTriggeredCurrentLimit specifies the current limit (in Amps) that the
@@ -129,7 +129,7 @@ func (ch *Channel) SetTriggeredCurrentLimit(limit float64) error {
 	ctx, cancel := ch.newContext()
 	defer cancel()
 
-	return ch.inst.Command(ctx, "%sCURR:TRIG %.4f", ch.prefix(), limit)
+	return ch.inst.Command(ctx, ch.setCmd("CURR:TRIG %.4f"), limit)
 }
 
 // TriggeredVoltageLevel returns the voltage level (in Volts) that the
@@ -143,7 +143,7 @@ func (ch *Channel) TriggeredVoltageLevel() (float64, error) {
 	ctx, cancel := ch.newContext()
 	defer cancel()
 
-	return query.Float64f(ctx, ch.inst, "%sVOLT:TRIG?", ch.prefix())
+	return query.Float64(ctx, ch.inst, ch.getCmd("VOLT:TRIG?"))
 }
 
 // SetTriggeredVoltageLevel specifies the voltage level (in Volts) that the
@@ -156,5 +156,5 @@ func (ch *Channel) SetTriggeredVoltageLevel(level float64) error {
 	ctx, cancel := ch.newContext()
 	defer cancel()
 
-	return ch.inst.Command(ctx, "%sVOLT:TRIG %.4f", ch.prefix(), level)
+	return ch.inst.Command(ctx, ch.setCmd("VOLT:TRIG %.4f"), level)
 }

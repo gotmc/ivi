@@ -6,7 +6,9 @@
 package e36000
 
 import (
+	"context"
 	"errors"
+	"fmt"
 	"slices"
 	"testing"
 
@@ -482,4 +484,98 @@ func TestChannel_EnableOutput(t *testing.T) {
 // treating a nil want as "no commands sent".
 func equalCommands(got, want []string) bool {
 	return slices.Equal(got, want)
+}
+
+// scriptedMock answers each query from a table keyed by the exact query
+// string, so a single test can serve a measurement and an output state query
+// with different values. Unlisted queries fail the call rather than returning
+// a stale value from a previous step.
+type scriptedMock struct {
+	ivitest.Mock
+	responses map[string]string
+	Queries   []string
+}
+
+func (m *scriptedMock) Query(_ context.Context, cmd string) (string, error) {
+	m.Queries = append(m.Queries, cmd)
+
+	resp, ok := m.responses[cmd]
+	if !ok {
+		return "", fmt.Errorf("scriptedMock: unexpected query %q", cmd)
+	}
+
+	return resp, nil
+}
+
+// TestE3631A_ConfigureEnableAndReadBack walks the P6V output through the
+// sequence a bench user would run by hand: set the output to 4.1 V with a
+// 1.2 A limit, turn the output on, read the voltage back, and confirm the
+// output is enabled.
+//
+// The driver has no APPLy method, so the first step is the IviDCPwr pair
+// SetVoltageLevel and SetCurrentLimit, which the E3631A accepts as the
+// equivalent of "APPL P6V,4.1,1.2". The read back uses the explicit
+// MEAS:VOLT? spelling rather than the "MEAS?" short form; VOLTage is the
+// default MEASure function on this supply, so the two are equivalent.
+func TestE3631A_ConfigureEnableAndReadBack(t *testing.T) {
+	mock := &scriptedMock{
+		responses: map[string]string{
+			"MEAS:VOLT? P6V": "+4.10000000E+00",
+			"OUTP?":          "1",
+		},
+	}
+
+	ch := channelForModel(t, mock, "E3631A", 0)
+	if got := ch.Name(); got != "P6V" {
+		t.Fatalf("Channel(0).Name() = %q, want %q", got, "P6V")
+	}
+
+	// Configure 4.1 V at a 1.2 A limit on the P6V output.
+	if err := ch.SetVoltageLevel(4.1); err != nil {
+		t.Fatalf("SetVoltageLevel() error: %v", err)
+	}
+
+	if err := ch.SetCurrentLimit(1.2); err != nil {
+		t.Fatalf("SetCurrentLimit() error: %v", err)
+	}
+
+	// Turn the output on. OUTPut:STATe is global on the E3631A, so this
+	// command carries no INSTrument prefix.
+	if err := ch.EnableOutput(); err != nil {
+		t.Fatalf("EnableOutput() error: %v", err)
+	}
+
+	wantCommands := []string{
+		"INST P6V; VOLT 4.1000",
+		"INST P6V; CURR 1.2000",
+		"OUTP ON",
+	}
+	if !slices.Equal(mock.CommandsSent, wantCommands) {
+		t.Errorf("sent %q, want %q", mock.CommandsSent, wantCommands)
+	}
+
+	// Read the voltage back from the P6V output.
+	volts, err := ch.MeasureVoltage()
+	if err != nil {
+		t.Fatalf("MeasureVoltage() error: %v", err)
+	}
+
+	if volts != 4.1 {
+		t.Errorf("MeasureVoltage() = %v, want %v", volts, 4.1)
+	}
+
+	// Confirm the output is enabled.
+	enabled, err := ch.OutputEnabled()
+	if err != nil {
+		t.Fatalf("OutputEnabled() error: %v", err)
+	}
+
+	if !enabled {
+		t.Error("OutputEnabled() = false, want true")
+	}
+
+	wantQueries := []string{"MEAS:VOLT? P6V", "OUTP?"}
+	if !slices.Equal(mock.Queries, wantQueries) {
+		t.Errorf("queried %q, want %q", mock.Queries, wantQueries)
+	}
 }
