@@ -9,6 +9,9 @@ import (
 	"errors"
 	"fmt"
 	"testing"
+	"time"
+
+	"github.com/gotmc/ivi/fgen"
 
 	"github.com/gotmc/ivi"
 	"github.com/gotmc/ivi/internal/ivitest"
@@ -160,5 +163,91 @@ func TestDriver_MaxFrequency(t *testing.T) {
 	}
 	if !d.SupportsArbWaveform() {
 		t.Error("SupportsArbWaveform() = false, want true")
+	}
+}
+
+// exerciseChannel calls every Channel method that reaches the transport.
+// Errors are ignored: only the strings that reach the wire are under test.
+func exerciseChannel(ch *Channel) {
+	_, _ = ch.OperationMode()
+	_ = ch.SetOperationMode(fgen.BurstMode)
+	_ = ch.SetOperationMode(fgen.ContinuousMode)
+	_, _ = ch.OutputEnabled()
+	_ = ch.SetOutputEnabled(true)
+	_ = ch.DisableOutput()
+	_ = ch.EnableOutput()
+	_, _ = ch.OutputImpedance()
+	_ = ch.SetOutputImpedance(50.0)
+	_ = ch.AbortGeneration()
+	_, _ = ch.Amplitude()
+	_ = ch.SetAmplitude(2.5)
+	_, _ = ch.DCOffset()
+	_ = ch.SetDCOffset(0.5)
+	_, _ = ch.DutyCycleHigh()
+	_ = ch.SetDutyCycleHigh(50.0)
+	_, _ = ch.Frequency()
+	_ = ch.SetFrequency(1000.0)
+	_, _ = ch.StartPhase()
+	_ = ch.SetStartPhase(0.0)
+	_, _ = ch.StandardWaveform()
+	_ = ch.ConfigureStandardWaveform(fgen.Sine, 0.5, 0.0, 100.0, 0.0)
+	_, _ = ch.StartTriggerDelay()
+	_ = ch.SetStartTriggerDelay(10 * time.Millisecond)
+	_, _ = ch.StartTriggerSlope()
+	_ = ch.SetStartTriggerSlope(fgen.TriggerSlopePositive)
+	_, _ = ch.StartTriggerSource()
+	_ = ch.SetStartTriggerSource(fgen.TriggerSourceExternal)
+	_, _ = ch.TriggerSource()
+	_, _ = ch.InternalTriggerRate()
+	_ = ch.SetInternalTriggerRate(1000.0)
+	_, _ = ch.BurstCount()
+	_ = ch.SetBurstCount(10)
+	_, _ = ch.ArbitraryGain()
+	_ = ch.SetArbitraryGain(1.0)
+	_, _ = ch.ArbitraryOffset()
+	_ = ch.SetArbitraryOffset(0.0)
+
+	for _, wave := range []fgen.StandardWaveform{
+		fgen.Sine, fgen.Square, fgen.Triangle, fgen.RampUp, fgen.RampDown,
+		fgen.DC,
+	} {
+		_ = ch.SetStandardWaveform(wave)
+	}
+}
+
+// TestAllModels_EmitValidSCPI drives every supported model, on every one of
+// its channels, through every channel-scoped method and checks that each
+// string reaching the transport is well-formed SCPI.
+//
+// The 33200 series and the Trueform models spell channel-scoped commands
+// differently, so this sweep is what keeps a new table entry from inheriting
+// the wrong command set silently.
+func TestAllModels_EmitValidSCPI(t *testing.T) {
+	for _, gen := range supportedGenerators {
+		t.Run(gen.model, func(t *testing.T) {
+			for i, name := range gen.channels {
+				t.Run(name, func(t *testing.T) {
+					strict := &ivitest.Strict{
+						Mock: ivitest.Mock{QueryResp: "1"},
+					}
+
+					channels := make([]Channel, len(gen.channels))
+					for j, chName := range gen.channels {
+						channels[j] = Channel{
+							name: chName, inst: strict, num: j,
+							family: gen.family, timeout: ivi.DefaultTimeout,
+						}
+					}
+
+					exerciseChannel(&channels[i])
+
+					strict.Check(t)
+
+					if len(strict.CommandsSent)+len(strict.QueriesSent) == 0 {
+						t.Error("no SCPI reached the transport")
+					}
+				})
+			}
+		})
 	}
 }
